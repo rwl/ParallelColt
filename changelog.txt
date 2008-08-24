@@ -1,0 +1,45 @@
+Parallel Colt changelog
+
+0.5:	August 24, 2008	
+	- added multithreaded quicksorts for many data types
+	- added parallel 1D histograms for 2D matrices
+	- added benchmarks for dense matrices
+	- added real FFTs and DHTs
+	- added javadoc distribution
+	- bzip2 is used to compress tar archives
+	- fixed bugs causing incorrect computations of the transforms for views
+	- fixed bug in normalize() causing incorrect results in some specific cases
+	- refactoring in edu.emory.mathcs.utils cern.colt.matrix.doublealgo, cern.colt.matrix.floatalgo and cern.colt.matrix.objectalgo
+	- unit tests and benchmarks are in separate directories now
+	- removed cern.colt.matrix.doublealgo.Transform and cern.colt.matrix.floatalgo.Transform
+
+0.4:	April 17, 2008
+	- more efficient implementation of all operations on "views"
+	- more efficient matrix-matrix multiplication algorithms
+	- fixed several bugs in dense matrices
+
+0.3:	February 15, 2008
+	- added single precision
+
+0.2.1:	January 30, 2008
+	- added JLAPACK 0.8
+	- added SingularValueDecompositionDC
+	
+0.2:	January 5, 2008
+	- added JTransforms
+	- added complex matrices, factories and functions
+	- added new methods in dense double matrices
+	- added JUnit tests for dense complex and double matrices
+	- removed SeqBlas
+	- fixed bug in aggregate methods
+	- added multithreaded versions of many methods in dense complex and double matrices
+
+0.1:	September 5, 2007
+	- initial release
+	- changes in Colt 1.2
+		- EDU.oswego.cs.dl.util.concurrent replaced by java.util.concurrent
+		- added multithreaded implementation of quicksort
+		- added sortIndex() methods
+		- added multithreaded varsions of all assign() and aggregate() methods for dense matrices
+		- automatic multithreading - no need to initialize threads in SmpBlas or any other class
+

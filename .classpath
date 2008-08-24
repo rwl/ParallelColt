@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="benchmark"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/junit-4.4.jar" sourcepath="src"/>
+	<classpathentry kind="lib" path="lib/blas.jar"/>
+	<classpathentry kind="lib" path="lib/f2jutil.jar"/>
+	<classpathentry kind="lib" path="lib/lapack.jar"/>
+	<classpathentry kind="lib" path="lib/xerbla.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,634 @@
+Wed Aug 13 09:57:58 EDT 2008
+System properties:
+	os.name = Linux
+	os.version = 2.6.18-92.1.6.el5
+	os.arch = amd64
+	java.vendor = Sun Microsystems Inc.
+	java.version = 1.6.0_05
+	available processors = 8
+Matrix size = 4096 x 4096
+--------------------------------------------------------------------------------------------------
+Method = aggregate(DoubleDoubleFunction, DoubleFunction)
+	No view execution times:
+		1 thread  = 93.02 milliseconds
+		2 threads = 60.19 milliseconds
+		4 threads = 46.30 milliseconds
+		8 threads = 33.98 milliseconds
+	View execution times:
+		1 thread  = 1637.52 milliseconds
+		2 threads = 1404.82 milliseconds
+		4 threads = 729.38 milliseconds
+		8 threads = 402.62 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = aggregate(DoubleDoubleFunction, DoubleFunction, DoubleProcedure)
+	No view execution times:
+		1 thread  = 191.60 milliseconds
+		2 threads = 92.74 milliseconds
+		4 threads = 52.76 milliseconds
+		8 threads = 37.92 milliseconds
+	View execution times:
+		1 thread  = 1854.83 milliseconds
+		2 threads = 1534.18 milliseconds
+		4 threads = 790.85 milliseconds
+		8 threads = 436.29 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = aggregate(DoubleDoubleFunction, DoubleFunction, IntArrayList, IntArrayList)
+	No view execution times:
+		1 thread  = 128.66 milliseconds
+		2 threads = 104.52 milliseconds
+		4 threads = 80.11 milliseconds
+		8 threads = 81.01 milliseconds
+	View execution times:
+		1 thread  = 1863.59 milliseconds
+		2 threads = 1340.76 milliseconds
+		4 threads = 819.70 milliseconds
+		8 threads = 464.71 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = aggregate(DoubleMatrix2D, DoubleDoubleFunction, DoubleDoubleFunction)
+	No view execution times:
+		1 thread  = 149.77 milliseconds
+		2 threads = 109.02 milliseconds
+		4 threads = 99.05 milliseconds
+		8 threads = 83.88 milliseconds
+	View execution times:
+		1 thread  = 1986.11 milliseconds
+		2 threads = 1581.09 milliseconds
+		4 threads = 886.95 milliseconds
+		8 threads = 761.13 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(double)
+	No view execution times:
+		1 thread  = 86.82 milliseconds
+		2 threads = 92.08 milliseconds
+		4 threads = 87.94 milliseconds
+		8 threads = 78.67 milliseconds
+	View execution times:
+		1 thread  = 1952.46 milliseconds
+		2 threads = 1576.92 milliseconds
+		4 threads = 898.98 milliseconds
+		8 threads = 839.58 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(double[])
+	No view execution times:
+		1 thread  = 133.05 milliseconds
+		2 threads = 96.63 milliseconds
+		4 threads = 83.64 milliseconds
+		8 threads = 79.06 milliseconds
+	View execution times:
+		1 thread  = 2460.03 milliseconds
+		2 threads = 1451.64 milliseconds
+		4 threads = 875.05 milliseconds
+		8 threads = 840.97 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(double[][])
+	No view execution times:
+		1 thread  = 131.00 milliseconds
+		2 threads = 100.04 milliseconds
+		4 threads = 77.43 milliseconds
+		8 threads = 76.78 milliseconds
+	View execution times:
+		1 thread  = 2034.73 milliseconds
+		2 threads = 1586.01 milliseconds
+		4 threads = 888.80 milliseconds
+		8 threads = 820.87 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(DoubleFunction)
+	No view execution times:
+		1 thread  = 100.24 milliseconds
+		2 threads = 92.60 milliseconds
+		4 threads = 85.17 milliseconds
+		8 threads = 77.21 milliseconds
+	View execution times:
+		1 thread  = 2200.07 milliseconds
+		2 threads = 1706.90 milliseconds
+		4 threads = 928.29 milliseconds
+		8 threads = 858.18 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(DoubleMatrix2D)
+	No view execution times:
+		1 thread  = 116.97 milliseconds
+		2 threads = 131.47 milliseconds
+		4 threads = 119.85 milliseconds
+		8 threads = 120.75 milliseconds
+	View execution times:
+		1 thread  = 3047.09 milliseconds
+		2 threads = 2511.54 milliseconds
+		4 threads = 1387.78 milliseconds
+		8 threads = 1261.16 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(DoubleMatrix2D, DoubleDoubleFuction)
+	No view execution times:
+		1 thread  = 169.03 milliseconds
+		2 threads = 92.42 milliseconds
+		4 threads = 82.41 milliseconds
+		8 threads = 84.05 milliseconds
+	View execution times:
+		1 thread  = 2388.28 milliseconds
+		2 threads = 1894.63 milliseconds
+		4 threads = 1332.05 milliseconds
+		8 threads = 1272.67 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(DoubleMatrix2D, DoubleDoubleFuction, IntArrayList, IntArrayList)
+	No view execution times:
+		1 thread  = 249.11 milliseconds
+		2 threads = 150.38 milliseconds
+		4 threads = 131.75 milliseconds
+		8 threads = 133.42 milliseconds
+	View execution times:
+		1 thread  = 3416.65 milliseconds
+		2 threads = 2680.11 milliseconds
+		4 threads = 1524.47 milliseconds
+		8 threads = 1358.05 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(DoubleProcedure, double)
+	No view execution times:
+		1 thread  = 155.69 milliseconds
+		2 threads = 100.37 milliseconds
+		4 threads = 91.48 milliseconds
+		8 threads = 82.84 milliseconds
+	View execution times:
+		1 thread  = 2775.18 milliseconds
+		2 threads = 1805.55 milliseconds
+		4 threads = 975.40 milliseconds
+		8 threads = 869.25 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(DoubleProcedure, DoubleFunction)
+	No view execution times:
+		1 thread  = 146.39 milliseconds
+		2 threads = 97.71 milliseconds
+		4 threads = 78.97 milliseconds
+		8 threads = 78.17 milliseconds
+	View execution times:
+		1 thread  = 2757.52 milliseconds
+		2 threads = 1710.19 milliseconds
+		4 threads = 918.06 milliseconds
+		8 threads = 836.33 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = assign(float[])
+	No view execution times:
+		1 thread  = 127.79 milliseconds
+		2 threads = 110.48 milliseconds
+		4 threads = 106.15 milliseconds
+		8 threads = 100.49 milliseconds
+	View execution times:
+		1 thread  = 2586.84 milliseconds
+		2 threads = 1570.23 milliseconds
+		4 threads = 847.27 milliseconds
+		8 threads = 727.82 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = cardinality()
+	No view execution times:
+		1 thread  = 117.13 milliseconds
+		2 threads = 67.74 milliseconds
+		4 threads = 38.95 milliseconds
+		8 threads = 34.49 milliseconds
+	View execution times:
+		1 thread  = 2380.42 milliseconds
+		2 threads = 1561.40 milliseconds
+		4 threads = 811.72 milliseconds
+		8 threads = 469.69 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dct2(boolean)
+	No view execution times:
+		1 thread  = 2279.63 milliseconds
+		2 threads = 1434.23 milliseconds
+		4 threads = 776.62 milliseconds
+		8 threads = 504.52 milliseconds
+	View execution times:
+		1 thread  = 6946.90 milliseconds
+		2 threads = 3884.42 milliseconds
+		4 threads = 2190.82 milliseconds
+		8 threads = 1738.74 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dctColumns(boolean)
+	No view execution times:
+		1 thread  = 5546.75 milliseconds
+		2 threads = 3798.69 milliseconds
+		4 threads = 2000.67 milliseconds
+		8 threads = 1192.31 milliseconds
+	View execution times:
+		1 thread  = 2518.65 milliseconds
+		2 threads = 1302.87 milliseconds
+		4 threads = 685.82 milliseconds
+		8 threads = 425.02 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dctRows(boolean)
+	No view execution times:
+		1 thread  = 2394.18 milliseconds
+		2 threads = 1310.23 milliseconds
+		4 threads = 681.01 milliseconds
+		8 threads = 373.58 milliseconds
+	View execution times:
+		1 thread  = 6475.19 milliseconds
+		2 threads = 3239.02 milliseconds
+		4 threads = 1735.33 milliseconds
+		8 threads = 1201.09 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dht2()
+	No view execution times:
+		1 thread  = 2098.54 milliseconds
+		2 threads = 1341.88 milliseconds
+		4 threads = 694.01 milliseconds
+		8 threads = 393.57 milliseconds
+	View execution times:
+		1 thread  = 7685.02 milliseconds
+		2 threads = 4166.55 milliseconds
+		4 threads = 2442.18 milliseconds
+		8 threads = 1662.82 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dhtColumns()
+	No view execution times:
+		1 thread  = 5329.22 milliseconds
+		2 threads = 2854.00 milliseconds
+		4 threads = 1669.10 milliseconds
+		8 threads = 928.20 milliseconds
+	View execution times:
+		1 thread  = 1965.25 milliseconds
+		2 threads = 1074.59 milliseconds
+		4 threads = 608.69 milliseconds
+		8 threads = 408.09 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dhtRows()
+	No view execution times:
+		1 thread  = 1731.82 milliseconds
+		2 threads = 918.42 milliseconds
+		4 threads = 525.65 milliseconds
+		8 threads = 328.32 milliseconds
+	View execution times:
+		1 thread  = 5067.06 milliseconds
+		2 threads = 3325.32 milliseconds
+		4 threads = 1739.83 milliseconds
+		8 threads = 1058.41 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dst2(boolean)
+	No view execution times:
+		1 thread  = 2766.41 milliseconds
+		2 threads = 1662.92 milliseconds
+		4 threads = 879.14 milliseconds
+		8 threads = 559.44 milliseconds
+	View execution times:
+		1 thread  = 7220.31 milliseconds
+		2 threads = 4140.35 milliseconds
+		4 threads = 2337.86 milliseconds
+		8 threads = 1720.77 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dstColumns(boolean)
+	No view execution times:
+		1 thread  = 7464.33 milliseconds
+		2 threads = 3627.52 milliseconds
+		4 threads = 1978.55 milliseconds
+		8 threads = 1172.16 milliseconds
+	View execution times:
+		1 thread  = 2541.93 milliseconds
+		2 threads = 1390.29 milliseconds
+		4 threads = 752.87 milliseconds
+		8 threads = 425.88 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = dstRows(boolean)
+	No view execution times:
+		1 thread  = 2794.92 milliseconds
+		2 threads = 1325.35 milliseconds
+		4 threads = 724.95 milliseconds
+		8 threads = 371.85 milliseconds
+	View execution times:
+		1 thread  = 6424.36 milliseconds
+		2 threads = 3571.49 milliseconds
+		4 threads = 1839.75 milliseconds
+		8 threads = 1011.02 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = fft2()
+	No view execution times:
+		1 thread  = 1762.78 milliseconds
+		2 threads = 1048.95 milliseconds
+		4 threads = 663.97 milliseconds
+		8 threads = 556.43 milliseconds
+	View execution times:
+		1 thread  = 6633.71 milliseconds
+		2 threads = 3473.96 milliseconds
+		4 threads = 2097.07 milliseconds
+		8 threads = 1495.42 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = forEachNonZero(IntIntDoubleFunction)
+	No view execution times:
+		1 thread  = 371.81 milliseconds
+		2 threads = 205.76 milliseconds
+		4 threads = 142.12 milliseconds
+		8 threads = 126.75 milliseconds
+	View execution times:
+		1 thread  = 2701.82 milliseconds
+		2 threads = 1908.11 milliseconds
+		4 threads = 1050.42 milliseconds
+		8 threads = 921.50 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getFft2()
+	No view execution times:
+		1 thread  = 2111.80 milliseconds
+		2 threads = 1511.06 milliseconds
+		4 threads = 1172.23 milliseconds
+		8 threads = 981.27 milliseconds
+	View execution times:
+		1 thread  = 5094.49 milliseconds
+		2 threads = 2905.62 milliseconds
+		4 threads = 1965.50 milliseconds
+		8 threads = 1641.21 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getFftColumns()
+	No view execution times:
+		1 thread  = 6346.11 milliseconds
+		2 threads = 3794.80 milliseconds
+		4 threads = 2156.79 milliseconds
+		8 threads = 1551.07 milliseconds
+	View execution times:
+		1 thread  = 4700.98 milliseconds
+		2 threads = 2784.88 milliseconds
+		4 threads = 1755.75 milliseconds
+		8 threads = 1693.39 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getFftRows()
+	No view execution times:
+		1 thread  = 2558.54 milliseconds
+		2 threads = 1510.07 milliseconds
+		4 threads = 1079.26 milliseconds
+		8 threads = 1029.42 milliseconds
+	View execution times:
+		1 thread  = 4405.05 milliseconds
+		2 threads = 2521.49 milliseconds
+		4 threads = 1582.14 milliseconds
+		8 threads = 1304.45 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getIfft2(boolean)
+	No view execution times:
+		1 thread  = 1781.45 milliseconds
+		2 threads = 1217.57 milliseconds
+		4 threads = 820.18 milliseconds
+		8 threads = 688.75 milliseconds
+	View execution times:
+		1 thread  = 6374.44 milliseconds
+		2 threads = 3759.41 milliseconds
+		4 threads = 2384.29 milliseconds
+		8 threads = 1763.91 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getIfftColumns(boolean)
+	No view execution times:
+		1 thread  = 6279.31 milliseconds
+		2 threads = 3684.88 milliseconds
+		4 threads = 2278.04 milliseconds
+		8 threads = 1818.96 milliseconds
+	View execution times:
+		1 thread  = 4347.23 milliseconds
+		2 threads = 2685.23 milliseconds
+		4 threads = 1887.06 milliseconds
+		8 threads = 1583.61 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getIfftRows(boolean)
+	No view execution times:
+		1 thread  = 2701.42 milliseconds
+		2 threads = 1528.07 milliseconds
+		4 threads = 1012.01 milliseconds
+		8 threads = 1085.26 milliseconds
+	View execution times:
+		1 thread  = 4616.06 milliseconds
+		2 threads = 2636.38 milliseconds
+		4 threads = 1915.66 milliseconds
+		8 threads = 1396.54 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getNegativeValues()
+	No view execution times:
+		1 thread  = 555.41 milliseconds
+		2 threads = 434.93 milliseconds
+		4 threads = 383.33 milliseconds
+		8 threads = 390.56 milliseconds
+	View execution times:
+		1 thread  = 2559.04 milliseconds
+		2 threads = 2360.15 milliseconds
+		4 threads = 2288.11 milliseconds
+		8 threads = 2235.97 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getNonZeros(IntArrayList, IntArrayList, DoubleArrayList)
+	No view execution times:
+		1 thread  = 384.27 milliseconds
+		2 threads = 373.25 milliseconds
+		4 threads = 368.12 milliseconds
+		8 threads = 368.69 milliseconds
+	View execution times:
+		1 thread  = 2736.69 milliseconds
+		2 threads = 2716.17 milliseconds
+		4 threads = 2708.68 milliseconds
+		8 threads = 2702.87 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getPositiveValues(IntArrayList, IntArrayList, DoubleArrayList)
+	No view execution times:
+		1 thread  = 377.92 milliseconds
+		2 threads = 377.17 milliseconds
+		4 threads = 376.60 milliseconds
+		8 threads = 376.68 milliseconds
+	View execution times:
+		1 thread  = 3103.89 milliseconds
+		2 threads = 3101.94 milliseconds
+		4 threads = 3101.18 milliseconds
+		8 threads = 3100.54 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = getNegativeValues(IntArrayList, IntArrayList, DoubleArrayList)
+	No view execution times:
+		1 thread  = 342.84 milliseconds
+		2 threads = 342.45 milliseconds
+		4 threads = 342.07 milliseconds
+		8 threads = 336.17 milliseconds
+	View execution times:
+		1 thread  = 2245.24 milliseconds
+		2 threads = 2243.28 milliseconds
+		4 threads = 2243.31 milliseconds
+		8 threads = 2242.81 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idct2(boolean)
+	No view execution times:
+		1 thread  = 2244.49 milliseconds
+		2 threads = 1395.38 milliseconds
+		4 threads = 787.21 milliseconds
+		8 threads = 583.08 milliseconds
+	View execution times:
+		1 thread  = 7064.98 milliseconds
+		2 threads = 3953.90 milliseconds
+		4 threads = 2255.54 milliseconds
+		8 threads = 1687.05 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idctColumns(boolean)
+	No view execution times:
+		1 thread  = 6738.42 milliseconds
+		2 threads = 3427.42 milliseconds
+		4 threads = 1870.46 milliseconds
+		8 threads = 1409.65 milliseconds
+	View execution times:
+		1 thread  = 2613.25 milliseconds
+		2 threads = 1334.26 milliseconds
+		4 threads = 689.76 milliseconds
+		8 threads = 423.44 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idctRows(boolean)
+	No view execution times:
+		1 thread  = 2506.93 milliseconds
+		2 threads = 1317.26 milliseconds
+		4 threads = 761.07 milliseconds
+		8 threads = 442.00 milliseconds
+	View execution times:
+		1 thread  = 5390.57 milliseconds
+		2 threads = 3461.74 milliseconds
+		4 threads = 1777.11 milliseconds
+		8 threads = 946.82 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idht2(boolean)
+	No view execution times:
+		1 thread  = 2682.55 milliseconds
+		2 threads = 1686.83 milliseconds
+		4 threads = 1020.34 milliseconds
+		8 threads = 850.06 milliseconds
+	View execution times:
+		1 thread  = 6582.61 milliseconds
+		2 threads = 4731.88 milliseconds
+		4 threads = 2681.40 milliseconds
+		8 threads = 1933.79 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idhtColumns(boolean)
+	No view execution times:
+		1 thread  = 5547.71 milliseconds
+		2 threads = 3085.86 milliseconds
+		4 threads = 1632.55 milliseconds
+		8 threads = 937.04 milliseconds
+	View execution times:
+		1 thread  = 2018.80 milliseconds
+		2 threads = 1232.62 milliseconds
+		4 threads = 794.88 milliseconds
+		8 threads = 514.80 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idhtRows(boolean)
+	No view execution times:
+		1 thread  = 1931.71 milliseconds
+		2 threads = 974.45 milliseconds
+		4 threads = 521.75 milliseconds
+		8 threads = 328.61 milliseconds
+	View execution times:
+		1 thread  = 5530.16 milliseconds
+		2 threads = 3282.55 milliseconds
+		4 threads = 1939.29 milliseconds
+		8 threads = 1161.19 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idst2(boolean)
+	No view execution times:
+		1 thread  = 2319.67 milliseconds
+		2 threads = 1474.58 milliseconds
+		4 threads = 843.47 milliseconds
+		8 threads = 594.84 milliseconds
+	View execution times:
+		1 thread  = 6175.86 milliseconds
+		2 threads = 4552.82 milliseconds
+		4 threads = 2557.47 milliseconds
+		8 threads = 1567.12 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idstColumns(boolean)
+	No view execution times:
+		1 thread  = 6740.38 milliseconds
+		2 threads = 3529.16 milliseconds
+		4 threads = 2050.58 milliseconds
+		8 threads = 1157.15 milliseconds
+	View execution times:
+		1 thread  = 2527.31 milliseconds
+		2 threads = 1475.91 milliseconds
+		4 threads = 769.26 milliseconds
+		8 threads = 427.10 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = idstRows(boolean)
+	No view execution times:
+		1 thread  = 2560.01 milliseconds
+		2 threads = 1384.76 milliseconds
+		4 threads = 786.46 milliseconds
+		8 threads = 515.83 milliseconds
+	View execution times:
+		1 thread  = 6706.82 milliseconds
+		2 threads = 3705.93 milliseconds
+		4 threads = 1986.39 milliseconds
+		8 threads = 1186.41 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = ifft2(boolean)
+	No view execution times:
+		1 thread  = 1705.62 milliseconds
+		2 threads = 1204.71 milliseconds
+		4 threads = 680.86 milliseconds
+		8 threads = 533.85 milliseconds
+	View execution times:
+		1 thread  = 5984.74 milliseconds
+		2 threads = 4307.39 milliseconds
+		4 threads = 2288.60 milliseconds
+		8 threads = 2010.12 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = maxLocation()
+	No view execution times:
+		1 thread  = 263.93 milliseconds
+		2 threads = 182.98 milliseconds
+		4 threads = 106.57 milliseconds
+		8 threads = 87.97 milliseconds
+	View execution times:
+		1 thread  = 2292.05 milliseconds
+		2 threads = 1823.69 milliseconds
+		4 threads = 951.28 milliseconds
+		8 threads = 599.94 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = minLocation()
+	No view execution times:
+		1 thread  = 118.96 milliseconds
+		2 threads = 79.58 milliseconds
+		4 threads = 57.05 milliseconds
+		8 threads = 42.68 milliseconds
+	View execution times:
+		1 thread  = 1910.97 milliseconds
+		2 threads = 1589.45 milliseconds
+		4 threads = 822.92 milliseconds
+		8 threads = 459.87 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = zSum()
+	No view execution times:
+		1 thread  = 78.55 milliseconds
+		2 threads = 57.47 milliseconds
+		4 threads = 51.11 milliseconds
+		8 threads = 39.26 milliseconds
+	View execution times:
+		1 thread  = 2137.03 milliseconds
+		2 threads = 1396.37 milliseconds
+		4 threads = 716.95 milliseconds
+		8 threads = 388.89 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = toArray()
+	No view execution times:
+		1 thread  = 224.15 milliseconds
+		2 threads = 192.97 milliseconds
+		4 threads = 203.13 milliseconds
+		8 threads = 214.72 milliseconds
+	View execution times:
+		1 thread  = 2557.36 milliseconds
+		2 threads = 1294.50 milliseconds
+		4 threads = 940.38 milliseconds
+		8 threads = 554.35 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = vectorize()
+	No view execution times:
+		1 thread  = 1970.59 milliseconds
+		2 threads = 1428.66 milliseconds
+		4 threads = 780.33 milliseconds
+		8 threads = 546.14 milliseconds
+	View execution times:
+		1 thread  = 484.82 milliseconds
+		2 threads = 333.77 milliseconds
+		4 threads = 295.93 milliseconds
+		8 threads = 255.28 milliseconds
+--------------------------------------------------------------------------------------------------
+Method = zMult(DoubleMatrix1D, DoubleMatrix1D, double, double, boolean)
+	No view execution times:
+		1 thread  = 279.33 milliseconds
+		2 threads = 198.65 milliseconds
+		4 threads = 123.94 milliseconds
+		8 threads = 88.50 milliseconds
+	View execution times:
+		1 thread  = 1742.56 milliseconds
+		2 threads = 1453.51 milliseconds
+		4 threads = 786.24 milliseconds
+		8 threads = 437.32 milliseconds
+--------------------------------------------------------------------------------------------------
