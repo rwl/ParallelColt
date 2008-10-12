@@ -208,7 +208,7 @@ public class FComplex extends FloatConstants {
         float[] z = new float[2];
         if (x[1] != 0.0) {
             float scalar;
-            if (Math.abs(x[0]) >= Math.abs(z[1])) {
+            if (Math.abs(x[0]) >= Math.abs(x[1])) {
                 scalar = (float) (1.0 / (x[0] + x[1] * (x[1] / x[0])));
                 z[0] = scalar;
                 z[1] = scalar * (-x[1] / x[0]);
