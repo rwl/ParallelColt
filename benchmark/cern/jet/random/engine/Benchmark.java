@@ -8,6 +8,11 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.jet.random.engine;
 
+import cern.jet.random.tdouble.engine.DRand;
+import cern.jet.random.tdouble.engine.DoubleMersenneTwister;
+import cern.jet.random.tdouble.engine.DoubleRandomEngine;
+import cern.jet.random.tdouble.engine.MersenneTwister64;
+
 /**
  * Benchmarks the performance of the currently provided uniform pseudo-random
  * number generation engines.

@@ -8,7 +8,7 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt;
 
-import cern.colt.function.IntComparator;
+import cern.colt.function.tint.IntComparator;
 
 /**
  * Generically sorts arbitrary shaped data (for example multiple arrays, 1,2 or
@@ -171,7 +171,7 @@ import cern.colt.function.IntComparator;
  * 
  * @see java.util.Arrays
  * @see cern.colt.Sorting
- * @see cern.colt.matrix.doublealgo.DoubleSorting
+ * @see cern.colt.matrix.tdouble.algo.DoubleSorting
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 03-Jul-99

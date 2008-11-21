@@ -102,7 +102,7 @@ public final class Version {
     private static int[] numbers() {
         int w = 4;
         // int[] numbers = new int[w];
-        int[] numbers = new int[] { 0, 5, 0, 0 };
+        int[] numbers = new int[] { 0, 6, 0, 0 };
         return numbers;
         /*
          * if (getPackage()==null) return numbers; String s =

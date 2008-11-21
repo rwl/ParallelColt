@@ -360,7 +360,7 @@ public class BenchmarkMatrixKernel {
         };
 
         // build string matrix
-        cern.colt.matrix.ObjectMatrix2D matrix = new cern.colt.matrix.impl.DenseObjectMatrix2D(properties.length, 2);
+        cern.colt.matrix.tobject.ObjectMatrix2D matrix = new cern.colt.matrix.tobject.impl.DenseObjectMatrix2D(properties.length, 2);
         matrix.viewColumn(0).assign(properties);
 
         // retrieve property values
@@ -372,7 +372,7 @@ public class BenchmarkMatrixKernel {
         }
 
         // format matrix
-        cern.colt.matrix.objectalgo.ObjectFormatter formatter = new cern.colt.matrix.objectalgo.ObjectFormatter();
+        cern.colt.matrix.tobject.algo.ObjectFormatter formatter = new cern.colt.matrix.tobject.algo.ObjectFormatter();
         formatter.setPrintShape(false);
         return formatter.toString(matrix);
     }

@@ -22,7 +22,7 @@ DoubleMatrix1DComparator comp = new DoubleMatrix1DComparator() {
 		return as < bs ? -1 : as == bs ? 0 : 1;
 	}
 };
-sorted = cern.colt.matrix.doublealgo.Sorting.quickSort(matrix,comp);
+sorted = cern.colt.matrix.tdouble.algo.Sorting.quickSort(matrix,comp);
 </pre>
 <p>Further, we would like to sort the rows of a 2d matrix by the aggregate sum of 
   logarithms in a row (which is a way to achieve sorting by <i>geometric mean</i> 
@@ -35,7 +35,7 @@ DoubleMatrix1DComparator comp = new DoubleMatrix1DComparator() {
 		return as < bs ? -1 : as == bs ? 0 : 1;
 	}
 };
-sorted = cern.colt.matrix.doublealgo.Sorting.quickSort(matrix,comp);
+sorted = cern.colt.matrix.tdouble.algo.Sorting.quickSort(matrix,comp);
 </pre>
 This is certainly not most efficient since row sums are recomputed many times 
 (<tt>2*rows*log(rows)</tt> times, on average), but will suffice as an example. 
@@ -43,7 +43,7 @@ An efficient app will precompute the sums and use <tt>cern.colt.GenericSorting</
 to sort the matrix. In general, if comparisons are expensive, precomputation boots 
 performance by a factor <tt>2*log(rows)</tt>. 
 <p> Recently, 
-  two methods that do exactly that were added to <a href="../doublealgo/DoubleSorting.html">cern.colt.matrix.doublealgo.DoubleSorting</a>. 
+  two methods that do exactly that were added to <a href="../doublealgo/DoubleSorting.html">cern.colt.matrix.tdouble.algo.DoubleSorting</a>. 
   One of them works by filling a row into a so-called "bin", which is a multi-set 
   with statistics operations defined upon. Aggregate measures over the row are 
   then computed via a <a href="../../../../hep/aida/bin/DoubleBinFunction1D.html">DoubleBinFunction1D</a>. 
@@ -51,13 +51,13 @@ performance by a factor <tt>2*log(rows)</tt>.
   Here is how to solve the problem efficiently: 
 <pre>
 // sort by sum of logarithms in a row
-sorted = cern.colt.matrix.doublealgo.Sorting.quickSort(matrix,hep.aida.bin.DoubleBinFunctions1D.sumLog);
+sorted = cern.colt.matrix.tdouble.algo.Sorting.quickSort(matrix,hep.aida.bin.DoubleBinFunctions1D.sumLog);
 
 // sort by median in a row
-sorted = cern.colt.matrix.doublealgo.Sorting.quickSort(matrix,hep.aida.bin.DoubleBinFunctions1D.median);
+sorted = cern.colt.matrix.tdouble.algo.Sorting.quickSort(matrix,hep.aida.bin.DoubleBinFunctions1D.median);
 
 // sort by maximum in a row
-sorted = cern.colt.matrix.doublealgo.Sorting.quickSort(matrix,hep.aida.bin.DoubleBinFunctions1D.max);
+sorted = cern.colt.matrix.tdouble.algo.Sorting.quickSort(matrix,hep.aida.bin.DoubleBinFunctions1D.max);
 </pre>
 </BODY>
 </HTML>

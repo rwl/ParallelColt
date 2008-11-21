@@ -8,9 +8,11 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.jet.random;
 
-import cern.colt.list.DoubleArrayList;
-import cern.colt.list.IntArrayList;
-import cern.jet.random.engine.DoubleRandomEngine;
+import cern.colt.list.tdouble.DoubleArrayList;
+import cern.colt.list.tint.IntArrayList;
+import cern.jet.random.tdouble.AbstractDoubleDistribution;
+import cern.jet.random.tdouble.Poisson;
+import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 
 /**
  * Benchmarks random number generation from various distributions as well as PDF
@@ -45,18 +47,18 @@ public class Benchmark extends cern.colt.PersistentObject {
 
         // for tests and debugging use a random engine with CONSTANT seed -->
         // deterministic and reproducible results
-        cern.jet.random.engine.DoubleRandomEngine engine = new cern.jet.random.engine.DoubleMersenneTwister();
+        cern.jet.random.tdouble.engine.DoubleRandomEngine engine = new cern.jet.random.tdouble.engine.DoubleMersenneTwister();
 
         // your favourite distribution goes here
-        cern.jet.random.AbstractDoubleDistribution dist = new cern.jet.random.Gamma(alpha, lambda, engine);
+        cern.jet.random.tdouble.AbstractDoubleDistribution dist = new cern.jet.random.tdouble.Gamma(alpha, lambda, engine);
 
         // collect random numbers and print statistics
         int size = 100000;
-        cern.colt.list.DoubleArrayList numbers = new cern.colt.list.DoubleArrayList(size);
+        cern.colt.list.tdouble.DoubleArrayList numbers = new cern.colt.list.tdouble.DoubleArrayList(size);
         for (int i = 0; i < size; i++)
             numbers.add(dist.nextDouble());
 
-        hep.aida.bin.DynamicDoubleBin1D bin = new hep.aida.bin.DynamicDoubleBin1D();
+        hep.aida.tdouble.bin.DynamicDoubleBin1D bin = new hep.aida.tdouble.bin.DynamicDoubleBin1D();
         bin.addAllOf(numbers);
         System.out.println(bin);
     }
@@ -242,7 +244,7 @@ public class Benchmark extends cern.colt.PersistentObject {
      * distribution.
      */
     public static void test2(int size, AbstractDoubleDistribution distribution) {
-        hep.aida.bin.DynamicDoubleBin1D bin = new hep.aida.bin.DynamicDoubleBin1D();
+        hep.aida.tdouble.bin.DynamicDoubleBin1D bin = new hep.aida.tdouble.bin.DynamicDoubleBin1D();
         for (int j = 0, i = size; --i >= 0; j++) {
             bin.add(distribution.nextDouble());
         }
@@ -255,8 +257,8 @@ public class Benchmark extends cern.colt.PersistentObject {
      * distribution.
      */
     public static void test2(int size, AbstractDoubleDistribution a, AbstractDoubleDistribution b) {
-        hep.aida.bin.DynamicDoubleBin1D binA = new hep.aida.bin.DynamicDoubleBin1D();
-        hep.aida.bin.DynamicDoubleBin1D binB = new hep.aida.bin.DynamicDoubleBin1D();
+        hep.aida.tdouble.bin.DynamicDoubleBin1D binA = new hep.aida.tdouble.bin.DynamicDoubleBin1D();
+        hep.aida.tdouble.bin.DynamicDoubleBin1D binB = new hep.aida.tdouble.bin.DynamicDoubleBin1D();
         for (int j = 0, i = size; --i >= 0; j++) {
             binA.add(a.nextDouble());
             binB.add(b.nextDouble());

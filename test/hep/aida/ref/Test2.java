@@ -1,8 +1,13 @@
 package hep.aida.ref;
 
-import hep.aida.DoubleIHistogram1D;
-import hep.aida.DoubleIHistogram2D;
-import hep.aida.DoubleIHistogram3D;
+import hep.aida.tdouble.DoubleIHistogram1D;
+import hep.aida.tdouble.DoubleIHistogram2D;
+import hep.aida.tdouble.DoubleIHistogram3D;
+import hep.aida.tdouble.ref.DoubleConverter;
+import hep.aida.tdouble.ref.DoubleHistogram1D;
+import hep.aida.tdouble.ref.DoubleHistogram2D;
+import hep.aida.tdouble.ref.DoubleHistogram3D;
+import hep.aida.tdouble.ref.DoubleVariableAxis;
 
 import java.io.FileWriter;
 import java.io.IOException;

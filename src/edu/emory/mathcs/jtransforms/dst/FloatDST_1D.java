@@ -42,361 +42,241 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  * Computes 1D Discrete Sine Transform (DST) of single precision data. The size
- * of data must be a power-of-two number. It uses DCT algorithm. This is a
- * parallel implementation optimized for SMP systems. <br>
- * <br>
+ * of data can be arbitrary number. It uses DCT algorithm. This is a parallel
+ * implementation optimized for SMP systems.
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 
  */
 public class FloatDST_1D {
 
-    private int n;
+	private int n;
 
-    private FloatDCT_1D dct;
+	private FloatDCT_1D dct;
 
-    /**
-     * Creates new instance of FloatDST_1D.
-     * 
-     * @param n
-     *            size of data - must be a power-of-two number
-     */
-    public FloatDST_1D(int n) {
-        this.n = n;
-        dct = new FloatDCT_1D(n);
-    }
+	/**
+	 * Creates new instance of FloatDST_1D.
+	 * 
+	 * @param n
+	 *            size of data
+	 */
+	public FloatDST_1D(int n) {
+		this.n = n;
+		dct = new FloatDCT_1D(n);
+	}
 
-    /**
-     * Creates new instance of FloatDST_1D.
-     * 
-     * @param n
-     *            size of data - must be a power-of-two number
-     * @param ip
-     *            work area for bit reversal, length >=
-     *            2+(1<<(int)(log(n/2+0.5)/log(2))/2)
-     * @param w
-     *            cos/sin table, length = n*5/4
-     */
-    public FloatDST_1D(int n, int[] ip, float[] w) {
-        this.n = n;
-        dct = new FloatDCT_1D(n, ip, w);
-    }
+	/**
+	 * Computes 1D forward DST (DST-II) leaving the result in <code>a</code>.
+	 * 
+	 * @param a
+	 *            data to transform
+	 * @param scale
+	 *            if true then scaling is performed
+	 */
+	public void forward(float[] a, boolean scale) {
+		forward(a, 0, scale);
+	}
 
-    /**
-     * Computes 1D forward DST (DST-II) leaving the result in <code>a</code>.
-     * 
-     * @param a
-     *            data to transform
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public void forward(float[] a, boolean scale) {
-        forward(a, 0, scale);
-    }
+	/**
+	 * Computes 1D forward DST (DST-II) leaving the result in <code>a</code>.
+	 * 
+	 * @param a
+	 *            data to transform
+	 * @param offa
+	 *            index of the first element in array <code>a</code>
+	 * @param scale
+	 *            if true then scaling is performed
+	 */
+	public void forward(final float[] a, final int offa, boolean scale) {
+		if (n == 1)
+			return;
+		float tmp;
+		int np = ConcurrencyUtils.getNumberOfProcessors();
+		if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+			final int k = n / 2;
+			Future[] futures = new Future[np];
+			for (int j = 0; j < np; j++) {
+				final int loc_offa = offa + j * k + 1;
+				final int loc_stopa;
+				if (j == np - 1) {
+					loc_stopa = n;
+				} else {
+					loc_stopa = loc_offa + k;
+				}
+				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					public void run() {
+						for (int i = loc_offa; i < loc_stopa; i += 2) {
+							a[i] = -a[i];
+						}
 
-    /**
-     * Computes 1D forward DST (DST-II) leaving the result in <code>a</code>.
-     * 
-     * @param a
-     *            data to transform
-     * @param offa
-     *            index of the first element in array <code>a</code>
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public void forward(final float[] a, final int offa, boolean scale) {
-        if (n == 1)
-            return;
-        float tmp;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            final int k = n / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = offa + j * k + 1;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = n;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                    public void run() {
-                        if (n >= 4) {
-                            for (int i = loc_offa; i < loc_stopa; i += 4) {
-                                a[i] = -a[i];
-                                a[i + 2] = -a[i + 2];
-                            }
-                        } else {
-                            for (int i = loc_offa; i < loc_stopa; i += 2) {
-                                a[i] = -a[i];
-                            }
-                        }
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            int startidx = 1 + offa;
-            int stopidx = offa + n;
-            if (n >= 4) {
-                for (int i = startidx; i < stopidx; i += 4) {
-                    a[i] = -a[i];
-                    a[i + 2] = -a[i + 2];
-                }
-            } else {
-                for (int i = startidx; i < stopidx; i += 2) {
-                    a[i] = -a[i];
-                }
-            }
-        }
-        dct.forward(a, offa, scale);
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            final int k = n / 2 / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = offa + j * k;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = n / 2;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                    public void run() {
-                        float tmp;
-                        int idx0 = offa + n - 1;
-                        int idx1;
-                        if (n / 2 >= 4) {
-                            for (int i = loc_offa; i < loc_stopa; i += 4) {
-                                tmp = a[i];
-                                idx1 = idx0 - i;
-                                a[i] = a[idx1];
-                                a[idx1] = tmp;
-                                tmp = a[i + 1];
-                                idx1 = idx0 - i - 1;
-                                a[i + 1] = a[idx1];
-                                a[idx1] = tmp;
-                                tmp = a[i + 2];
-                                idx1 = idx0 - i - 2;
-                                a[i + 2] = a[idx1];
-                                a[idx1] = tmp;
-                                tmp = a[i + 3];
-                                idx1 = idx0 - i - 3;
-                                a[i + 3] = a[idx1];
-                                a[idx1] = tmp;
-                            }
-                        } else {
-                            for (int i = loc_offa; i < loc_stopa; i++) {
-                                tmp = a[i];
-                                idx1 = idx0 - i;
-                                a[i] = a[idx1];
-                                a[idx1] = tmp;
-                            }
-                        }
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            int idx0 = offa + n - 1;
-            if (n / 2 >= 4) {
-                for (int i = 0; i < n / 2; i += 4) {
-                    tmp = a[offa + i];
-                    a[offa + i] = a[idx0 - i];
-                    a[idx0 - i] = tmp;
-                    tmp = a[offa + i + 1];
-                    a[offa + i + 1] = a[idx0 - i - 1];
-                    a[idx0 - i - 1] = tmp;
-                    tmp = a[offa + i + 2];
-                    a[offa + i + 2] = a[idx0 - i - 2];
-                    a[idx0 - i - 2] = tmp;
-                    tmp = a[offa + i + 3];
-                    a[offa + i + 3] = a[idx0 - i - 3];
-                    a[idx0 - i - 3] = tmp;
-                }
-            } else {
-                for (int i = 0; i < n / 2; i++) {
-                    tmp = a[offa + i];
-                    a[offa + i] = a[idx0 - i];
-                    a[idx0 - i] = tmp;
-                }
-            }
-        }
-    }
+					}
+				});
+			}
+			try {
+				for (int j = 0; j < np; j++) {
+					futures[j].get();
+				}
+			} catch (ExecutionException ex) {
+				ex.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			int startidx = 1 + offa;
+			int stopidx = offa + n;
+			for (int i = startidx; i < stopidx; i += 2) {
+				a[i] = -a[i];
+			}
+		}
+		dct.forward(a, offa, scale);
+		if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+			final int k = n / 2 / 2;
+			Future[] futures = new Future[np];
+			for (int j = 0; j < np; j++) {
+				final int loc_offa = offa + j * k;
+				final int loc_stopa;
+				if (j == np - 1) {
+					loc_stopa = n / 2;
+				} else {
+					loc_stopa = loc_offa + k;
+				}
+				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					public void run() {
+						float tmp;
+						int idx0 = offa + n - 1;
+						int idx1;
+						for (int i = loc_offa; i < loc_stopa; i++) {
+							tmp = a[i];
+							idx1 = idx0 - i;
+							a[i] = a[idx1];
+							a[idx1] = tmp;
+						}
+					}
+				});
+			}
+			try {
+				for (int j = 0; j < np; j++) {
+					futures[j].get();
+				}
+			} catch (ExecutionException ex) {
+				ex.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			int idx0 = offa + n - 1;
+			for (int i = 0; i < n / 2; i++) {
+				tmp = a[offa + i];
+				a[offa + i] = a[idx0 - i];
+				a[idx0 - i] = tmp;
+			}
+		}
+	}
 
-    /**
-     * Computes 1D inverse DST (DST-III) leaving the result in <code>a</code>.
-     * 
-     * @param a
-     *            data to transform
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public void inverse(float[] a, boolean scale) {
-        inverse(a, 0, scale);
-    }
+	/**
+	 * Computes 1D inverse DST (DST-III) leaving the result in <code>a</code>.
+	 * 
+	 * @param a
+	 *            data to transform
+	 * @param scale
+	 *            if true then scaling is performed
+	 */
+	public void inverse(float[] a, boolean scale) {
+		inverse(a, 0, scale);
+	}
 
-    /**
-     * Computes 1D inverse DST (DST-III) leaving the result in <code>a</code>.
-     * 
-     * @param a
-     *            data to transform
-     * @param offa
-     *            index of the first element in array <code>a</code>
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public void inverse(final float[] a, final int offa, boolean scale) {
-        if (n == 1)
-            return;
-        float tmp;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            final int k = n / 2 / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = offa + j * k;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = n / 2;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                    public void run() {
-                        float tmp;
-                        int idx0 = offa + n - 1;
-                        int idx1;
-                        if (n / 2 >= 4) {
-                            for (int i = loc_offa; i < loc_stopa; i += 4) {
-                                tmp = a[i];
-                                idx1 = idx0 - i;
-                                a[i] = a[idx1];
-                                a[idx1] = tmp;
-                                tmp = a[i + 1];
-                                idx1 = idx0 - i - 1;
-                                a[i + 1] = a[idx1];
-                                a[idx1] = tmp;
-                                tmp = a[i + 2];
-                                idx1 = idx0 - i - 2;
-                                a[i + 2] = a[idx1];
-                                a[idx1] = tmp;
-                                tmp = a[i + 3];
-                                idx1 = idx0 - i - 3;
-                                a[i + 3] = a[idx1];
-                                a[idx1] = tmp;
-                            }
-                        } else {
-                            for (int i = loc_offa; i < loc_stopa; i++) {
-                                tmp = a[i];
-                                idx1 = idx0 - i;
-                                a[i] = a[idx1];
-                                a[idx1] = tmp;
-                            }
-                        }
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            int idx0 = offa + n - 1;
-            if (n / 2 >= 4) {
-                for (int i = 0; i < n / 2; i += 4) {
-                    tmp = a[offa + i];
-                    a[offa + i] = a[idx0 - i];
-                    a[idx0 - i] = tmp;
-                    tmp = a[offa + i + 1];
-                    a[offa + i + 1] = a[idx0 - i - 1];
-                    a[idx0 - i - 1] = tmp;
-                    tmp = a[offa + i + 2];
-                    a[offa + i + 2] = a[idx0 - i - 2];
-                    a[idx0 - i - 2] = tmp;
-                    tmp = a[offa + i + 3];
-                    a[offa + i + 3] = a[idx0 - i - 3];
-                    a[idx0 - i - 3] = tmp;
-                }
-            } else {
-                for (int i = 0; i < n / 2; i++) {
-                    tmp = a[offa + i];
-                    a[offa + i] = a[idx0 - i];
-                    a[idx0 - i] = tmp;
-                }
-            }
-        }
-        dct.inverse(a, offa, scale);
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            final int k = n / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = offa + j * k + 1;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = n;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                    public void run() {
-                        if (n >= 4) {
-                            for (int i = loc_offa; i < loc_stopa; i += 4) {
-                                a[i] = -a[i];
-                                a[i + 2] = -a[i + 2];
-                            }
-                        } else {
-                            for (int i = loc_offa; i < loc_stopa; i += 2) {
-                                a[i] = -a[i];
-                            }
-                        }
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            int startidx = 1 + offa;
-            int stopidx = offa + n;
-            if (n >= 4) {
-                for (int i = startidx; i < stopidx; i += 4) {
-                    a[i] = -a[i];
-                    a[i + 2] = -a[i + 2];
-                }
-            } else {
-                for (int i = startidx; i < stopidx; i += 2) {
-                    a[i] = -a[i];
-                }
-            }
-        }
-    }
+	/**
+	 * Computes 1D inverse DST (DST-III) leaving the result in <code>a</code>.
+	 * 
+	 * @param a
+	 *            data to transform
+	 * @param offa
+	 *            index of the first element in array <code>a</code>
+	 * @param scale
+	 *            if true then scaling is performed
+	 */
+	public void inverse(final float[] a, final int offa, boolean scale) {
+		if (n == 1)
+			return;
+		float tmp;
+		int np = ConcurrencyUtils.getNumberOfProcessors();
+		if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+			final int k = n / 2 / 2;
+			Future[] futures = new Future[np];
+			for (int j = 0; j < np; j++) {
+				final int loc_offa = offa + j * k;
+				final int loc_stopa;
+				if (j == np - 1) {
+					loc_stopa = n / 2;
+				} else {
+					loc_stopa = loc_offa + k;
+				}
+				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					public void run() {
+						float tmp;
+						int idx0 = offa + n - 1;
+						int idx1;
+						for (int i = loc_offa; i < loc_stopa; i++) {
+							tmp = a[i];
+							idx1 = idx0 - i;
+							a[i] = a[idx1];
+							a[idx1] = tmp;
+						}
+					}
+				});
+			}
+			try {
+				for (int j = 0; j < np; j++) {
+					futures[j].get();
+				}
+			} catch (ExecutionException ex) {
+				ex.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			int idx0 = offa + n - 1;
+			for (int i = 0; i < n / 2; i++) {
+				tmp = a[offa + i];
+				a[offa + i] = a[idx0 - i];
+				a[idx0 - i] = tmp;
+			}
+		}
+		dct.inverse(a, offa, scale);
+		if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+			final int k = n / 2;
+			Future[] futures = new Future[np];
+			for (int j = 0; j < np; j++) {
+				final int loc_offa = offa + j * k + 1;
+				final int loc_stopa;
+				if (j == np - 1) {
+					loc_stopa = n;
+				} else {
+					loc_stopa = loc_offa + k;
+				}
+				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					public void run() {
+						for (int i = loc_offa; i < loc_stopa; i += 2) {
+							a[i] = -a[i];
+						}
+					}
+				});
+			}
+			try {
+				for (int j = 0; j < np; j++) {
+					futures[j].get();
+				}
+			} catch (ExecutionException ex) {
+				ex.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			int startidx = 1 + offa;
+			int stopidx = offa + n;
+			for (int i = startidx; i < stopidx; i += 2) {
+				a[i] = -a[i];
+			}
+		}
+	}
 }

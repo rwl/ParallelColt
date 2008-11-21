@@ -10,13 +10,13 @@ package cern.colt;
 
 import java.util.Comparator;
 
-import cern.colt.function.ByteComparator;
-import cern.colt.function.CharComparator;
-import cern.colt.function.DoubleComparator;
-import cern.colt.function.FloatComparator;
-import cern.colt.function.IntComparator;
-import cern.colt.function.LongComparator;
-import cern.colt.function.ShortComparator;
+import cern.colt.function.tbyte.ByteComparator;
+import cern.colt.function.tchar.CharComparator;
+import cern.colt.function.tdouble.DoubleComparator;
+import cern.colt.function.tfloat.FloatComparator;
+import cern.colt.function.tint.IntComparator;
+import cern.colt.function.tlong.LongComparator;
+import cern.colt.function.tshort.ShortComparator;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -29,7 +29,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * V1.26 algorithms, modified as necessary.
  * 
  * @see cern.colt.GenericSorting
- * @see cern.colt.matrix.doublealgo.DoubleSorting
+ * @see cern.colt.matrix.tdouble.algo.DoubleSorting
  * @see java.util.Arrays
  * 
  * @author wolfgang.hoschek@cern.ch
@@ -1600,7 +1600,7 @@ public class Sorting extends Object {
 
         // Postprocessing phase: change 0.0's to -0.0's as required
         if (numNegZeros != 0) {
-            int j = new cern.colt.list.DoubleArrayList(a).binarySearchFromTo(0.0d, fromIndex, n - 1); // posn
+            int j = new cern.colt.list.tdouble.DoubleArrayList(a).binarySearchFromTo(0.0d, fromIndex, n - 1); // posn
             // of
             // ANY
             // zero
@@ -1647,7 +1647,7 @@ public class Sorting extends Object {
 
         // Postprocessing phase: change 0.0's to -0.0's as required
         if (numNegZeros != 0) {
-            int j = new cern.colt.list.FloatArrayList(a).binarySearchFromTo(0.0f, fromIndex, n - 1); // posn
+            int j = new cern.colt.list.tfloat.FloatArrayList(a).binarySearchFromTo(0.0f, fromIndex, n - 1); // posn
             // of
             // ANY
             // zero

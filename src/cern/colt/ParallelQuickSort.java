@@ -12,13 +12,13 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import cern.colt.function.ByteComparator;
-import cern.colt.function.CharComparator;
-import cern.colt.function.DoubleComparator;
-import cern.colt.function.FloatComparator;
-import cern.colt.function.IntComparator;
-import cern.colt.function.LongComparator;
-import cern.colt.function.ShortComparator;
+import cern.colt.function.tbyte.ByteComparator;
+import cern.colt.function.tchar.CharComparator;
+import cern.colt.function.tdouble.DoubleComparator;
+import cern.colt.function.tfloat.FloatComparator;
+import cern.colt.function.tint.IntComparator;
+import cern.colt.function.tlong.LongComparator;
+import cern.colt.function.tshort.ShortComparator;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**

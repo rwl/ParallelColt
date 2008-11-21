@@ -1,5 +1,11 @@
 Parallel Colt changelog
 
+0.6:
+	- a lot of refactoring (now each object of a given type has its own package)
+	- JTransforms updated to version 2.0 (no more power-of-two size limitation)
+	- multithreaded implementation of Object matrices
+	- fixed bug in DComplex.inv() and FComplex.inv()
+
 0.5:	August 24, 2008	
 	- added multithreaded quicksorts for many data types
 	- added parallel 1D histograms for 2D matrices

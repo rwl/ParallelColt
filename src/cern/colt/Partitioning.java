@@ -8,9 +8,9 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt;
 
-import cern.colt.function.IntComparator;
-import cern.colt.list.DoubleArrayList;
-import cern.colt.list.IntArrayList;
+import cern.colt.function.tint.IntComparator;
+import cern.colt.list.tdouble.DoubleArrayList;
+import cern.colt.list.tint.IntArrayList;
 
 /**
  * Given some interval boundaries, partitions arrays such that all elements
@@ -39,7 +39,7 @@ import cern.colt.list.IntArrayList;
  * intervals is <tt>O( N * log(k))</tt>. Constants factors are minimized. No
  * temporary memory is allocated; Partitioning is in-place.
  * 
- * @see cern.colt.matrix.doublealgo.DoublePartitioning
+ * @see cern.colt.matrix.tdouble.algo.DoublePartitioning
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 03-Jul-99

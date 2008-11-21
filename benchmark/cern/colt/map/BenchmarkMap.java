@@ -9,6 +9,9 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.map;
 
 import cern.colt.Timer;
+import cern.colt.map.tint.AbstractIntIntMap;
+import cern.colt.map.tint.OpenIntIntHashMap;
+import cern.colt.map.tint.QuickOpenIntIntHashMap;
 
 /**
  * Benchmarks the classes of this package.
@@ -98,7 +101,7 @@ public class BenchmarkMap extends Object {
     /**
      */
     public static void test2(int length) {
-        cern.jet.random.DoubleUniform uniform = new cern.jet.random.DoubleUniform(new cern.jet.random.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.DoubleUniform uniform = new cern.jet.random.tdouble.DoubleUniform(new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         // using a map
         // int[] keys = {0 , 3 , 277+3, 277*2+3, 100000, 9 };
         // double[] values = {100.0, 1000.0, 277+3, 277*2+3, 70.0 , 71.0 ,};

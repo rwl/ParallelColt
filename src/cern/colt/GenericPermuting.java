@@ -120,9 +120,9 @@ public class GenericPermuting extends Object {
      * <p>
      * This is, for example, useful for Monte-Carlo-tests where one might want
      * to compute <tt>k</tt> distinct and random permutations of a sequence,
-     * obtaining <tt>p</tt> from {@link cern.jet.random.sampling} without
+     * obtaining <tt>p</tt> from {@link cern.jet.random.tdouble.sampling} without
      * replacement or a random engine like
-     * {@link cern.jet.random.engine.DoubleMersenneTwister}. <br>
+     * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister}. <br>
      * Note: When <tt>N!</tt> exceeds the 64-bit range (i.e. for
      * <tt>N > 20</tt>), this method has <i>different</i> behaviour: it
      * makes a sequence <tt>[0,1,...,N-1]</tt> and randomizes it, seeded with
@@ -176,7 +176,7 @@ public class GenericPermuting extends Object {
             // Note that this is perhaps not what you want...
             for (int i = N; --i >= 0;)
                 permutation[i] = i;
-            cern.jet.random.DoubleUniform gen = new cern.jet.random.DoubleUniform(new cern.jet.random.engine.DoubleMersenneTwister((int) p));
+            cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) p));
             for (int i = 0; i < N - 1; i++) {
                 int random = gen.nextIntFromTo(i, N - 1);
 
@@ -190,7 +190,7 @@ public class GenericPermuting extends Object {
         }
 
         // the normal case - exact enumeration
-        if (p > cern.jet.math.DoubleArithmetic.longFactorial(N))
+        if (p > cern.jet.math.tdouble.DoubleArithmetic.longFactorial(N))
             throw new IllegalArgumentException("N too large (a sequence of N elements only has N! permutations).");
 
         int[] tmp = new int[N];
@@ -199,7 +199,7 @@ public class GenericPermuting extends Object {
 
         long io = p - 1;
         for (int M = N - 1; M >= 1; M--) {
-            long fac = cern.jet.math.DoubleArithmetic.longFactorial(M);
+            long fac = cern.jet.math.tdouble.DoubleArithmetic.longFactorial(M);
             int in = ((int) (io / fac)) + 1;
             io = io % fac;
             permutation[N - M - 1] = tmp[in - 1];

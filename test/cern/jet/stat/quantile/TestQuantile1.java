@@ -1,13 +1,13 @@
 package cern.jet.stat.quantile;
 
-import hep.aida.bin.DynamicDoubleBin1D;
-import hep.aida.bin.QuantileDoubleBin1D;
+import hep.aida.tdouble.bin.DynamicDoubleBin1D;
+import hep.aida.tdouble.bin.QuantileDoubleBin1D;
 
 import java.text.DecimalFormat;
 import java.util.Date;
 
-import cern.jet.random.DoubleUniform;
-import cern.jet.random.engine.DRand;
+import cern.jet.random.tdouble.DoubleUniform;
+import cern.jet.random.tdouble.engine.DRand;
 
 /**
  * A class to test the QuantileBin1D code. The command line is "java

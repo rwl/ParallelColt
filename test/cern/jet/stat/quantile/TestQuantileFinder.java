@@ -9,8 +9,13 @@ It is provided "as is" without expressed or implied warranty.
 package cern.jet.stat.quantile;
 
 import cern.colt.Timer;
-import cern.colt.list.DoubleArrayList;
-import cern.colt.list.IntArrayList;
+import cern.colt.list.tdouble.DoubleArrayList;
+import cern.colt.list.tint.IntArrayList;
+import cern.jet.stat.Utils;
+import cern.jet.stat.tdouble.quantile.DoubleBuffer;
+import cern.jet.stat.tdouble.quantile.DoubleQuantileFinder;
+import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
+import cern.jet.stat.tdouble.quantile.ExactDoubleQuantileFinder;
 
 /**
  * A class holding test cases for exact and approximate quantile finders.
@@ -60,7 +65,7 @@ class TestQuantileFinder {
      * Observed epsilon
      */
     public static double epsilon(DoubleArrayList sortedList, double phi, double element) {
-        double rank = cern.jet.stat.DoubleDescriptive.rankInterpolated(sortedList, element);
+        double rank = cern.jet.stat.tdouble.DoubleDescriptive.rankInterpolated(sortedList, element);
         return epsilon(sortedList.size(), phi, rank);
     }
 

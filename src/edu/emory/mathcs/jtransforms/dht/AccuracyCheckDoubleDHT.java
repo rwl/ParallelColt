@@ -44,157 +44,157 @@ import edu.emory.mathcs.utils.IOUtils;
  */
 public class AccuracyCheckDoubleDHT {
 
-    public static void checkAccuracyDHT_1D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 1D DHT...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            DoubleDHT_1D fht = new DoubleDHT_1D(size);
-            double e, err = 0.0f;
-            double[] a = new double[size];
-            IOUtils.fillMatrix_1D(size, a);
-            double[] b = new double[size];
-            IOUtils.fillMatrix_1D(size, b);
-            fht.forward(a);
-            fht.inverse(a, true);
-            for (int j = 0; j < size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fht = null;
-            System.gc();
-        }
-    }
+	private static int[] sizes1D = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 512, 1024, 1056, 2048, 8192, 10158, 16384, 32768, 65536, 131072 };
 
-    public static void checkAccuracyDHT_2D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 2D DHT (double[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            DoubleDHT_2D fht2 = new DoubleDHT_2D(size, size);
-            double e, err = 0.0f;
-            double[] a = new double[size * size];
-            IOUtils.fillMatrix_2D(size, size, a);
-            double[] b = new double[size * size];
-            IOUtils.fillMatrix_2D(size, size, b);
-            fht2.forward(a);
-            fht2.inverse(a, true);
-            for (int j = 0; j < size * size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fht2 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 2D DHT (double[][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            DoubleDHT_2D fht2 = new DoubleDHT_2D(size, size);
-            double e, err = 0.0f;
-            double[][] a = new double[size][2 * size];
-            IOUtils.fillMatrix_2D(size, 2 * size, a);
-            double[][] b = new double[size][2 * size];
-            IOUtils.fillMatrix_2D(size, 2 * size, b);
-            fht2.forward(a);
-            fht2.inverse(a, true);
-            for (int r = 0; r < size; r++) {
-                for (int c = 0; c < 2 * size; c++) {
-                    e = Math.abs(b[r][c] - a[r][c]);
-                    err = Math.max(err, e);
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fht2 = null;
-            System.gc();
-        }
+	private static int[] sizes2D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 511, 512, 1024 };
 
-    }
+	private static int[] sizes3D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 128 };
 
-    public static void checkAccuracyDHT_3D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 3D DHT (double[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            DoubleDHT_3D dht3 = new DoubleDHT_3D(size, size, size);
-            double e, err = 0.0;
-            double[] a = new double[size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            double[] b = new double[size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            dht3.forward(a);
-            dht3.inverse(a, true);
-            for (int j = 0; j < size * size * size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-10) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            dht3 = null;
-            System.gc();
-        }
+	private AccuracyCheckDoubleDHT() {
 
-        System.out.println("Checking accuracy of 3D DHT (double[][][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            DoubleDHT_3D dht3 = new DoubleDHT_3D(size, size, size);
-            double e, err = 0.0;
-            double[][][] a = new double[size][size][size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            double[][][] b = new double[size][size][size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            dht3.forward(a);
-            dht3.inverse(a, true);
-            for (int s = 0; s < size; s++) {
-                for (int r = 0; r < size; r++) {
-                    for (int c = 0; c < size; c++) {
-                        e = Math.abs(b[s][r][c] - a[s][r][c]);
-                        err = Math.max(err, e);
-                    }
-                }
-            }
-            if (err > 1e-10) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            dht3 = null;
-            System.gc();
-        }
-    }
+	}
 
-    public static void main(String[] args) {
-        checkAccuracyDHT_1D(0, 21);
-        checkAccuracyDHT_2D(1, 11);
-        checkAccuracyDHT_3D(1, 7);
-        System.exit(0);
-    }
+	public static void checkAccuracyDHT_1D() {
+		System.out.println("Checking accuracy of 1D DHT...");
+		for (int i = 0; i < sizes1D.length; i++) {
+			DoubleDHT_1D fht = new DoubleDHT_1D(sizes1D[i]);
+			double e, err = 0.0;
+			double[] a = new double[sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], a);
+			double[] b = new double[sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], b);
+			fht.forward(a);
+			fht.inverse(a, true);
+			for (int j = 0; j < sizes1D[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-10) {
+				System.err.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fht = null;
+			System.gc();
+		}
+	}
+
+	public static void checkAccuracyDHT_2D() {
+		System.out.println("Checking accuracy of 2D DHT (double[] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			DoubleDHT_2D fht2 = new DoubleDHT_2D(sizes2D[i], sizes2D[i]);
+			double e, err = 0.0;
+			double[] a = new double[sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
+			double[] b = new double[sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], b);
+			fht2.forward(a);
+			fht2.inverse(a, true);
+			for (int j = 0; j < sizes2D[i] * sizes2D[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-10) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fht2 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 2D DHT (double[][] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			DoubleDHT_2D fht2 = new DoubleDHT_2D(sizes2D[i], sizes2D[i]);
+			double e, err = 0.0;
+			double[][] a = new double[sizes2D[i]][sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
+			double[][] b = new double[sizes2D[i]][sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], b);
+			fht2.forward(a);
+			fht2.inverse(a, true);
+			for (int r = 0; r < sizes2D[i]; r++) {
+				for (int c = 0; c < sizes2D[i]; c++) {
+					e = Math.abs(b[r][c] - a[r][c]);
+					err = Math.max(err, e);
+				}
+			}
+			if (err > 1e-10) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fht2 = null;
+			System.gc();
+		}
+
+	}
+
+	public static void checkAccuracyDHT_3D() {
+		System.out.println("Checking accuracy of 3D DHT (double[] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			DoubleDHT_3D dht3 = new DoubleDHT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			double e, err = 0.0;
+			double[] a = new double[sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
+			double[] b = new double[sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], b);
+			dht3.forward(a);
+			dht3.inverse(a, true);
+			for (int j = 0; j < sizes3D[i] * sizes3D[i] * sizes3D[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-10) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			dht3 = null;
+			System.gc();
+		}
+
+		System.out.println("Checking accuracy of 3D DHT (double[][][] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			DoubleDHT_3D dht3 = new DoubleDHT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			double e, err = 0.0;
+			double[][][] a = new double[sizes3D[i]][sizes3D[i]][sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
+			double[][][] b = new double[sizes3D[i]][sizes3D[i]][sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], b);
+			dht3.forward(a);
+			dht3.inverse(a, true);
+			for (int s = 0; s < sizes3D[i]; s++) {
+				for (int r = 0; r < sizes3D[i]; r++) {
+					for (int c = 0; c < sizes3D[i]; c++) {
+						e = Math.abs(b[s][r][c] - a[s][r][c]);
+						err = Math.max(err, e);
+					}
+				}
+			}
+			if (err > 1e-10) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			dht3 = null;
+			System.gc();
+		}
+	}
+
+	public static void main(String[] args) {
+		checkAccuracyDHT_1D();
+		checkAccuracyDHT_2D();
+		checkAccuracyDHT_3D();
+		System.exit(0);
+	}
 }

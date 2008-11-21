@@ -8,8 +8,12 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix;
 
-import cern.colt.matrix.linalg.DoubleBlas;
-import cern.colt.matrix.linalg.SmpDoubleBlas;
+import cern.colt.matrix.tdouble.DoubleFactory2D;
+import cern.colt.matrix.tdouble.DoubleFactory3D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.DoubleMatrix3D;
+import cern.colt.matrix.tdouble.algo.DoubleBlas;
+import cern.colt.matrix.tdouble.algo.SmpDoubleBlas;
 
 /**
  * Configurable matrix benchmark. Runs the operations defined in main(args) or
@@ -188,7 +192,7 @@ public class BenchmarkMatrix {
 
 			public void setParameters(DoubleMatrix2D G, DoubleMatrix2D H) {
 				super.setParameters(G, H);
-				D = new cern.colt.matrix.impl.DenseDoubleMatrix2D(A.rows(), A.columns()).assign(0.5);
+				D = new cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D(A.rows(), A.columns()).assign(0.5);
 				C = D.copy();
 				B = D.copy();
 			}
@@ -222,7 +226,7 @@ public class BenchmarkMatrix {
 
 			public void setParameters(DoubleMatrix2D G, DoubleMatrix2D H) {
 				super.setParameters(G, H);
-				D = new cern.colt.matrix.impl.DenseDoubleMatrix2D(A.rows(), A.columns()).assign(0.5);
+				D = new cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D(A.rows(), A.columns()).assign(0.5);
 				C = D.copy();
 				B = D.copy();
 			}
@@ -258,8 +262,8 @@ public class BenchmarkMatrix {
 
 			public void setParameters(DoubleMatrix2D A, DoubleMatrix2D B) {
 				if (k < 0) { // must be nonsingular for inversion
-					if (!cern.colt.matrix.linalg.DoubleProperty.ZERO.isDiagonallyDominantByRow(A) || !cern.colt.matrix.linalg.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
-						cern.colt.matrix.linalg.DoubleProperty.ZERO.generateNonSingular(A);
+					if (!cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByRow(A) || !cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
+						cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.generateNonSingular(A);
 					}
 					super.setParameters(A, B);
 				}
@@ -269,7 +273,7 @@ public class BenchmarkMatrix {
 			}
 
 			public void apply(cern.colt.Timer timer) {
-				cern.colt.matrix.linalg.DoubleAlgebra.DEFAULT.pow(A, k);
+				cern.colt.matrix.tdouble.algo.DoubleAlgebra.DEFAULT.pow(A, k);
 			}
 
 			public double operations() { // Mflops
@@ -384,7 +388,7 @@ public class BenchmarkMatrix {
 
 			public void apply(cern.colt.Timer timer) {
 				DoubleBlas smpBlas = new SmpDoubleBlas();
-				smpBlas.assign(A, cern.jet.math.DoubleFunctions.log);
+				smpBlas.assign(A, cern.jet.math.tdouble.DoubleFunctions.log);
 			}
 		};
 	}
@@ -404,7 +408,7 @@ public class BenchmarkMatrix {
 
 			public void apply(cern.colt.Timer timer) {
 				DoubleBlas smpBlas = new SmpDoubleBlas();
-				smpBlas.assign(A, B, cern.jet.math.DoubleFunctions.plusMult(0.5));
+				smpBlas.assign(A, B, cern.jet.math.tdouble.DoubleFunctions.plusMult(0.5));
 			}
 
 			public double operations() { // Mflops
@@ -435,7 +439,7 @@ public class BenchmarkMatrix {
 			}
 
 			public void apply(cern.colt.Timer timer) {
-				cern.colt.matrix.doublealgo.DoubleStatistic.correlation(cern.colt.matrix.doublealgo.DoubleStatistic.covariance(A));
+				cern.colt.matrix.tdouble.algo.DoubleStatistic.correlation(cern.colt.matrix.tdouble.algo.DoubleStatistic.covariance(A));
 			}
 
 			public double operations() { // Mflops
@@ -461,7 +465,7 @@ public class BenchmarkMatrix {
 
 			public void apply(cern.colt.Timer timer) {
 				DoubleBlas smpBlas = new SmpDoubleBlas();
-				smpBlas.assign(A, cern.jet.math.DoubleFunctions.mult(0.5));
+				smpBlas.assign(A, cern.jet.math.tdouble.DoubleFunctions.mult(0.5));
 			}
 		};
 	}
@@ -481,7 +485,7 @@ public class BenchmarkMatrix {
 
 			public void apply(cern.colt.Timer timer) {
 				DoubleBlas smpBlas = new SmpDoubleBlas();
-				smpBlas.assign(A, B, cern.jet.math.DoubleFunctions.mult);
+				smpBlas.assign(A, B, cern.jet.math.tdouble.DoubleFunctions.mult);
 			}
 		};
 	}
@@ -521,7 +525,7 @@ public class BenchmarkMatrix {
 	 */
 	protected static Double2DProcedure funLUDecompose() {
 		return new Double2DProcedure() {
-			cern.colt.matrix.linalg.DoubleLUDecompositionQuick lu = new cern.colt.matrix.linalg.DoubleLUDecompositionQuick(0);
+			cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick lu = new cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick(0);
 
 			public String toString() {
 				return "LU.decompose(A) [Mflops/sec]";
@@ -547,7 +551,7 @@ public class BenchmarkMatrix {
 	 */
 	protected static Double2DProcedure funLUSolve() {
 		return new Double2DProcedure() {
-			cern.colt.matrix.linalg.DoubleLUDecompositionQuick lu;
+			cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick lu;
 
 			public String toString() {
 				return "LU.solve(A) [Mflops/sec]";
@@ -555,11 +559,11 @@ public class BenchmarkMatrix {
 
 			public void setParameters(DoubleMatrix2D A, DoubleMatrix2D B) {
 				lu = null;
-				if (!cern.colt.matrix.linalg.DoubleProperty.ZERO.isDiagonallyDominantByRow(A) || !cern.colt.matrix.linalg.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
-					cern.colt.matrix.linalg.DoubleProperty.ZERO.generateNonSingular(A);
+				if (!cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByRow(A) || !cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
+					cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.generateNonSingular(A);
 				}
 				super.setParameters(A, B);
-				lu = new cern.colt.matrix.linalg.DoubleLUDecompositionQuick(0);
+				lu = new cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick(0);
 				lu.decompose(A);
 			}
 
@@ -623,7 +627,7 @@ public class BenchmarkMatrix {
 
 			public void setParameters(DoubleMatrix2D G, DoubleMatrix2D H) {
 				super.setParameters(G, H);
-				D = new cern.colt.matrix.impl.DenseDoubleMatrix2D(A.rows(), A.columns()).assign(0.5);
+				D = new cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D(A.rows(), A.columns()).assign(0.5);
 				C = D.copy();
 				B = D.copy();
 			}
@@ -700,7 +704,7 @@ public class BenchmarkMatrix {
 
 			final double beta = 1 - omega;
 
-			cern.colt.function.Double9Function function = new cern.colt.function.Double9Function() {
+			cern.colt.function.tdouble.Double9Function function = new cern.colt.function.tdouble.Double9Function() {
 				public final double apply(double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22) {
 					return alpha * a11 + beta * (a01 + a10 + a12 + a21);
 				}
@@ -739,7 +743,7 @@ public class BenchmarkMatrix {
 
 			final double beta = 1 - omega;
 
-			cern.colt.function.Double9Function function = new cern.colt.function.Double9Function() {
+			cern.colt.function.tdouble.Double9Function function = new cern.colt.function.tdouble.Double9Function() {
 				public final double apply(double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22) {
 					return alpha * a11 + beta * (a00 + a10 + a20 + a01 + a21 + a02 + a12 + a22);
 				}
@@ -890,7 +894,7 @@ public class BenchmarkMatrix {
 		cern.colt.Timer timer = new cern.colt.Timer().start();
 		if (!args[0].equals("-file")) { // interactive mode, commands supplied
 			// via java class args
-			System.out.println("\n\nExecuting command = " + new cern.colt.list.ObjectArrayList(args) + " ...");
+			System.out.println("\n\nExecuting command = " + new cern.colt.list.tobject.ObjectArrayList(args) + " ...");
 			handle(args);
 		} else { // batch mode, read commands from file
 			/*
@@ -911,7 +915,7 @@ public class BenchmarkMatrix {
 			stream.slashSlashComments(true); // allow // comments
 			stream.slashStarComments(true); // allow /* comments */
 			try {
-				cern.colt.list.ObjectArrayList words = new cern.colt.list.ObjectArrayList();
+				cern.colt.list.tobject.ObjectArrayList words = new cern.colt.list.tobject.ObjectArrayList();
 				int token;
 				while ((token = stream.nextToken()) != stream.TT_EOF) { // while
 					// not
@@ -933,7 +937,7 @@ public class BenchmarkMatrix {
 						words.clear();
 					} else {
 						String word;
-						cern.colt.matrix.impl.Former formatter = new cern.colt.matrix.impl.FormerFactory().create("%G");
+						cern.colt.matrix.Former formatter = new cern.colt.matrix.FormerFactory().create("%G");
 						// ok: 2.0 -> 2 wrong: 2.0 -> 2.0 (kills
 						// Integer.parseInt())
 						if (token == stream.TT_NUMBER)
@@ -1047,8 +1051,8 @@ public class BenchmarkMatrix {
 		// String[] sliceNames = {"dense", "sparse"};
 		// String[] sliceNames = {"dense", "sparse", "rowCompressed"};
 		String[] sliceNames = types;
-		hep.aida.bin.DoubleBinFunctions1D F = hep.aida.bin.DoubleBinFunctions1D.functions;
-		hep.aida.bin.DoubleBinFunction1D[] aggr = null; // {F.mean, F.median,
+		hep.aida.tdouble.bin.DoubleBinFunctions1D F = hep.aida.tdouble.bin.DoubleBinFunctions1D.functions;
+		hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr = null; // {F.mean, F.median,
 		// F.sum};
 		String[] rowNames = new String[sizes.length];
 		String[] colNames = new String[densities.length];
@@ -1065,7 +1069,7 @@ public class BenchmarkMatrix {
 		rowNames = colNames;
 		colNames = tmp2;
 		timings = timings.viewDice(0, 2, 1);
-		System.out.println(new cern.colt.matrix.doublealgo.DoubleFormatter("%1.3G").toTitleString(timings, sliceNames, rowNames, colNames, sliceAxisName, rowAxisName, colAxisName, "Performance of " + title, aggr));
+		System.out.println(new cern.colt.matrix.tdouble.algo.DoubleFormatter("%1.3G").toTitleString(timings, sliceNames, rowNames, colNames, sliceAxisName, rowAxisName, colAxisName, "Performance of " + title, aggr));
 		/*
 		 * title = "Speedup of dense over sparse"; DoubleMatrix2D speedup =
 		 * cern.colt.matrix.doublealgo.Transform.div(timings.viewSlice(0).copy(),timings.viewSlice(1));
@@ -1115,15 +1119,15 @@ public class BenchmarkMatrix {
 		}
 		runTime.stop();
 
-		hep.aida.bin.DoubleBinFunctions1D F = hep.aida.bin.DoubleBinFunctions1D.functions;
-		hep.aida.bin.DoubleBinFunction1D[] aggr = null; // {F.mean, F.median,
+		hep.aida.tdouble.bin.DoubleBinFunctions1D F = hep.aida.tdouble.bin.DoubleBinFunctions1D.functions;
+		hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr = null; // {F.mean, F.median,
 		// F.sum};
 		String[] rowNames = null;
 		String[] colNames = { "dense (y=1,n=0)", "size", "density", "flops/sec" };
 		String rowAxisName = null;
 		String colAxisName = null;
 		System.out.println("*");
-		System.out.println(new cern.colt.matrix.doublealgo.DoubleFormatter("%1.3G").toTitleString(timings, rowNames, colNames, rowAxisName, colAxisName, title, aggr));
+		System.out.println(new cern.colt.matrix.tdouble.algo.DoubleFormatter("%1.3G").toTitleString(timings, rowNames, colNames, rowAxisName, colAxisName, title, aggr));
 
 		System.out.println("Run took a total of " + runTime + ". End of run.");
 	}

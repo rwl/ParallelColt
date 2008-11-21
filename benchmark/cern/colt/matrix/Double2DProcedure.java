@@ -8,6 +8,8 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix;
 
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
+
 
 abstract class Double2DProcedure implements TimerProcedure {
 	public DoubleMatrix2D A;

@@ -1,7 +1,7 @@
 <HTML>
 <BODY>
 Matrix <i>interfaces and factories</i>; efficient and flexible dense and sparse 
-1, 2, 3 and d-dimensional matrices holding objects or primitive data types such 
+1, 2, 3-dimensional matrices holding objects or primitive data types such 
 as <tt>int</tt>, <tt>double</tt>, etc; Templated, fixed sized (not dynamically 
 resizable); Also known as <i>multi-dimensional arrays</i> or<i> Data Cubes</i>. 
 Note that d-dimensional and <tt>int</tt> based matrices are not yet provided. 
@@ -448,7 +448,7 @@ System.out.println(sum);
     <td> 
       <p>Note that the result of a slicing operation is not a 2-d matrix with 
         one row, but a true 1-d <b>type</b> with all capabilities of the type, 
-        namely {@link cern.colt.matrix.DoubleMatrix1D}, generated in constant 
+        namely {@link cern.colt.matrix.tdouble.DoubleMatrix1D}, generated in constant 
         time.</p>
       <p>The slicing view is now fed into some external algorithm expecting a 
         1-dimensional matrix:<br>
@@ -534,9 +534,9 @@ System.out.println(sum);
   to exchange things without noticing any difference. Again, as long as the things 
   adhere to some common interface.</p>
 <p>The common interface for matrices is defined in abstract base classes (e.g. 
-  {@link cern.colt.matrix.DoubleMatrix2D}). Note that looking at the documentation 
-  of some concrete instantiable class (e.g. {@link cern.colt.matrix.impl.DenseDoubleMatrix2D}, 
-  {@link cern.colt.matrix.impl.SparseDoubleMatrix2D}, {@link cern.colt.matrix.impl.RCDoubleMatrix2D}<img src="../doc-files/new.gif" width="32" height="22" align="top">) 
+  {@link cern.colt.matrix.tdouble.DoubleMatrix2D}). Note that looking at the documentation 
+  of some concrete instantiable class (e.g. {@link cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D}, 
+  {@link cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D}, {@link cern.colt.matrix.tdouble.impl.RCDoubleMatrix2D}<img src="../doc-files/new.gif" width="32" height="22" align="top">) 
   will not reveal more information than can be obtained by looking at the abstract 
   base classes. The convention is that concrete classes <i>do no subsetting or 
   supersetting</i>. They override methods to implement behaviour dictated by abstract 
@@ -579,7 +579,7 @@ System.out.println(sum);
 </ol>
 <p>Usually, assign operations are heavily optimized for frequently used function 
   objects like plus, minus, mult, div, plusMult, minusMult, etc. Concerning the 
-  performance of unoptimized function objects, see {@link cern.jet.math.DoubleFunctions}.</p>
+  performance of unoptimized function objects, see {@link cern.jet.math.tdouble.DoubleFunctions}.</p>
 <p></p>
 <p><a href="#Overview">Back</a> to Overview
 <h2></h2>
@@ -594,11 +594,11 @@ System.out.println(sum);
   on sparse and dense matrices and all their views. This will ensure scalability 
   over time, as more and more features are added. </p>
 <p>Some algorithms for formatting, sorting, statistics and partitioning, are, 
-  for example, provided in the package {@link cern.colt.matrix.doublealgo}. </p>
+  for example, provided in the package {@link cern.colt.matrix.tdouble.algo}. </p>
 <p><a href="#Overview">Back</a> to Overview</p>
 <h2></h2>
 <h2><a name="LinearAlgebra"></a>7. Linear Algebra</h2>
-<p>See the documentation of the linear algebra package {@link cern.colt.matrix.linalg}.</p>
+<p>See the documentation of the linear algebra package {@link cern.colt.matrix.tdouble.algo}.</p>
 <p><a href="#Overview">Back</a> to Overview </p>
 <h2><a name="PackageOrganization"></a>8. Package Organization, Naming Conventions, 
   Policies</h2>
@@ -608,17 +608,17 @@ System.out.println(sum);
   a common abstract base class named <tt>&lt;ValueType&gt;Matrix&lt;Rank&gt;D</tt>, 
   which is in many ways equivalent to an &quot;interface&quot;. <b>99% of the 
   time you will operate on these abstract classes only</b>. For example, all 2-dimensional 
-  matrices operating on <tt>double</tt> values are derived from {@link cern.colt.matrix.DoubleMatrix2D}. 
+  matrices operating on <tt>double</tt> values are derived from {@link cern.colt.matrix.tdouble.DoubleMatrix2D}. 
   This is the interface to operate on.</p>
 <p>Class naming for concrete instantiable classes follows the schema <tt>&lt;Property&gt;&lt;ValueType&gt;Matrix&lt;Rank&gt;D</tt>. 
-  For example, we have a {@link cern.colt.matrix.impl.DenseDoubleMatrix2D}, a 
-  {@link cern.colt.matrix.impl.SparseDoubleMatrix2D}, and so on. All concrete instantiable classes are separated into an extra package, 
-  {@link cern.colt.matrix.impl}, to clearly distinguish between interfaces and 
+  For example, we have a {@link cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D}, a 
+  {@link cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D}, and so on. All concrete instantiable classes are separated into an extra package, 
+  {@link cern.colt.matrix.tdouble.impl}, to clearly distinguish between interfaces and 
   implementations.</p>
-<p>{@link cern.colt.matrix.DoubleMatrix2D} in turn is derived from an abstract 
+<p>{@link cern.colt.matrix.tdouble.DoubleMatrix2D} in turn is derived from an abstract 
   base class tying together all 2-dimensional matrices regardless of value type, 
-  {@link cern.colt.matrix.impl.AbstractMatrix2D}, which finally is rooted in grandmother 
-  {@link cern.colt.matrix.impl.AbstractMatrix}.</p>
+  {@link cern.colt.matrix.AbstractMatrix2D}, which finally is rooted in grandmother 
+  {@link cern.colt.matrix.AbstractMatrix}.</p>
 <p>The abstract base classes provide skeleton implementations for all but few 
   methods. Experimental data layouts can easily be implemented and inherit a rich 
   set of functionality. For example, to implement a fully functional 2-d or 3-d 
@@ -640,7 +640,7 @@ System.out.println(sum);
   no methods to fill results into empty result matrices. Use idioms like <tt>result 
   = matrix.copy().mult(5)</tt> to achieve the same functionality. Some convenience 
   methods are provided in the factory classes as well as in external packages 
-  like {@link cern.colt.matrix.doublealgo}.</p>
+  like {@link cern.colt.matrix.tdouble.algo}.</p>
 <p><a href="#Overview">Back</a> to Overview 
 <h2><a name="Performance"></a>9. Performance</h2>
 <p>The following statements apply to all currently implemented features (i.e. 

@@ -8,7 +8,7 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt;
 
-import cern.colt.function.IntComparator;
+import cern.colt.function.tint.IntComparator;
 
 /**
  * Demonstrates how to use {@link Sort}.
@@ -131,8 +131,8 @@ class TestGenericSorting extends Object {
      * parameters and checking whether results are correct.
      */
     public static void testRandomly(int runs) {
-        cern.jet.random.engine.DoubleRandomEngine engine = new cern.jet.random.engine.DoubleMersenneTwister();
-        cern.jet.random.DoubleUniform gen = new cern.jet.random.DoubleUniform(engine);
+        cern.jet.random.tdouble.engine.DoubleRandomEngine engine = new cern.jet.random.tdouble.engine.DoubleMersenneTwister();
+        cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(engine);
 
         for (int run = 0; run < runs; run++) {
             int maxSize = 50;
@@ -148,8 +148,8 @@ class TestGenericSorting extends Object {
                 to = gen.nextIntFromTo(Math.min(from, size - 1), size - 1);
             }
 
-            cern.colt.matrix.DoubleMatrix2D A1 = new cern.colt.matrix.impl.DenseDoubleMatrix2D(size, size);
-            cern.colt.matrix.DoubleMatrix2D P1 = A1.viewPart(from, from, size - to, size - to);
+            cern.colt.matrix.tdouble.DoubleMatrix2D A1 = new cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D(size, size);
+            cern.colt.matrix.tdouble.DoubleMatrix2D P1 = A1.viewPart(from, from, size - to, size - to);
 
             int intervalFrom = gen.nextIntFromTo(size / 2, 2 * size);
             int intervalTo = gen.nextIntFromTo(intervalFrom, 2 * size);
@@ -160,12 +160,12 @@ class TestGenericSorting extends Object {
                 }
             }
 
-            cern.colt.matrix.DoubleMatrix2D A2 = A1.copy();
-            cern.colt.matrix.DoubleMatrix2D P2 = A2.viewPart(from, from, size - to, size - to);
+            cern.colt.matrix.tdouble.DoubleMatrix2D A2 = A1.copy();
+            cern.colt.matrix.tdouble.DoubleMatrix2D P2 = A2.viewPart(from, from, size - to, size - to);
 
             int c = 0;
-            cern.colt.matrix.DoubleMatrix2D S1 = cern.colt.matrix.doublealgo.DoubleSorting.quickSort.sort(P1, c);
-            cern.colt.matrix.DoubleMatrix2D S2 = cern.colt.matrix.doublealgo.DoubleSorting.mergeSort.sort(P2, c);
+            cern.colt.matrix.tdouble.DoubleMatrix2D S1 = cern.colt.matrix.tdouble.algo.DoubleSorting.quickSort.sort(P1, c);
+            cern.colt.matrix.tdouble.DoubleMatrix2D S2 = cern.colt.matrix.tdouble.algo.DoubleSorting.mergeSort.sort(P2, c);
 
             if (!(S1.viewColumn(c).equals(S2.viewColumn(c))))
                 throw new InternalError();

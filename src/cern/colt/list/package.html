@@ -54,12 +54,12 @@ Resizable lists holding objects or primitive data types such as <tt>int</tt>,
   original, and vice-versa. 
 <h2>3. Organization of this package</h2>
 <p>Class naming follows the schema <tt>&lt;ElementType&gt;&lt;ImplementationTechnique&gt;List</tt>. 
-  For example, we have a {@link cern.colt.list.DoubleArrayList}, which is a list 
+  For example, we have a {@link cern.colt.list.tdouble.DoubleArrayList}, which is a list 
   holding <tt>double</tt> elements implemented with <tt>double</tt>[] arrays. 
 </p>
 <p>The classes for lists of a given value type are derived from a common abstract 
   base class tagged <tt>Abstract&lt;ElementType&gt;</tt><tt>List</tt>. For example, 
-  all lists operating on <tt>double</tt> elements are derived from {@link cern.colt.list.AbstractDoubleList}, 
+  all lists operating on <tt>double</tt> elements are derived from {@link cern.colt.list.tdouble.AbstractDoubleList}, 
   which in turn is derived from an abstract base class tying together all lists 
   regardless of value type, {@link cern.colt.list.AbstractList}, which finally 
   is rooted in grandmother {@link cern.colt.list.AbstractCollection}. The abstract 

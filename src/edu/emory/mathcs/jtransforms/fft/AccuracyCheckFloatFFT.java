@@ -34,6 +34,7 @@
 
 package edu.emory.mathcs.jtransforms.fft;
 
+import edu.emory.mathcs.utils.ConcurrencyUtils;
 import edu.emory.mathcs.utils.IOUtils;
 
 /**
@@ -44,603 +45,576 @@ import edu.emory.mathcs.utils.IOUtils;
  */
 public class AccuracyCheckFloatFFT {
 
-    private AccuracyCheckFloatFFT() {
+	private static int[] sizes1D = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 512, 1024, 1056, 2048, 8192, 10158, 16384, 32768, 65536, 131072 };
 
-    }
+	private static int[] sizes2D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 511, 512, 1024 };
 
-    public static void checkAccuracyComplexFFT_1D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 1D complex FFT...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_1D fft = new FloatFFT_1D(size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size];
-            IOUtils.fillMatrix_1D(2 * size, a);
-            float[] b = new float[2 * size];
-            IOUtils.fillMatrix_1D(2 * size, b);
-            fft.complexForward(a);
-            fft.complexInverse(a, true);
-            for (int j = 0; j < 2 * size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft = null;
-            System.gc();
-        }
-    }
+	private static int[] sizes3D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 128 };
 
-    public static void checkAccuracyComplexFFT_2D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 2D complex FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size * size];
-            IOUtils.fillMatrix_2D(size, 2 * size, a);
-            float[] b = new float[2 * size * size];
-            IOUtils.fillMatrix_2D(size, 2 * size, b);
-            fft2.complexForward(a);
-            fft2.complexInverse(a, true);
-            for (int j = 0; j < 2 * size * size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 2D complex FFT (float[][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[][] a = new float[size][2 * size];
-            IOUtils.fillMatrix_2D(size, 2 * size, a);
-            float[][] b = new float[size][2 * size];
-            IOUtils.fillMatrix_2D(size, 2 * size, b);
-            fft2.complexForward(a);
-            fft2.complexInverse(a, true);
-            for (int r = 0; r < size; r++) {
-                for (int c = 0; c < 2 * size; c++) {
-                    e = Math.abs(b[r][c] - a[r][c]);
-                    err = Math.max(err, e);
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
+	private static int[] sizes2D2 = { 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 };
 
-    }
+	private static int[] sizes3D2 = { 2, 4, 8, 16, 32, 64, 128, 256 };
 
-    public static void checkAccuracyComplexFFT_3D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 3D complex FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size * size * size];
-            IOUtils.fillMatrix_3D(size, size, 2 * size, a);
-            float[] b = new float[2 * size * size * size];
-            IOUtils.fillMatrix_3D(size, size, 2 * size, b);
-            fft3.complexForward(a);
-            fft3.complexInverse(a, true);
-            for (int j = 0; j < 2 * size * size * size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 3D complex FFT (float[][][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[][][] a = new float[size][size][2 * size];
-            IOUtils.fillMatrix_3D(size, size, 2 * size, a);
-            float[][][] b = new float[size][size][2 * size];
-            IOUtils.fillMatrix_3D(size, size, 2 * size, b);
-            fft3.complexForward(a);
-            fft3.complexInverse(a, true);
-            for (int s = 0; s < size; s++) {
-                for (int r = 0; r < size; r++) {
-                    for (int c = 0; c < 2 * size; c++) {
-                        e = Math.abs(b[s][r][c] - a[s][r][c]);
-                        err = Math.max(err, e);
-                    }
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-    }
+	private AccuracyCheckFloatFFT() {
 
-    public static void checkAccuracyRealFFT_1D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 1D real FFT...");
+	}
 
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_1D fft = new FloatFFT_1D(size);
-            float e, err = 0.0f;
-            float[] a = new float[size];
-            IOUtils.fillMatrix_1D(size, a);
-            float[] b = new float[size];
-            IOUtils.fillMatrix_1D(size, b);
-            fft.realForward(b);
-            fft.realInverse(b, true);
-            for (int j = 0; j < size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of on 1D real forward full FFT...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_1D fft = new FloatFFT_1D(size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size];
-            IOUtils.fillMatrix_1D(size, a);
-            float[] b = new float[2 * size];
-            IOUtils.fillMatrix_1D(size, b);
-            fft.realForwardFull(b);
-            fft.complexInverse(b, true);
-            for (int j = 0; j < size; j++) {
-                e = Math.abs(b[2 * j] - a[j]);
-                err = Math.max(err, e);
-                e = Math.abs(b[2 * j + 1]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 1D real inverse full FFT...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_1D fft = new FloatFFT_1D(size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size];
-            IOUtils.fillMatrix_1D(size, a);
-            float[] b = new float[2 * size];
-            IOUtils.fillMatrix_1D(size, b);
-            fft.realInverseFull(b, true);
-            fft.complexForward(b);
-            for (int j = 0; j < size; j++) {
-                e = Math.abs(b[2 * j] - a[j]);
-                err = Math.max(err, e);
-                e = Math.abs(b[2 * j + 1]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft = null;
-            System.gc();
-        }
+	public static void checkAccuracyComplexFFT_1D() {
+		System.out.println("Checking accuracy of 1D complex FFT...");
+		for (int i = 0; i < sizes1D.length; i++) {
+			FloatFFT_1D fft = new FloatFFT_1D(sizes1D[i]);
+			float e, err = 0;
+			float[] a = new float[2 * sizes1D[i]];
+			IOUtils.fillMatrix_1D(2 * sizes1D[i], a);
+			float[] b = new float[2 * sizes1D[i]];
+			IOUtils.fillMatrix_1D(2 * sizes1D[i], b);
+			fft.complexForward(a);
+			fft.complexInverse(a, true);
+			for (int j = 0; j < 2 * sizes1D[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft = null;
+			System.gc();
+		}
 
-    }
+	}
 
-    public static void checkAccuracyRealFFT_2D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 2D real FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[] a = new float[size * size];
-            IOUtils.fillMatrix_2D(size, size, a);
-            float[] b = new float[size * size];
-            IOUtils.fillMatrix_2D(size, size, b);
-            fft2.realForward(b);
-            fft2.realInverse(b, true);
-            for (int j = 0; j < size * size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 2D real FFT (float[][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[][] a = new float[size][size];
-            IOUtils.fillMatrix_2D(size, size, a);
-            float[][] b = new float[size][size];
-            IOUtils.fillMatrix_2D(size, size, b);
-            fft2.realForward(b);
-            fft2.realInverse(b, true);
-            for (int r = 0; r < size; r++) {
-                for (int c = 0; c < size; c++) {
-                    e = Math.abs(b[r][c] - a[r][c]);
-                    err = Math.max(err, e);
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 2D real forward full FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size * size];
-            IOUtils.fillMatrix_2D(size, size, a);
-            float[] b = new float[2 * size * size];
-            IOUtils.fillMatrix_2D(size, size, b);
-            fft2.realForwardFull(b);
-            fft2.complexInverse(b, true);
-            for (int j = 0; j < size * size; j++) {
-                e = Math.abs(b[2 * j] - a[j]);
-                err = Math.max(err, e);
-                e = Math.abs(b[2 * j + 1]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 2D real forward full FFT (float[][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[][] a = new float[size][size];
-            IOUtils.fillMatrix_2D(size, size, a);
-            float[][] b = new float[size][2 * size];
-            IOUtils.fillMatrix_2D(size, size, b);
-            fft2.realForwardFull(b);
-            fft2.complexInverse(b, true);
-            for (int r = 0; r < size; r++) {
-                for (int c = 0; c < size; c++) {
-                    e = Math.abs(b[r][2 * c] - a[r][c]);
-                    err = Math.max(err, e);
-                    e = Math.abs(b[r][2 * c + 1]);
-                    err = Math.max(err, e);
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 2D real inverse full FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size * size];
-            IOUtils.fillMatrix_2D(size, size, a);
-            float[] b = new float[2 * size * size];
-            IOUtils.fillMatrix_2D(size, size, b);
-            fft2.realInverseFull(b, true);
-            fft2.complexForward(b);
-            for (int j = 0; j < size * size; j++) {
-                e = Math.abs(b[2 * j] - a[j]);
-                err = Math.max(err, e);
-                e = Math.abs(b[2 * j + 1]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 2D real inverse full FFT (float[][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_2D fft2 = new FloatFFT_2D(size, size);
-            float e, err = 0.0f;
-            float[][] a = new float[size][size];
-            IOUtils.fillMatrix_2D(size, size, a);
-            float[][] b = new float[size][2 * size];
-            IOUtils.fillMatrix_2D(size, size, b);
-            fft2.realInverseFull(b, true);
-            fft2.complexForward(b);
-            for (int r = 0; r < size; r++) {
-                for (int c = 0; c < size; c++) {
-                    e = Math.abs(b[r][2 * c] - a[r][c]);
-                    err = Math.max(err, e);
-                    e = Math.abs(b[r][2 * c + 1]);
-                    err = Math.max(err, e);
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + ";\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft2 = null;
-            System.gc();
-        }
+	public static void checkAccuracyComplexFFT_2D() {
+		System.out.println("Checking accuracy of 2D complex FFT (float[] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D[i], sizes2D[i]);
+			float e, err = 0;
+			float[] a = new float[2 * sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], 2 * sizes2D[i], a);
+			float[] b = new float[2 * sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], 2 * sizes2D[i], b);
+			fft2.complexForward(a);
+			fft2.complexInverse(a, true);
+			for (int j = 0; j < 2 * sizes2D[i] * sizes2D[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 2D complex FFT (float[][] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D[i], sizes2D[i]);
+			float e, err = 0;
+			float[][] a = new float[sizes2D[i]][2 * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], 2 * sizes2D[i], a);
+			float[][] b = new float[sizes2D[i]][2 * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], 2 * sizes2D[i], b);
+			fft2.complexForward(a);
+			fft2.complexInverse(a, true);
+			for (int r = 0; r < sizes2D[i]; r++) {
+				for (int c = 0; c < 2 * sizes2D[i]; c++) {
+					e = Math.abs(b[r][c] - a[r][c]);
+					err = Math.max(err, e);
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+	}
 
-    }
+	public static void checkAccuracyComplexFFT_3D() {
+		System.out.println("Checking accuracy of 3D complex FFT (float[] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			float e, err = 0;
+			float[] a = new float[2 * sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], 2 * sizes3D[i], a);
+			float[] b = new float[2 * sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], 2 * sizes3D[i], b);
+			fft3.complexForward(a);
+			fft3.complexInverse(a, true);
+			for (int j = 0; j < 2 * sizes3D[i] * sizes3D[i] * sizes3D[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
 
-    public static void checkAccuracyRealFFT_3D(int init_exp, int iters) {
-        System.out.println("Checking accuracy of 3D real FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[] a = new float[size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            float[] b = new float[size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            fft3.realForward(b);
-            fft3.realInverse(b, true);
-            for (int j = 0; j < size * size * size; j++) {
-                e = Math.abs(b[j] - a[j]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 3D real FFT (float[][][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[][][] a = new float[size][size][size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            float[][][] b = new float[size][size][size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            fft3.realForward(b);
-            fft3.realInverse(b, true);
-            for (int s = 0; s < size; s++) {
-                for (int r = 0; r < size; r++) {
-                    for (int c = 0; c < size; c++) {
-                        e = Math.abs(b[s][r][c] - a[s][r][c]);
-                        err = Math.max(err, e);
-                    }
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 3D real forward full FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            float[] b = new float[2 * size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            fft3.realForwardFull(b);
-            fft3.complexInverse(b, true);
-            for (int j = 0; j < size * size * size; j++) {
-                e = Math.abs(b[2 * j] - a[j]);
-                err = Math.max(err, e);
-                e = Math.abs(b[2 * j + 1]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 3D real forward full FFT (float[][][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[][][] a = new float[size][size][2 * size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            float[][][] b = new float[size][size][2 * size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            fft3.realForwardFull(b);
-            fft3.complexInverse(b, true);
-            for (int s = 0; s < size; s++) {
-                for (int r = 0; r < size; r++) {
-                    for (int c = 0; c < size; c++) {
-                        e = Math.abs(b[s][r][2 * c] - a[s][r][c]);
-                        err = Math.max(err, e);
-                        e = Math.abs(b[s][r][2 * c + 1]);
-                        err = Math.max(err, e);
-                    }
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 3D real inverse full FFT (float[] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[] a = new float[2 * size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            float[] b = new float[2 * size * size * size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            fft3.realInverseFull(b, true);
-            fft3.complexForward(b);
-            for (int j = 0; j < size * size * size; j++) {
-                e = Math.abs(b[2 * j] - a[j]);
-                err = Math.max(err, e);
-                e = Math.abs(b[2 * j + 1]);
-                err = Math.max(err, e);
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-        System.out.println("Checking accuracy of 3D real inverse full FFT (float[][][] input)...");
-        for (int i = 0; i < iters; i++) {
-            int exp = init_exp + i;
-            int size = (int) Math.pow(2, exp);
-            FloatFFT_3D fft3 = new FloatFFT_3D(size, size, size);
-            float e, err = 0.0f;
-            float[][][] a = new float[size][size][2 * size];
-            IOUtils.fillMatrix_3D(size, size, size, a);
-            float[][][] b = new float[size][size][2 * size];
-            IOUtils.fillMatrix_3D(size, size, size, b);
-            fft3.realInverseFull(b, true);
-            fft3.complexForward(b);
-            for (int s = 0; s < size; s++) {
-                for (int r = 0; r < size; r++) {
-                    for (int c = 0; c < size; c++) {
-                        e = Math.abs(b[s][r][2 * c] - a[s][r][c]);
-                        err = Math.max(err, e);
-                        e = Math.abs(b[s][r][2 * c + 1]);
-                        err = Math.max(err, e);
-                    }
-                }
-            }
-            if (err > 1e-5) {
-                System.err.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            } else {
-                System.out.println("\tsize = 2^" + exp + " x 2^" + exp + " x 2^" + exp + ";\t\terror = " + err);
-            }
-            a = null;
-            b = null;
-            fft3 = null;
-            System.gc();
-        }
-    }
+		System.out.println("Checking accuracy of 3D complex FFT (float[][][] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			float e, err = 0;
+			float[][][] a = new float[sizes3D[i]][sizes3D[i]][2 * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], 2 * sizes3D[i], a);
+			float[][][] b = new float[sizes3D[i]][sizes3D[i]][2 * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], 2 * sizes3D[i], b);
+			fft3.complexForward(a);
+			fft3.complexInverse(a, true);
+			for (int s = 0; s < sizes3D[i]; s++) {
+				for (int r = 0; r < sizes3D[i]; r++) {
+					for (int c = 0; c < 2 * sizes3D[i]; c++) {
+						e = Math.abs(b[s][r][c] - a[s][r][c]);
+						err = Math.max(err, e);
+					}
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
+	}
 
-    public static void main(String[] args) {
-        checkAccuracyComplexFFT_1D(0, 21);
-        checkAccuracyRealFFT_1D(0, 21);
-        checkAccuracyComplexFFT_2D(1, 11);
-        checkAccuracyRealFFT_2D(1, 11);
-        checkAccuracyComplexFFT_3D(1, 7);
-        checkAccuracyRealFFT_3D(1, 7);
-        System.exit(0);
-    }
+	public static void checkAccuracyRealFFT_1D() {
+		System.out.println("Checking accuracy of 1D real FFT...");
+		for (int i = 0; i < sizes1D.length; i++) {
+			FloatFFT_1D fft = new FloatFFT_1D(sizes1D[i]);
+			float e, err = 0;
+			float[] a = new float[sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], a);
+			float[] b = new float[sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], b);
+			fft.realForward(a);
+			fft.realInverse(a, true);
+			for (int j = 0; j < sizes1D[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of on 1D real forward full FFT...");
+		for (int i = 0; i < sizes1D.length; i++) {
+			FloatFFT_1D fft = new FloatFFT_1D(sizes1D[i]);
+			float e, err = 0;
+			float[] a = new float[2 * sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], a);
+			float[] b = new float[2 * sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], b);
+			fft.realForwardFull(b);
+			fft.complexInverse(b, true);
+			for (int j = 0; j < sizes1D[i]; j++) {
+				e = Math.abs(b[2 * j] - a[j]);
+				err = Math.max(err, e);
+				e = Math.abs(b[2 * j + 1]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 1D real inverse full FFT...");
+		for (int i = 0; i < sizes1D.length; i++) {
+			FloatFFT_1D fft = new FloatFFT_1D(sizes1D[i]);
+			float e, err = 0;
+			float[] a = new float[2 * sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], a);
+			float[] b = new float[2 * sizes1D[i]];
+			IOUtils.fillMatrix_1D(sizes1D[i], b);
+			fft.realInverseFull(b, true);
+			fft.complexForward(b);
+			for (int j = 0; j < sizes1D[i]; j++) {
+				e = Math.abs(b[2 * j] - a[j]);
+				err = Math.max(err, e);
+				e = Math.abs(b[2 * j + 1]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes1D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft = null;
+			System.gc();
+		}
+
+	}
+
+	public static void checkAccuracyRealFFT_2D() {
+		System.out.println("Checking accuracy of 2D real FFT (float[] input)...");
+		for (int i = 0; i < sizes2D2.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D2[i], sizes2D2[i]);
+			float e, err = 0;
+			float[] a = new float[sizes2D2[i] * sizes2D2[i]];
+			IOUtils.fillMatrix_2D(sizes2D2[i], sizes2D2[i], a);
+			float[] b = new float[sizes2D2[i] * sizes2D2[i]];
+			IOUtils.fillMatrix_2D(sizes2D2[i], sizes2D2[i], b);
+			fft2.realForward(b);
+			fft2.realInverse(b, true);
+			for (int j = 0; j < sizes2D2[i] * sizes2D2[i]; j++) {
+				e = Math.abs(a[j] - b[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D2[i] + " x " + sizes2D2[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D2[i] + " x " + sizes2D2[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 2D real FFT (float[][] input)...");
+		for (int i = 0; i < sizes2D2.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D2[i], sizes2D2[i]);
+			float e, err = 0;
+			float[][] a = new float[sizes2D2[i]][sizes2D2[i]];
+			IOUtils.fillMatrix_2D(sizes2D2[i], sizes2D2[i], a);
+			float[][] b = new float[sizes2D2[i]][sizes2D2[i]];
+			IOUtils.fillMatrix_2D(sizes2D2[i], sizes2D2[i], b);
+			fft2.realForward(b);
+			fft2.realInverse(b, true);
+			for (int r = 0; r < sizes2D2[i]; r++) {
+				for (int c = 0; c < sizes2D2[i]; c++) {
+					e = Math.abs(b[r][c] - a[r][c]);
+					err = Math.max(err, e);
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D2[i] + " x " + sizes2D2[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D2[i] + " x " + sizes2D2[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 2D real forward full FFT (float[] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D[i], sizes2D[i]);
+			float e, err = 0;
+			float[] a = new float[sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
+			float[] b = new float[2 * sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], b);
+			fft2.realForwardFull(b);
+			fft2.complexInverse(b, true);
+			for (int j = 0; j < sizes2D[i] * sizes2D[i]; j++) {
+				e = Math.abs(a[j] - b[2 * j]);
+				err = Math.max(err, e);
+				e = Math.abs(b[2 * j + 1]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 2D real forward full FFT (float[][] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D[i], sizes2D[i]);
+			float e, err = 0;
+			float[][] a = new float[sizes2D[i]][sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
+			float[][] b = new float[sizes2D[i]][2 * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], b);
+			fft2.realForwardFull(b);
+			fft2.complexInverse(b, true);
+			for (int r = 0; r < sizes2D[i]; r++) {
+				for (int c = 0; c < sizes2D[i]; c++) {
+					e = Math.abs(b[r][2 * c] - a[r][c]);
+					err = Math.max(err, e);
+					e = Math.abs(b[r][2 * c + 1]);
+					err = Math.max(err, e);
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 2D real inverse full FFT (float[] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D[i], sizes2D[i]);
+			float e, err = 0;
+			float[] a = new float[sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
+			float[] b = new float[2 * sizes2D[i] * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], b);
+			fft2.realInverseFull(b, true);
+			fft2.complexForward(b);
+			for (int j = 0; j < sizes2D[i] * sizes2D[i]; j++) {
+				e = Math.abs(a[j] - b[2 * j]);
+				err = Math.max(err, e);
+				e = Math.abs(b[2 * j + 1]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 2D real inverse full FFT (float[][] input)...");
+		for (int i = 0; i < sizes2D.length; i++) {
+			FloatFFT_2D fft2 = new FloatFFT_2D(sizes2D[i], sizes2D[i]);
+			float e, err = 0;
+			float[][] a = new float[sizes2D[i]][sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
+			float[][] b = new float[sizes2D[i]][2 * sizes2D[i]];
+			IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], b);
+			fft2.realInverseFull(b, true);
+			fft2.complexForward(b);
+			for (int r = 0; r < sizes2D[i]; r++) {
+				for (int c = 0; c < sizes2D[i]; c++) {
+					e = Math.abs(b[r][2 * c] - a[r][c]);
+					err = Math.max(err, e);
+					e = Math.abs(b[r][2 * c + 1]);
+					err = Math.max(err, e);
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes2D[i] + " x " + sizes2D[i] + ";\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft2 = null;
+			System.gc();
+		}
+
+	}
+
+	public static void checkAccuracyRealFFT_3D() {
+		System.out.println("Checking accuracy of 3D real FFT (float[] input)...");
+		for (int i = 0; i < sizes3D2.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D2[i], sizes3D2[i], sizes3D2[i]);
+			float e, err = 0;
+			float[] a = new float[sizes3D2[i] * sizes3D2[i] * sizes3D2[i]];
+			IOUtils.fillMatrix_3D(sizes3D2[i], sizes3D2[i], sizes3D2[i], a);
+			float[] b = new float[sizes3D2[i] * sizes3D2[i] * sizes3D2[i]];
+			IOUtils.fillMatrix_3D(sizes3D2[i], sizes3D2[i], sizes3D2[i], b);
+			fft3.realForward(b);
+			fft3.realInverse(b, true);
+			for (int j = 0; j < sizes3D2[i] * sizes3D2[i] * sizes3D2[i]; j++) {
+				e = Math.abs(b[j] - a[j]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D2[i] + " x " + sizes3D2[i] + " x " + sizes3D2[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D2[i] + " x " + sizes3D2[i] + " x " + sizes3D2[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 3D real FFT (float[][][] input)...");
+		for (int i = 0; i < sizes3D2.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D2[i], sizes3D2[i], sizes3D2[i]);
+			float e, err = 0;
+			float[][][] a = new float[sizes3D2[i]][sizes3D2[i]][sizes3D2[i]];
+			IOUtils.fillMatrix_3D(sizes3D2[i], sizes3D2[i], sizes3D2[i], a);
+			float[][][] b = new float[sizes3D2[i]][sizes3D2[i]][sizes3D2[i]];
+			IOUtils.fillMatrix_3D(sizes3D2[i], sizes3D2[i], sizes3D2[i], b);
+			fft3.realForward(b);
+			fft3.realInverse(b, true);
+			for (int s = 0; s < sizes3D2[i]; s++) {
+				for (int r = 0; r < sizes3D2[i]; r++) {
+					for (int c = 0; c < sizes3D2[i]; c++) {
+						e = Math.abs(b[s][r][c] - a[s][r][c]);
+						err = Math.max(err, e);
+					}
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D2[i] + " x " + sizes3D2[i] + " x " + sizes3D2[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D2[i] + " x " + sizes3D2[i] + " x " + sizes3D2[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 3D real forward full FFT (float[] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			float e, err = 0;
+			float[] a = new float[2 * sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
+			float[] b = new float[2 * sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], b);
+			fft3.realForwardFull(b);
+			fft3.complexInverse(b, true);
+			for (int j = 0; j < sizes3D[i] * sizes3D[i] * sizes3D[i]; j++) {
+				e = Math.abs(b[2 * j] - a[j]);
+				err = Math.max(err, e);
+				e = Math.abs(b[2 * j + 1]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
+
+		System.out.println("Checking accuracy of 3D real forward full FFT (float[][][] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			float e, err = 0;
+			float[][][] a = new float[sizes3D[i]][sizes3D[i]][2 * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
+			float[][][] b = new float[sizes3D[i]][sizes3D[i]][2 * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], b);
+			fft3.realForwardFull(b);
+			fft3.complexInverse(b, true);
+			for (int s = 0; s < sizes3D[i]; s++) {
+				for (int r = 0; r < sizes3D[i]; r++) {
+					for (int c = 0; c < sizes3D[i]; c++) {
+						e = Math.abs(b[s][r][2 * c] - a[s][r][c]);
+						err = Math.max(err, e);
+						e = Math.abs(b[s][r][2 * c + 1]);
+						err = Math.max(err, e);
+					}
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
+
+		System.out.println("Checking accuracy of 3D real inverse full FFT (float[] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			float e, err = 0;
+			float[] a = new float[2 * sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
+			float[] b = new float[2 * sizes3D[i] * sizes3D[i] * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], b);
+			fft3.realInverseFull(b, true);
+			fft3.complexForward(b);
+			for (int j = 0; j < sizes3D[i] * sizes3D[i] * sizes3D[i]; j++) {
+				e = Math.abs(b[2 * j] - a[j]);
+				err = Math.max(err, e);
+				e = Math.abs(b[2 * j + 1]);
+				err = Math.max(err, e);
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
+		System.out.println("Checking accuracy of 3D real inverse full FFT (float[][][] input)...");
+		for (int i = 0; i < sizes3D.length; i++) {
+			FloatFFT_3D fft3 = new FloatFFT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
+			float e, err = 0;
+			float[][][] a = new float[sizes3D[i]][sizes3D[i]][2 * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
+			float[][][] b = new float[sizes3D[i]][sizes3D[i]][2 * sizes3D[i]];
+			IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], b);
+			fft3.realInverseFull(b, true);
+			fft3.complexForward(b);
+			for (int s = 0; s < sizes3D[i]; s++) {
+				for (int r = 0; r < sizes3D[i]; r++) {
+					for (int c = 0; c < sizes3D[i]; c++) {
+						e = Math.abs(b[s][r][2 * c] - a[s][r][c]);
+						err = Math.max(err, e);
+						e = Math.abs(b[s][r][2 * c + 1]);
+						err = Math.max(err, e);
+					}
+				}
+			}
+			if (err > 1e-5) {
+				System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			} else {
+				System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+			}
+			a = null;
+			b = null;
+			fft3 = null;
+			System.gc();
+		}
+	}
+
+	public static void main(String[] args) {
+		ConcurrencyUtils.setNumberOfProcessors(2);
+		checkAccuracyComplexFFT_1D();
+		checkAccuracyRealFFT_1D();
+		checkAccuracyComplexFFT_2D();
+		checkAccuracyRealFFT_2D();
+		checkAccuracyComplexFFT_3D();
+		checkAccuracyRealFFT_3D();
+		System.exit(0);
+	}
 }

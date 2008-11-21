@@ -1,7 +1,9 @@
 package hep.aida.ref;
 
-import hep.aida.DoubleIHistogram1D;
-import hep.aida.DoubleIHistogram2D;
+import hep.aida.tdouble.DoubleIHistogram1D;
+import hep.aida.tdouble.DoubleIHistogram2D;
+import hep.aida.tdouble.ref.DoubleHistogram1D;
+import hep.aida.tdouble.ref.DoubleHistogram2D;
 
 import java.io.FileWriter;
 import java.io.IOException;
