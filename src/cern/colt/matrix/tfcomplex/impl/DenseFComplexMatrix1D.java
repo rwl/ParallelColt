@@ -786,7 +786,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
 
     public void fft() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (fft == null) {
             fft = new FloatFFT_1D(size);
         }
@@ -926,7 +926,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
 
     public void ifft(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (fft == null) {
             fft = new FloatFFT_1D(size);
         }

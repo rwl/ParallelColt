@@ -86,13 +86,13 @@ public class ConcurrencyUtils {
      * @return number of available processors
      */
     public static int concurrency() {
-    	return Runtime.getRuntime().availableProcessors();
-//        int availableProcessors = Runtime.getRuntime().availableProcessors();
-//        if (availableProcessors > 1) {
-//            return prevPow2(availableProcessors);
-//        } else {
-//            return 1;
-//        }
+        return Runtime.getRuntime().availableProcessors();
+        //        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        //        if (availableProcessors > 1) {
+        //            return prevPow2(availableProcessors);
+        //        } else {
+        //            return 1;
+        //        }
     }
 
     /**
@@ -236,16 +236,11 @@ public class ConcurrencyUtils {
      * @return the number of available processors
      */
     public static int setNumberOfProcessors(int n) {
-//        if (isPowerOf2(n)) {
-//            np = n;
-//        } else {
-//            np = prevPow2(n);
-//        }
-		if (n > 0) {
-			np = n;
-		} else {
-			np = concurrency();
-         }
+        if (n > 0) {
+            np = n;
+        } else {
+            np = concurrency();
+        }
         return np;
     }
 
@@ -258,6 +253,9 @@ public class ConcurrencyUtils {
     public static int nextPow2(int x) {
         if (x < 1)
             throw new IllegalArgumentException("x must be greater or equal 1");
+        if ((x & (x - 1)) == 0) {
+            return x; // x is already a power-of-two number 
+        }
         x |= (x >>> 1);
         x |= (x >>> 2);
         x |= (x >>> 4);

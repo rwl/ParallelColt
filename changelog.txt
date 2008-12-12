@@ -1,51 +1,54 @@
 Parallel Colt changelog
 
-0.6:
-	- a lot of refactoring (now each object of a given type has its own package)
-	- JTransforms updated to version 2.0 (no more power-of-two size limitation)
-	- multithreaded implementation of Object matrices
-	- fixed bug in DComplex.inv() and FComplex.inv()
+0.6.1:	December 12, 2008
+	- JTransforms updated to version 2.1 
+
+0.6:	November 21, 2008
+	- A lot of refactoring (now each object of a given type has its own package).
+	- JTransforms updated to version 2.0 (no more power-of-two size limitation).
+	- Multithreaded implementation of Object matrices.
+	- Fixed bug in DComplex.inv() and FComplex.inv().
 
 0.5:	August 24, 2008	
-	- added multithreaded quicksorts for many data types
-	- added parallel 1D histograms for 2D matrices
-	- added benchmarks for dense matrices
-	- added real FFTs and DHTs
-	- added javadoc distribution
-	- bzip2 is used to compress tar archives
-	- fixed bugs causing incorrect computations of the transforms for views
-	- fixed bug in normalize() causing incorrect results in some specific cases
-	- refactoring in edu.emory.mathcs.utils cern.colt.matrix.doublealgo, cern.colt.matrix.floatalgo and cern.colt.matrix.objectalgo
-	- unit tests and benchmarks are in separate directories now
-	- removed cern.colt.matrix.doublealgo.Transform and cern.colt.matrix.floatalgo.Transform
+	- Added multithreaded quicksorts for many data types.
+	- Added parallel 1D histograms for 2D matrices.
+	- Added benchmarks for dense matrices.
+	- Added real FFTs and DHTs.
+	- Added javadoc distribution.
+	- Bzip2 is used to compress tar archives.
+	- Fixed bugs causing incorrect computations of the transforms for views.
+	- Fixed bug in normalize() causing incorrect results in some specific cases.
+	- Refactoring in edu.emory.mathcs.utils cern.colt.matrix.doublealgo, cern.colt.matrix.floatalgo and cern.colt.matrix.objectalgo.
+	- Unit tests and benchmarks are in separate directories now.
+	- Removed cern.colt.matrix.doublealgo.Transform and cern.colt.matrix.floatalgo.Transform.
 
 0.4:	April 17, 2008
-	- more efficient implementation of all operations on "views"
-	- more efficient matrix-matrix multiplication algorithms
-	- fixed several bugs in dense matrices
+	- More efficient implementation of all operations on "views".
+	- More efficient matrix-matrix multiplication algorithms.
+	- Fixed several bugs in dense matrices.
 
 0.3:	February 15, 2008
-	- added single precision
+	- Added single precision.
 
 0.2.1:	January 30, 2008
-	- added JLAPACK 0.8
-	- added SingularValueDecompositionDC
+	- Added JLAPACK 0.8.
+	- Added SingularValueDecompositionDC.
 	
 0.2:	January 5, 2008
-	- added JTransforms
-	- added complex matrices, factories and functions
-	- added new methods in dense double matrices
-	- added JUnit tests for dense complex and double matrices
-	- removed SeqBlas
-	- fixed bug in aggregate methods
-	- added multithreaded versions of many methods in dense complex and double matrices
+	- Added JTransforms.
+	- Added complex matrices, factories and functions.
+	- Added new methods in dense double matrices.
+	- Added JUnit tests for dense complex and double matrices.
+	- Removed SeqBlas.
+	- Fixed bug in aggregate methods.
+	- Added multithreaded versions of many methods in dense complex and double matrices.
 
 0.1:	September 5, 2007
-	- initial release
-	- changes in Colt 1.2
-		- EDU.oswego.cs.dl.util.concurrent replaced by java.util.concurrent
-		- added multithreaded implementation of quicksort
-		- added sortIndex() methods
-		- added multithreaded varsions of all assign() and aggregate() methods for dense matrices
-		- automatic multithreading - no need to initialize threads in SmpBlas or any other class
+	- Initial release.
+	- Changes in Colt 1.2:
+		- EDU.oswego.cs.dl.util.concurrent replaced by java.util.concurrent.
+		- Added multithreaded implementation of quicksort.
+		- Added sortIndex() methods.
+		- Added multithreaded varsions of all assign() and aggregate() methods for dense matrices.
+		- Automatic multithreading - no need to initialize threads in SmpBlas or any other class.
 

@@ -1377,7 +1377,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void dct2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (dct2 == null) {
             dct2 = new DoubleDCT_2D(rows, columns);
         }
@@ -1434,7 +1434,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void dctRows(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -1478,7 +1478,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     
     public void dht2() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (dht2 == null) {
             dht2 = new DoubleDHT_2D(rows, columns);
         }
@@ -1494,7 +1494,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void dhtColumns() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -1538,7 +1538,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void dhtRows() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -1582,7 +1582,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void dst2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (dst2 == null) {
             dst2 = new DoubleDST_2D(rows, columns);
         }
@@ -1598,7 +1598,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void dstColumns(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -1645,7 +1645,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void dstRows(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -1696,7 +1696,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void fft2() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
@@ -1767,7 +1767,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DComplexMatrix2D getFft2() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
@@ -1821,7 +1821,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DComplexMatrix2D getFftColumns() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1867,7 +1867,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DComplexMatrix2D getFftRows() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1913,7 +1913,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DComplexMatrix2D getIfft2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         final double[] cElems = (double[]) ((DenseDComplexMatrix2D) C).elements();
         final double[] elems;
@@ -1967,7 +1967,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DComplexMatrix2D getIfftColumns(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -2013,7 +2013,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DComplexMatrix2D getIfftRows(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -2119,7 +2119,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idct2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (dct2 == null) {
             dct2 = new DoubleDCT_2D(rows, columns);
         }
@@ -2135,7 +2135,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idctColumns(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -2179,7 +2179,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idctRows(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -2222,7 +2222,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     
     public void idht2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (dht2 == null) {
             dht2 = new DoubleDHT_2D(rows, columns);
         }
@@ -2238,7 +2238,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idhtColumns(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -2282,7 +2282,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idhtRows(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -2325,7 +2325,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idst2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (dst2 == null) {
             dst2 = new DoubleDST_2D(rows, columns);
         }
@@ -2341,7 +2341,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idstColumns(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -2385,7 +2385,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void idstRows(final boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	int np = ConcurrencyUtils.getNumberOfProcessors();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
@@ -2428,7 +2428,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public void ifft2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }

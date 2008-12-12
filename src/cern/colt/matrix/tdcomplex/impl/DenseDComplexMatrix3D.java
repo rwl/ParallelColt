@@ -1225,7 +1225,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
 
     public void fft2Slices() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         DComplexMatrix2D slice;
         for (int s = 0; s < slices; s++) {
             slice = viewSlice(s).copy();
@@ -1237,7 +1237,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
 
     public void fft3() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (fft3 == null) {
             fft3 = new DoubleFFT_3D(slices, rows, columns);
         }
@@ -1414,7 +1414,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
 
     public void ifft2Slices(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         DComplexMatrix2D slice;
         for (int s = 0; s < slices; s++) {
             slice = viewSlice(s).copy();
@@ -1426,7 +1426,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
 
     public void ifft3(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (fft3 == null) {
             fft3 = new DoubleFFT_3D(slices, rows, columns);
         }

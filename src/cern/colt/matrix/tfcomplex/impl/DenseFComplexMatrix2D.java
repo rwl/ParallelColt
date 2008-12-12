@@ -1143,7 +1143,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public void fft2() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (fft2 == null) {
             fft2 = new FloatFFT_2D(rows, columns);
         }
@@ -1153,7 +1153,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public void fftColumns() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         FComplexMatrix1D column;
         for (int c = 0; c < columns; c++) {
             column = viewColumn(c).copy();
@@ -1165,7 +1165,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public void fftRows() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	FComplexMatrix1D row;
         for (int r = 0; r < rows; r++) {
             row = viewRow(r).copy();
@@ -1448,7 +1448,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public void ifft2(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         if (fft2 == null) {
             fft2 = new FloatFFT_2D(rows, columns);
         }
@@ -1458,7 +1458,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public void ifftColumns(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	FComplexMatrix1D column;
         for (int c = 0; c < columns; c++) {
             column = viewColumn(c).copy();
@@ -1470,7 +1470,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public void ifftRows(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	FComplexMatrix1D row;
         for (int r = 0; r < rows; r++) {
             row = viewRow(r).copy();

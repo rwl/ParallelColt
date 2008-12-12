@@ -825,7 +825,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void dct(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dct == null) {
 			dct = new DoubleDCT_1D(size);
 		}
@@ -841,7 +841,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void dht() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dht == null) {
 			dht = new DoubleDHT_1D(size);
 		}
@@ -857,7 +857,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void dst(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dst == null) {
 			dst = new DoubleDST_1D(size);
 		}
@@ -877,7 +877,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void fft() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (fft == null) {
 			fft = new DoubleFFT_1D(size);
 		}
@@ -893,7 +893,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public DComplexMatrix1D getFft() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		final double[] elems;
 		if (isNoView == true) {
 			elems = elements;
@@ -913,7 +913,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public DComplexMatrix1D getIfft(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		final double[] elems;
 		if (isNoView == true) {
 			elems = elements;
@@ -1155,7 +1155,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void idct(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dct == null) {
 			dct = new DoubleDCT_1D(size);
 		}
@@ -1171,7 +1171,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void idht(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dht == null) {
 			dht = new DoubleDHT_1D(size);
 		}
@@ -1187,7 +1187,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void idst(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dst == null) {
 			dst = new DoubleDST_1D(size);
 		}
@@ -1203,7 +1203,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
 	public void ifft(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (fft == null) {
 			fft = new DoubleFFT_1D(size);
 		}

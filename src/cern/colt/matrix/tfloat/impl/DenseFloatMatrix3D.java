@@ -1217,7 +1217,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void dct2Slices(final boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
 			Future[] futures = new Future[np];
@@ -1258,7 +1258,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void dht3() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dht3 == null) {
 			dht3 = new FloatDHT_3D(slices, rows, columns);
 		}
@@ -1274,7 +1274,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void dht2Slices() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
 			Future[] futures = new Future[np];
@@ -1315,7 +1315,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void dct3(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dct3 == null) {
 			dct3 = new FloatDCT_3D(slices, rows, columns);
 		}
@@ -1331,7 +1331,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void dst2Slices(final boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
 			Future[] futures = new Future[np];
@@ -1372,7 +1372,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void dst3(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dst3 == null) {
 			dst3 = new FloatDST_3D(slices, rows, columns);
 		}
@@ -1392,7 +1392,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void fft3() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (fft3 == null) {
 			fft3 = new FloatFFT_3D(slices, rows, columns);
 		}
@@ -1408,7 +1408,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public FComplexMatrix3D getFft2Slices() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		final FComplexMatrix3D C = new DenseFComplexMatrix3D(slices, rows, columns);
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
@@ -1451,7 +1451,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public FComplexMatrix3D getFft3() {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		FComplexMatrix3D C = new DenseFComplexMatrix3D(slices, rows, columns);
 		final int sliceStride = rows * columns;
 		final int rowStride = columns;
@@ -1515,7 +1515,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public FComplexMatrix3D getIfft2Slices(final boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		final FComplexMatrix3D C = new DenseFComplexMatrix3D(slices, rows, columns);
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
@@ -1558,7 +1558,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public FComplexMatrix3D getIfft3(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		FComplexMatrix3D C = new DenseFComplexMatrix3D(slices, rows, columns);
 		final int sliceStride = rows * columns;
 		final int rowStride = columns;
@@ -1704,7 +1704,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void idct2Slices(final boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
 			Future[] futures = new Future[np];
@@ -1745,7 +1745,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void idht3(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dht3 == null) {
 			dht3 = new FloatDHT_3D(slices, rows, columns);
 		}
@@ -1761,7 +1761,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void idht2Slices(final boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
 			Future[] futures = new Future[np];
@@ -1802,7 +1802,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void idct3(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dct3 == null) {
 			dct3 = new FloatDCT_3D(slices, rows, columns);
 		}
@@ -1818,7 +1818,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void idst2Slices(final boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		int np = ConcurrencyUtils.getNumberOfProcessors();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
 			Future[] futures = new Future[np];
@@ -1859,7 +1859,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void idst3(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (dst3 == null) {
 			dst3 = new FloatDST_3D(slices, rows, columns);
 		}
@@ -1875,7 +1875,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
 	public void ifft3(boolean scale) {
 		int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+		ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
 		if (fft3 == null) {
 			fft3 = new FloatFFT_3D(slices, rows, columns);
 		}

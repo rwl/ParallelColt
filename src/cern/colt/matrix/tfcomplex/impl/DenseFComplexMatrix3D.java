@@ -1224,7 +1224,7 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
 
     public void fft2Slices() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         FComplexMatrix2D slice;
         for (int s = 0; s < slices; s++) {
             slice = viewSlice(s).copy();
@@ -1236,7 +1236,7 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
 
     public void fft3() {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (fft3 == null) {
             fft3 = new FloatFFT_3D(slices, rows, columns);
         }
@@ -1413,7 +1413,7 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
 
     public void ifft2Slices(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
         FComplexMatrix2D slice;
         for (int s = 0; s < slices; s++) {
             slice = viewSlice(s).copy();
@@ -1425,7 +1425,7 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
 
     public void ifft3(boolean scale) {
     	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.prevPow2(ConcurrencyUtils.getNumberOfProcessors()));
+    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
     	if (fft3 == null) {
             fft3 = new FloatFFT_3D(slices, rows, columns);
         }
