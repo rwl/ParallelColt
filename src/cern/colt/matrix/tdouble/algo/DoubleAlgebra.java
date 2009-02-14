@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
@@ -19,6 +20,12 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
+import cern.colt.matrix.tdouble.algo.decomposition.DoubleCholeskyDecomposition;
+import cern.colt.matrix.tdouble.algo.decomposition.DoubleEigenvalueDecomposition;
+import cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecomposition;
+import cern.colt.matrix.tdouble.algo.decomposition.DoubleQRDecomposition;
+import cern.colt.matrix.tdouble.algo.decomposition.DoubleSingularValueDecomposition;
+import cern.colt.matrix.tdouble.algo.decomposition.DoubleSingularValueDecompositionDC;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix3D;
@@ -45,8 +52,8 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * tolerance. Allows ommiting to construct an Algebra object time and again.
      * 
      * Note that this Algebra object is immutable. Any attempt to assign a new
-     * Property object to it (via method <tt>setProperty</tt>), or to alter
-     * the tolerance of its property object (via
+     * Property object to it (via method <tt>setProperty</tt>), or to alter the
+     * tolerance of its property object (via
      * <tt>property().setTolerance(...)</tt>) will throw an exception.
      */
     public static final DoubleAlgebra DEFAULT;
@@ -56,8 +63,8 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * tolerance. Allows ommiting to construct an Algebra object time and again.
      * 
      * Note that this Algebra object is immutable. Any attempt to assign a new
-     * Property object to it (via method <tt>setProperty</tt>), or to alter
-     * the tolerance of its property object (via
+     * Property object to it (via method <tt>setProperty</tt>), or to alter the
+     * tolerance of its property object (via
      * <tt>property().setTolerance(...)</tt>) will throw an exception.
      */
     public static final DoubleAlgebra ZERO;
@@ -113,8 +120,8 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the condition of matrix <tt>A</tt>, which is the ratio of
-     * largest to smallest singular value.
+     * Returns the condition of matrix <tt>A</tt>, which is the ratio of largest
+     * to smallest singular value.
      */
     public double cond(DoubleMatrix2D A) {
         return svd(A).cond();
@@ -139,7 +146,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     /**
      * Returns sqrt(a^2 + b^2) without under/overflow.
      */
-    protected static double hypot(double a, double b) {
+    public static double hypot(double a, double b) {
         double r;
         if (Math.abs(a) > Math.abs(b)) {
             r = b / a;
@@ -156,7 +163,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     /**
      * Returns sqrt(a^2 + b^2) without under/overflow.
      */
-    protected static cern.colt.function.tdouble.DoubleDoubleFunction hypotFunction() {
+    public static cern.colt.function.tdouble.DoubleDoubleFunction hypotFunction() {
         return new cern.colt.function.tdouble.DoubleDoubleFunction() {
             public final double apply(double a, double b) {
                 return hypot(a, b);
@@ -173,7 +180,12 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     public DoubleMatrix2D inverse(DoubleMatrix2D A) {
         if (property.isSquare(A) && property.isDiagonal(A)) {
             DoubleMatrix2D inv = A.copy();
-            boolean isNonSingular = DoubleDiagonal.inverse(inv);
+            boolean isNonSingular = true;
+            for (int i = inv.rows(); --i >= 0;) {
+                double v = inv.getQuick(i, i);
+                isNonSingular &= (v != 0);
+                inv.setQuick(i, i, 1 / v);
+            }
             if (!isNonSingular)
                 throw new IllegalArgumentException("A is singular.");
             return inv;
@@ -190,6 +202,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Computes the Kronecker product of two complex matrices.
+     * 
      * @param x
      * @param y
      * @return the Kronecker product of two complex matrices
@@ -207,6 +220,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Computes the Kronecker product of two arrays.
+     * 
      * @param A
      * @param B
      * @return the Kronecker product of two arrays
@@ -222,12 +236,13 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
         return C;
     }
 
-   /**
-    * Computes the Kronecker product of two real matrices.
-    * @param x
-    * @param y
-    * @return the Kronecker product of two real matrices
-    */
+    /**
+     * Computes the Kronecker product of two real matrices.
+     * 
+     * @param x
+     * @param y
+     * @return the Kronecker product of two real matrices
+     */
     public DoubleMatrix1D kron(DoubleMatrix1D x, DoubleMatrix1D y) {
         int size_x = x.size();
         int size_y = y.size();
@@ -335,8 +350,8 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the one-norm of matrix <tt>A</tt>, which is the maximum
-     * absolute column sum.
+     * Returns the one-norm of matrix <tt>A</tt>, which is the maximum absolute
+     * column sum.
      */
     public double norm1(DoubleMatrix2D A) {
         double max = 0;
@@ -363,9 +378,9 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
             final int rows = X.rows();
             final int cols = X.columns();
             double sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (rows * cols >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Double result;
                 int k = rows / np;
                 for (int j = 0; j < np; j++) {
@@ -376,7 +391,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stoprow = startrow + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                         public Double call() throws Exception {
                             double sum = 0;
                             double elem;
@@ -413,9 +428,9 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
         } else {
             final double[] elems = (double[]) ((DenseDoubleMatrix2D) X).elements();
             double sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (elems.length >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Double result;
                 int k = elems.length / np;
                 for (int j = 0; j < np; j++) {
@@ -426,7 +441,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stopidx = startidx + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                         public Double call() throws Exception {
                             double sum = 0;
                             for (int l = startidx; l < stopidx; l++) {
@@ -466,9 +481,9 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
             final int rows = X.rows();
             final int cols = X.columns();
             double sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (rows * cols >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Double result;
                 int k = slices / np;
                 for (int j = 0; j < np; j++) {
@@ -479,7 +494,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stopslice = startslice + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                         public Double call() throws Exception {
                             double sum = 0;
                             double elem;
@@ -520,9 +535,9 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
         } else {
             final double[] elems = (double[]) ((DenseDoubleMatrix3D) X).elements();
             double sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (elems.length >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Double result;
                 int k = elems.length / np;
                 for (int j = 0; j < np; j++) {
@@ -533,7 +548,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stopidx = startidx + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                         public Double call() throws Exception {
                             double sum = 0;
                             for (int l = startidx; l < stopidx; l++) {
@@ -563,9 +578,41 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
         }
     }
 
+    public double norm(DoubleMatrix2D A, Norm type) {
+        switch (type) {
+        case Frobenius:
+            return DEFAULT.normF(A);
+        case Infinity:
+            return DEFAULT.normInfinity(A);
+        case One:
+            return DEFAULT.norm1(A);
+        case Two:
+            return DEFAULT.norm2(A);
+        default:
+            return 0;
+        }
+
+    }
+
+    public double norm(DoubleMatrix1D x, Norm type) {
+        switch (type) {
+        case Frobenius:
+            return DEFAULT.normF(x);
+        case Infinity:
+            return DEFAULT.normInfinity(x);
+        case One:
+            return DEFAULT.norm1(x);
+        case Two:
+            return DEFAULT.norm2(x);
+        default:
+            return 0;
+        }
+
+    }
+
     /**
-     * Returns the two-norm of matrix <tt>A</tt>, which is the maximum
-     * singular value; obtained from SVD.
+     * Returns the two-norm of matrix <tt>A</tt>, which is the maximum singular
+     * value; obtained from SVD.
      */
     public double norm2(DoubleMatrix2D A) {
         return svd(A).norm2();
@@ -576,6 +623,16 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * <tt>Sqrt(Sum(A[i,j]<sup>2</sup>))</tt>.
      */
     public double normF(DoubleMatrix2D A) {
+        if (A.size() == 0)
+            return 0;
+        return A.aggregate(hypotFunction(), cern.jet.math.tdouble.DoubleFunctions.identity);
+    }
+
+    /**
+     * Returns the Frobenius norm of matrix <tt>A</tt>, which is
+     * <tt>Sqrt(Sum(A[i]<sup>2</sup>))</tt>.
+     */
+    public double normF(DoubleMatrix1D A) {
         if (A.size() == 0)
             return 0;
         return A.aggregate(hypotFunction(), cern.jet.math.tdouble.DoubleFunctions.identity);
@@ -650,18 +707,19 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * 	 [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
      * 	 [A,E,B,C,D]
      * 	 In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[1], A[3]&lt;--A[2], A[4]&lt;--A[3].
-     * 	
+     * 
      * </pre>
      * 
      * @param A
      *            the vector to permute.
      * @param indexes
      *            the permutation indexes, must satisfy
-     *            <tt>indexes.length==A.size() && indexes[i] >= 0 && indexes[i] < A.size()</tt>;
+     *            <tt>indexes.length==A.size() && indexes[i] >= 0 && indexes[i] < A.size()</tt>
+     *            ;
      * @param work
      *            the working storage, must satisfy
-     *            <tt>work.length >= A.size()</tt>; set <tt>work==null</tt>
-     *            if you don't care about performance.
+     *            <tt>work.length >= A.size()</tt>; set <tt>work==null</tt> if
+     *            you don't care about performance.
      * @return the modified <tt>A</tt> (for convenience only).
      * @throws IndexOutOfBoundsException
      *             if <tt>indexes.length != A.size()</tt>.
@@ -689,11 +747,11 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs and returns a new row and column permuted <i>selection view</i>
-     * of matrix <tt>A</tt>; equivalent to
-     * {@link DoubleMatrix2D#viewSelection(int[],int[])}. The returned matrix
-     * is backed by this matrix, so changes in the returned matrix are reflected
-     * in this matrix, and vice-versa. Use idioms like
+     * Constructs and returns a new row and column permuted <i>selection
+     * view</i> of matrix <tt>A</tt>; equivalent to
+     * {@link DoubleMatrix2D#viewSelection(int[],int[])}. The returned matrix is
+     * backed by this matrix, so changes in the returned matrix are reflected in
+     * this matrix, and vice-versa. Use idioms like
      * <tt>result = permute(...).copy()</tt> to generate an independent sub
      * matrix.
      * 
@@ -704,20 +762,21 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Modifies the given matrix <tt>A</tt> such that it's columns are
-     * permuted as specified; Useful for pivoting. Column <tt>A[i]</tt> will
-     * go into column <tt>A[indexes[i]]</tt>. Equivalent to
+     * Modifies the given matrix <tt>A</tt> such that it's columns are permuted
+     * as specified; Useful for pivoting. Column <tt>A[i]</tt> will go into
+     * column <tt>A[indexes[i]]</tt>. Equivalent to
      * <tt>permuteRows(transpose(A), indexes, work)</tt>.
      * 
      * @param A
      *            the matrix to permute.
      * @param indexes
      *            the permutation indexes, must satisfy
-     *            <tt>indexes.length==A.columns() && indexes[i] >= 0 && indexes[i] < A.columns()</tt>;
+     *            <tt>indexes.length==A.columns() && indexes[i] >= 0 && indexes[i] < A.columns()</tt>
+     *            ;
      * @param work
      *            the working storage, must satisfy
-     *            <tt>work.length >= A.columns()</tt>; set
-     *            <tt>work==null</tt> if you don't care about performance.
+     *            <tt>work.length >= A.columns()</tt>; set <tt>work==null</tt>
+     *            if you don't care about performance.
      * @return the modified <tt>A</tt> (for convenience only).
      * @throws IndexOutOfBoundsException
      *             if <tt>indexes.length != A.columns()</tt>.
@@ -727,8 +786,8 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Modifies the given matrix <tt>A</tt> such that it's rows are permuted
-     * as specified; Useful for pivoting. Row <tt>A[i]</tt> will go into row
+     * Modifies the given matrix <tt>A</tt> such that it's rows are permuted as
+     * specified; Useful for pivoting. Row <tt>A[i]</tt> will go into row
      * <tt>A[indexes[i]]</tt>.
      * <p>
      * <b>Example:</b>
@@ -743,18 +802,19 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * 	 [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
      * 	 [A,E,B,C,D]
      * 	 In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[1], A[3]&lt;--A[2], A[4]&lt;--A[3].
-     * 	
+     * 
      * </pre>
      * 
      * @param A
      *            the matrix to permute.
      * @param indexes
      *            the permutation indexes, must satisfy
-     *            <tt>indexes.length==A.rows() && indexes[i] >= 0 && indexes[i] < A.rows()</tt>;
+     *            <tt>indexes.length==A.rows() && indexes[i] >= 0 && indexes[i] < A.rows()</tt>
+     *            ;
      * @param work
      *            the working storage, must satisfy
-     *            <tt>work.length >= A.rows()</tt>; set <tt>work==null</tt>
-     *            if you don't care about performance.
+     *            <tt>work.length >= A.rows()</tt>; set <tt>work==null</tt> if
+     *            you don't care about performance.
      * @return the modified <tt>A</tt> (for convenience only).
      * @throws IndexOutOfBoundsException
      *             if <tt>indexes.length != A.rows()</tt>.
@@ -894,8 +954,8 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the effective numerical rank of matrix <tt>A</tt>, obtained
-     * from Singular Value Decomposition.
+     * Returns the effective numerical rank of matrix <tt>A</tt>, obtained from
+     * Singular Value Decomposition.
      */
     public int rank(DoubleMatrix2D A) {
         return svd(A).rank();
@@ -907,8 +967,8 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * @param property
      *            the Property object to be attached.
      * @throws UnsupportedOperationException
-     *             if <tt>this==DEFAULT && property!=this.property()</tt> -
-     *             The DEFAULT Algebra object is immutable.
+     *             if <tt>this==DEFAULT && property!=this.property()</tt> - The
+     *             DEFAULT Algebra object is immutable.
      * @throws UnsupportedOperationException
      *             if <tt>this==ZERO && property!=this.property()</tt> - The
      *             ZERO Algebra object is immutable.
@@ -928,10 +988,6 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
         x.setQuick(rows - 1, b.getQuick(rows - 1) / U.getQuick(rows - 1, rows - 1));
         double sum;
         for (int r = rows - 2; r >= 0; r--) {
-            // sum = 0;
-            // for (int c = r; c < rows; c++) {
-            // sum += U.getQuick(r, c) * x.getQuick(c);
-            // }
             sum = U.viewRow(r).zDotProduct(x);
             x.setQuick(r, (b.getQuick(r) - sum) / U.getQuick(r, r));
         }
@@ -945,13 +1001,21 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
         x.setQuick(0, b.getQuick(0) / L.getQuick(0, 0));
         for (int r = 1; r < rows; r++) {
             sum = L.viewRow(r).zDotProduct(x);
-            // sum = 0;
-            // for (int c = 0; c < r; c++) {
-            // sum += L.getQuick(r, c) * x.getQuick(c);
-            // }
             x.setQuick(r, (b.getQuick(r) - sum) / L.getQuick(r, r));
         }
         return x;
+    }
+
+    /**
+     * Solves A*x = b. A has to be square.
+     * 
+     * @return x; a solution
+     */
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b) {
+        if (A.rows() != A.columns()) {
+            throw new IllegalArgumentException("This method only applies to square matrices");
+        }
+        return lu(A).solve(b);
     }
 
     /**
@@ -976,8 +1040,9 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Copies the columns of the indicated rows into a new sub matrix.
-     * <tt>sub[0..rowIndexes.length-1,0..columnTo-columnFrom] = A[rowIndexes(:),columnFrom..columnTo]</tt>;
-     * The returned matrix is <i>not backed</i> by this matrix, so changes in
+     * 
+     * <tt>sub[0..rowIndexes.length-1,0..columnTo-columnFrom] = A[rowIndexes(:),columnFrom..columnTo]</tt>
+     * ; The returned matrix is <i>not backed</i> by this matrix, so changes in
      * the returned matrix are <i>not reflected</i> in this matrix, and
      * vice-versa.
      * 
@@ -990,10 +1055,13 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * @param columnTo
      *            the index of the last column to copy (inclusive).
      * @return a new sub matrix; with
-     *         <tt>sub.rows()==rowIndexes.length; sub.columns()==columnTo-columnFrom+1</tt>.
+     *         <tt>sub.rows()==rowIndexes.length; sub.columns()==columnTo-columnFrom+1</tt>
+     *         .
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>columnFrom<0 || columnTo-columnFrom+1<0 || columnTo+1>matrix.columns() || for any row=rowIndexes[i]: row < 0 || row >= matrix.rows()</tt>.
+     * 
+     *             <tt>columnFrom<0 || columnTo-columnFrom+1<0 || columnTo+1>matrix.columns() || for any row=rowIndexes[i]: row < 0 || row >= matrix.rows()</tt>
+     *             .
      */
     public DoubleMatrix2D subMatrix(DoubleMatrix2D A, int[] rowIndexes, int columnFrom, int columnTo) {
         int width = columnTo - columnFrom + 1;
@@ -1012,8 +1080,9 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Copies the rows of the indicated columns into a new sub matrix.
-     * <tt>sub[0..rowTo-rowFrom,0..columnIndexes.length-1] = A[rowFrom..rowTo,columnIndexes(:)]</tt>;
-     * The returned matrix is <i>not backed</i> by this matrix, so changes in
+     * 
+     * <tt>sub[0..rowTo-rowFrom,0..columnIndexes.length-1] = A[rowFrom..rowTo,columnIndexes(:)]</tt>
+     * ; The returned matrix is <i>not backed</i> by this matrix, so changes in
      * the returned matrix are <i>not reflected</i> in this matrix, and
      * vice-versa.
      * 
@@ -1026,10 +1095,13 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * @param columnIndexes
      *            the indexes of the columns to copy. May be unsorted.
      * @return a new sub matrix; with
-     *         <tt>sub.rows()==rowTo-rowFrom+1; sub.columns()==columnIndexes.length</tt>.
+     *         <tt>sub.rows()==rowTo-rowFrom+1; sub.columns()==columnIndexes.length</tt>
+     *         .
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>rowFrom<0 || rowTo-rowFrom+1<0 || rowTo+1>matrix.rows() || for any col=columnIndexes[i]: col < 0 || col >= matrix.columns()</tt>.
+     * 
+     *             <tt>rowFrom<0 || rowTo-rowFrom+1<0 || rowTo+1>matrix.rows() || for any col=columnIndexes[i]: col < 0 || col >= matrix.columns()</tt>
+     *             .
      */
     public DoubleMatrix2D subMatrix(DoubleMatrix2D A, int rowFrom, int rowTo, int[] columnIndexes) {
         if (rowTo - rowFrom >= A.rows())
@@ -1069,6 +1141,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * @return a new sub-range view.
      * @throws IndexOutOfBoundsException
      *             if
+     * 
      *             <tt>fromColumn<0 || toColumn-fromColumn+1<0 || toColumn>=A.columns() || fromRow<0 || toRow-fromRow+1<0 || toRow>=A.rows()</tt>
      */
     public DoubleMatrix2D subMatrix(DoubleMatrix2D A, int fromRow, int toRow, int fromColumn, int toColumn) {
@@ -1104,7 +1177,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * 	 normInfinity  : 1.5406551198102534
      * 	 rank          : 3
      * 	 trace         : 0
-     * 	
+     * 
      * </pre>
      */
     public String toString(DoubleMatrix2D matrix) {
@@ -1211,9 +1284,9 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the results of <tt>toString(A)</tt> and additionally the
-     * results of all sorts of decompositions applied to the given matrix.
-     * Useful for debugging or to quickly get the rough picture. For example,
+     * Returns the results of <tt>toString(A)</tt> and additionally the results
+     * of all sorts of decompositions applied to the given matrix. Useful for
+     * debugging or to quickly get the rough picture. For example,
      * 
      * <pre>
      * 	 A = 3 x 3 matrix
@@ -1355,7 +1428,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * 	 0.577296 -0.808174  0.116546
      * 	 0.517308  0.251562 -0.817991
      * 	 0.631761  0.532513  0.563301
-     * 	
+     * 
      * </pre>
      */
     public String toVerboseString(DoubleMatrix2D matrix) {
@@ -1441,19 +1514,19 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Constructs and returns a new view which is the transposition of the given
-     * matrix <tt>A</tt>. Equivalent to
-     * {@link DoubleMatrix2D#viewDice A.viewDice()}. This is a zero-copy
-     * transposition, taking O(1), i.e. constant time. The returned view is
-     * backed by this matrix, so changes in the returned view are reflected in
-     * this matrix, and vice-versa. Use idioms like
-     * <tt>result = transpose(A).copy()</tt> to generate an independent
-     * matrix.
+     * matrix <tt>A</tt>. Equivalent to {@link DoubleMatrix2D#viewDice
+     * A.viewDice()}. This is a zero-copy transposition, taking O(1), i.e.
+     * constant time. The returned view is backed by this matrix, so changes in
+     * the returned view are reflected in this matrix, and vice-versa. Use
+     * idioms like <tt>result = transpose(A).copy()</tt> to generate an
+     * independent matrix.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>transpose ==></td>
      * <td valign="top">3 x 2 matrix:<br>
      * 1, 4 <br>
@@ -1462,7 +1535,7 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
      * <td>transpose ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 

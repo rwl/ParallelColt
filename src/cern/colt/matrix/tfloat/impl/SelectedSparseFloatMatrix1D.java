@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,8 +8,7 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfloat.impl;
 
-import cern.colt.map.tfloat.AbstractIntFloatMap;
-import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
+import cern.colt.map.tfloat.AbstractLongFloatMap;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
@@ -55,7 +54,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntFloatMap elements;
+    protected AbstractLongFloatMap elements;
 
     /**
      * The offsets of visible indexes of this matrix.
@@ -75,7 +74,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param indexes
      *            The indexes of the cells that shall be visible.
      */
-    protected SelectedSparseFloatMatrix1D(AbstractIntFloatMap elements, int[] offsets) {
+    protected SelectedSparseFloatMatrix1D(AbstractLongFloatMap elements, int[] offsets) {
         this(offsets.length, elements, 0, 1, offsets, 0);
     }
 
@@ -95,7 +94,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseFloatMatrix1D(int size, AbstractIntFloatMap elements, int zero, int stride, int[] offsets, int offset) {
+    protected SelectedSparseFloatMatrix1D(int size, AbstractLongFloatMap elements, int zero, int stride, int[] offsets, int offset) {
         setUp(size, zero, stride);
 
         this.elements = elements;
@@ -104,33 +103,8 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
         this.isNoView = false;
     }
 
-    public void dct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public AbstractIntFloatMap elements() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void fft() {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public FComplexMatrix1D getFft() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix1D getIfft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
+    public AbstractLongFloatMap elements() {
+        return elements;
     }
 
     /**
@@ -153,22 +127,6 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
         return elements.get(offset + offsets[zero + index * stride]);
     }
 
-    public void idct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idht(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the position of the element with the given relative rank within
      * the (virtual or non-virtual) internal 1-dimensional array. You may want
@@ -177,7 +135,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
         return offset + offsets[zero + rank * stride];
@@ -219,11 +177,33 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
     }
 
     public FloatMatrix2D reshape(int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (rows * cols != size) {
+            throw new IllegalArgumentException("rows*cols != size");
+        }
+        FloatMatrix2D M = new SparseFloatMatrix2D(rows, cols);
+        int idx = 0;
+        for (int c = 0; c < cols; c++) {
+            for (int r = 0; r < rows; r++) {
+                M.setQuick(r, c, getQuick(idx++));
+            }
+        }
+        return M;
     }
 
     public FloatMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (slices * rows * cols != size) {
+            throw new IllegalArgumentException("slices*rows*cols != size");
+        }
+        FloatMatrix3D M = new SparseFloatMatrix3D(slices, rows, cols);
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < cols; c++) {
+                for (int r = 0; r < rows; r++) {
+                    M.setQuick(s, r, c, getQuick(idx++));
+                }
+            }
+        }
+        return M;
     }
 
     /**

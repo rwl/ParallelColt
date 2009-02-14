@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -15,7 +15,6 @@ import java.util.concurrent.Future;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix1D;
-import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
@@ -79,9 +78,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		if (size == 0)
 			return Double.NaN;
 		double a = f.apply(getQuick(0));
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Double[] results = new Double[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -92,7 +91,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 					public Double call() throws Exception {
 						double a = f.apply(getQuick(startsize));
 						for (int i = startsize + 1; i < stopsize; i++) {
@@ -102,19 +101,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					results[j] = (Double) futures[j].get();
-				}
-				a = results[0];
-				for (int j = 1; j < np; j++) {
-					a = aggr.apply(a, results[j]);
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			a = ConcurrencyUtils.waitForCompletion(futures, aggr);
 		} else {
 			for (int i = 1; i < size; i++) {
 				a = aggr.apply(a, f.apply(getQuick(i)));
@@ -166,9 +153,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		if (size == 0)
 			return Double.NaN;
 		double a = f.apply(getQuick(0), other.getQuick(0));
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Double[] results = new Double[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -179,7 +166,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 					public Double call() throws Exception {
 						double a = f.apply(getQuick(startsize), other.getQuick(startsize));
 						for (int i = startsize + 1; i < stopsize; i++) {
@@ -189,19 +176,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					results[j] = (Double) futures[j].get();
-				}
-				a = results[0].doubleValue();
-				for (int j = 1; j < np; j++) {
-					a = aggr.apply(a, results[j].doubleValue());
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			a = ConcurrencyUtils.waitForCompletion(futures, aggr);
 		} else {
 			for (int i = 1; i < size; i++) {
 				a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
@@ -235,9 +210,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	 * @see cern.jet.math.tdouble.DoubleFunctions
 	 */
 	public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleFunction f) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -247,7 +222,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int i = startsize; i < stopsize; i++) {
@@ -256,15 +231,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				setQuick(i, f.apply(getQuick(i)));
@@ -285,9 +252,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	 * @see cern.jet.math.tdouble.DoubleFunctions
 	 */
 	public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final cern.colt.function.tdouble.DoubleFunction f) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -297,7 +264,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						double elem;
@@ -310,15 +277,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			double elem;
 			for (int i = 0; i < size; i++) {
@@ -343,9 +302,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	 * 
 	 */
 	public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final double value) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -355,7 +314,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						double elem;
@@ -368,15 +327,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			double elem;
 			for (int i = 0; i < size; i++) {
@@ -397,9 +348,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	 * @return <tt>this</tt> (for convenience only).
 	 */
 	public DoubleMatrix1D assign(final double value) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -409,7 +360,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int i = startsize; i < stopsize; i++) {
@@ -418,15 +369,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				setQuick(i, value);
@@ -451,9 +394,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	public DoubleMatrix1D assign(final double[] values) {
 		if (values.length != size)
 			throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()=" + size());
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -463,7 +406,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int i = startsize; i < stopsize; i++) {
@@ -472,15 +415,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				setQuick(i, values[i]);
@@ -513,9 +448,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		} else {
 			other_loc = other;
 		}
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -525,7 +460,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int i = startsize; i < stopsize; i++) {
@@ -534,15 +469,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				setQuick(i, other_loc.getQuick(i));
@@ -583,9 +510,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	 */
 	public DoubleMatrix1D assign(final DoubleMatrix1D y, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
 		checkSize(y);
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -595,7 +522,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int i = startsize; i < stopsize; i++) {
@@ -604,15 +531,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				setQuick(i, function.apply(getQuick(i), y.getQuick(i)));
@@ -677,8 +596,8 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				// all nonZeros
 				j++;
 			}
-		} else if (function instanceof cern.jet.math.tdouble.DoublePlusMult) {
-			double multiplicator = ((cern.jet.math.tdouble.DoublePlusMult) function).multiplicator;
+		} else if (function instanceof cern.jet.math.tdouble.DoublePlusMultSecond) {
+			double multiplicator = ((cern.jet.math.tdouble.DoublePlusMultSecond) function).multiplicator;
 			if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
 				return this;
 			} else if (multiplicator == 1) { // x[i] = x[i] + y[i]
@@ -710,9 +629,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	 */
 	public int cardinality() {
 		int cardinality = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Integer[] results = new Integer[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -723,7 +642,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Integer>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
 					public Integer call() throws Exception {
 						int cardinality = 0;
 						for (int i = startsize; i < stopsize; i++) {
@@ -785,36 +704,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		return copy;
 	}
 
-	/**
-	 * Computes the discrete cosine transform (DCT-II) of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void dct(boolean scale);
-
-	/**
-	 * Computes the discrete Hartley transform (DHT) of this matrix.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void dht();
-
-	/**
-	 * Computes the discrete sine transform (DST-II) of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 */
-	public abstract void dst(boolean scale);
-
+	
+	
+	
 	/**
 	 * Returns the elements of this matrix.
 	 * 
@@ -857,26 +749,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		return cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.equals(this, (DoubleMatrix1D) obj);
 	}
 
-	/**
-	 * Computes the discrete Fourier transform (DFT) of this matrix. The
-	 * physical layout of the output data is as follows:
-	 * 
-	 * <pre>
-	 * this[2*k] = Re[k], 0&lt;=k&lt;size/2
-	 * this[2*k+1] = Im[k], 0&lt;k&lt;size/2
-	 * this[1] = Re[size/2]
-	 * </pre>
-	 * 
-	 * This method computes only half of the elements of the real transform. The
-	 * other half satisfies the symmetry condition. If you want the full real
-	 * forward transform, use <code>getFft</code>. To get back the original
-	 * data, use <code>ifft</code>.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 */
-	public abstract void fft();
-
+	
 	/**
 	 * Returns the matrix cell value at coordinate <tt>index</tt>.
 	 * 
@@ -900,27 +773,8 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		return this;
 	}
 
-	/**
-	 * Returns new complex matrix which is the discrete Fourier transform (DFT)
-	 * of this matrix.
-	 * 
-	 * @return the discrete Fourier transform (DFT) of this matrix.
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 */
-	public abstract DComplexMatrix1D getFft();
-
-	/**
-	 * Returns new complex matrix which is the inverse of the discrete Fourier
-	 * (IDFT) transform of this matrix.
-	 * 
-	 * @return the inverse of the discrete Fourier transform (IDFT) of this
-	 *         matrix.
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 */
-	public abstract DComplexMatrix1D getIfft(boolean scale);
-
+	
+	
 	/**
 	 * Fills the coordinates and values of cells having negative values into the
 	 * specified lists. Fills into the lists, starting at index 0. After this
@@ -1139,59 +993,10 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		return false;
 	}
 
-	/**
-	 * Computes the inverse of the discrete cosine transform (DCT-III) of this
-	 * matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idct(boolean scale);
-
-	/**
-	 * Computes the inverse of the discrete Hartley transform (IDHT) of this
-	 * matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idht(boolean scale);
-
-	/**
-	 * Computes the inverse of discrete sine transform (DST-III) of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 */
-	public abstract void idst(boolean scale);
-
-	/**
-	 * Computes the inverse of the discrete Fourier transform (DFT) of this
-	 * matrix. The physical layout of the input data has to be as follows:
-	 * 
-	 * <pre>
-	 * this[2*k] = Re[k], 0&lt;=k&lt;size/2
-	 * this[2*k+1] = Im[k], 0&lt;k&lt;size/2
-	 * this[1] = Re[size/2]
-	 * </pre>
-	 * 
-	 * This method computes only half of the elements of the real transform. The
-	 * other half satisfies the symmetry condition. If you want the full real
-	 * inverse transform, use <code>getIfft</code>.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the size of this matrix is not a power of 2 number.
-	 */
-	public abstract void ifft(boolean scale);
-
+	
+	
+	
+	
 	/**
 	 * Construct and returns a new empty matrix <i>of the same dynamic type</i>
 	 * as the receiver, having the same size. For example, if the receiver is an
@@ -1246,9 +1051,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	public double[] getMaxLocation() {
 		int location = 0;
 		double maxValue = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			double[][] results = new double[np][2];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -1259,7 +1064,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 					public double[] call() throws Exception {
 						int location = startsize;
 						double maxValue = getQuick(location);
@@ -1314,9 +1119,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	public double[] getMinLocation() {
 		int location = 0;
 		double minValue = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			double[][] results = new double[np][2];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -1327,7 +1132,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 					public double[] call() throws Exception {
 						int location = startsize;
 						double minValue = getQuick(location);
@@ -1467,9 +1272,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	 */
 	public void swap(final DoubleMatrix1D other) {
 		checkSize(other);
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -1479,7 +1284,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						for (int i = startsize; i < stopsize; i++) {
 							double tmp = getQuick(i);
@@ -1489,15 +1294,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				double tmp = getQuick(i);
@@ -1535,9 +1332,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 	public void toArray(final double[] values) {
 		if (values.length < size)
 			throw new IllegalArgumentException("values too small");
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startsize = j * k;
@@ -1547,7 +1344,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						for (int i = startsize; i < stopsize; i++) {
 							values[i] = getQuick(i);
@@ -1555,15 +1352,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				values[i] = getQuick(i);
@@ -1724,7 +1513,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		checkIndexes(indexes);
 		int[] offsets = new int[indexes.length];
 		for (int i = 0; i < indexes.length; i++) {
-			offsets[i] = index(indexes[i]);
+			offsets[i] = (int)index(indexes[i]);
 		}
 		return viewSelectionLike(offsets);
 	}
@@ -1807,9 +1596,9 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 		length = tail - from;
 
 		double sum = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Double[] results = new Double[np];
 			int k = length / np;
 			for (int j = 0; j < np; j++) {
@@ -1821,7 +1610,7 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
 					stoplength = startlength + k;
 				}
 
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 					public Double call() throws Exception {
 						double sum = 0;
 						int idx;

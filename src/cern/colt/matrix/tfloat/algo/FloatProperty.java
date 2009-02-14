@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -246,9 +246,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 		int size = A.size();
 		final float epsilon = tolerance();
 		boolean result = false;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -259,7 +259,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						for (int i = startsize; i < stopsize; i++) {
 							float x = A.getQuick(i);
@@ -318,10 +318,10 @@ public class FloatProperty extends cern.colt.PersistentObject {
 			return false;
 		final float epsilon = tolerance();
 		boolean result = false;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		int size = A.size();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -332,7 +332,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						float[] diff = new float[2];
 						for (int i = startsize; i < stopsize; i++) {
@@ -408,9 +408,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 
 		final float epsilon = tolerance();
 		boolean result = false;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -421,7 +421,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						for (int i = startsize; i < stopsize; i++) {
 							float x = A.getQuick(i);
@@ -487,9 +487,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 
 		final float epsilon = tolerance();
 		boolean result = false;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -500,7 +500,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopsize = startsize + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						float[] diff = new float[2];
 						for (int i = startsize; i < stopsize; i++) {
@@ -574,9 +574,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 		final int columns = A.columns();
 		boolean result = false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = A.rows() / np;
 			for (int j = 0; j < np; j++) {
@@ -587,7 +587,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stoprows = startrows + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						for (int r = startrows; r < stoprows; r++) {
 							for (int c = 0; c < columns; c++) {
@@ -652,9 +652,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 		int columns = A.columns();
 		boolean result = false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = A.rows() / np;
 			for (int j = 0; j < np; j++) {
@@ -665,7 +665,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stoprows = startrows + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						float[] diff = new float[2];
 						for (int r = startrows; r < stoprows; r++) {
@@ -746,9 +746,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 			return false;
 		boolean result = false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = A.rows() / np;
 			for (int j = 0; j < np; j++) {
@@ -759,7 +759,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stoprows = startrows + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						for (int r = startrows; r < stoprows; r++) {
 							for (int c = 0; c < columns; c++) {
@@ -829,9 +829,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 			return false;
 		boolean result = false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = A.rows() / np;
 			for (int j = 0; j < np; j++) {
@@ -842,7 +842,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stoprows = startrows + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						float[] diff = new float[2];
 						for (int r = startrows; r < stoprows; r++) {
@@ -922,9 +922,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 		final int columns = A.columns();
 		boolean result = false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -935,7 +935,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						for (int s = startslice; s < stopslice; s++) {
 							for (int r = 0; r < rows; r++) {
@@ -1005,9 +1005,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 		final int columns = A.columns();
 		boolean result = false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -1018,7 +1018,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						float[] diff = new float[2];
 						for (int s = startslice; s < stopslice; s++) {
@@ -1104,9 +1104,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 			return false;
 		boolean result = false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -1117,7 +1117,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						for (int s = startslice; s < stopslice; s++) {
 							for (int r = 0; r < rows; r++) {
@@ -1192,9 +1192,9 @@ public class FloatProperty extends cern.colt.PersistentObject {
 		if (columns != B.columns() || rows != B.rows() || slices != B.slices())
 			return false;
 		final float epsilon = tolerance();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Boolean[] results = new Boolean[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -1205,7 +1205,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Boolean>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
 					public Boolean call() throws Exception {
 						float[] diff = new float[2];
 						for (int s = startslice; s < stopslice; s++) {

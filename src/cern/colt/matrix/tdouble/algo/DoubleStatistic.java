@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -10,7 +10,6 @@ package cern.colt.matrix.tdouble.algo;
 
 import hep.aida.tdouble.bin.DynamicDoubleBin1D;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import cern.colt.function.tdouble.DoubleDoubleFunction;
@@ -572,7 +571,7 @@ public class DoubleStatistic extends Object {
      * @return <tt>histo</tt> (for convenience only).
      */
     public static hep.aida.tdouble.DoubleIHistogram1D histogram(final hep.aida.tdouble.DoubleIHistogram1D histo, final DoubleMatrix2D matrix) {
-        histo.fill_2D((double[]) matrix.elements(), matrix.rows(), matrix.columns(), matrix.index(0, 0), matrix.rowStride(), matrix.columnStride());
+        histo.fill_2D((double[]) matrix.elements(), matrix.rows(), matrix.columns(), (int)matrix.index(0, 0), matrix.rowStride(), matrix.columnStride());
         return histo;
     }
 
@@ -604,9 +603,9 @@ public class DoubleStatistic extends Object {
         }
         width[n - 1] = cols - (n - 1) * col_size;
 
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = m / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -616,34 +615,26 @@ public class DoubleStatistic extends Object {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         DoubleMatrix2D view = null;
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < n; c++) {
                                 view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                                histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), view.index(0, 0), view.rowStride(), view.columnStride());
+                                histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int)view.index(0, 0), view.rowStride(), view.columnStride());
                             }
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             DoubleMatrix2D view = null;
             for (int r = 0; r < m; r++) {
                 for (int c = 0; c < n; c++) {
                     view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                    histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), view.index(0, 0), view.rowStride(), view.columnStride());
+                    histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int)view.index(0, 0), view.rowStride(), view.columnStride());
                 }
             }
         }

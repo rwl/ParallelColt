@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -9,7 +9,6 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tdouble.impl;
 
 import cern.colt.matrix.AbstractMatrix2D;
-import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
@@ -124,77 +123,8 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
         this.isNoView = false;
     }
 
-    public void dct2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public void dctColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dctRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht2() {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public void dhtColumns() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dhtRows() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dst2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public void dstColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dstRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     public double[] elements() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void fft2() {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public DComplexMatrix2D getFft2() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix2D getFftColumns() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix2D getFftRows() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix2D getIfft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public DComplexMatrix2D getIfftColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix2D getIfftRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
+        return elements;
     }
 
     /**
@@ -221,49 +151,6 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
         return elements[offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]];
     }
 
-    public void idct2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public void idctColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idctRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idht2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public void idhtColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idhtRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idst2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public void idstColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idstRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the position of the given coordinate within the (virtual or
      * non-virtual) internal 1-dimensional array.
@@ -273,7 +160,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    public int index(int row, int column) {
+    public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
         return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];

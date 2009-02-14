@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfcomplex.impl;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.AbstractMatrix2D;
@@ -148,30 +147,6 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
         return rowOffsets[absRank];
     }
 
-    public void fft2() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fftRows() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifftRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fftColumns() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifftColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
     /**
      * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
      * 
@@ -236,7 +211,7 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    public int index(int row, int column) {
+    public long index(int row, int column) {
         return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
     }
 
@@ -463,9 +438,9 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
      */
     public FloatMatrix2D getRealPart() {
         final DenseFloatMatrix2D R = new DenseFloatMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -475,7 +450,7 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp;
                         for (int r = startrow; r < stoprow; r++) {
@@ -487,15 +462,7 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] tmp;
             for (int r = 0; r < rows; r++) {
@@ -515,9 +482,9 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
      */
     public FloatMatrix2D getImaginaryPart() {
         final DenseFloatMatrix2D Im = new DenseFloatMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -527,7 +494,7 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp;
                         for (int r = startrow; r < stoprow; r++) {
@@ -539,15 +506,7 @@ class SelectedDenseFComplexMatrix2D extends FComplexMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] tmp;
             for (int r = 0; r < rows; r++) {

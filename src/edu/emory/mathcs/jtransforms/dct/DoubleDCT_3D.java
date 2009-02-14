@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -34,7 +34,6 @@
 
 package edu.emory.mathcs.jtransforms.dct;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -53,11 +52,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public class DoubleDCT_3D {
 
-    private int n1;
+    private int slices;
 
-    private int n2;
+    private int rows;
 
-    private int n3;
+    private int columns;
 
     private int sliceStride;
 
@@ -65,9 +64,9 @@ public class DoubleDCT_3D {
 
     private double[] t;
 
-    private DoubleDCT_1D dctn1, dctn2, dctn3;
+    private DoubleDCT_1D dctSlices, dctRows, dctColumns;
 
-    private int oldNthread;
+    private int oldNthreads;
 
     private int nt;
 
@@ -78,54 +77,54 @@ public class DoubleDCT_3D {
     /**
      * Creates new instance of DoubleDCT_3D.
      * 
-     * @param n1
-     *            number of slices - must be a power-of-two number
-     * @param n2
-     *            number of rows - must be a power-of-two number
-     * @param n3
-     *            number of columns - must be a power-of-two number
+     * @param slices
+     *            number of slices
+     * @param rows
+     *            number of rows
+     * @param columns
+     *            number of columns
      */
-    public DoubleDCT_3D(int n1, int n2, int n3) {
-        if (n1 <= 1 || n2 <= 1 || n3 <= 1) {
-            throw new IllegalArgumentException("n1, n2 and n3 must be greater than 1");
+    public DoubleDCT_3D(int slices, int rows, int columns) {
+        if (slices <= 1 || rows <= 1 || columns <= 1) {
+            throw new IllegalArgumentException("slices, rows and columns must be greater than 1");
         }
-        this.n1 = n1;
-        this.n2 = n2;
-        this.n3 = n3;
-        this.sliceStride = n2 * n3;
-        this.rowStride = n3;
-        if (n1 * n2 * n3 >= ConcurrencyUtils.getThreadsBeginN_3D()) {
+        this.slices = slices;
+        this.rows = rows;
+        this.columns = columns;
+        this.sliceStride = rows * columns;
+        this.rowStride = columns;
+        if (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D()) {
             this.useThreads = true;
         }
-        if (ConcurrencyUtils.isPowerOf2(n1) && ConcurrencyUtils.isPowerOf2(n2) && ConcurrencyUtils.isPowerOf2(n3)) {
+        if (ConcurrencyUtils.isPowerOf2(slices) && ConcurrencyUtils.isPowerOf2(rows) && ConcurrencyUtils.isPowerOf2(columns)) {
             isPowerOfTwo = true;
 
-            oldNthread = ConcurrencyUtils.getNumberOfProcessors();
-            nt = n1;
-            if (nt < n2) {
-                nt = n2;
+            oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+            nt = slices;
+            if (nt < rows) {
+                nt = rows;
             }
             nt *= 4;
-            if (oldNthread > 1) {
-                nt *= oldNthread;
+            if (oldNthreads > 1) {
+                nt *= oldNthreads;
             }
-            if (n3 == 2) {
+            if (columns == 2) {
                 nt >>= 1;
             }
             t = new double[nt];
         }
-        dctn1 = new DoubleDCT_1D(n1);
-        if (n1 == n2) {
-            dctn2 = dctn1;
+        dctSlices = new DoubleDCT_1D(slices);
+        if (slices == rows) {
+            dctRows = dctSlices;
         } else {
-            dctn2 = new DoubleDCT_1D(n2);
+            dctRows = new DoubleDCT_1D(rows);
         }
-        if (n1 == n3) {
-            dctn3 = dctn1;
-        } else if (n2 == n3) {
-            dctn3 = dctn2;
+        if (slices == columns) {
+            dctColumns = dctSlices;
+        } else if (rows == columns) {
+            dctColumns = dctRows;
         } else {
-            dctn3 = new DoubleDCT_1D(n3);
+            dctColumns = new DoubleDCT_1D(columns);
         }
     }
 
@@ -133,8 +132,9 @@ public class DoubleDCT_3D {
      * Computes the 3D forward DCT (DCT-II) leaving the result in <code>a</code>
      * . The data is stored in 1D array addressed in slice-major, then
      * row-major, then column-major, in order of significance, i.e. the element
-     * (i,j,k) of 3D array x[n1][n2][n3] is stored in a[i*sliceStride +
-     * j*rowStride + k], where sliceStride = n2 * n3 and rowStride = n3.
+     * (i,j,k) of 3D array x[slices][rows][columns] is stored in a[i*sliceStride
+     * + j*rowStride + k], where sliceStride = rows * columns and rowStride =
+     * columns.
      * 
      * @param a
      *            data to transform
@@ -142,24 +142,24 @@ public class DoubleDCT_3D {
      *            if true then scaling is performed
      */
     public void forward(final double[] a, final boolean scale) {
-        int nthread = ConcurrencyUtils.getNumberOfProcessors();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (isPowerOfTwo) {
-            if (nthread != oldNthread) {
-                nt = n1;
-                if (nt < n2) {
-                    nt = n2;
+            if (nthreads != oldNthreads) {
+                nt = slices;
+                if (nt < rows) {
+                    nt = rows;
                 }
                 nt *= 4;
-                if (nthread > 1) {
-                    nt *= nthread;
+                if (nthreads > 1) {
+                    nt *= nthreads;
                 }
-                if (n3 == 2) {
+                if (columns == 2) {
                     nt >>= 1;
                 }
                 t = new double[nt];
-                oldNthread = nthread;
+                oldNthreads = nthreads;
             }
-            if ((nthread > 1) && useThreads) {
+            if ((nthreads > 1) && useThreads) {
                 ddxt3da_subth(-1, a, scale);
                 ddxt3db_subth(-1, a, scale);
             } else {
@@ -167,59 +167,40 @@ public class DoubleDCT_3D {
                 ddxt3db_sub(-1, a, scale);
             }
         } else {
-            if ((nthread > 1) && useThreads && (n1 >= nthread) && (n2 >= nthread) && (n3 >= nthread)) {
-                Future[] futures = new Future[nthread];
-                int p = n1 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            if ((nthreads > 1) && useThreads && (slices >= nthreads) && (rows >= nthreads) && (columns >= nthreads)) {
+                Future<?>[] futures = new Future[nthreads];
+                int p = slices / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int s = startSlice; s < stopSlice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 int idx1 = s * sliceStride;
-                                for (int r = 0; r < n2; r++) {
-                                    dctn3.forward(a, idx1 + r * rowStride, scale);
+                                for (int r = 0; r < rows; r++) {
+                                    dctColumns.forward(a, idx1 + r * rowStride, scale);
                                 }
                             }
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n2];
-                            for (int s = startSlice; s < stopSlice; s++) {
+                            double[] temp = new double[rows];
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 int idx1 = s * sliceStride;
-                                for (int c = 0; c < n3; c++) {
-                                    for (int r = 0; r < n2; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int r = 0; r < rows; r++) {
                                         int idx3 = idx1 + r * rowStride + c;
-                                        int idx4 = 2 * r;
                                         temp[r] = a[idx3];
                                     }
-                                    dctn2.forward(temp, scale);
-                                    for (int r = 0; r < n2; r++) {
+                                    dctRows.forward(temp, scale);
+                                    for (int r = 0; r < rows; r++) {
                                         int idx3 = idx1 + r * rowStride + c;
                                         a[idx3] = temp[r];
                                     }
@@ -228,37 +209,24 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                p = n2 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startRow = l * p;
-                    final int stopRow;
-                    if (l == nthread - 1) {
-                        stopRow = n2;
-                    } else {
-                        stopRow = startRow + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                p = rows / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstRow = l * p;
+                    final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n1];
-                            for (int r = startRow; r < stopRow; r++) {
+                            double[] temp = new double[slices];
+                            for (int r = firstRow; r < lastRow; r++) {
                                 int idx1 = r * rowStride;
-                                for (int c = 0; c < n3; c++) {
-                                    for (int s = 0; s < n1; s++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int s = 0; s < slices; s++) {
                                         int idx3 = s * sliceStride + idx1 + c;
                                         temp[s] = a[idx3];
                                     }
-                                    dctn1.forward(temp, scale);
-                                    for (int s = 0; s < n1; s++) {
+                                    dctSlices.forward(temp, scale);
+                                    for (int s = 0; s < slices; s++) {
                                         int idx3 = s * sliceStride + idx1 + c;
                                         a[idx3] = temp[s];
                                     }
@@ -267,48 +235,40 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
             } else {
-                for (int s = 0; s < n1; s++) {
+                for (int s = 0; s < slices; s++) {
                     int idx1 = s * sliceStride;
-                    for (int r = 0; r < n2; r++) {
-                        dctn3.forward(a, idx1 + r * rowStride, scale);
+                    for (int r = 0; r < rows; r++) {
+                        dctColumns.forward(a, idx1 + r * rowStride, scale);
                     }
                 }
-                double[] temp = new double[n2];
-                for (int s = 0; s < n1; s++) {
+                double[] temp = new double[rows];
+                for (int s = 0; s < slices; s++) {
                     int idx1 = s * sliceStride;
-                    for (int c = 0; c < n3; c++) {
-                        for (int r = 0; r < n2; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int r = 0; r < rows; r++) {
                             int idx3 = idx1 + r * rowStride + c;
                             temp[r] = a[idx3];
                         }
-                        dctn2.forward(temp, scale);
-                        for (int r = 0; r < n2; r++) {
+                        dctRows.forward(temp, scale);
+                        for (int r = 0; r < rows; r++) {
                             int idx3 = idx1 + r * rowStride + c;
                             a[idx3] = temp[r];
                         }
                     }
                 }
-                temp = new double[n1];
-                for (int r = 0; r < n2; r++) {
+                temp = new double[slices];
+                for (int r = 0; r < rows; r++) {
                     int idx1 = r * rowStride;
-                    for (int c = 0; c < n3; c++) {
-                        for (int s = 0; s < n1; s++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int s = 0; s < slices; s++) {
                             int idx3 = s * sliceStride + idx1 + c;
                             temp[s] = a[idx3];
                         }
-                        dctn1.forward(temp, scale);
-                        for (int s = 0; s < n1; s++) {
+                        dctSlices.forward(temp, scale);
+                        for (int s = 0; s < slices; s++) {
                             int idx3 = s * sliceStride + idx1 + c;
                             a[idx3] = temp[s];
                         }
@@ -328,24 +288,24 @@ public class DoubleDCT_3D {
      *            if true then scaling is performed
      */
     public void forward(final double[][][] a, final boolean scale) {
-        int nthread = ConcurrencyUtils.getNumberOfProcessors();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (isPowerOfTwo) {
-            if (nthread != oldNthread) {
-                nt = n1;
-                if (nt < n2) {
-                    nt = n2;
+            if (nthreads != oldNthreads) {
+                nt = slices;
+                if (nt < rows) {
+                    nt = rows;
                 }
                 nt *= 4;
-                if (nthread > 1) {
-                    nt *= nthread;
+                if (nthreads > 1) {
+                    nt *= nthreads;
                 }
-                if (n3 == 2) {
+                if (columns == 2) {
                     nt >>= 1;
                 }
                 t = new double[nt];
-                oldNthread = nthread;
+                oldNthreads = nthreads;
             }
-            if ((nthread > 1) && useThreads) {
+            if ((nthreads > 1) && useThreads) {
                 ddxt3da_subth(-1, a, scale);
                 ddxt3db_subth(-1, a, scale);
             } else {
@@ -353,55 +313,37 @@ public class DoubleDCT_3D {
                 ddxt3db_sub(-1, a, scale);
             }
         } else {
-            if ((nthread > 1) && useThreads && (n1 >= nthread) && (n2 >= nthread) && (n3 >= nthread)) {
-                Future[] futures = new Future[nthread];
-                int p = n1 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            if ((nthreads > 1) && useThreads && (slices >= nthreads) && (rows >= nthreads) && (columns >= nthreads)) {
+                Future<?>[] futures = new Future[nthreads];
+                int p = slices / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int s = startSlice; s < stopSlice; s++) {
-                                for (int r = 0; r < n2; r++) {
-                                    dctn3.forward(a[s][r], scale);
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    dctColumns.forward(a[s][r], scale);
                                 }
                             }
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n2];
-                            for (int s = startSlice; s < stopSlice; s++) {
-                                for (int c = 0; c < n3; c++) {
-                                    for (int r = 0; r < n2; r++) {
+                            double[] temp = new double[rows];
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int r = 0; r < rows; r++) {
                                         temp[r] = a[s][r][c];
                                     }
-                                    dctn2.forward(temp, scale);
-                                    for (int r = 0; r < n2; r++) {
+                                    dctRows.forward(temp, scale);
+                                    for (int r = 0; r < rows; r++) {
                                         a[s][r][c] = temp[r];
                                     }
                                 }
@@ -409,35 +351,22 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                p = n2 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startRow = l * p;
-                    final int stopRow;
-                    if (l == nthread - 1) {
-                        stopRow = n2;
-                    } else {
-                        stopRow = startRow + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                p = rows / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstRow = l * p;
+                    final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n1];
-                            for (int r = startRow; r < stopRow; r++) {
-                                for (int c = 0; c < n3; c++) {
-                                    for (int s = 0; s < n1; s++) {
+                            double[] temp = new double[slices];
+                            for (int r = firstRow; r < lastRow; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int s = 0; s < slices; s++) {
                                         temp[s] = a[s][r][c];
                                     }
-                                    dctn1.forward(temp, scale);
-                                    for (int s = 0; s < n1; s++) {
+                                    dctSlices.forward(temp, scale);
+                                    for (int s = 0; s < slices; s++) {
                                         a[s][r][c] = temp[s];
                                     }
                                 }
@@ -445,42 +374,34 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
             } else {
-                for (int s = 0; s < n1; s++) {
-                    for (int r = 0; r < n2; r++) {
-                        dctn3.forward(a[s][r], scale);
+                for (int s = 0; s < slices; s++) {
+                    for (int r = 0; r < rows; r++) {
+                        dctColumns.forward(a[s][r], scale);
                     }
                 }
-                double[] temp = new double[n2];
-                for (int s = 0; s < n1; s++) {
-                    for (int c = 0; c < n3; c++) {
-                        for (int r = 0; r < n2; r++) {
+                double[] temp = new double[rows];
+                for (int s = 0; s < slices; s++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int r = 0; r < rows; r++) {
                             temp[r] = a[s][r][c];
                         }
-                        dctn2.forward(temp, scale);
-                        for (int r = 0; r < n2; r++) {
+                        dctRows.forward(temp, scale);
+                        for (int r = 0; r < rows; r++) {
                             a[s][r][c] = temp[r];
                         }
                     }
                 }
-                temp = new double[n1];
-                for (int r = 0; r < n2; r++) {
-                    for (int c = 0; c < n3; c++) {
-                        for (int s = 0; s < n1; s++) {
+                temp = new double[slices];
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int s = 0; s < slices; s++) {
                             temp[s] = a[s][r][c];
                         }
-                        dctn1.forward(temp, scale);
-                        for (int s = 0; s < n1; s++) {
+                        dctSlices.forward(temp, scale);
+                        for (int s = 0; s < slices; s++) {
                             a[s][r][c] = temp[s];
                         }
                     }
@@ -493,8 +414,9 @@ public class DoubleDCT_3D {
      * Computes the 3D inverse DCT (DCT-III) leaving the result in
      * <code>a</code>. The data is stored in 1D array addressed in slice-major,
      * then row-major, then column-major, in order of significance, i.e. the
-     * element (i,j,k) of 3D array x[n1][n2][n3] is stored in a[i*sliceStride +
-     * j*rowStride + k], where sliceStride = n2 * n3 and rowStride = n3.
+     * element (i,j,k) of 3D array x[slices][rows][columns] is stored in
+     * a[i*sliceStride + j*rowStride + k], where sliceStride = rows * columns
+     * and rowStride = columns.
      * 
      * @param a
      *            data to transform
@@ -502,24 +424,24 @@ public class DoubleDCT_3D {
      *            if true then scaling is performed
      */
     public void inverse(final double[] a, final boolean scale) {
-        int nthread = ConcurrencyUtils.getNumberOfProcessors();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (isPowerOfTwo) {
-            if (nthread != oldNthread) {
-                nt = n1;
-                if (nt < n2) {
-                    nt = n2;
+            if (nthreads != oldNthreads) {
+                nt = slices;
+                if (nt < rows) {
+                    nt = rows;
                 }
                 nt *= 4;
-                if (nthread > 1) {
-                    nt *= nthread;
+                if (nthreads > 1) {
+                    nt *= nthreads;
                 }
-                if (n3 == 2) {
+                if (columns == 2) {
                     nt >>= 1;
                 }
                 t = new double[nt];
-                oldNthread = nthread;
+                oldNthreads = nthreads;
             }
-            if ((nthread > 1) && useThreads) {
+            if ((nthreads > 1) && useThreads) {
                 ddxt3da_subth(1, a, scale);
                 ddxt3db_subth(1, a, scale);
             } else {
@@ -527,58 +449,40 @@ public class DoubleDCT_3D {
                 ddxt3db_sub(1, a, scale);
             }
         } else {
-            if ((nthread > 1) && useThreads && (n1 >= nthread) && (n2 >= nthread) && (n3 >= nthread)) {
-                Future[] futures = new Future[nthread];
-                int p = n1 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            if ((nthreads > 1) && useThreads && (slices >= nthreads) && (rows >= nthreads) && (columns >= nthreads)) {
+                Future<?>[] futures = new Future[nthreads];
+                int p = slices / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int s = startSlice; s < stopSlice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 int idx1 = s * sliceStride;
-                                for (int r = 0; r < n2; r++) {
-                                    dctn3.inverse(a, idx1 + r * rowStride, scale);
+                                for (int r = 0; r < rows; r++) {
+                                    dctColumns.inverse(a, idx1 + r * rowStride, scale);
                                 }
                             }
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n2];
-                            for (int s = startSlice; s < stopSlice; s++) {
+                            double[] temp = new double[rows];
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 int idx1 = s * sliceStride;
-                                for (int c = 0; c < n3; c++) {
-                                    for (int r = 0; r < n2; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int r = 0; r < rows; r++) {
                                         int idx3 = idx1 + r * rowStride + c;
                                         temp[r] = a[idx3];
                                     }
-                                    dctn2.inverse(temp, scale);
-                                    for (int r = 0; r < n2; r++) {
+                                    dctRows.inverse(temp, scale);
+                                    for (int r = 0; r < rows; r++) {
                                         int idx3 = idx1 + r * rowStride + c;
                                         a[idx3] = temp[r];
                                     }
@@ -587,37 +491,24 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                p = n2 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startRow = l * p;
-                    final int stopRow;
-                    if (l == nthread - 1) {
-                        stopRow = n2;
-                    } else {
-                        stopRow = startRow + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                p = rows / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstRow = l * p;
+                    final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n1];
-                            for (int r = startRow; r < stopRow; r++) {
+                            double[] temp = new double[slices];
+                            for (int r = firstRow; r < lastRow; r++) {
                                 int idx1 = r * rowStride;
-                                for (int c = 0; c < n3; c++) {
-                                    for (int s = 0; s < n1; s++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int s = 0; s < slices; s++) {
                                         int idx3 = s * sliceStride + idx1 + c;
                                         temp[s] = a[idx3];
                                     }
-                                    dctn1.inverse(temp, scale);
-                                    for (int s = 0; s < n1; s++) {
+                                    dctSlices.inverse(temp, scale);
+                                    for (int s = 0; s < slices; s++) {
                                         int idx3 = s * sliceStride + idx1 + c;
                                         a[idx3] = temp[s];
                                     }
@@ -626,48 +517,40 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
             } else {
-                for (int s = 0; s < n1; s++) {
+                for (int s = 0; s < slices; s++) {
                     int idx1 = s * sliceStride;
-                    for (int r = 0; r < n2; r++) {
-                        dctn3.inverse(a, idx1 + r * rowStride, scale);
+                    for (int r = 0; r < rows; r++) {
+                        dctColumns.inverse(a, idx1 + r * rowStride, scale);
                     }
                 }
-                double[] temp = new double[n2];
-                for (int s = 0; s < n1; s++) {
+                double[] temp = new double[rows];
+                for (int s = 0; s < slices; s++) {
                     int idx1 = s * sliceStride;
-                    for (int c = 0; c < n3; c++) {
-                        for (int r = 0; r < n2; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int r = 0; r < rows; r++) {
                             int idx3 = idx1 + r * rowStride + c;
                             temp[r] = a[idx3];
                         }
-                        dctn2.inverse(temp, scale);
-                        for (int r = 0; r < n2; r++) {
+                        dctRows.inverse(temp, scale);
+                        for (int r = 0; r < rows; r++) {
                             int idx3 = idx1 + r * rowStride + c;
                             a[idx3] = temp[r];
                         }
                     }
                 }
-                temp = new double[n1];
-                for (int r = 0; r < n2; r++) {
+                temp = new double[slices];
+                for (int r = 0; r < rows; r++) {
                     int idx1 = r * rowStride;
-                    for (int c = 0; c < n3; c++) {
-                        for (int s = 0; s < n1; s++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int s = 0; s < slices; s++) {
                             int idx3 = s * sliceStride + idx1 + c;
                             temp[s] = a[idx3];
                         }
-                        dctn1.inverse(temp, scale);
-                        for (int s = 0; s < n1; s++) {
+                        dctSlices.inverse(temp, scale);
+                        for (int s = 0; s < slices; s++) {
                             int idx3 = s * sliceStride + idx1 + c;
                             a[idx3] = temp[s];
                         }
@@ -687,24 +570,24 @@ public class DoubleDCT_3D {
      *            if true then scaling is performed
      */
     public void inverse(final double[][][] a, final boolean scale) {
-        int nthread = ConcurrencyUtils.getNumberOfProcessors();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (isPowerOfTwo) {
-            if (nthread != oldNthread) {
-                nt = n1;
-                if (nt < n2) {
-                    nt = n2;
+            if (nthreads != oldNthreads) {
+                nt = slices;
+                if (nt < rows) {
+                    nt = rows;
                 }
                 nt *= 4;
-                if (nthread > 1) {
-                    nt *= nthread;
+                if (nthreads > 1) {
+                    nt *= nthreads;
                 }
-                if (n3 == 2) {
+                if (columns == 2) {
                     nt >>= 1;
                 }
                 t = new double[nt];
-                oldNthread = nthread;
+                oldNthreads = nthreads;
             }
-            if ((nthread > 1) && useThreads) {
+            if ((nthreads > 1) && useThreads) {
                 ddxt3da_subth(1, a, scale);
                 ddxt3db_subth(1, a, scale);
             } else {
@@ -712,55 +595,37 @@ public class DoubleDCT_3D {
                 ddxt3db_sub(1, a, scale);
             }
         } else {
-            if ((nthread > 1) && useThreads && (n1 >= nthread) && (n2 >= nthread) && (n3 >= nthread)) {
-                Future[] futures = new Future[nthread];
-                int p = n1 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            if ((nthreads > 1) && useThreads && (slices >= nthreads) && (rows >= nthreads) && (columns >= nthreads)) {
+                Future<?>[] futures = new Future[nthreads];
+                int p = slices / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int s = startSlice; s < stopSlice; s++) {
-                                for (int r = 0; r < n2; r++) {
-                                    dctn3.inverse(a[s][r], scale);
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    dctColumns.inverse(a[s][r], scale);
                                 }
                             }
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                for (int l = 0; l < nthread; l++) {
-                    final int startSlice = l * p;
-                    final int stopSlice;
-                    if (l == nthread - 1) {
-                        stopSlice = n1;
-                    } else {
-                        stopSlice = startSlice + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstSlice = l * p;
+                    final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n2];
-                            for (int s = startSlice; s < stopSlice; s++) {
-                                for (int c = 0; c < n3; c++) {
-                                    for (int r = 0; r < n2; r++) {
+                            double[] temp = new double[rows];
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int r = 0; r < rows; r++) {
                                         temp[r] = a[s][r][c];
                                     }
-                                    dctn2.inverse(temp, scale);
-                                    for (int r = 0; r < n2; r++) {
+                                    dctRows.inverse(temp, scale);
+                                    for (int r = 0; r < rows; r++) {
                                         a[s][r][c] = temp[r];
                                     }
                                 }
@@ -768,35 +633,22 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
-                p = n2 / nthread;
-                for (int l = 0; l < nthread; l++) {
-                    final int startRow = l * p;
-                    final int stopRow;
-                    if (l == nthread - 1) {
-                        stopRow = n2;
-                    } else {
-                        stopRow = startRow + p;
-                    }
-                    futures[l] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                p = rows / nthreads;
+                for (int l = 0; l < nthreads; l++) {
+                    final int firstRow = l * p;
+                    final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                    futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            double[] temp = new double[n1];
-                            for (int r = startRow; r < stopRow; r++) {
-                                for (int c = 0; c < n3; c++) {
-                                    for (int s = 0; s < n1; s++) {
+                            double[] temp = new double[slices];
+                            for (int r = firstRow; r < lastRow; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    for (int s = 0; s < slices; s++) {
                                         temp[s] = a[s][r][c];
                                     }
-                                    dctn1.inverse(temp, scale);
-                                    for (int s = 0; s < n1; s++) {
+                                    dctSlices.inverse(temp, scale);
+                                    for (int s = 0; s < slices; s++) {
                                         a[s][r][c] = temp[s];
                                     }
                                 }
@@ -804,42 +656,34 @@ public class DoubleDCT_3D {
                         }
                     });
                 }
-                try {
-                    for (int l = 0; l < nthread; l++) {
-                        futures[l].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
 
             } else {
-                for (int s = 0; s < n1; s++) {
-                    for (int r = 0; r < n2; r++) {
-                        dctn3.inverse(a[s][r], scale);
+                for (int s = 0; s < slices; s++) {
+                    for (int r = 0; r < rows; r++) {
+                        dctColumns.inverse(a[s][r], scale);
                     }
                 }
-                double[] temp = new double[n2];
-                for (int s = 0; s < n1; s++) {
-                    for (int c = 0; c < n3; c++) {
-                        for (int r = 0; r < n2; r++) {
+                double[] temp = new double[rows];
+                for (int s = 0; s < slices; s++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int r = 0; r < rows; r++) {
                             temp[r] = a[s][r][c];
                         }
-                        dctn2.inverse(temp, scale);
-                        for (int r = 0; r < n2; r++) {
+                        dctRows.inverse(temp, scale);
+                        for (int r = 0; r < rows; r++) {
                             a[s][r][c] = temp[r];
                         }
                     }
                 }
-                temp = new double[n1];
-                for (int r = 0; r < n2; r++) {
-                    for (int c = 0; c < n3; c++) {
-                        for (int s = 0; s < n1; s++) {
+                temp = new double[slices];
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        for (int s = 0; s < slices; s++) {
                             temp[s] = a[s][r][c];
                         }
-                        dctn1.inverse(temp, scale);
-                        for (int s = 0; s < n1; s++) {
+                        dctSlices.inverse(temp, scale);
+                        for (int s = 0; s < slices; s++) {
                             a[s][r][c] = temp[s];
                         }
                     }
@@ -848,96 +692,94 @@ public class DoubleDCT_3D {
         }
     }
 
-    /* -------- child routines -------- */
-
     private void ddxt3da_sub(int isgn, double[] a, boolean scale) {
-        int i, j, k, idx0, idx1, idx2;
+        int idx0, idx1, idx2;
 
         if (isgn == -1) {
-            for (i = 0; i < n1; i++) {
-                idx0 = i * sliceStride;
-                for (j = 0; j < n2; j++) {
-                    dctn3.forward(a, idx0 + j * rowStride, scale);
+            for (int s = 0; s < slices; s++) {
+                idx0 = s * sliceStride;
+                for (int r = 0; r < rows; r++) {
+                    dctColumns.forward(a, idx0 + r * rowStride, scale);
                 }
-                if (n3 > 2) {
-                    for (k = 0; k < n3; k += 4) {
-                        for (j = 0; j < n2; j++) {
-                            idx1 = idx0 + j * rowStride + k;
-                            idx2 = n2 + j;
-                            t[j] = a[idx1];
+                if (columns > 2) {
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int r = 0; r < rows; r++) {
+                            idx1 = idx0 + r * rowStride + c;
+                            idx2 = rows + r;
+                            t[r] = a[idx1];
                             t[idx2] = a[idx1 + 1];
-                            t[idx2 + n2] = a[idx1 + 2];
-                            t[idx2 + 2 * n2] = a[idx1 + 3];
+                            t[idx2 + rows] = a[idx1 + 2];
+                            t[idx2 + 2 * rows] = a[idx1 + 3];
                         }
-                        dctn2.forward(t, 0, scale);
-                        dctn2.forward(t, n2, scale);
-                        dctn2.forward(t, 2 * n2, scale);
-                        dctn2.forward(t, 3 * n2, scale);
-                        for (j = 0; j < n2; j++) {
-                            idx1 = idx0 + j * rowStride + k;
-                            idx2 = n2 + j;
-                            a[idx1] = t[j];
+                        dctRows.forward(t, 0, scale);
+                        dctRows.forward(t, rows, scale);
+                        dctRows.forward(t, 2 * rows, scale);
+                        dctRows.forward(t, 3 * rows, scale);
+                        for (int r = 0; r < rows; r++) {
+                            idx1 = idx0 + r * rowStride + c;
+                            idx2 = rows + r;
+                            a[idx1] = t[r];
                             a[idx1 + 1] = t[idx2];
-                            a[idx1 + 2] = t[idx2 + n2];
-                            a[idx1 + 3] = t[idx2 + 2 * n2];
+                            a[idx1 + 2] = t[idx2 + rows];
+                            a[idx1 + 3] = t[idx2 + 2 * rows];
                         }
                     }
-                } else if (n3 == 2) {
-                    for (j = 0; j < n2; j++) {
-                        idx1 = idx0 + j * rowStride;
-                        t[j] = a[idx1];
-                        t[n2 + j] = a[idx1 + 1];
+                } else if (columns == 2) {
+                    for (int r = 0; r < rows; r++) {
+                        idx1 = idx0 + r * rowStride;
+                        t[r] = a[idx1];
+                        t[rows + r] = a[idx1 + 1];
                     }
-                    dctn2.forward(t, 0, scale);
-                    dctn2.forward(t, n2, scale);
-                    for (j = 0; j < n2; j++) {
-                        idx1 = idx0 + j * rowStride;
-                        a[idx1] = t[j];
-                        a[idx1 + 1] = t[n2 + j];
+                    dctRows.forward(t, 0, scale);
+                    dctRows.forward(t, rows, scale);
+                    for (int r = 0; r < rows; r++) {
+                        idx1 = idx0 + r * rowStride;
+                        a[idx1] = t[r];
+                        a[idx1 + 1] = t[rows + r];
                     }
                 }
             }
         } else {
-            for (i = 0; i < n1; i++) {
-                idx0 = i * sliceStride;
-                for (j = 0; j < n2; j++) {
-                    dctn3.inverse(a, idx0 + j * rowStride, scale);
+            for (int s = 0; s < slices; s++) {
+                idx0 = s * sliceStride;
+                for (int r = 0; r < rows; r++) {
+                    dctColumns.inverse(a, idx0 + r * rowStride, scale);
                 }
-                if (n3 > 2) {
-                    for (k = 0; k < n3; k += 4) {
-                        for (j = 0; j < n2; j++) {
-                            idx1 = idx0 + j * rowStride + k;
-                            idx2 = n2 + j;
-                            t[j] = a[idx1];
+                if (columns > 2) {
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int r = 0; r < rows; r++) {
+                            idx1 = idx0 + r * rowStride + c;
+                            idx2 = rows + r;
+                            t[r] = a[idx1];
                             t[idx2] = a[idx1 + 1];
-                            t[idx2 + n2] = a[idx1 + 2];
-                            t[idx2 + 2 * n2] = a[idx1 + 3];
+                            t[idx2 + rows] = a[idx1 + 2];
+                            t[idx2 + 2 * rows] = a[idx1 + 3];
                         }
-                        dctn2.inverse(t, 0, scale);
-                        dctn2.inverse(t, n2, scale);
-                        dctn2.inverse(t, 2 * n2, scale);
-                        dctn2.inverse(t, 3 * n2, scale);
-                        for (j = 0; j < n2; j++) {
-                            idx1 = idx0 + j * rowStride + k;
-                            idx2 = n2 + j;
-                            a[idx1] = t[j];
+                        dctRows.inverse(t, 0, scale);
+                        dctRows.inverse(t, rows, scale);
+                        dctRows.inverse(t, 2 * rows, scale);
+                        dctRows.inverse(t, 3 * rows, scale);
+                        for (int r = 0; r < rows; r++) {
+                            idx1 = idx0 + r * rowStride + c;
+                            idx2 = rows + r;
+                            a[idx1] = t[r];
                             a[idx1 + 1] = t[idx2];
-                            a[idx1 + 2] = t[idx2 + n2];
-                            a[idx1 + 3] = t[idx2 + 2 * n2];
+                            a[idx1 + 2] = t[idx2 + rows];
+                            a[idx1 + 3] = t[idx2 + 2 * rows];
                         }
                     }
-                } else if (n3 == 2) {
-                    for (j = 0; j < n2; j++) {
-                        idx1 = idx0 + j * rowStride;
-                        t[j] = a[idx1];
-                        t[n2 + j] = a[idx1 + 1];
+                } else if (columns == 2) {
+                    for (int r = 0; r < rows; r++) {
+                        idx1 = idx0 + r * rowStride;
+                        t[r] = a[idx1];
+                        t[rows + r] = a[idx1 + 1];
                     }
-                    dctn2.inverse(t, 0, scale);
-                    dctn2.inverse(t, n2, scale);
-                    for (j = 0; j < n2; j++) {
-                        idx1 = idx0 + j * rowStride;
-                        a[idx1] = t[j];
-                        a[idx1 + 1] = t[n2 + j];
+                    dctRows.inverse(t, 0, scale);
+                    dctRows.inverse(t, rows, scale);
+                    for (int r = 0; r < rows; r++) {
+                        idx1 = idx0 + r * rowStride;
+                        a[idx1] = t[r];
+                        a[idx1 + 1] = t[rows + r];
                     }
                 }
             }
@@ -945,83 +787,83 @@ public class DoubleDCT_3D {
     }
 
     private void ddxt3da_sub(int isgn, double[][][] a, boolean scale) {
-        int i, j, k, idx2;
+        int idx2;
 
         if (isgn == -1) {
-            for (i = 0; i < n1; i++) {
-                for (j = 0; j < n2; j++) {
-                    dctn3.forward(a[i][j], scale);
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    dctColumns.forward(a[s][r], scale);
                 }
-                if (n3 > 2) {
-                    for (k = 0; k < n3; k += 4) {
-                        for (j = 0; j < n2; j++) {
-                            idx2 = n2 + j;
-                            t[j] = a[i][j][k];
-                            t[idx2] = a[i][j][k + 1];
-                            t[idx2 + n2] = a[i][j][k + 2];
-                            t[idx2 + 2 * n2] = a[i][j][k + 3];
+                if (columns > 2) {
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int r = 0; r < rows; r++) {
+                            idx2 = rows + r;
+                            t[r] = a[s][r][c];
+                            t[idx2] = a[s][r][c + 1];
+                            t[idx2 + rows] = a[s][r][c + 2];
+                            t[idx2 + 2 * rows] = a[s][r][c + 3];
                         }
-                        dctn2.forward(t, 0, scale);
-                        dctn2.forward(t, n2, scale);
-                        dctn2.forward(t, 2 * n2, scale);
-                        dctn2.forward(t, 3 * n2, scale);
-                        for (j = 0; j < n2; j++) {
-                            idx2 = n2 + j;
-                            a[i][j][k] = t[j];
-                            a[i][j][k + 1] = t[idx2];
-                            a[i][j][k + 2] = t[idx2 + n2];
-                            a[i][j][k + 3] = t[idx2 + 2 * n2];
+                        dctRows.forward(t, 0, scale);
+                        dctRows.forward(t, rows, scale);
+                        dctRows.forward(t, 2 * rows, scale);
+                        dctRows.forward(t, 3 * rows, scale);
+                        for (int r = 0; r < rows; r++) {
+                            idx2 = rows + r;
+                            a[s][r][c] = t[r];
+                            a[s][r][c + 1] = t[idx2];
+                            a[s][r][c + 2] = t[idx2 + rows];
+                            a[s][r][c + 3] = t[idx2 + 2 * rows];
                         }
                     }
-                } else if (n3 == 2) {
-                    for (j = 0; j < n2; j++) {
-                        t[j] = a[i][j][0];
-                        t[n2 + j] = a[i][j][1];
+                } else if (columns == 2) {
+                    for (int r = 0; r < rows; r++) {
+                        t[r] = a[s][r][0];
+                        t[rows + r] = a[s][r][1];
                     }
-                    dctn2.forward(t, 0, scale);
-                    dctn2.forward(t, n2, scale);
-                    for (j = 0; j < n2; j++) {
-                        a[i][j][0] = t[j];
-                        a[i][j][1] = t[n2 + j];
+                    dctRows.forward(t, 0, scale);
+                    dctRows.forward(t, rows, scale);
+                    for (int r = 0; r < rows; r++) {
+                        a[s][r][0] = t[r];
+                        a[s][r][1] = t[rows + r];
                     }
                 }
             }
         } else {
-            for (i = 0; i < n1; i++) {
-                for (j = 0; j < n2; j++) {
-                    dctn3.inverse(a[i][j], scale);
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    dctColumns.inverse(a[s][r], scale);
                 }
-                if (n3 > 2) {
-                    for (k = 0; k < n3; k += 4) {
-                        for (j = 0; j < n2; j++) {
-                            idx2 = n2 + j;
-                            t[j] = a[i][j][k];
-                            t[idx2] = a[i][j][k + 1];
-                            t[idx2 + n2] = a[i][j][k + 2];
-                            t[idx2 + 2 * n2] = a[i][j][k + 3];
+                if (columns > 2) {
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int r = 0; r < rows; r++) {
+                            idx2 = rows + r;
+                            t[r] = a[s][r][c];
+                            t[idx2] = a[s][r][c + 1];
+                            t[idx2 + rows] = a[s][r][c + 2];
+                            t[idx2 + 2 * rows] = a[s][r][c + 3];
                         }
-                        dctn2.inverse(t, 0, scale);
-                        dctn2.inverse(t, n2, scale);
-                        dctn2.inverse(t, 2 * n2, scale);
-                        dctn2.inverse(t, 3 * n2, scale);
-                        for (j = 0; j < n2; j++) {
-                            idx2 = n2 + j;
-                            a[i][j][k] = t[j];
-                            a[i][j][k + 1] = t[idx2];
-                            a[i][j][k + 2] = t[idx2 + n2];
-                            a[i][j][k + 3] = t[idx2 + 2 * n2];
+                        dctRows.inverse(t, 0, scale);
+                        dctRows.inverse(t, rows, scale);
+                        dctRows.inverse(t, 2 * rows, scale);
+                        dctRows.inverse(t, 3 * rows, scale);
+                        for (int r = 0; r < rows; r++) {
+                            idx2 = rows + r;
+                            a[s][r][c] = t[r];
+                            a[s][r][c + 1] = t[idx2];
+                            a[s][r][c + 2] = t[idx2 + rows];
+                            a[s][r][c + 3] = t[idx2 + 2 * rows];
                         }
                     }
-                } else if (n3 == 2) {
-                    for (j = 0; j < n2; j++) {
-                        t[j] = a[i][j][0];
-                        t[n2 + j] = a[i][j][1];
+                } else if (columns == 2) {
+                    for (int r = 0; r < rows; r++) {
+                        t[r] = a[s][r][0];
+                        t[rows + r] = a[s][r][1];
                     }
-                    dctn2.inverse(t, 0, scale);
-                    dctn2.inverse(t, n2, scale);
-                    for (j = 0; j < n2; j++) {
-                        a[i][j][0] = t[j];
-                        a[i][j][1] = t[n2 + j];
+                    dctRows.inverse(t, 0, scale);
+                    dctRows.inverse(t, rows, scale);
+                    for (int r = 0; r < rows; r++) {
+                        a[s][r][0] = t[r];
+                        a[s][r][1] = t[rows + r];
                     }
                 }
             }
@@ -1029,94 +871,94 @@ public class DoubleDCT_3D {
     }
 
     private void ddxt3db_sub(int isgn, double[] a, boolean scale) {
-        int i, j, k, idx0, idx1, idx2;
+        int idx0, idx1, idx2;
 
         if (isgn == -1) {
-            if (n3 > 2) {
-                for (j = 0; j < n2; j++) {
-                    idx0 = j * rowStride;
-                    for (k = 0; k < n3; k += 4) {
-                        for (i = 0; i < n1; i++) {
-                            idx1 = i * sliceStride + idx0 + k;
-                            idx2 = n1 + i;
-                            t[i] = a[idx1];
+            if (columns > 2) {
+                for (int r = 0; r < rows; r++) {
+                    idx0 = r * rowStride;
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int s = 0; s < slices; s++) {
+                            idx1 = s * sliceStride + idx0 + c;
+                            idx2 = slices + s;
+                            t[s] = a[idx1];
                             t[idx2] = a[idx1 + 1];
-                            t[idx2 + n1] = a[idx1 + 2];
-                            t[idx2 + 2 * n1] = a[idx1 + 3];
+                            t[idx2 + slices] = a[idx1 + 2];
+                            t[idx2 + 2 * slices] = a[idx1 + 3];
                         }
-                        dctn1.forward(t, 0, scale);
-                        dctn1.forward(t, n1, scale);
-                        dctn1.forward(t, 2 * n1, scale);
-                        dctn1.forward(t, 3 * n1, scale);
-                        for (i = 0; i < n1; i++) {
-                            idx1 = i * sliceStride + idx0 + k;
-                            idx2 = n1 + i;
-                            a[idx1] = t[i];
+                        dctSlices.forward(t, 0, scale);
+                        dctSlices.forward(t, slices, scale);
+                        dctSlices.forward(t, 2 * slices, scale);
+                        dctSlices.forward(t, 3 * slices, scale);
+                        for (int s = 0; s < slices; s++) {
+                            idx1 = s * sliceStride + idx0 + c;
+                            idx2 = slices + s;
+                            a[idx1] = t[s];
                             a[idx1 + 1] = t[idx2];
-                            a[idx1 + 2] = t[idx2 + n1];
-                            a[idx1 + 3] = t[idx2 + 2 * n1];
+                            a[idx1 + 2] = t[idx2 + slices];
+                            a[idx1 + 3] = t[idx2 + 2 * slices];
                         }
                     }
                 }
-            } else if (n3 == 2) {
-                for (j = 0; j < n2; j++) {
-                    idx0 = j * rowStride;
-                    for (i = 0; i < n1; i++) {
-                        idx1 = i * sliceStride + idx0;
-                        t[i] = a[idx1];
-                        t[n1 + i] = a[idx1 + 1];
+            } else if (columns == 2) {
+                for (int r = 0; r < rows; r++) {
+                    idx0 = r * rowStride;
+                    for (int s = 0; s < slices; s++) {
+                        idx1 = s * sliceStride + idx0;
+                        t[s] = a[idx1];
+                        t[slices + s] = a[idx1 + 1];
                     }
-                    dctn1.forward(t, 0, scale);
-                    dctn1.forward(t, n1, scale);
-                    for (i = 0; i < n1; i++) {
-                        idx1 = i * sliceStride + idx0;
-                        a[idx1] = t[i];
-                        a[idx1 + 1] = t[n1 + i];
+                    dctSlices.forward(t, 0, scale);
+                    dctSlices.forward(t, slices, scale);
+                    for (int s = 0; s < slices; s++) {
+                        idx1 = s * sliceStride + idx0;
+                        a[idx1] = t[s];
+                        a[idx1 + 1] = t[slices + s];
                     }
                 }
             }
         } else {
-            if (n3 > 2) {
-                for (j = 0; j < n2; j++) {
-                    idx0 = j * rowStride;
-                    for (k = 0; k < n3; k += 4) {
-                        for (i = 0; i < n1; i++) {
-                            idx1 = i * sliceStride + idx0 + k;
-                            idx2 = n1 + i;
-                            t[i] = a[idx1];
+            if (columns > 2) {
+                for (int r = 0; r < rows; r++) {
+                    idx0 = r * rowStride;
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int s = 0; s < slices; s++) {
+                            idx1 = s * sliceStride + idx0 + c;
+                            idx2 = slices + s;
+                            t[s] = a[idx1];
                             t[idx2] = a[idx1 + 1];
-                            t[idx2 + n1] = a[idx1 + 2];
-                            t[idx2 + 2 * n1] = a[idx1 + 3];
+                            t[idx2 + slices] = a[idx1 + 2];
+                            t[idx2 + 2 * slices] = a[idx1 + 3];
                         }
-                        dctn1.inverse(t, 0, scale);
-                        dctn1.inverse(t, n1, scale);
-                        dctn1.inverse(t, 2 * n1, scale);
-                        dctn1.inverse(t, 3 * n1, scale);
+                        dctSlices.inverse(t, 0, scale);
+                        dctSlices.inverse(t, slices, scale);
+                        dctSlices.inverse(t, 2 * slices, scale);
+                        dctSlices.inverse(t, 3 * slices, scale);
 
-                        for (i = 0; i < n1; i++) {
-                            idx1 = i * sliceStride + idx0 + k;
-                            idx2 = n1 + i;
-                            a[idx1] = t[i];
+                        for (int s = 0; s < slices; s++) {
+                            idx1 = s * sliceStride + idx0 + c;
+                            idx2 = slices + s;
+                            a[idx1] = t[s];
                             a[idx1 + 1] = t[idx2];
-                            a[idx1 + 2] = t[idx2 + n1];
-                            a[idx1 + 3] = t[idx2 + 2 * n1];
+                            a[idx1 + 2] = t[idx2 + slices];
+                            a[idx1 + 3] = t[idx2 + 2 * slices];
                         }
                     }
                 }
-            } else if (n3 == 2) {
-                for (j = 0; j < n2; j++) {
-                    idx0 = j * rowStride;
-                    for (i = 0; i < n1; i++) {
-                        idx1 = i * sliceStride + idx0;
-                        t[i] = a[idx1];
-                        t[n1 + i] = a[idx1 + 1];
+            } else if (columns == 2) {
+                for (int r = 0; r < rows; r++) {
+                    idx0 = r * rowStride;
+                    for (int s = 0; s < slices; s++) {
+                        idx1 = s * sliceStride + idx0;
+                        t[s] = a[idx1];
+                        t[slices + s] = a[idx1 + 1];
                     }
-                    dctn1.inverse(t, 0, scale);
-                    dctn1.inverse(t, n1, scale);
-                    for (i = 0; i < n1; i++) {
-                        idx1 = i * sliceStride + idx0;
-                        a[idx1] = t[i];
-                        a[idx1 + 1] = t[n1 + i];
+                    dctSlices.inverse(t, 0, scale);
+                    dctSlices.inverse(t, slices, scale);
+                    for (int s = 0; s < slices; s++) {
+                        idx1 = s * sliceStride + idx0;
+                        a[idx1] = t[s];
+                        a[idx1 + 1] = t[slices + s];
                     }
                 }
             }
@@ -1124,82 +966,82 @@ public class DoubleDCT_3D {
     }
 
     private void ddxt3db_sub(int isgn, double[][][] a, boolean scale) {
-        int i, j, k, idx2;
+        int idx2;
 
         if (isgn == -1) {
-            if (n3 > 2) {
-                for (j = 0; j < n2; j++) {
-                    for (k = 0; k < n3; k += 4) {
-                        for (i = 0; i < n1; i++) {
-                            idx2 = n1 + i;
-                            t[i] = a[i][j][k];
-                            t[idx2] = a[i][j][k + 1];
-                            t[idx2 + n1] = a[i][j][k + 2];
-                            t[idx2 + 2 * n1] = a[i][j][k + 3];
+            if (columns > 2) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int s = 0; s < slices; s++) {
+                            idx2 = slices + s;
+                            t[s] = a[s][r][c];
+                            t[idx2] = a[s][r][c + 1];
+                            t[idx2 + slices] = a[s][r][c + 2];
+                            t[idx2 + 2 * slices] = a[s][r][c + 3];
                         }
-                        dctn1.forward(t, 0, scale);
-                        dctn1.forward(t, n1, scale);
-                        dctn1.forward(t, 2 * n1, scale);
-                        dctn1.forward(t, 3 * n1, scale);
-                        for (i = 0; i < n1; i++) {
-                            idx2 = n1 + i;
-                            a[i][j][k] = t[i];
-                            a[i][j][k + 1] = t[idx2];
-                            a[i][j][k + 2] = t[idx2 + n1];
-                            a[i][j][k + 3] = t[idx2 + 2 * n1];
+                        dctSlices.forward(t, 0, scale);
+                        dctSlices.forward(t, slices, scale);
+                        dctSlices.forward(t, 2 * slices, scale);
+                        dctSlices.forward(t, 3 * slices, scale);
+                        for (int s = 0; s < slices; s++) {
+                            idx2 = slices + s;
+                            a[s][r][c] = t[s];
+                            a[s][r][c + 1] = t[idx2];
+                            a[s][r][c + 2] = t[idx2 + slices];
+                            a[s][r][c + 3] = t[idx2 + 2 * slices];
                         }
                     }
                 }
-            } else if (n3 == 2) {
-                for (j = 0; j < n2; j++) {
-                    for (i = 0; i < n1; i++) {
-                        t[i] = a[i][j][0];
-                        t[n1 + i] = a[i][j][1];
+            } else if (columns == 2) {
+                for (int r = 0; r < rows; r++) {
+                    for (int s = 0; s < slices; s++) {
+                        t[s] = a[s][r][0];
+                        t[slices + s] = a[s][r][1];
                     }
-                    dctn1.forward(t, 0, scale);
-                    dctn1.forward(t, n1, scale);
-                    for (i = 0; i < n1; i++) {
-                        a[i][j][0] = t[i];
-                        a[i][j][1] = t[n1 + i];
+                    dctSlices.forward(t, 0, scale);
+                    dctSlices.forward(t, slices, scale);
+                    for (int s = 0; s < slices; s++) {
+                        a[s][r][0] = t[s];
+                        a[s][r][1] = t[slices + s];
                     }
                 }
             }
         } else {
-            if (n3 > 2) {
-                for (j = 0; j < n2; j++) {
-                    for (k = 0; k < n3; k += 4) {
-                        for (i = 0; i < n1; i++) {
-                            idx2 = n1 + i;
-                            t[i] = a[i][j][k];
-                            t[idx2] = a[i][j][k + 1];
-                            t[idx2 + n1] = a[i][j][k + 2];
-                            t[idx2 + 2 * n1] = a[i][j][k + 3];
+            if (columns > 2) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c += 4) {
+                        for (int s = 0; s < slices; s++) {
+                            idx2 = slices + s;
+                            t[s] = a[s][r][c];
+                            t[idx2] = a[s][r][c + 1];
+                            t[idx2 + slices] = a[s][r][c + 2];
+                            t[idx2 + 2 * slices] = a[s][r][c + 3];
                         }
-                        dctn1.inverse(t, 0, scale);
-                        dctn1.inverse(t, n1, scale);
-                        dctn1.inverse(t, 2 * n1, scale);
-                        dctn1.inverse(t, 3 * n1, scale);
+                        dctSlices.inverse(t, 0, scale);
+                        dctSlices.inverse(t, slices, scale);
+                        dctSlices.inverse(t, 2 * slices, scale);
+                        dctSlices.inverse(t, 3 * slices, scale);
 
-                        for (i = 0; i < n1; i++) {
-                            idx2 = n1 + i;
-                            a[i][j][k] = t[i];
-                            a[i][j][k + 1] = t[idx2];
-                            a[i][j][k + 2] = t[idx2 + n1];
-                            a[i][j][k + 3] = t[idx2 + 2 * n1];
+                        for (int s = 0; s < slices; s++) {
+                            idx2 = slices + s;
+                            a[s][r][c] = t[s];
+                            a[s][r][c + 1] = t[idx2];
+                            a[s][r][c + 2] = t[idx2 + slices];
+                            a[s][r][c + 3] = t[idx2 + 2 * slices];
                         }
                     }
                 }
-            } else if (n3 == 2) {
-                for (j = 0; j < n2; j++) {
-                    for (i = 0; i < n1; i++) {
-                        t[i] = a[i][j][0];
-                        t[n1 + i] = a[i][j][1];
+            } else if (columns == 2) {
+                for (int r = 0; r < rows; r++) {
+                    for (int s = 0; s < slices; s++) {
+                        t[s] = a[s][r][0];
+                        t[slices + s] = a[s][r][1];
                     }
-                    dctn1.inverse(t, 0, scale);
-                    dctn1.inverse(t, n1, scale);
-                    for (i = 0; i < n1; i++) {
-                        a[i][j][0] = t[i];
-                        a[i][j][1] = t[n1 + i];
+                    dctSlices.inverse(t, 0, scale);
+                    dctSlices.inverse(t, slices, scale);
+                    for (int s = 0; s < slices; s++) {
+                        a[s][r][0] = t[s];
+                        a[s][r][1] = t[slices + s];
                     }
                 }
             }
@@ -1207,110 +1049,105 @@ public class DoubleDCT_3D {
     }
 
     private void ddxt3da_subth(final int isgn, final double[] a, final boolean scale) {
-        int nthread, nt, i;
-        nthread = ConcurrencyUtils.getNumberOfProcessors();
-        if (nthread > n1) {
-            nthread = n1;
-        }
-        nt = 4 * n2;
-        if (n3 == 2) {
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
+        int nt = 4 * rows;
+        if (columns == 2) {
             nt >>= 1;
         }
-        final int nthread_f = nthread;
-        Future[] futures = new Future[nthread];
+        Future<?>[] futures = new Future[nthreads];
 
-        for (i = 0; i < nthread; i++) {
+        for (int i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
-            futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            futures[i] = ConcurrencyUtils.submit(new Runnable() {
 
                 public void run() {
                     int idx0, idx1, idx2;
                     if (isgn == -1) {
-                        for (int i = n0; i < n1; i += nthread_f) {
-                            idx0 = i * sliceStride;
-                            for (int j = 0; j < n2; j++) {
-                                dctn3.forward(a, idx0 + j * rowStride, scale);
+                        for (int s = n0; s < slices; s += nthreads) {
+                            idx0 = s * sliceStride;
+                            for (int r = 0; r < rows; r++) {
+                                dctColumns.forward(a, idx0 + r * rowStride, scale);
                             }
-                            if (n3 > 2) {
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int j = 0; j < n2; j++) {
-                                        idx1 = idx0 + j * rowStride + k;
-                                        idx2 = startt + n2 + j;
-                                        t[startt + j] = a[idx1];
+                            if (columns > 2) {
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int r = 0; r < rows; r++) {
+                                        idx1 = idx0 + r * rowStride + c;
+                                        idx2 = startt + rows + r;
+                                        t[startt + r] = a[idx1];
                                         t[idx2] = a[idx1 + 1];
-                                        t[idx2 + n2] = a[idx1 + 2];
-                                        t[idx2 + 2 * n2] = a[idx1 + 3];
+                                        t[idx2 + rows] = a[idx1 + 2];
+                                        t[idx2 + 2 * rows] = a[idx1 + 3];
                                     }
-                                    dctn2.forward(t, startt, scale);
-                                    dctn2.forward(t, startt + n2, scale);
-                                    dctn2.forward(t, startt + 2 * n2, scale);
-                                    dctn2.forward(t, startt + 3 * n2, scale);
-                                    for (int j = 0; j < n2; j++) {
-                                        idx1 = idx0 + j * rowStride + k;
-                                        idx2 = startt + n2 + j;
-                                        a[idx1] = t[startt + j];
+                                    dctRows.forward(t, startt, scale);
+                                    dctRows.forward(t, startt + rows, scale);
+                                    dctRows.forward(t, startt + 2 * rows, scale);
+                                    dctRows.forward(t, startt + 3 * rows, scale);
+                                    for (int r = 0; r < rows; r++) {
+                                        idx1 = idx0 + r * rowStride + c;
+                                        idx2 = startt + rows + r;
+                                        a[idx1] = t[startt + r];
                                         a[idx1 + 1] = t[idx2];
-                                        a[idx1 + 2] = t[idx2 + n2];
-                                        a[idx1 + 3] = t[idx2 + 2 * n2];
+                                        a[idx1 + 2] = t[idx2 + rows];
+                                        a[idx1 + 3] = t[idx2 + 2 * rows];
                                     }
                                 }
-                            } else if (n3 == 2) {
-                                for (int j = 0; j < n2; j++) {
-                                    idx1 = idx0 + j * rowStride;
-                                    t[startt + j] = a[idx1];
-                                    t[startt + n2 + j] = a[idx1 + 1];
+                            } else if (columns == 2) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx1 = idx0 + r * rowStride;
+                                    t[startt + r] = a[idx1];
+                                    t[startt + rows + r] = a[idx1 + 1];
                                 }
-                                dctn2.forward(t, startt, scale);
-                                dctn2.forward(t, startt + n2, scale);
-                                for (int j = 0; j < n2; j++) {
-                                    idx1 = idx0 + j * rowStride;
-                                    a[idx1] = t[startt + j];
-                                    a[idx1 + 1] = t[startt + n2 + j];
+                                dctRows.forward(t, startt, scale);
+                                dctRows.forward(t, startt + rows, scale);
+                                for (int r = 0; r < rows; r++) {
+                                    idx1 = idx0 + r * rowStride;
+                                    a[idx1] = t[startt + r];
+                                    a[idx1 + 1] = t[startt + rows + r];
                                 }
                             }
                         }
                     } else {
-                        for (int i = n0; i < n1; i += nthread_f) {
-                            idx0 = i * sliceStride;
-                            for (int j = 0; j < n2; j++) {
-                                dctn3.inverse(a, idx0 + j * rowStride, scale);
+                        for (int s = n0; s < slices; s += nthreads) {
+                            idx0 = s * sliceStride;
+                            for (int r = 0; r < rows; r++) {
+                                dctColumns.inverse(a, idx0 + r * rowStride, scale);
                             }
-                            if (n3 > 2) {
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int j = 0; j < n2; j++) {
-                                        idx1 = idx0 + j * rowStride + k;
-                                        idx2 = startt + n2 + j;
+                            if (columns > 2) {
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int j = 0; j < rows; j++) {
+                                        idx1 = idx0 + j * rowStride + c;
+                                        idx2 = startt + rows + j;
                                         t[startt + j] = a[idx1];
                                         t[idx2] = a[idx1 + 1];
-                                        t[idx2 + n2] = a[idx1 + 2];
-                                        t[idx2 + 2 * n2] = a[idx1 + 3];
+                                        t[idx2 + rows] = a[idx1 + 2];
+                                        t[idx2 + 2 * rows] = a[idx1 + 3];
                                     }
-                                    dctn2.inverse(t, startt, scale);
-                                    dctn2.inverse(t, startt + n2, scale);
-                                    dctn2.inverse(t, startt + 2 * n2, scale);
-                                    dctn2.inverse(t, startt + 3 * n2, scale);
-                                    for (int j = 0; j < n2; j++) {
-                                        idx1 = idx0 + j * rowStride + k;
-                                        idx2 = startt + n2 + j;
+                                    dctRows.inverse(t, startt, scale);
+                                    dctRows.inverse(t, startt + rows, scale);
+                                    dctRows.inverse(t, startt + 2 * rows, scale);
+                                    dctRows.inverse(t, startt + 3 * rows, scale);
+                                    for (int j = 0; j < rows; j++) {
+                                        idx1 = idx0 + j * rowStride + c;
+                                        idx2 = startt + rows + j;
                                         a[idx1] = t[startt + j];
                                         a[idx1 + 1] = t[idx2];
-                                        a[idx1 + 2] = t[idx2 + n2];
-                                        a[idx1 + 3] = t[idx2 + 2 * n2];
+                                        a[idx1 + 2] = t[idx2 + rows];
+                                        a[idx1 + 3] = t[idx2 + 2 * rows];
                                     }
                                 }
-                            } else if (n3 == 2) {
-                                for (int j = 0; j < n2; j++) {
-                                    idx1 = idx0 + j * rowStride;
-                                    t[startt + j] = a[idx1];
-                                    t[startt + n2 + j] = a[idx1 + 1];
+                            } else if (columns == 2) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx1 = idx0 + r * rowStride;
+                                    t[startt + r] = a[idx1];
+                                    t[startt + rows + r] = a[idx1 + 1];
                                 }
-                                dctn2.inverse(t, startt, scale);
-                                dctn2.inverse(t, startt + n2, scale);
-                                for (int j = 0; j < n2; j++) {
-                                    idx1 = idx0 + j * rowStride;
-                                    a[idx1] = t[startt + j];
-                                    a[idx1 + 1] = t[startt + n2 + j];
+                                dctRows.inverse(t, startt, scale);
+                                dctRows.inverse(t, startt + rows, scale);
+                                for (int r = 0; r < rows; r++) {
+                                    idx1 = idx0 + r * rowStride;
+                                    a[idx1] = t[startt + r];
+                                    a[idx1 + 1] = t[startt + rows + r];
                                 }
                             }
                         }
@@ -1318,114 +1155,99 @@ public class DoubleDCT_3D {
                 }
             });
         }
-        try {
-            for (int j = 0; j < nthread; j++) {
-                futures[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ConcurrencyUtils.waitForCompletion(futures);
     }
 
     private void ddxt3da_subth(final int isgn, final double[][][] a, final boolean scale) {
-        final int nthread;
-        int nt, i;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if (np > n1) {
-            nthread = n1;
-        } else {
-            nthread = np;
-        }
-        nt = 4 * n2;
-        if (n3 == 2) {
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
+        int nt = 4 * rows;
+        if (columns == 2) {
             nt >>= 1;
         }
-        Future[] futures = new Future[nthread];
+        Future<?>[] futures = new Future[nthreads];
 
-        for (i = 0; i < nthread; i++) {
+        for (int i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
-            futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            futures[i] = ConcurrencyUtils.submit(new Runnable() {
 
                 public void run() {
                     int idx2;
                     if (isgn == -1) {
-                        for (int i = n0; i < n1; i += nthread) {
-                            for (int j = 0; j < n2; j++) {
-                                dctn3.forward(a[i][j], scale);
+                        for (int s = n0; s < slices; s += nthreads) {
+                            for (int r = 0; r < rows; r++) {
+                                dctColumns.forward(a[s][r], scale);
                             }
-                            if (n3 > 2) {
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int j = 0; j < n2; j++) {
-                                        idx2 = startt + n2 + j;
-                                        t[startt + j] = a[i][j][k];
-                                        t[idx2] = a[i][j][k + 1];
-                                        t[idx2 + n2] = a[i][j][k + 2];
-                                        t[idx2 + 2 * n2] = a[i][j][k + 3];
+                            if (columns > 2) {
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int r = 0; r < rows; r++) {
+                                        idx2 = startt + rows + r;
+                                        t[startt + r] = a[s][r][c];
+                                        t[idx2] = a[s][r][c + 1];
+                                        t[idx2 + rows] = a[s][r][c + 2];
+                                        t[idx2 + 2 * rows] = a[s][r][c + 3];
                                     }
-                                    dctn2.forward(t, startt, scale);
-                                    dctn2.forward(t, startt + n2, scale);
-                                    dctn2.forward(t, startt + 2 * n2, scale);
-                                    dctn2.forward(t, startt + 3 * n2, scale);
-                                    for (int j = 0; j < n2; j++) {
-                                        idx2 = startt + n2 + j;
-                                        a[i][j][k] = t[startt + j];
-                                        a[i][j][k + 1] = t[idx2];
-                                        a[i][j][k + 2] = t[idx2 + n2];
-                                        a[i][j][k + 3] = t[idx2 + 2 * n2];
+                                    dctRows.forward(t, startt, scale);
+                                    dctRows.forward(t, startt + rows, scale);
+                                    dctRows.forward(t, startt + 2 * rows, scale);
+                                    dctRows.forward(t, startt + 3 * rows, scale);
+                                    for (int r = 0; r < rows; r++) {
+                                        idx2 = startt + rows + r;
+                                        a[s][r][c] = t[startt + r];
+                                        a[s][r][c + 1] = t[idx2];
+                                        a[s][r][c + 2] = t[idx2 + rows];
+                                        a[s][r][c + 3] = t[idx2 + 2 * rows];
                                     }
                                 }
-                            } else if (n3 == 2) {
-                                for (int j = 0; j < n2; j++) {
-                                    t[startt + j] = a[i][j][0];
-                                    t[startt + n2 + j] = a[i][j][1];
+                            } else if (columns == 2) {
+                                for (int r = 0; r < rows; r++) {
+                                    t[startt + r] = a[s][r][0];
+                                    t[startt + rows + r] = a[s][r][1];
                                 }
-                                dctn2.forward(t, startt, scale);
-                                dctn2.forward(t, startt + n2, scale);
-                                for (int j = 0; j < n2; j++) {
-                                    a[i][j][0] = t[startt + j];
-                                    a[i][j][1] = t[startt + n2 + j];
+                                dctRows.forward(t, startt, scale);
+                                dctRows.forward(t, startt + rows, scale);
+                                for (int r = 0; r < rows; r++) {
+                                    a[s][r][0] = t[startt + r];
+                                    a[s][r][1] = t[startt + rows + r];
                                 }
                             }
                         }
                     } else {
-                        for (int i = n0; i < n1; i += nthread) {
-                            for (int j = 0; j < n2; j++) {
-                                dctn3.inverse(a[i][j], scale);
+                        for (int s = n0; s < slices; s += nthreads) {
+                            for (int r = 0; r < rows; r++) {
+                                dctColumns.inverse(a[s][r], scale);
                             }
-                            if (n3 > 2) {
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int j = 0; j < n2; j++) {
-                                        idx2 = startt + n2 + j;
-                                        t[startt + j] = a[i][j][k];
-                                        t[idx2] = a[i][j][k + 1];
-                                        t[idx2 + n2] = a[i][j][k + 2];
-                                        t[idx2 + 2 * n2] = a[i][j][k + 3];
+                            if (columns > 2) {
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int r = 0; r < rows; r++) {
+                                        idx2 = startt + rows + r;
+                                        t[startt + r] = a[s][r][c];
+                                        t[idx2] = a[s][r][c + 1];
+                                        t[idx2 + rows] = a[s][r][c + 2];
+                                        t[idx2 + 2 * rows] = a[s][r][c + 3];
                                     }
-                                    dctn2.inverse(t, startt, scale);
-                                    dctn2.inverse(t, startt + n2, scale);
-                                    dctn2.inverse(t, startt + 2 * n2, scale);
-                                    dctn2.inverse(t, startt + 3 * n2, scale);
-                                    for (int j = 0; j < n2; j++) {
-                                        idx2 = startt + n2 + j;
-                                        a[i][j][k] = t[startt + j];
-                                        a[i][j][k + 1] = t[idx2];
-                                        a[i][j][k + 2] = t[idx2 + n2];
-                                        a[i][j][k + 3] = t[idx2 + 2 * n2];
+                                    dctRows.inverse(t, startt, scale);
+                                    dctRows.inverse(t, startt + rows, scale);
+                                    dctRows.inverse(t, startt + 2 * rows, scale);
+                                    dctRows.inverse(t, startt + 3 * rows, scale);
+                                    for (int r = 0; r < rows; r++) {
+                                        idx2 = startt + rows + r;
+                                        a[s][r][c] = t[startt + r];
+                                        a[s][r][c + 1] = t[idx2];
+                                        a[s][r][c + 2] = t[idx2 + rows];
+                                        a[s][r][c + 3] = t[idx2 + 2 * rows];
                                     }
                                 }
-                            } else if (n3 == 2) {
-                                for (int j = 0; j < n2; j++) {
-                                    t[startt + j] = a[i][j][0];
-                                    t[startt + n2 + j] = a[i][j][1];
+                            } else if (columns == 2) {
+                                for (int r = 0; r < rows; r++) {
+                                    t[startt + r] = a[s][r][0];
+                                    t[startt + rows + r] = a[s][r][1];
                                 }
-                                dctn2.inverse(t, startt, scale);
-                                dctn2.inverse(t, startt + n2, scale);
-                                for (int j = 0; j < n2; j++) {
-                                    a[i][j][0] = t[startt + j];
-                                    a[i][j][1] = t[startt + n2 + j];
+                                dctRows.inverse(t, startt, scale);
+                                dctRows.inverse(t, startt + rows, scale);
+                                for (int r = 0; r < rows; r++) {
+                                    a[s][r][0] = t[startt + r];
+                                    a[s][r][1] = t[startt + rows + r];
                                 }
                             }
                         }
@@ -1433,122 +1255,109 @@ public class DoubleDCT_3D {
                 }
             });
         }
-        try {
-            for (int j = 0; j < nthread; j++) {
-                futures[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ConcurrencyUtils.waitForCompletion(futures);
     }
 
     private void ddxt3db_subth(final int isgn, final double[] a, final boolean scale) {
-        int nthread, nt, i;
-        nthread = ConcurrencyUtils.getNumberOfProcessors();
-        if (nthread > n2) {
-            nthread = n2;
-        }
-        nt = 4 * n1;
-        if (n3 == 2) {
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        int nt = 4 * slices;
+        if (columns == 2) {
             nt >>= 1;
         }
-        Future[] futures = new Future[nthread];
-        final int nthread_f = nthread;
-        for (i = 0; i < nthread; i++) {
+        Future<?>[] futures = new Future[nthreads];
+        for (int i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
-            futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            futures[i] = ConcurrencyUtils.submit(new Runnable() {
 
                 public void run() {
                     int idx0, idx1, idx2;
                     if (isgn == -1) {
-                        if (n3 > 2) {
-                            for (int j = n0; j < n2; j += nthread_f) {
-                                idx0 = j * rowStride;
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int i = 0; i < n1; i++) {
-                                        idx1 = i * sliceStride + idx0 + k;
-                                        idx2 = startt + n1 + i;
-                                        t[startt + i] = a[idx1];
+                        if (columns > 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                idx0 = r * rowStride;
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int s = 0; s < slices; s++) {
+                                        idx1 = s * sliceStride + idx0 + c;
+                                        idx2 = startt + slices + s;
+                                        t[startt + s] = a[idx1];
                                         t[idx2] = a[idx1 + 1];
-                                        t[idx2 + n1] = a[idx1 + 2];
-                                        t[idx2 + 2 * n1] = a[idx1 + 3];
+                                        t[idx2 + slices] = a[idx1 + 2];
+                                        t[idx2 + 2 * slices] = a[idx1 + 3];
                                     }
-                                    dctn1.forward(t, startt, scale);
-                                    dctn1.forward(t, startt + n1, scale);
-                                    dctn1.forward(t, startt + 2 * n1, scale);
-                                    dctn1.forward(t, startt + 3 * n1, scale);
-                                    for (int i = 0; i < n1; i++) {
-                                        idx1 = i * sliceStride + idx0 + k;
-                                        idx2 = startt + n1 + i;
-                                        a[idx1] = t[startt + i];
+                                    dctSlices.forward(t, startt, scale);
+                                    dctSlices.forward(t, startt + slices, scale);
+                                    dctSlices.forward(t, startt + 2 * slices, scale);
+                                    dctSlices.forward(t, startt + 3 * slices, scale);
+                                    for (int s = 0; s < slices; s++) {
+                                        idx1 = s * sliceStride + idx0 + c;
+                                        idx2 = startt + slices + s;
+                                        a[idx1] = t[startt + s];
                                         a[idx1 + 1] = t[idx2];
-                                        a[idx1 + 2] = t[idx2 + n1];
-                                        a[idx1 + 3] = t[idx2 + 2 * n1];
+                                        a[idx1 + 2] = t[idx2 + slices];
+                                        a[idx1 + 3] = t[idx2 + 2 * slices];
                                     }
                                 }
                             }
-                        } else if (n3 == 2) {
-                            for (int j = n0; j < n2; j += nthread_f) {
-                                idx0 = j * rowStride;
-                                for (int i = 0; i < n1; i++) {
-                                    idx1 = i * sliceStride + idx0;
-                                    t[startt + i] = a[idx1];
-                                    t[startt + n1 + i] = a[idx1 + 1];
+                        } else if (columns == 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                idx0 = r * rowStride;
+                                for (int s = 0; s < slices; s++) {
+                                    idx1 = s * sliceStride + idx0;
+                                    t[startt + s] = a[idx1];
+                                    t[startt + slices + s] = a[idx1 + 1];
                                 }
-                                dctn1.forward(t, startt, scale);
-                                dctn1.forward(t, startt + n1, scale);
-                                for (int i = 0; i < n1; i++) {
-                                    idx1 = i * sliceStride + idx0;
-                                    a[idx1] = t[startt + i];
-                                    a[idx1 + 1] = t[startt + n1 + i];
+                                dctSlices.forward(t, startt, scale);
+                                dctSlices.forward(t, startt + slices, scale);
+                                for (int s = 0; s < slices; s++) {
+                                    idx1 = s * sliceStride + idx0;
+                                    a[idx1] = t[startt + s];
+                                    a[idx1 + 1] = t[startt + slices + s];
                                 }
                             }
                         }
                     } else {
-                        if (n3 > 2) {
-                            for (int j = n0; j < n2; j += nthread_f) {
-                                idx0 = j * rowStride;
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int i = 0; i < n1; i++) {
-                                        idx1 = i * sliceStride + idx0 + k;
-                                        idx2 = startt + n1 + i;
-                                        t[startt + i] = a[idx1];
+                        if (columns > 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                idx0 = r * rowStride;
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int s = 0; s < slices; s++) {
+                                        idx1 = s * sliceStride + idx0 + c;
+                                        idx2 = startt + slices + s;
+                                        t[startt + s] = a[idx1];
                                         t[idx2] = a[idx1 + 1];
-                                        t[idx2 + n1] = a[idx1 + 2];
-                                        t[idx2 + 2 * n1] = a[idx1 + 3];
+                                        t[idx2 + slices] = a[idx1 + 2];
+                                        t[idx2 + 2 * slices] = a[idx1 + 3];
                                     }
-                                    dctn1.inverse(t, startt, scale);
-                                    dctn1.inverse(t, startt + n1, scale);
-                                    dctn1.inverse(t, startt + 2 * n1, scale);
-                                    dctn1.inverse(t, startt + 3 * n1, scale);
-                                    for (int i = 0; i < n1; i++) {
-                                        idx1 = i * sliceStride + idx0 + k;
-                                        idx2 = startt + n1 + i;
-                                        a[idx1] = t[startt + i];
+                                    dctSlices.inverse(t, startt, scale);
+                                    dctSlices.inverse(t, startt + slices, scale);
+                                    dctSlices.inverse(t, startt + 2 * slices, scale);
+                                    dctSlices.inverse(t, startt + 3 * slices, scale);
+                                    for (int s = 0; s < slices; s++) {
+                                        idx1 = s * sliceStride + idx0 + c;
+                                        idx2 = startt + slices + s;
+                                        a[idx1] = t[startt + s];
                                         a[idx1 + 1] = t[idx2];
-                                        a[idx1 + 2] = t[idx2 + n1];
-                                        a[idx1 + 3] = t[idx2 + 2 * n1];
+                                        a[idx1 + 2] = t[idx2 + slices];
+                                        a[idx1 + 3] = t[idx2 + 2 * slices];
                                     }
                                 }
                             }
-                        } else if (n3 == 2) {
-                            for (int j = n0; j < n2; j += nthread_f) {
-                                idx0 = j * rowStride;
-                                for (int i = 0; i < n1; i++) {
-                                    idx1 = i * sliceStride + idx0;
-                                    t[startt + i] = a[idx1];
-                                    t[startt + n1 + i] = a[idx1 + 1];
+                        } else if (columns == 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                idx0 = r * rowStride;
+                                for (int s = 0; s < slices; s++) {
+                                    idx1 = s * sliceStride + idx0;
+                                    t[startt + s] = a[idx1];
+                                    t[startt + slices + s] = a[idx1 + 1];
                                 }
-                                dctn1.inverse(t, startt, scale);
-                                dctn1.inverse(t, startt + n1, scale);
+                                dctSlices.inverse(t, startt, scale);
+                                dctSlices.inverse(t, startt + slices, scale);
 
-                                for (int i = 0; i < n1; i++) {
-                                    idx1 = i * sliceStride + idx0;
-                                    a[idx1] = t[startt + i];
-                                    a[idx1 + 1] = t[startt + n1 + i];
+                                for (int s = 0; s < slices; s++) {
+                                    idx1 = s * sliceStride + idx0;
+                                    a[idx1] = t[startt + s];
+                                    a[idx1 + 1] = t[startt + slices + s];
                                 }
                             }
                         }
@@ -1556,113 +1365,98 @@ public class DoubleDCT_3D {
                 }
             });
         }
-        try {
-            for (int j = 0; j < nthread; j++) {
-                futures[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ConcurrencyUtils.waitForCompletion(futures);
     }
 
     private void ddxt3db_subth(final int isgn, final double[][][] a, final boolean scale) {
-        final int nthread;
-        int nt, i;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if (np > n2) {
-            nthread = n2;
-        } else {
-            nthread = np;
-        }
-        nt = 4 * n1;
-        if (n3 == 2) {
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        int nt = 4 * slices;
+        if (columns == 2) {
             nt >>= 1;
         }
-        Future[] futures = new Future[nthread];
+        Future<?>[] futures = new Future[nthreads];
 
-        for (i = 0; i < nthread; i++) {
+        for (int i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
-            futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            futures[i] = ConcurrencyUtils.submit(new Runnable() {
 
                 public void run() {
                     int idx2;
                     if (isgn == -1) {
-                        if (n3 > 2) {
-                            for (int j = n0; j < n2; j += nthread) {
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int i = 0; i < n1; i++) {
-                                        idx2 = startt + n1 + i;
-                                        t[startt + i] = a[i][j][k];
-                                        t[idx2] = a[i][j][k + 1];
-                                        t[idx2 + n1] = a[i][j][k + 2];
-                                        t[idx2 + 2 * n1] = a[i][j][k + 3];
+                        if (columns > 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int s = 0; s < slices; s++) {
+                                        idx2 = startt + slices + s;
+                                        t[startt + s] = a[s][r][c];
+                                        t[idx2] = a[s][r][c + 1];
+                                        t[idx2 + slices] = a[s][r][c + 2];
+                                        t[idx2 + 2 * slices] = a[s][r][c + 3];
                                     }
-                                    dctn1.forward(t, startt, scale);
-                                    dctn1.forward(t, startt + n1, scale);
-                                    dctn1.forward(t, startt + 2 * n1, scale);
-                                    dctn1.forward(t, startt + 3 * n1, scale);
-                                    for (int i = 0; i < n1; i++) {
-                                        idx2 = startt + n1 + i;
-                                        a[i][j][k] = t[startt + i];
-                                        a[i][j][k + 1] = t[idx2];
-                                        a[i][j][k + 2] = t[idx2 + n1];
-                                        a[i][j][k + 3] = t[idx2 + 2 * n1];
+                                    dctSlices.forward(t, startt, scale);
+                                    dctSlices.forward(t, startt + slices, scale);
+                                    dctSlices.forward(t, startt + 2 * slices, scale);
+                                    dctSlices.forward(t, startt + 3 * slices, scale);
+                                    for (int s = 0; s < slices; s++) {
+                                        idx2 = startt + slices + s;
+                                        a[s][r][c] = t[startt + s];
+                                        a[s][r][c + 1] = t[idx2];
+                                        a[s][r][c + 2] = t[idx2 + slices];
+                                        a[s][r][c + 3] = t[idx2 + 2 * slices];
                                     }
                                 }
                             }
-                        } else if (n3 == 2) {
-                            for (int j = n0; j < n2; j += nthread) {
-                                for (int i = 0; i < n1; i++) {
-                                    t[startt + i] = a[i][j][0];
-                                    t[startt + n1 + i] = a[i][j][1];
+                        } else if (columns == 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                for (int s = 0; s < slices; s++) {
+                                    t[startt + s] = a[s][r][0];
+                                    t[startt + slices + s] = a[s][r][1];
                                 }
-                                dctn1.forward(t, startt, scale);
-                                dctn1.forward(t, startt + n1, scale);
-                                for (int i = 0; i < n1; i++) {
-                                    a[i][j][0] = t[startt + i];
-                                    a[i][j][1] = t[startt + n1 + i];
+                                dctSlices.forward(t, startt, scale);
+                                dctSlices.forward(t, startt + slices, scale);
+                                for (int s = 0; s < slices; s++) {
+                                    a[s][r][0] = t[startt + s];
+                                    a[s][r][1] = t[startt + slices + s];
                                 }
                             }
                         }
                     } else {
-                        if (n3 > 2) {
-                            for (int j = n0; j < n2; j += nthread) {
-                                for (int k = 0; k < n3; k += 4) {
-                                    for (int i = 0; i < n1; i++) {
-                                        idx2 = startt + n1 + i;
-                                        t[startt + i] = a[i][j][k];
-                                        t[idx2] = a[i][j][k + 1];
-                                        t[idx2 + n1] = a[i][j][k + 2];
-                                        t[idx2 + 2 * n1] = a[i][j][k + 3];
+                        if (columns > 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                for (int c = 0; c < columns; c += 4) {
+                                    for (int s = 0; s < slices; s++) {
+                                        idx2 = startt + slices + s;
+                                        t[startt + s] = a[s][r][c];
+                                        t[idx2] = a[s][r][c + 1];
+                                        t[idx2 + slices] = a[s][r][c + 2];
+                                        t[idx2 + 2 * slices] = a[s][r][c + 3];
                                     }
-                                    dctn1.inverse(t, startt, scale);
-                                    dctn1.inverse(t, startt + n1, scale);
-                                    dctn1.inverse(t, startt + 2 * n1, scale);
-                                    dctn1.inverse(t, startt + 3 * n1, scale);
-                                    for (int i = 0; i < n1; i++) {
-                                        idx2 = startt + n1 + i;
-                                        a[i][j][k] = t[startt + i];
-                                        a[i][j][k + 1] = t[idx2];
-                                        a[i][j][k + 2] = t[idx2 + n1];
-                                        a[i][j][k + 3] = t[idx2 + 2 * n1];
+                                    dctSlices.inverse(t, startt, scale);
+                                    dctSlices.inverse(t, startt + slices, scale);
+                                    dctSlices.inverse(t, startt + 2 * slices, scale);
+                                    dctSlices.inverse(t, startt + 3 * slices, scale);
+                                    for (int s = 0; s < slices; s++) {
+                                        idx2 = startt + slices + s;
+                                        a[s][r][c] = t[startt + s];
+                                        a[s][r][c + 1] = t[idx2];
+                                        a[s][r][c + 2] = t[idx2 + slices];
+                                        a[s][r][c + 3] = t[idx2 + 2 * slices];
                                     }
                                 }
                             }
-                        } else if (n3 == 2) {
-                            for (int j = n0; j < n2; j += nthread) {
-                                for (int i = 0; i < n1; i++) {
-                                    t[startt + i] = a[i][j][0];
-                                    t[startt + n1 + i] = a[i][j][1];
+                        } else if (columns == 2) {
+                            for (int r = n0; r < rows; r += nthreads) {
+                                for (int s = 0; s < slices; s++) {
+                                    t[startt + s] = a[s][r][0];
+                                    t[startt + slices + s] = a[s][r][1];
                                 }
-                                dctn1.inverse(t, startt, scale);
-                                dctn1.inverse(t, startt + n1, scale);
+                                dctSlices.inverse(t, startt, scale);
+                                dctSlices.inverse(t, startt + slices, scale);
 
-                                for (int i = 0; i < n1; i++) {
-                                    a[i][j][0] = t[startt + i];
-                                    a[i][j][1] = t[startt + n1 + i];
+                                for (int s = 0; s < slices; s++) {
+                                    a[s][r][0] = t[startt + s];
+                                    a[s][r][1] = t[startt + slices + s];
                                 }
                             }
                         }
@@ -1670,14 +1464,6 @@ public class DoubleDCT_3D {
                 }
             });
         }
-        try {
-            for (int j = 0; j < nthread; j++) {
-                futures[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ConcurrencyUtils.waitForCompletion(futures);
     }
 }

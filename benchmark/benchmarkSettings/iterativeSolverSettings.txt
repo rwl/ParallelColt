@@ -1,0 +1,6 @@
+ORDER of Variables: path to matrix file (String); number of repeats (int); maximal number of iterations (int); number of threads (e.g. 1, 2, 4);
+D:/ijs.mtx
+1
+100
+1, 2
+

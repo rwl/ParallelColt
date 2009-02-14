@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -36,6 +36,40 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      * it.
      */
     protected AbstractIntIntMap() {
+    }
+    
+    /**
+     * Assigns the result of a function to each value;
+     * <tt>v[i] = function(v[i])</tt>.
+     * 
+     * @param function
+     *            a function object taking as argument the current association's
+     *            value.
+     */
+    public void assign(final cern.colt.function.tint.IntFunction function) {
+        copy().forEachPair(new cern.colt.function.tint.IntIntProcedure() {
+            public boolean apply(int key, int value) {
+                put(key, function.apply(value));
+                return true;
+            }
+        });
+    }
+    
+    /**
+     * Clears the receiver, then adds all (key,value) pairs of <tt>other</tt>values
+     * to it.
+     * 
+     * @param other
+     *            the other map to be copied into the receiver.
+     */
+    public void assign(AbstractIntIntMap other) {
+        clear();
+        other.forEachPair(new IntIntProcedure() {
+            public boolean apply(int key, int value) {
+                put(key, value);
+                return true;
+            }
+        });
     }
 
     /**

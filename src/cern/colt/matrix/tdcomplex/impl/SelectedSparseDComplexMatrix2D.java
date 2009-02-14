@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -119,30 +119,6 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
         return rowOffsets[absRank];
     }
 
-    public void fft2() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fftRows() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifftRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fftColumns() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifftColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
     /**
      * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
      * 
@@ -197,7 +173,7 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    public int index(int row, int column) {
+    public long index(int row, int column) {
         return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
     }
 

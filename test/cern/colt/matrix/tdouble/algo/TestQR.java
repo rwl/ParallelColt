@@ -2,7 +2,6 @@ package cern.colt.matrix.tdouble.algo;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
 
 //import Jama.Matrix.*;
 //import Jama.*;

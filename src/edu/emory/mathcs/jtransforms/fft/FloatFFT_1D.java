@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -34,7 +34,6 @@
 
 package edu.emory.mathcs.jtransforms.fft;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -46,7 +45,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * for SMP systems. <br>
  * <br>
  * This code is derived from General Purpose FFT Package written by Takuya Ooura
- * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html) and from Jfftpack written
+ * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html) and from JFFTPack written
  * by Baoshe Zhang (http://jfftpack.sourceforge.net/)
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
@@ -60,7 +59,7 @@ public class FloatFFT_1D {
 
     private int n;
 
-    private int n_b;
+    private int nBluestein;
 
     private int[] ip;
 
@@ -82,9 +81,9 @@ public class FloatFFT_1D {
 
     private static final int[] factors = { 4, 2, 3, 5 };
 
-    private static final float pi = 3.14159265358979311599796346854418516f;
+    private static final double PI = 3.14159265358979311599796346854418516;
 
-    private static final float two_pi = 6.28318530717958623199592693708837032f;
+    private static final double TWO_PI = 6.28318530717958623199592693708837032;
 
     /**
      * Creates new instance of FloatFFT_1D.
@@ -101,20 +100,20 @@ public class FloatFFT_1D {
         if (!ConcurrencyUtils.isPowerOf2(n)) {
             if (getReminder(n, factors) >= 211) {
                 plan = Plans.BLUESTEIN;
-                n_b = ConcurrencyUtils.nextPow2(n * 2 - 1);
-                bk1 = new float[2 * n_b];
-                bk2 = new float[2 * n_b];
-                this.ip = new int[2 + (int) Math.ceil(2 + (1 << (int) (Math.log(n_b + 0.5) / Math.log(2)) / 2))];
-                this.w = new float[n_b];
-                int twon = 2 * n_b;
+                nBluestein = ConcurrencyUtils.nextPow2(n * 2 - 1);
+                bk1 = new float[2 * nBluestein];
+                bk2 = new float[2 * nBluestein];
+                this.ip = new int[2 + (int) Math.ceil(2 + (1 << (int) (Math.log(nBluestein + 0.5) / Math.log(2)) / 2))];
+                this.w = new float[nBluestein];
+                int twon = 2 * nBluestein;
                 nw = ip[0];
                 if (twon > (nw << 2)) {
                     nw = twon >> 2;
                     makewt(nw);
                 }
                 nc = ip[1];
-                if (n_b > (nc << 2)) {
-                    nc = n_b >> 2;
+                if (nBluestein > (nc << 2)) {
+                    nc = nBluestein >> 2;
                     makect(nc, w, nw);
                 }
                 bluesteini();
@@ -170,8 +169,8 @@ public class FloatFFT_1D {
      * follows:
      * 
      * <pre>
-     * a[2*k] = Re[k], 
-     * a[2*k+1] = Im[k], 0&lt;=k&lt;n
+     * a[offa+2*k] = Re[k], 
+     * a[offa+2*k+1] = Im[k], 0&lt;=k&lt;n
      * </pre>
      * 
      * @param a
@@ -224,8 +223,8 @@ public class FloatFFT_1D {
      * follows:
      * 
      * <pre>
-     * a[2*k] = Re[k], 
-     * a[2*k+1] = Im[k], 0&lt;=k&lt;n
+     * a[offa+2*k] = Re[k], 
+     * a[offa+2*k+1] = Im[k], 0&lt;=k&lt;n
      * </pre>
      * 
      * @param a
@@ -256,7 +255,7 @@ public class FloatFFT_1D {
 
     /**
      * Computes 1D forward DFT of real data leaving the result in <code>a</code>
-     * . The physical layout of the output data is as follows:
+     * . The physical layout of the output data is as follows:<br>
      * 
      * If n is even then:
      * 
@@ -266,7 +265,7 @@ public class FloatFFT_1D {
      * a[1] = Re[n/2]
      * </pre>
      * 
-     * If n is odd then:
+     * if n is odd then
      * 
      * <pre>
      * a[2*k] = Re[k], 0&lt;=k&lt;(n+1)/2
@@ -288,22 +287,22 @@ public class FloatFFT_1D {
 
     /**
      * Computes 1D forward DFT of real data leaving the result in <code>a</code>
-     * . The physical layout of the output data is as follows:
+     * . The physical layout of the output data is as follows:<br>
      * 
      * If n is even then:
      * 
      * <pre>
-     * a[2*k] = Re[k], 0&lt;=k&lt;n/2
-     * a[2*k+1] = Im[k], 0&lt;k&lt;n/2
-     * a[1] = Re[n/2]
+     * a[offa+2*k] = Re[k], 0&lt;=k&lt;n/2
+     * a[offa+2*k+1] = Im[k], 0&lt;k&lt;n/2
+     * a[offa+1] = Re[n/2]
      * </pre>
      * 
-     * If n is odd then:
+     * if n is odd then
      * 
      * <pre>
-     * a[2*k] = Re[k], 0&lt;=k&lt;(n+1)/2
-     * a[2*k+1] = Im[k], 0&lt;k&lt;(n-1)/2
-     * a[1] = Im[(n-1)/2]
+     * a[offa+2*k] = Re[k], 0&lt;=k&lt;(n+1)/2
+     * a[offa+2*k+1] = Im[k], 0&lt;k&lt;(n-1)/2
+     * a[offa+1] = Im[(n-1)/2]
      * </pre>
      * 
      * This method computes only half of the elements of the real transform. The
@@ -385,22 +384,17 @@ public class FloatFFT_1D {
         switch (plan) {
         case SPLIT_RADIX:
             realForward(a, offa);
-            int np = ConcurrencyUtils.getNumberOfProcessors();
-            if ((np > 1) && (n / 2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-                Future[] futures = new Future[np];
-                int k = n / 2 / np;
-                for (int i = 0; i < np; i++) {
-                    final int startidx = i * k;
-                    final int stopidx;
-                    if (i == np - 1)
-                        stopidx = n / 2;
-                    else {
-                        stopidx = startidx + k;
-                    }
-                    futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (n / 2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                Future<?>[] futures = new Future[nthreads];
+                int k = n / 2 / nthreads;
+                for (int i = 0; i < nthreads; i++) {
+                    final int firstIdx = i * k;
+                    final int lastIdx = (i == (nthreads - 1)) ? n / 2 : firstIdx + k;
+                    futures[i] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             int idx1, idx2;
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 idx1 = 2 * k;
                                 idx2 = offa + ((twon - idx1) % twon);
                                 a[idx2] = a[offa + idx1];
@@ -409,15 +403,7 @@ public class FloatFFT_1D {
                         }
                     });
                 }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
             } else {
                 int idx1, idx2;
                 for (int k = 0; k < n / 2; k++) {
@@ -460,7 +446,7 @@ public class FloatFFT_1D {
 
     /**
      * Computes 1D inverse DFT of real data leaving the result in <code>a</code>
-     * . The physical layout of the input data has to be as follows:
+     * . The physical layout of the input data has to be as follows:<br>
      * 
      * If n is even then:
      * 
@@ -470,7 +456,7 @@ public class FloatFFT_1D {
      * a[1] = Re[n/2]
      * </pre>
      * 
-     * If n is odd then:
+     * if n is odd then
      * 
      * <pre>
      * a[2*k] = Re[k], 0&lt;=k&lt;(n+1)/2
@@ -495,22 +481,22 @@ public class FloatFFT_1D {
 
     /**
      * Computes 1D inverse DFT of real data leaving the result in <code>a</code>
-     * . The physical layout of the input data has to be as follows:
+     * . The physical layout of the input data has to be as follows:<br>
      * 
-     * If n is even then:
+     * if n is even then
      * 
      * <pre>
-     * a[2*k] = Re[k], 0&lt;=k&lt;n/2
-     * a[2*k+1] = Im[k], 0&lt;k&lt;n/2
-     * a[1] = Re[n/2]
+     * a[offa+2*k] = Re[k], 0&lt;=k&lt;n/2
+     * a[offa+2*k+1] = Im[k], 0&lt;k&lt;n/2
+     * a[offa+1] = Re[n/2]
      * </pre>
      * 
-     * If n is odd then:
+     * if n is odd then
      * 
      * <pre>
-     * a[2*k] = Re[k], 0&lt;=k&lt;(n+1)/2
-     * a[2*k+1] = Im[k], 0&lt;k&lt;(n-1)/2
-     * a[1] = Im[(n-1)/2]
+     * a[offa+2*k] = Re[k], 0&lt;=k&lt;(n+1)/2
+     * a[offa+2*k+1] = Im[k], 0&lt;k&lt;(n-1)/2
+     * a[offa+1] = Im[(n-1)/2]
      * </pre>
      * 
      * This method computes only half of the elements of the real transform. The
@@ -601,22 +587,17 @@ public class FloatFFT_1D {
         switch (plan) {
         case SPLIT_RADIX:
             realInverse2(a, offa, scale);
-            int np = ConcurrencyUtils.getNumberOfProcessors();
-            if ((np > 1) && (n / 2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-                Future[] futures = new Future[np];
-                int k = n / 2 / np;
-                for (int i = 0; i < np; i++) {
-                    final int startidx = i * k;
-                    final int stopidx;
-                    if (i == np - 1)
-                        stopidx = n / 2;
-                    else {
-                        stopidx = startidx + k;
-                    }
-                    futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (n / 2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                Future<?>[] futures = new Future[nthreads];
+                int k = n / 2 / nthreads;
+                for (int i = 0; i < nthreads; i++) {
+                    final int firstIdx = i * k;
+                    final int lastIdx = (i == (nthreads - 1)) ? n / 2 : firstIdx + k;
+                    futures[i] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             int idx1, idx2;
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 idx1 = 2 * k;
                                 idx2 = offa + ((twon - idx1) % twon);
                                 a[idx2] = a[offa + idx1];
@@ -625,15 +606,7 @@ public class FloatFFT_1D {
                         }
                     });
                 }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
             } else {
                 int idx1, idx2;
                 for (int k = 0; k < n / 2; k++) {
@@ -764,13 +737,13 @@ public class FloatFFT_1D {
 
         final int twon = 2 * n;
         final int fourn = 4 * n;
-        float argh;
+        double argh;
         int idot, ntry = 0, i, j;
-        float argld;
+        double argld;
         int i1, k1, l1, l2, ib;
-        float fi;
+        double fi;
         int ld, ii, nf, ip, nl, nq, nr;
-        float arg;
+        double arg;
         int ido, ipm;
 
         nl = n;
@@ -804,7 +777,7 @@ public class FloatFFT_1D {
         }
         wtable[offw + fourn] = n;
         wtable[offw + 1 + fourn] = nf;
-        argh = two_pi / (float) n;
+        argh = TWO_PI / (double) n;
         i = 1;
         l1 = 1;
         for (k1 = 1; k1 <= nf; k1++) {
@@ -847,13 +820,13 @@ public class FloatFFT_1D {
 
         final int twon = 2 * n;
         final int fourn = 4 * n;
-        float argh;
+        double argh;
         int idot, ntry = 0, i, j;
-        float argld;
+        double argld;
         int i1, k1, l1, l2, ib;
-        float fi;
+        double fi;
         int ld, ii, nf, ip, nl, nq, nr;
-        float arg;
+        double arg;
         int ido, ipm;
 
         nl = n;
@@ -887,7 +860,7 @@ public class FloatFFT_1D {
         }
         wtable[fourn] = n;
         wtable[1 + fourn] = nf;
-        argh = two_pi / (float) n;
+        argh = TWO_PI / (double) n;
         i = 1;
         l1 = 1;
         for (k1 = 1; k1 <= nf; k1++) {
@@ -929,13 +902,13 @@ public class FloatFFT_1D {
         if (n == 1)
             return;
         final int twon = 2 * n;
-        float argh;
+        double argh;
         int ntry = 0, i, j;
-        float argld;
+        double argld;
         int k1, l1, l2, ib;
-        float fi;
+        double fi;
         int ld, ii, nf, ip, nl, is, nq, nr;
-        float arg;
+        double arg;
         int ido, ipm;
         int nfm1;
 
@@ -971,7 +944,7 @@ public class FloatFFT_1D {
         }
         wtable_r[twon] = n;
         wtable_r[1 + twon] = nf;
-        argh = two_pi / (float) (n);
+        argh = TWO_PI / (float) (n);
         is = 0;
         nfm1 = nf - 1;
         l1 = 1;
@@ -1005,8 +978,8 @@ public class FloatFFT_1D {
 
     private void bluesteini() {
         int k = 0;
-        float arg;
-        float pi_n = pi / n;
+        double arg;
+        double pi_n = PI / n;
         bk1[0] = 1;
         bk1[1] = 0;
         for (int i = 1; i < n; i++) {
@@ -1017,32 +990,32 @@ public class FloatFFT_1D {
             bk1[2 * i] = (float) Math.cos(arg);
             bk1[2 * i + 1] = (float) Math.sin(arg);
         }
-        float scale = (float) (1.0 / n_b);
+        float scale = (float) (1.0 / nBluestein);
         bk2[0] = bk1[0] * scale;
         bk2[1] = bk1[1] * scale;
         for (int i = 2; i < 2 * n; i += 2) {
             bk2[i] = bk1[i] * scale;
             bk2[i + 1] = bk1[i + 1] * scale;
-            bk2[2 * n_b - i] = bk2[i];
-            bk2[2 * n_b - i + 1] = bk2[i + 1];
+            bk2[2 * nBluestein - i] = bk2[i];
+            bk2[2 * nBluestein - i + 1] = bk2[i + 1];
         }
-        cftbsub(2 * n_b, bk2, 0, ip, nw, w);
+        cftbsub(2 * nBluestein, bk2, 0, ip, nw, w);
     }
 
     private void makewt(int nw) {
         int j, nwh, nw0, nw1;
-        float delta, wn4r, wk1r, wk1i, wk3r, wk3i;
-        float delta2, deltaj, deltaj3;
+        float wn4r, wk1r, wk1i, wk3r, wk3i;
+        double delta, delta2, deltaj, deltaj3;
 
         ip[0] = nw;
         ip[1] = 1;
         if (nw > 2) {
             nwh = nw >> 1;
-            delta = (float) (0.785398163397448278999490867136046290 / nwh);
+            delta = 0.785398163397448278999490867136046290 / nwh;
             delta2 = delta * 2;
             wn4r = (float) Math.cos(delta * nwh);
             w[0] = 1;
-            w[1] = wn4r;
+            w[1] = (float) wn4r;
             if (nwh == 4) {
                 w[2] = (float) Math.cos(delta2);
                 w[3] = (float) Math.sin(delta2);
@@ -1113,12 +1086,12 @@ public class FloatFFT_1D {
 
     private void makect(int nc, float[] c, int startc) {
         int j, nch;
-        float delta, deltaj;
+        double delta, deltaj;
 
         ip[1] = nc;
         if (nc > 1) {
             nch = nc >> 1;
-            delta = (float) (0.785398163397448278999490867136046290 / nch);
+            delta = 0.785398163397448278999490867136046290 / nch;
             c[startc] = (float) Math.cos(delta * nch);
             c[startc + nch] = (float) (0.5 * c[startc]);
             for (j = 1; j < nch; j++) {
@@ -1129,30 +1102,23 @@ public class FloatFFT_1D {
         }
     }
 
-    /* -------- child routines -------- */
-
     private void bluestein_complex(final float[] a, final int offa, final int isign) {
-        final float[] ak = new float[2 * n_b];
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            if ((np >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
-                np = 4;
+        final float[] ak = new float[2 * nBluestein];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            if ((nthreads >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
+                nthreads = 4;
             }
-            Future[] futures = new Future[np];
-            int k = n / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            Future<?>[] futures = new Future[nthreads];
+            int k = n / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         if (isign > 0) {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 int idx3 = offa + idx1;
@@ -1161,7 +1127,7 @@ public class FloatFFT_1D {
                                 ak[idx2] = a[idx3] * bk1[idx2] + a[idx4] * bk1[idx1];
                             }
                         } else {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 int idx3 = offa + idx1;
@@ -1173,31 +1139,18 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            k = n_b / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n_b;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            k = nBluestein / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? nBluestein : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         if (isign > 0) {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1205,7 +1158,7 @@ public class FloatFFT_1D {
                                 ak[idx2] = im;
                             }
                         } else {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 float im = ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1216,31 +1169,18 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
-            cftfsub(2 * n_b, ak, 0, ip, nw, w);
+            cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            k = n / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            k = n / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         if (isign > 0) {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 int idx3 = offa + idx1;
@@ -1249,7 +1189,7 @@ public class FloatFFT_1D {
                                 a[idx4] = bk1[idx2] * ak[idx1] + bk1[idx1] * ak[idx2];
                             }
                         } else {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 int idx3 = offa + idx1;
@@ -1261,15 +1201,7 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             if (isign > 0) {
                 for (int i = 0; i < n; i++) {
@@ -1291,10 +1223,10 @@ public class FloatFFT_1D {
                 }
             }
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
             if (isign > 0) {
-                for (int i = 0; i < n_b; i++) {
+                for (int i = 0; i < nBluestein; i++) {
                     int idx1 = 2 * i;
                     int idx2 = idx1 + 1;
                     float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1302,7 +1234,7 @@ public class FloatFFT_1D {
                     ak[idx2] = im;
                 }
             } else {
-                for (int i = 0; i < n_b; i++) {
+                for (int i = 0; i < nBluestein; i++) {
                     int idx1 = 2 * i;
                     int idx2 = idx1 + 1;
                     float im = ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1311,7 +1243,7 @@ public class FloatFFT_1D {
                 }
             }
 
-            cftfsub(2 * n_b, ak, 0, ip, nw, w);
+            cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
             if (isign > 0) {
                 for (int i = 0; i < n; i++) {
                     int idx1 = 2 * i;
@@ -1335,27 +1267,22 @@ public class FloatFFT_1D {
     }
 
     private void bluestein_real_full(final float[] a, final int offa, final int isign) {
-        final float[] ak = new float[2 * n_b];
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            if ((np >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
-                np = 4;
+        final float[] ak = new float[2 * nBluestein];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            if ((nthreads >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
+                nthreads = 4;
             }
-            Future[] futures = new Future[np];
-            int k = n / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            Future<?>[] futures = new Future[nthreads];
+            int k = n / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         if (isign > 0) {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 int idx3 = offa + i;
@@ -1363,7 +1290,7 @@ public class FloatFFT_1D {
                                 ak[idx2] = a[idx3] * bk1[idx2];
                             }
                         } else {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 int idx3 = offa + i;
@@ -1374,31 +1301,18 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            k = n_b / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n_b;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            k = nBluestein / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? nBluestein : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         if (isign > 0) {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1406,7 +1320,7 @@ public class FloatFFT_1D {
                                 ak[idx2] = im;
                             }
                         } else {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 float im = ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1417,38 +1331,25 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
-            cftfsub(2 * n_b, ak, 0, ip, nw, w);
+            cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            k = n / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            k = n / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         if (isign > 0) {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 a[offa + idx1] = bk1[idx1] * ak[idx1] - bk1[idx2] * ak[idx2];
                                 a[offa + idx2] = bk1[idx2] * ak[idx1] + bk1[idx1] * ak[idx2];
                             }
                         } else {
-                            for (int i = startidx; i < stopidx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int idx1 = 2 * i;
                                 int idx2 = idx1 + 1;
                                 a[offa + idx1] = bk1[idx1] * ak[idx1] + bk1[idx2] * ak[idx2];
@@ -1458,15 +1359,7 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             if (isign > 0) {
                 for (int i = 0; i < n; i++) {
@@ -1486,10 +1379,10 @@ public class FloatFFT_1D {
                 }
             }
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
             if (isign > 0) {
-                for (int i = 0; i < n_b; i++) {
+                for (int i = 0; i < nBluestein; i++) {
                     int idx1 = 2 * i;
                     int idx2 = idx1 + 1;
                     float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1497,7 +1390,7 @@ public class FloatFFT_1D {
                     ak[idx2] = im;
                 }
             } else {
-                for (int i = 0; i < n_b; i++) {
+                for (int i = 0; i < nBluestein; i++) {
                     int idx1 = 2 * i;
                     int idx2 = idx1 + 1;
                     float im = ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1506,7 +1399,7 @@ public class FloatFFT_1D {
                 }
             }
 
-            cftfsub(2 * n_b, ak, 0, ip, nw, w);
+            cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
 
             if (isign > 0) {
                 for (int i = 0; i < n; i++) {
@@ -1527,26 +1420,21 @@ public class FloatFFT_1D {
     }
 
     private void bluestein_real_forward(final float[] a, final int offa) {
-        final float[] ak = new float[2 * n_b];
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            if ((np >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
-                np = 4;
+        final float[] ak = new float[2 * nBluestein];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            if ((nthreads >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
+                nthreads = 4;
             }
-            Future[] futures = new Future[np];
-            int k = n / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            Future<?>[] futures = new Future[nthreads];
+            int k = n / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             int idx1 = 2 * i;
                             int idx2 = idx1 + 1;
                             int idx3 = offa + i;
@@ -1556,30 +1444,17 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            k = n_b / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n_b;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            k = nBluestein / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? nBluestein : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             int idx1 = 2 * i;
                             int idx2 = idx1 + 1;
                             float im = ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1589,15 +1464,7 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
 
@@ -1609,9 +1476,9 @@ public class FloatFFT_1D {
                 ak[idx2] = -a[idx3] * bk1[idx2];
             }
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            for (int i = 0; i < n_b; i++) {
+            for (int i = 0; i < nBluestein; i++) {
                 int idx1 = 2 * i;
                 int idx2 = idx1 + 1;
                 float im = ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1620,7 +1487,7 @@ public class FloatFFT_1D {
             }
         }
 
-        cftfsub(2 * n_b, ak, 0, ip, nw, w);
+        cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
 
         if (n % 2 == 0) {
             a[offa] = bk1[0] * ak[0] + bk1[1] * ak[1];
@@ -1646,7 +1513,7 @@ public class FloatFFT_1D {
     }
 
     private void bluestein_real_inverse(final float[] a, final int offa) {
-        final float[] ak = new float[2 * n_b];
+        final float[] ak = new float[2 * nBluestein];
         if (n % 2 == 0) {
             ak[0] = a[offa] * bk1[0];
             ak[1] = a[offa] * bk1[1];
@@ -1701,27 +1568,22 @@ public class FloatFFT_1D {
             }
         }
 
-        cftbsub(2 * n_b, ak, 0, ip, nw, w);
+        cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            if ((np >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
-                np = 4;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            if ((nthreads >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
+                nthreads = 4;
             }
-            Future[] futures = new Future[np];
-            int k = n_b / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n_b;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            Future<?>[] futures = new Future[nthreads];
+            int k = nBluestein / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? nBluestein : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             int idx1 = 2 * i;
                             int idx2 = idx1 + 1;
                             float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1731,30 +1593,17 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
-            cftfsub(2 * n_b, ak, 0, ip, nw, w);
+            cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            k = n / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            k = n / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             int idx1 = 2 * i;
                             int idx2 = idx1 + 1;
                             a[offa + i] = bk1[idx1] * ak[idx1] - bk1[idx2] * ak[idx2];
@@ -1762,19 +1611,11 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
 
-            for (int i = 0; i < n_b; i++) {
+            for (int i = 0; i < nBluestein; i++) {
                 int idx1 = 2 * i;
                 int idx2 = idx1 + 1;
                 float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1782,7 +1623,7 @@ public class FloatFFT_1D {
                 ak[idx2] = im;
             }
 
-            cftfsub(2 * n_b, ak, 0, ip, nw, w);
+            cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
 
             for (int i = 0; i < n; i++) {
                 int idx1 = 2 * i;
@@ -1793,26 +1634,21 @@ public class FloatFFT_1D {
     }
 
     private void bluestein_real_inverse2(final float[] a, final int offa) {
-        final float[] ak = new float[2 * n_b];
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            if ((np >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
-                np = 4;
+        final float[] ak = new float[2 * nBluestein];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            if ((nthreads >= 4) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads())) {
+                nthreads = 4;
             }
-            Future[] futures = new Future[np];
-            int k = n / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            Future<?>[] futures = new Future[nthreads];
+            int k = n / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             int idx1 = 2 * i;
                             int idx2 = idx1 + 1;
                             int idx3 = offa + i;
@@ -1822,30 +1658,17 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            k = n_b / np;
-            for (int i = 0; i < np; i++) {
-                final int startidx = i * k;
-                final int stopidx;
-                if (i == np - 1)
-                    stopidx = n_b;
-                else {
-                    stopidx = startidx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            k = nBluestein / nthreads;
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? nBluestein : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             int idx1 = 2 * i;
                             int idx2 = idx1 + 1;
                             float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1855,15 +1678,7 @@ public class FloatFFT_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
 
@@ -1875,9 +1690,9 @@ public class FloatFFT_1D {
                 ak[idx2] = a[idx3] * bk1[idx2];
             }
 
-            cftbsub(2 * n_b, ak, 0, ip, nw, w);
+            cftbsub(2 * nBluestein, ak, 0, ip, nw, w);
 
-            for (int i = 0; i < n_b; i++) {
+            for (int i = 0; i < nBluestein; i++) {
                 int idx1 = 2 * i;
                 int idx2 = idx1 + 1;
                 float im = -ak[idx1] * bk2[idx2] + ak[idx2] * bk2[idx1];
@@ -1886,7 +1701,7 @@ public class FloatFFT_1D {
             }
         }
 
-        cftfsub(2 * n_b, ak, 0, ip, nw, w);
+        cftfsub(2 * nBluestein, ak, 0, ip, nw, w);
 
         if (n % 2 == 0) {
             a[offa] = bk1[0] * ak[0] - bk1[1] * ak[1];
@@ -1916,7 +1731,7 @@ public class FloatFFT_1D {
     void rfftf(final float a[], final int offa) {
         if (n == 1)
             return;
-        int k1, l1, l2, na, kh, nf, ip, iw, ido, idl1;
+        int l1, l2, na, kh, nf, ip, iw, ido, idl1;
 
         final float[] ch = new float[n];
         final int twon = 2 * n;
@@ -1924,7 +1739,7 @@ public class FloatFFT_1D {
         na = 1;
         l2 = n;
         iw = twon - 1;
-        for (k1 = 1; k1 <= nf; ++k1) {
+        for (int k1 = 1; k1 <= nf; ++k1) {
             kh = nf - k1;
             ip = (int) wtable_r[kh + 2 + twon];
             l1 = l2 / ip;
@@ -1986,7 +1801,7 @@ public class FloatFFT_1D {
     void rfftb(final float a[], final int offa) {
         if (n == 1)
             return;
-        int k1, l1, l2, na, nf, ip, iw, ido, idl1;
+        int l1, l2, na, nf, ip, iw, ido, idl1;
 
         float[] ch = new float[n];
         final int twon = 2 * n;
@@ -1994,7 +1809,7 @@ public class FloatFFT_1D {
         na = 0;
         l1 = 1;
         iw = n;
-        for (k1 = 1; k1 <= nf; k1++) {
+        for (int k1 = 1; k1 <= nf; k1++) {
             ip = (int) wtable_r[k1 + 1 + twon];
             l2 = ip * l1;
             ido = n / l2;
@@ -2054,13 +1869,13 @@ public class FloatFFT_1D {
        radf2: Real FFT's forward processing of factor 2
       -------------------------------------------------*/
     void radf2(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
-        int i, k, ic, idx0, idx1, idx2, idx3, idx4;
+        int i, ic, idx0, idx1, idx2, idx3, idx4;
         float t1i, t1r, w1r, w1i;
         int iw1;
         iw1 = offset;
         idx0 = l1 * ido;
         idx1 = 2 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int oidx1 = out_off + k * idx1;
             int oidx2 = oidx1 + idx1 - 1;
             int iidx1 = in_off + k * ido;
@@ -2075,7 +1890,7 @@ public class FloatFFT_1D {
         if (ido < 2)
             return;
         if (ido != 2) {
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 idx1 = k * ido;
                 idx2 = 2 * idx1;
                 idx3 = idx2 + ido;
@@ -2110,7 +1925,7 @@ public class FloatFFT_1D {
                 return;
         }
         idx2 = 2 * idx1;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             idx1 = k * ido;
             int oidx1 = out_off + idx2 + ido;
             int iidx1 = in_off + ido - 1 + idx1;
@@ -2124,12 +1939,12 @@ public class FloatFFT_1D {
        radb2: Real FFT's backward processing of factor 2
       -------------------------------------------------*/
     void radb2(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
-        int i, k, ic;
+        int i, ic;
         float t1i, t1r, w1r, w1i;
         int iw1 = offset;
 
         int idx0 = l1 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 2 * idx1;
             int idx3 = idx2 + ido;
@@ -2144,7 +1959,7 @@ public class FloatFFT_1D {
         if (ido < 2)
             return;
         if (ido != 2) {
-            for (k = 0; k < l1; ++k) {
+            for (int k = 0; k < l1; ++k) {
                 int idx1 = k * ido;
                 int idx2 = 2 * idx1;
                 int idx3 = idx2 + ido;
@@ -2177,7 +1992,7 @@ public class FloatFFT_1D {
             if (ido % 2 == 1)
                 return;
         }
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 2 * idx1;
             int oidx1 = out_off + ido - 1 + idx1;
@@ -2193,14 +2008,14 @@ public class FloatFFT_1D {
     void radf3(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
         final float taur = -0.5f;
         final float taui = 0.866025403784438707610604524234076962f;
-        int i, k, ic;
+        int i, ic;
         float ci2, di2, di3, cr2, dr2, dr3, ti2, ti3, tr2, tr3, w1r, w2r, w1i, w2i;
         int iw1, iw2;
         iw1 = offset;
         iw2 = iw1 + ido;
 
         int idx0 = l1 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx3 = 2 * idx0;
             int idx4 = (3 * k + 1) * ido;
@@ -2217,7 +2032,7 @@ public class FloatFFT_1D {
         }
         if (ido == 1)
             return;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx3 = k * ido;
             int idx4 = 3 * idx3;
             int idx5 = idx3 + idx0;
@@ -2279,13 +2094,13 @@ public class FloatFFT_1D {
     void radb3(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
         final float taur = -0.5f;
         final float taui = 0.866025403784438707610604524234076962f;
-        int i, k, ic;
+        int i, ic;
         float ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2, w1r, w2r, w1i, w2i;
         int iw1, iw2;
         iw1 = offset;
         iw2 = iw1 + ido;
 
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int iidx1 = in_off + 3 * idx1;
             int iidx2 = iidx1 + 2 * ido;
@@ -2302,7 +2117,7 @@ public class FloatFFT_1D {
         if (ido == 1)
             return;
         int idx0 = l1 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 3 * idx1;
             int idx3 = idx2 + ido;
@@ -2363,14 +2178,14 @@ public class FloatFFT_1D {
       -------------------------------------------------*/
     void radf4(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
         final float hsqt2 = 0.707106781186547572737310929369414225f;
-        int i, k, ic;
+        int i, ic;
         float ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, tr3, tr4, w1r, w1i, w2r, w2i, w3r, w3i;
         int iw1, iw2, iw3;
         iw1 = offset;
         iw2 = offset + ido;
         iw3 = iw2 + ido;
         int idx0 = l1 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 4 * idx1;
             int idx3 = idx1 + idx0;
@@ -2396,7 +2211,7 @@ public class FloatFFT_1D {
         if (ido < 2)
             return;
         if (ido != 2) {
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx1 = k * ido;
                 int idx2 = idx1 + idx0;
                 int idx3 = idx2 + idx0;
@@ -2467,7 +2282,7 @@ public class FloatFFT_1D {
             if (ido % 2 == 1)
                 return;
         }
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 4 * idx1;
             int idx3 = idx1 + idx0;
@@ -2499,7 +2314,7 @@ public class FloatFFT_1D {
       -------------------------------------------------*/
     void radb4(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
         final float sqrt2 = 1.41421356237309514547462185873882845f;
-        int i, k, ic;
+        int i, ic;
         float ci2, ci3, ci4, cr2, cr3, cr4;
         float ti1, ti2, ti3, ti4, tr1, tr2, tr3, tr4, w1r, w1i, w2r, w2i, w3r, w3i;
         int iw1, iw2, iw3;
@@ -2508,7 +2323,7 @@ public class FloatFFT_1D {
         iw3 = iw2 + ido;
 
         int idx0 = l1 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 4 * idx1;
             int idx3 = idx1 + idx0;
@@ -2536,7 +2351,7 @@ public class FloatFFT_1D {
         if (ido < 2)
             return;
         if (ido != 2) {
-            for (k = 0; k < l1; ++k) {
+            for (int k = 0; k < l1; ++k) {
                 int idx1 = k * ido;
                 int idx2 = idx1 + idx0;
                 int idx3 = idx2 + idx0;
@@ -2608,7 +2423,7 @@ public class FloatFFT_1D {
             if (ido % 2 == 1)
                 return;
         }
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 4 * idx1;
             int idx3 = idx1 + idx0;
@@ -2645,7 +2460,7 @@ public class FloatFFT_1D {
         final float ti11 = 0.951056516295153531181938433292089030f;
         final float tr12 = -0.809016994374947340240566973079694435f;
         final float ti12 = 0.587785252292473248125759255344746634f;
-        int i, k, ic;
+        int i, ic;
         float ci2, di2, ci4, ci5, di3, di4, di5, ci3, cr2, cr3, dr2, dr3, dr4, dr5, cr5, cr4, ti2, ti3, ti5, ti4, tr2, tr3, tr4, tr5, w1r, w1i, w2r, w2i, w3r, w3i, w4r, w4i;
         int iw1, iw2, iw3, iw4;
         iw1 = offset;
@@ -2654,7 +2469,7 @@ public class FloatFFT_1D {
         iw4 = iw3 + ido;
 
         int idx0 = l1 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 5 * idx1;
             int idx3 = idx2 + ido;
@@ -2686,7 +2501,7 @@ public class FloatFFT_1D {
         }
         if (ido == 1)
             return;
-        for (k = 0; k < l1; ++k) {
+        for (int k = 0; k < l1; ++k) {
             int idx1 = k * ido;
             int idx2 = 5 * idx1;
             int idx3 = idx2 + ido;
@@ -2788,7 +2603,7 @@ public class FloatFFT_1D {
         final float ti11 = 0.951056516295153531181938433292089030f;
         final float tr12 = -0.809016994374947340240566973079694435f;
         final float ti12 = 0.587785252292473248125759255344746634f;
-        int i, k, ic;
+        int i, ic;
         float ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5, w1r, w1i, w2r, w2i, w3r, w3i, w4r, w4i;
         int iw1, iw2, iw3, iw4;
         iw1 = offset;
@@ -2797,7 +2612,7 @@ public class FloatFFT_1D {
         iw4 = iw3 + ido;
 
         int idx0 = l1 * ido;
-        for (k = 0; k < l1; k++) {
+        for (int k = 0; k < l1; k++) {
             int idx1 = k * ido;
             int idx2 = 5 * idx1;
             int idx3 = idx2 + ido;
@@ -2829,7 +2644,7 @@ public class FloatFFT_1D {
         }
         if (ido == 1)
             return;
-        for (k = 0; k < l1; ++k) {
+        for (int k = 0; k < l1; ++k) {
             int idx1 = k * ido;
             int idx2 = 5 * idx1;
             int idx3 = idx2 + ido;
@@ -2926,39 +2741,39 @@ public class FloatFFT_1D {
        radfg: Real FFT's forward processing of general factor
       --------------------------------------------------------*/
     void radfg(final int ido, final int ip, final int l1, final int idl1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
-        int idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is, nbd;
-        float dc2, ai1, ai2, ar1, ar2, ds2, dcp, arg, dsp, ar1h, ar2h, w1r, w1i;
+        int idij, ipph, j2, ic, jc, lc, is, nbd;
+        float dc2, ai1, ai2, ar1, ar2, ds2, dcp, dsp, ar1h, ar2h, w1r, w1i;
         int iw1 = offset;
 
-        arg = two_pi / (float) ip;
+        double arg = TWO_PI / (double) ip;
         dcp = (float) Math.cos(arg);
         dsp = (float) Math.sin(arg);
         ipph = (ip + 1) / 2;
         nbd = (ido - 1) / 2;
         if (ido != 1) {
-            for (ik = 0; ik < idl1; ik++)
+            for (int ik = 0; ik < idl1; ik++)
                 out[out_off + ik] = in[in_off + ik];
-            for (j = 1; j < ip; j++) {
+            for (int j = 1; j < ip; j++) {
                 int idx1 = j * l1 * ido;
-                for (k = 0; k < l1; k++) {
+                for (int k = 0; k < l1; k++) {
                     int idx2 = k * ido + idx1;
                     out[out_off + idx2] = in[in_off + idx2];
                 }
             }
             if (nbd <= l1) {
                 is = -ido;
-                for (j = 1; j < ip; j++) {
+                for (int j = 1; j < ip; j++) {
                     is += ido;
                     idij = is - 1;
                     int idx1 = j * l1 * ido;
-                    for (i = 2; i < ido; i += 2) {
+                    for (int i = 2; i < ido; i += 2) {
                         idij += 2;
                         int idx2 = idij + iw1;
                         int idx4 = in_off + i;
                         int idx5 = out_off + i;
                         w1r = wtable_r[idx2 - 1];
                         w1i = wtable_r[idx2];
-                        for (k = 0; k < l1; k++) {
+                        for (int k = 0; k < l1; k++) {
                             int idx3 = k * ido + idx1;
                             int oidx1 = idx5 + idx3;
                             int iidx1 = idx4 + idx3;
@@ -2972,13 +2787,13 @@ public class FloatFFT_1D {
                 }
             } else {
                 is = -ido;
-                for (j = 1; j < ip; j++) {
+                for (int j = 1; j < ip; j++) {
                     is += ido;
                     int idx1 = j * l1 * ido;
-                    for (k = 0; k < l1; k++) {
+                    for (int k = 0; k < l1; k++) {
                         idij = is - 1;
                         int idx3 = k * ido + idx1;
-                        for (i = 2; i < ido; i += 2) {
+                        for (int i = 2; i < ido; i += 2) {
                             idij += 2;
                             int idx2 = idij + iw1;
                             w1r = wtable_r[idx2 - 1];
@@ -2995,14 +2810,14 @@ public class FloatFFT_1D {
                 }
             }
             if (nbd >= l1) {
-                for (j = 1; j < ipph; j++) {
+                for (int j = 1; j < ipph; j++) {
                     jc = ip - j;
                     int idx1 = j * l1 * ido;
                     int idx2 = jc * l1 * ido;
-                    for (k = 0; k < l1; k++) {
+                    for (int k = 0; k < l1; k++) {
                         int idx3 = k * ido + idx1;
                         int idx4 = k * ido + idx2;
-                        for (i = 2; i < ido; i += 2) {
+                        for (int i = 2; i < ido; i += 2) {
                             int idx5 = in_off + i;
                             int idx6 = out_off + i;
                             int iidx1 = idx5 + idx3;
@@ -3023,14 +2838,14 @@ public class FloatFFT_1D {
                     }
                 }
             } else {
-                for (j = 1; j < ipph; j++) {
+                for (int j = 1; j < ipph; j++) {
                     jc = ip - j;
                     int idx1 = j * l1 * ido;
                     int idx2 = jc * l1 * ido;
-                    for (i = 2; i < ido; i += 2) {
+                    for (int i = 2; i < ido; i += 2) {
                         int idx5 = in_off + i;
                         int idx6 = out_off + i;
-                        for (k = 0; k < l1; k++) {
+                        for (int k = 0; k < l1; k++) {
                             int idx3 = k * ido + idx1;
                             int idx4 = k * ido + idx2;
                             int iidx1 = idx5 + idx3;
@@ -3053,11 +2868,11 @@ public class FloatFFT_1D {
         } else {
             System.arraycopy(out, out_off, in, in_off, idl1);
         }
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             jc = ip - j;
             int idx1 = j * l1 * ido;
             int idx2 = jc * l1 * ido;
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx3 = k * ido + idx1;
                 int idx4 = k * ido + idx2;
                 int oidx1 = out_off + idx3;
@@ -3073,14 +2888,14 @@ public class FloatFFT_1D {
         ar1 = 1;
         ai1 = 0;
         int idx0 = (ip - 1) * idl1;
-        for (l = 1; l < ipph; l++) {
+        for (int l = 1; l < ipph; l++) {
             lc = ip - l;
             ar1h = dcp * ar1 - dsp * ai1;
             ai1 = dcp * ai1 + dsp * ar1;
             ar1 = ar1h;
             int idx1 = l * idl1;
             int idx2 = lc * idl1;
-            for (ik = 0; ik < idl1; ik++) {
+            for (int ik = 0; ik < idl1; ik++) {
                 int idx3 = out_off + ik;
                 int idx4 = in_off + ik;
                 out[idx3 + idx1] = in[idx4] + ar1 * in[idx4 + idl1];
@@ -3090,14 +2905,14 @@ public class FloatFFT_1D {
             ds2 = ai1;
             ar2 = ar1;
             ai2 = ai1;
-            for (j = 2; j < ipph; j++) {
+            for (int j = 2; j < ipph; j++) {
                 jc = ip - j;
                 ar2h = dc2 * ar2 - ds2 * ai2;
                 ai2 = dc2 * ai2 + ds2 * ar2;
                 ar2 = ar2h;
                 int idx3 = j * idl1;
                 int idx4 = jc * idl1;
-                for (ik = 0; ik < idl1; ik++) {
+                for (int ik = 0; ik < idl1; ik++) {
                     int idx5 = out_off + ik;
                     int idx6 = in_off + ik;
                     out[idx5 + idx1] += ar2 * in[idx6 + idx3];
@@ -3105,37 +2920,37 @@ public class FloatFFT_1D {
                 }
             }
         }
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             int idx1 = j * idl1;
-            for (ik = 0; ik < idl1; ik++) {
+            for (int ik = 0; ik < idl1; ik++) {
                 out[out_off + ik] += in[in_off + ik + idx1];
             }
         }
 
         if (ido >= l1) {
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx1 = k * ido;
                 int idx2 = idx1 * ip;
-                for (i = 0; i < ido; i++) {
+                for (int i = 0; i < ido; i++) {
                     in[in_off + i + idx2] = out[out_off + i + idx1];
                 }
             }
         } else {
-            for (i = 0; i < ido; i++) {
-                for (k = 0; k < l1; k++) {
+            for (int i = 0; i < ido; i++) {
+                for (int k = 0; k < l1; k++) {
                     int idx1 = k * ido;
                     in[in_off + i + idx1 * ip] = out[out_off + i + idx1];
                 }
             }
         }
         int idx01 = ip * ido;
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             jc = ip - j;
             j2 = 2 * j;
             int idx1 = j * l1 * ido;
             int idx2 = jc * l1 * ido;
             int idx3 = j2 * ido;
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx4 = k * ido;
                 int idx5 = idx4 + idx1;
                 int idx6 = idx4 + idx2;
@@ -3147,16 +2962,16 @@ public class FloatFFT_1D {
         if (ido == 1)
             return;
         if (nbd >= l1) {
-            for (j = 1; j < ipph; j++) {
+            for (int j = 1; j < ipph; j++) {
                 jc = ip - j;
                 j2 = 2 * j;
                 int idx1 = j * l1 * ido;
                 int idx2 = jc * l1 * ido;
                 int idx3 = j2 * ido;
-                for (k = 0; k < l1; k++) {
+                for (int k = 0; k < l1; k++) {
                     int idx4 = k * idx01;
                     int idx5 = k * ido;
-                    for (i = 2; i < ido; i += 2) {
+                    for (int i = 2; i < ido; i += 2) {
                         ic = ido - i;
                         int idx6 = in_off + i;
                         int idx7 = in_off + ic;
@@ -3178,18 +2993,18 @@ public class FloatFFT_1D {
                 }
             }
         } else {
-            for (j = 1; j < ipph; j++) {
+            for (int j = 1; j < ipph; j++) {
                 jc = ip - j;
                 j2 = 2 * j;
                 int idx1 = j * l1 * ido;
                 int idx2 = jc * l1 * ido;
                 int idx3 = j2 * ido;
-                for (i = 2; i < ido; i += 2) {
+                for (int i = 2; i < ido; i += 2) {
                     ic = ido - i;
                     int idx6 = in_off + i;
                     int idx7 = in_off + ic;
                     int idx8 = out_off + i;
-                    for (k = 0; k < l1; k++) {
+                    for (int k = 0; k < l1; k++) {
                         int idx4 = k * idx01;
                         int idx5 = k * ido;
                         int iidx1 = idx6 + idx3 + idx4;
@@ -3215,43 +3030,43 @@ public class FloatFFT_1D {
        radbg: Real FFT's backward processing of general factor
       --------------------------------------------------------*/
     void radbg(final int ido, final int ip, final int l1, final int idl1, final float in[], final int in_off, final float out[], final int out_off, final int offset) {
-        int idij, ipph, i, j, k, l, j2, ic, jc, lc, ik, is;
+        int idij, ipph, j2, ic, jc, lc, is;
         float dc2, ai1, ai2, ar1, ar2, ds2, w1r, w1i;
         int nbd;
-        float dcp, arg, dsp, ar1h, ar2h;
+        float dcp, dsp, ar1h, ar2h;
         int iw1 = offset;
 
-        arg = two_pi / (float) ip;
+        double arg = TWO_PI / (double) ip;
         dcp = (float) Math.cos(arg);
         dsp = (float) Math.sin(arg);
         nbd = (ido - 1) / 2;
         ipph = (ip + 1) / 2;
         int idx0 = ip * ido;
         if (ido >= l1) {
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx1 = k * ido;
                 int idx2 = k * idx0;
-                for (i = 0; i < ido; i++) {
+                for (int i = 0; i < ido; i++) {
                     out[out_off + i + idx1] = in[in_off + i + idx2];
                 }
             }
         } else {
-            for (i = 0; i < ido; i++) {
+            for (int i = 0; i < ido; i++) {
                 int idx1 = out_off + i;
                 int idx2 = in_off + i;
-                for (k = 0; k < l1; k++) {
+                for (int k = 0; k < l1; k++) {
                     out[idx1 + k * ido] = in[idx2 + k * idx0];
                 }
             }
         }
         int iidx0 = in_off + ido - 1;
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             jc = ip - j;
             j2 = 2 * j;
             int idx1 = j * l1 * ido;
             int idx2 = jc * l1 * ido;
             int idx3 = j2 * ido;
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx4 = k * ido;
                 int idx5 = idx4 * ip;
                 int iidx1 = iidx0 + idx3 + idx5 - ido;
@@ -3266,16 +3081,16 @@ public class FloatFFT_1D {
 
         if (ido != 1) {
             if (nbd >= l1) {
-                for (j = 1; j < ipph; j++) {
+                for (int j = 1; j < ipph; j++) {
                     jc = ip - j;
                     int idx1 = j * l1 * ido;
                     int idx2 = jc * l1 * ido;
                     int idx3 = 2 * j * ido;
-                    for (k = 0; k < l1; k++) {
+                    for (int k = 0; k < l1; k++) {
                         int idx4 = k * ido + idx1;
                         int idx5 = k * ido + idx2;
                         int idx6 = k * ip * ido + idx3;
-                        for (i = 2; i < ido; i += 2) {
+                        for (int i = 2; i < ido; i += 2) {
                             ic = ido - i;
                             int idx7 = out_off + i;
                             int idx8 = in_off + ic;
@@ -3297,17 +3112,17 @@ public class FloatFFT_1D {
                     }
                 }
             } else {
-                for (j = 1; j < ipph; j++) {
+                for (int j = 1; j < ipph; j++) {
                     jc = ip - j;
                     int idx1 = j * l1 * ido;
                     int idx2 = jc * l1 * ido;
                     int idx3 = 2 * j * ido;
-                    for (i = 2; i < ido; i += 2) {
+                    for (int i = 2; i < ido; i += 2) {
                         ic = ido - i;
                         int idx7 = out_off + i;
                         int idx8 = in_off + ic;
                         int idx9 = in_off + i;
-                        for (k = 0; k < l1; k++) {
+                        for (int k = 0; k < l1; k++) {
                             int idx4 = k * ido + idx1;
                             int idx5 = k * ido + idx2;
                             int idx6 = k * ip * ido + idx3;
@@ -3333,14 +3148,14 @@ public class FloatFFT_1D {
         ar1 = 1;
         ai1 = 0;
         int idx01 = (ip - 1) * idl1;
-        for (l = 1; l < ipph; l++) {
+        for (int l = 1; l < ipph; l++) {
             lc = ip - l;
             ar1h = dcp * ar1 - dsp * ai1;
             ai1 = dcp * ai1 + dsp * ar1;
             ar1 = ar1h;
             int idx1 = l * idl1;
             int idx2 = lc * idl1;
-            for (ik = 0; ik < idl1; ik++) {
+            for (int ik = 0; ik < idl1; ik++) {
                 int idx3 = in_off + ik;
                 int idx4 = out_off + ik;
                 in[idx3 + idx1] = out[idx4] + ar1 * out[idx4 + idl1];
@@ -3350,14 +3165,14 @@ public class FloatFFT_1D {
             ds2 = ai1;
             ar2 = ar1;
             ai2 = ai1;
-            for (j = 2; j < ipph; j++) {
+            for (int j = 2; j < ipph; j++) {
                 jc = ip - j;
                 ar2h = dc2 * ar2 - ds2 * ai2;
                 ai2 = dc2 * ai2 + ds2 * ar2;
                 ar2 = ar2h;
                 int idx5 = j * idl1;
                 int idx6 = jc * idl1;
-                for (ik = 0; ik < idl1; ik++) {
+                for (int ik = 0; ik < idl1; ik++) {
                     int idx7 = in_off + ik;
                     int idx8 = out_off + ik;
                     in[idx7 + idx1] += ar2 * out[idx8 + idx5];
@@ -3365,18 +3180,18 @@ public class FloatFFT_1D {
                 }
             }
         }
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             int idx1 = j * idl1;
-            for (ik = 0; ik < idl1; ik++) {
+            for (int ik = 0; ik < idl1; ik++) {
                 int idx2 = out_off + ik;
                 out[idx2] += out[idx2 + idx1];
             }
         }
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             jc = ip - j;
             int idx1 = j * l1 * ido;
             int idx2 = jc * l1 * ido;
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx3 = k * ido;
                 int oidx1 = out_off + idx3;
                 int iidx1 = in_off + idx3 + idx1;
@@ -3392,13 +3207,13 @@ public class FloatFFT_1D {
         if (ido == 1)
             return;
         if (nbd >= l1) {
-            for (j = 1; j < ipph; j++) {
+            for (int j = 1; j < ipph; j++) {
                 jc = ip - j;
                 int idx1 = j * l1 * ido;
                 int idx2 = jc * l1 * ido;
-                for (k = 0; k < l1; k++) {
+                for (int k = 0; k < l1; k++) {
                     int idx3 = k * ido;
-                    for (i = 2; i < ido; i += 2) {
+                    for (int i = 2; i < ido; i += 2) {
                         int idx4 = out_off + i;
                         int idx5 = in_off + i;
                         int oidx1 = idx4 + idx3 + idx1;
@@ -3418,14 +3233,14 @@ public class FloatFFT_1D {
                 }
             }
         } else {
-            for (j = 1; j < ipph; j++) {
+            for (int j = 1; j < ipph; j++) {
                 jc = ip - j;
                 int idx1 = j * l1 * ido;
                 int idx2 = jc * l1 * ido;
-                for (i = 2; i < ido; i += 2) {
+                for (int i = 2; i < ido; i += 2) {
                     int idx4 = out_off + i;
                     int idx5 = in_off + i;
-                    for (k = 0; k < l1; k++) {
+                    for (int k = 0; k < l1; k++) {
                         int idx3 = k * ido;
                         int oidx1 = idx4 + idx3 + idx1;
                         int oidx2 = idx4 + idx3 + idx2;
@@ -3445,27 +3260,27 @@ public class FloatFFT_1D {
             }
         }
         System.arraycopy(out, out_off, in, in_off, idl1);
-        for (j = 1; j < ip; j++) {
+        for (int j = 1; j < ip; j++) {
             int idx1 = j * l1 * ido;
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx2 = k * ido + idx1;
                 in[in_off + idx2] = out[out_off + idx2];
             }
         }
         if (nbd <= l1) {
             is = -ido;
-            for (j = 1; j < ip; j++) {
+            for (int j = 1; j < ip; j++) {
                 is += ido;
                 idij = is - 1;
                 int idx1 = j * l1 * ido;
-                for (i = 2; i < ido; i += 2) {
+                for (int i = 2; i < ido; i += 2) {
                     idij += 2;
                     int idx2 = idij + iw1;
                     w1r = wtable_r[idx2 - 1];
                     w1i = wtable_r[idx2];
                     int idx4 = in_off + i;
                     int idx5 = out_off + i;
-                    for (k = 0; k < l1; k++) {
+                    for (int k = 0; k < l1; k++) {
                         int idx3 = k * ido + idx1;
                         int iidx1 = idx4 + idx3;
                         int oidx1 = idx5 + idx3;
@@ -3479,13 +3294,13 @@ public class FloatFFT_1D {
             }
         } else {
             is = -ido;
-            for (j = 1; j < ip; j++) {
+            for (int j = 1; j < ip; j++) {
                 is += ido;
                 int idx1 = j * l1 * ido;
-                for (k = 0; k < l1; k++) {
+                for (int k = 0; k < l1; k++) {
                     idij = is - 1;
                     int idx3 = k * ido + idx1;
-                    for (i = 2; i < ido; i += 2) {
+                    for (int i = 2; i < ido; i += 2) {
                         idij += 2;
                         int idx2 = idij + iw1;
                         w1r = wtable_r[idx2 - 1];
@@ -3511,7 +3326,7 @@ public class FloatFFT_1D {
       --------------------------------------------------------*/
     void cfftf(float a[], int offa, int isign) {
         int idot;
-        int k1, l1, l2;
+        int l1, l2;
         int na, nf, ip, iw, ido, idl1;
         int[] nac = new int[1];
         final int twon = 2 * n;
@@ -3526,7 +3341,7 @@ public class FloatFFT_1D {
         na = 0;
         l1 = 1;
         iw = iw1;
-        for (k1 = 2; k1 <= nf + 1; k1++) {
+        for (int k1 = 2; k1 <= nf + 1; k1++) {
             ip = (int) wtable[k1 + iw2];
             l2 = ip * l1;
             ido = n / l2;
@@ -3590,13 +3405,12 @@ public class FloatFFT_1D {
       ----------------------------------------------------------------------*/
 
     void passf2(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset, final int isign) {
-        int i, k;
         float t1i, t1r;
         int iw1;
         iw1 = offset;
         int idx = ido * l1;
         if (ido <= 2) {
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx0 = k * ido;
                 int iidx1 = in_off + 2 * idx0;
                 int iidx2 = iidx1 + ido;
@@ -3613,8 +3427,8 @@ public class FloatFFT_1D {
                 out[oidx2 + 1] = a1i - a2i;
             }
         } else {
-            for (k = 0; k < l1; k++) {
-                for (i = 0; i < ido - 1; i += 2) {
+            for (int k = 0; k < l1; k++) {
+                for (int i = 0; i < ido - 1; i += 2) {
                     int idx0 = k * ido;
                     int iidx1 = in_off + i + 2 * idx0;
                     int iidx2 = iidx1 + ido;
@@ -3648,7 +3462,6 @@ public class FloatFFT_1D {
     void passf3(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset, final int isign) {
         final float taur = -0.5f;
         final float taui = 0.866025403784438707610604524234076962f;
-        int i, k;
         float ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
         int iw1, iw2;
 
@@ -3658,7 +3471,7 @@ public class FloatFFT_1D {
         final int idxt = l1 * ido;
 
         if (ido == 2) {
-            for (k = 1; k <= l1; k++) {
+            for (int k = 1; k <= l1; k++) {
                 int iidx1 = in_off + (3 * k - 2) * ido;
                 int iidx2 = iidx1 + ido;
                 int iidx3 = iidx1 - ido;
@@ -3687,10 +3500,10 @@ public class FloatFFT_1D {
                 out[oidx3 + 1] = ci2 - cr3;
             }
         } else {
-            for (k = 1; k <= l1; k++) {
+            for (int k = 1; k <= l1; k++) {
                 int idx1 = in_off + (3 * k - 2) * ido;
                 int idx2 = out_off + (k - 1) * ido;
-                for (i = 0; i < ido - 1; i += 2) {
+                for (int i = 0; i < ido - 1; i += 2) {
                     int iidx1 = i + idx1;
                     int iidx2 = iidx1 + ido;
                     int iidx3 = iidx1 - ido;
@@ -3738,7 +3551,6 @@ public class FloatFFT_1D {
        isign is +1 for backward and -1 for forward transforms
       ----------------------------------------------------------------------*/
     void passf4(final int ido, final int l1, final float in[], final int in_off, final float out[], final int out_off, final int offset, final int isign) {
-        int i, k;
         float ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, tr3, tr4;
         int iw1, iw2, iw3;
         iw1 = offset;
@@ -3747,7 +3559,7 @@ public class FloatFFT_1D {
 
         int idx0 = l1 * ido;
         if (ido == 2) {
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idxt1 = k * ido;
                 int iidx1 = in_off + 4 * idxt1 + 1;
                 int iidx2 = iidx1 + ido;
@@ -3786,10 +3598,10 @@ public class FloatFFT_1D {
                 out[oidx4 + 1] = ti1 - isign * ti4;
             }
         } else {
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx1 = k * ido;
                 int idx2 = in_off + 1 + 4 * idx1;
-                for (i = 0; i < ido - 1; i += 2) {
+                for (int i = 0; i < ido - 1; i += 2) {
                     int iidx1 = i + idx2;
                     int iidx2 = iidx1 + ido;
                     int iidx3 = iidx2 + ido;
@@ -3856,7 +3668,6 @@ public class FloatFFT_1D {
         final float ti11 = 0.951056516295153531181938433292089030f;
         final float tr12 = -0.809016994374947340240566973079694435f;
         final float ti12 = 0.587785252292473248125759255344746634f;
-        int i, k;
         float ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
         int iw1, iw2, iw3, iw4;
 
@@ -3868,7 +3679,7 @@ public class FloatFFT_1D {
         int idx0 = l1 * ido;
 
         if (ido == 2) {
-            for (k = 1; k <= l1; ++k) {
+            for (int k = 1; k <= l1; ++k) {
                 int iidx1 = in_off + (5 * k - 4) * ido + 1;
                 int iidx2 = iidx1 + ido;
                 int iidx3 = iidx1 - ido;
@@ -3920,10 +3731,10 @@ public class FloatFFT_1D {
                 out[oidx5 + 1] = ci2 - cr5;
             }
         } else {
-            for (k = 1; k <= l1; k++) {
+            for (int k = 1; k <= l1; k++) {
                 int idx1 = in_off + 1 + (k * 5 - 4) * ido;
                 int idx2 = out_off + (k - 1) * ido;
-                for (i = 0; i < ido - 1; i += 2) {
+                for (int i = 0; i < ido - 1; i += 2) {
                     int iidx1 = i + idx1;
                     int iidx2 = iidx1 + ido;
                     int iidx3 = iidx1 - ido;
@@ -3998,123 +3809,12 @@ public class FloatFFT_1D {
         }
     }
 
-    // /*----------------------------------------------------------------------
-    // passf5: Complex FFT's forward/backward processing of factor 6;
-    // isign is +1 for backward and -1 for forward transforms
-    // ----------------------------------------------------------------------*/
-    // void passf6(final int ido, final int l1, final float a[], final int
-    // offa, final float ch[], final int offch, final int offset, final int
-    // isign)
-    // /*isign==-1 for forward transform and+1 for backward transform*/
-    // {
-    // float tau = isign * Math.sqrt(3.0) / 2.0;
-    // int i, k;
-    // float ci2, ci3, ci4, ci5, di3, di4, di5, di2, cr2, cr3, cr5, cr4, ti1,
-    // tr1, ti2, ti3, ti4, ti5, dr3, dr4, dr5, dr2, tr2, tr3, tr4, tr5;
-    // int iw1, iw2, iw3, iw4, iw5;
-    //
-    // iw1 = offset;
-    // iw2 = iw1 + ido;
-    // iw3 = iw2 + ido;
-    // iw4 = iw3 + ido;
-    // iw5 = iw4 + ido;
-    //
-    // int idxt2 = l1 * ido;
-    // for (k = 1; k <= l1; k++) {
-    // for (i = 0; i < ido - 1; i += 2) {
-    // int idx1 = offa + i + 1 + (k * 6 - 5) * ido;
-    // int idx2 = idx1 + ido;
-    // int idx3 = idx1 - ido;
-    // int idx4 = idx2 + ido;
-    // int idx5 = idx4 + ido;
-    // int idx6 = idx5 + ido;
-    //              
-    // int idx7 = offch + i + (k - 1) * ido;
-    // int idx8 = idx7 + idxt2;
-    // int idx9 = idx8 + idxt2;
-    // int idx10 = idx9 + idxt2;
-    // int idx11 = idx10 + idxt2;
-    // int idx12 = i + iw1;
-    // int idx13 = i + iw2;
-    // int idx14 = i + iw3;
-    // int idx15 = i + iw4;
-    // int idx16 = i + iw5;
-    //              
-    // float a1r = a[idx1];
-    // float a1i = a[idx1 - 1];
-    // float a2r = a[idx2];
-    // float a2i = a[idx2 - 1];
-    // float a3r = a[idx3];
-    // float a3i = a[idx3 - 1];
-    // float a4r = a[idx4];
-    // float a4i = a[idx4 - 1];
-    // float a5r = a[idx5];
-    // float a5i = a[idx5 - 1];
-    // float a6r = a[idx6];
-    // float a6i = a[idx6 - 1];
-    //              
-    // float w1r = wtable[idx12];
-    // float w1i = isign * wtable[idx12 + 1];
-    // float w2r = wtable[idx13];
-    // float w2i = isign * wtable[idx13 + 1];
-    // float w3r = wtable[idx14];
-    // float w3i = isign * wtable[idx14 + 1];
-    // float w4r = wtable[idx15];
-    // float w4i = isign * wtable[idx15 + 1];
-    // float w5r = wtable[idx16];
-    // float w5i = isign * wtable[idx16 + 1];
-    //              
-    // ti5 = a1r - a5r;
-    // ti2 = a1r + a5r;
-    // ti4 = a2r - a4r;
-    // ti3 = a2r + a4r;
-    // tr5 = a1i - a5i;
-    // tr2 = a1i + a5i;
-    // tr4 = a2i - a4i;
-    // tr3 = a2i + a4i;
-    // cr2 = a3i + tr11 * tr2 + tr12 * tr3;
-    //
-    // ci2 = a3r + tr11 * ti2 + tr12 * ti3;
-    // cr3 = a3i + tr12 * tr2 + tr11 * tr3;
-    //
-    // ci3 = a3r + tr12 * ti2 + tr11 * ti3;
-    // cr5 = isign * (ti11 * tr5 + ti12 * tr4);
-    // ci5 = isign * (ti11 * ti5 + ti12 * ti4);
-    // cr4 = isign * (ti12 * tr5 - ti11 * tr4);
-    // ci4 = isign * (ti12 * ti5 - ti11 * ti4);
-    // dr3 = cr3 - ci4;
-    // dr4 = cr3 + ci4;
-    // di3 = ci3 + cr4;
-    // di4 = ci3 - cr4;
-    // dr5 = cr2 + ci5;
-    // dr2 = cr2 - ci5;
-    // di5 = ci2 - cr5;
-    // di2 = ci2 + cr5;
-    //              
-    // ch[idx7] = a3i + tr2 + tr3;
-    // ch[idx7 + 1] = a3r + ti2 + ti3;
-    // ch[idx8] = w1r * dr2 - w1i * di2;
-    // ch[idx8 + 1] = w1r * di2 + w1i * dr2;
-    // ch[idx9] = w2r * dr3 - w2i * di3;
-    // ch[idx9 + 1] = w2r * di3 + w2i * dr3;
-    // ch[idx10] = w3r * dr4 - w3i * di4;
-    // ch[idx10 + 1] = w3r * di4 + w3i * dr4;
-    // ch[idx11] = w4r * dr5 - w4i * di5;
-    // ch[idx11 + 1] = w4r * di5 + w4i * dr5;
-    // }
-    // }
-    // }
-
-    void passfg_new(final int nac[], final int ido, final int ip, final int l1, final int idl1, final float in[], final int in_off, final float out[], final int out_off, final int offset, final int isign) {
-
-    }
-
     /*----------------------------------------------------------------------
        passfg: Complex FFT's forward/backward processing of general factor;
        isign is +1 for backward and -1 for forward transforms
       ----------------------------------------------------------------------*/
     void passfg(final int nac[], final int ido, final int ip, final int l1, final int idl1, final float in[], final int in_off, final float out[], final int out_off, final int offset, final int isign) {
-        int idij, idlj, idot, ipph, i, j, k, l, jc, lc, ik, idj, idl, inc, idp;
+        int idij, idlj, idot, ipph, l, jc, lc, idj, idl, inc, idp;
         float w1r, w1i, w2i, w2r;
         int iw1;
 
@@ -4123,16 +3823,16 @@ public class FloatFFT_1D {
         ipph = (ip + 1) / 2;
         idp = ip * ido;
         if (ido >= l1) {
-            for (j = 1; j < ipph; j++) {
+            for (int j = 1; j < ipph; j++) {
                 jc = ip - j;
                 int idx1 = j * ido;
                 int idx2 = jc * ido;
-                for (k = 0; k < l1; k++) {
+                for (int k = 0; k < l1; k++) {
                     int idx3 = k * ido;
                     int idx4 = idx3 + idx1 * l1;
                     int idx5 = idx3 + idx2 * l1;
                     int idx6 = idx3 * ip;
-                    for (i = 0; i < ido; i++) {
+                    for (int i = 0; i < ido; i++) {
                         int oidx1 = out_off + i;
                         float i1r = in[in_off + i + idx1 + idx6];
                         float i2r = in[in_off + i + idx2 + idx6];
@@ -4141,22 +3841,22 @@ public class FloatFFT_1D {
                     }
                 }
             }
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idxt1 = k * ido;
                 int idxt2 = idxt1 * ip;
-                for (i = 0; i < ido; i++) {
+                for (int i = 0; i < ido; i++) {
                     out[out_off + i + idxt1] = in[in_off + i + idxt2];
                 }
             }
         } else {
-            for (j = 1; j < ipph; j++) {
+            for (int j = 1; j < ipph; j++) {
                 jc = ip - j;
                 int idxt1 = j * l1 * ido;
                 int idxt2 = jc * l1 * ido;
                 int idxt3 = j * ido;
                 int idxt4 = jc * ido;
-                for (i = 0; i < ido; i++) {
-                    for (k = 0; k < l1; k++) {
+                for (int i = 0; i < ido; i++) {
+                    for (int k = 0; k < l1; k++) {
                         int idx1 = k * ido;
                         int idx2 = idx1 * ip;
                         int idx3 = out_off + i;
@@ -4168,8 +3868,8 @@ public class FloatFFT_1D {
                     }
                 }
             }
-            for (i = 0; i < ido; i++) {
-                for (k = 0; k < l1; k++) {
+            for (int i = 0; i < ido; i++) {
+                for (int k = 0; k < l1; k++) {
                     int idx1 = k * ido;
                     out[out_off + i + idx1] = in[in_off + i + idx1 * ip];
                 }
@@ -4187,7 +3887,7 @@ public class FloatFFT_1D {
             int idxt3 = idl + iw1;
             w1r = wtable[idxt3 - 2];
             w1i = isign * wtable[idxt3 - 1];
-            for (ik = 0; ik < idl1; ik++) {
+            for (int ik = 0; ik < idl1; ik++) {
                 int idx1 = in_off + ik;
                 int idx2 = out_off + ik;
                 in[idx1 + idxt1] = out[idx2] + w1r * out[idx2 + idl1];
@@ -4195,7 +3895,7 @@ public class FloatFFT_1D {
             }
             idlj = idl;
             inc += ido;
-            for (j = 2; j < ipph; j++) {
+            for (int j = 2; j < ipph; j++) {
                 jc = ip - j;
                 idlj += inc;
                 if (idlj > idp)
@@ -4205,7 +3905,7 @@ public class FloatFFT_1D {
                 w2i = isign * wtable[idxt4 - 1];
                 int idxt5 = j * idl1;
                 int idxt6 = jc * idl1;
-                for (ik = 0; ik < idl1; ik++) {
+                for (int ik = 0; ik < idl1; ik++) {
                     int idx1 = in_off + ik;
                     int idx2 = out_off + ik;
                     in[idx1 + idxt1] += w2r * out[idx2 + idxt5];
@@ -4213,18 +3913,18 @@ public class FloatFFT_1D {
                 }
             }
         }
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             int idxt1 = j * idl1;
-            for (ik = 0; ik < idl1; ik++) {
+            for (int ik = 0; ik < idl1; ik++) {
                 int idx1 = out_off + ik;
                 out[idx1] += out[idx1 + idxt1];
             }
         }
-        for (j = 1; j < ipph; j++) {
+        for (int j = 1; j < ipph; j++) {
             jc = ip - j;
             int idx1 = j * idl1;
             int idx2 = jc * idl1;
-            for (ik = 1; ik < idl1; ik += 2) {
+            for (int ik = 1; ik < idl1; ik += 2) {
                 int idx3 = out_off + ik;
                 int idx4 = in_off + ik;
                 int iidx1 = idx4 + idx1;
@@ -4248,9 +3948,9 @@ public class FloatFFT_1D {
         nac[0] = 0;
         System.arraycopy(out, out_off, in, in_off, idl1);
         int idx0 = l1 * ido;
-        for (j = 1; j < ip; j++) {
+        for (int j = 1; j < ip; j++) {
             int idx1 = j * idx0;
-            for (k = 0; k < l1; k++) {
+            for (int k = 0; k < l1; k++) {
                 int idx2 = k * ido;
                 int oidx1 = out_off + idx2 + idx1;
                 int iidx1 = in_off + idx2 + idx1;
@@ -4260,17 +3960,17 @@ public class FloatFFT_1D {
         }
         if (idot <= l1) {
             idij = 0;
-            for (j = 1; j < ip; j++) {
+            for (int j = 1; j < ip; j++) {
                 idij += 2;
                 int idx1 = j * l1 * ido;
-                for (i = 3; i < ido; i += 2) {
+                for (int i = 3; i < ido; i += 2) {
                     idij += 2;
                     int idx2 = idij + iw1 - 1;
                     w1r = wtable[idx2 - 1];
                     w1i = isign * wtable[idx2];
                     int idx3 = in_off + i;
                     int idx4 = out_off + i;
-                    for (k = 0; k < l1; k++) {
+                    for (int k = 0; k < l1; k++) {
                         int idx5 = k * ido + idx1;
                         int iidx1 = idx3 + idx5;
                         int oidx1 = idx4 + idx5;
@@ -4283,13 +3983,13 @@ public class FloatFFT_1D {
             }
         } else {
             idj = 2 - ido;
-            for (j = 1; j < ip; j++) {
+            for (int j = 1; j < ip; j++) {
                 idj += ido;
                 int idx1 = j * l1 * ido;
-                for (k = 0; k < l1; k++) {
+                for (int k = 0; k < l1; k++) {
                     idij = idj;
                     int idx3 = k * ido + idx1;
-                    for (i = 3; i < ido; i += 2) {
+                    for (int i = 3; i < ido; i += 2) {
                         idij += 2;
                         int idx2 = idij - 1 + iw1;
                         w1r = wtable[idx2 - 1];
@@ -4310,7 +4010,7 @@ public class FloatFFT_1D {
         if (n > 8) {
             if (n > 32) {
                 cftf1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);
@@ -4338,7 +4038,7 @@ public class FloatFFT_1D {
         if (n > 8) {
             if (n > 32) {
                 cftb1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);
@@ -4363,7 +4063,7 @@ public class FloatFFT_1D {
     }
 
     private void bitrv2(int n, int[] ip, float[] a, int offa) {
-        int j, j1, k, k1, l, m, nh, nm;
+        int j1, k1, l, m, nh, nm;
         float xr, xi, yr, yi;
         int idx0, idx1, idx2;
 
@@ -4374,9 +4074,9 @@ public class FloatFFT_1D {
         nh = n >> 1;
         nm = 4 * m;
         if (l == 8) {
-            for (k = 0; k < m; k++) {
+            for (int k = 0; k < m; k++) {
                 idx0 = 4 * k;
-                for (j = 0; j < k; j++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + 2 * ip[m + k];
                     k1 = idx0 + 2 * ip[m + j];
                     idx1 = offa + j1;
@@ -4645,9 +4345,9 @@ public class FloatFFT_1D {
                 a[idx2 + 1] = xi;
             }
         } else {
-            for (k = 0; k < m; k++) {
+            for (int k = 0; k < m; k++) {
                 idx0 = 4 * k;
-                for (j = 0; j < k; j++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + ip[m + k];
                     k1 = idx0 + ip[m + j];
                     idx1 = offa + j1;
@@ -4775,7 +4475,7 @@ public class FloatFFT_1D {
     }
 
     private void bitrv2conj(int n, int[] ip, float[] a, int offa) {
-        int j, j1, k, k1, l, m, nh, nm;
+        int j1, k1, l, m, nh, nm;
         float xr, xi, yr, yi;
         int idx0, idx1, idx2;
 
@@ -4786,9 +4486,9 @@ public class FloatFFT_1D {
         nh = n >> 1;
         nm = 4 * m;
         if (l == 8) {
-            for (k = 0; k < m; k++) {
+            for (int k = 0; k < m; k++) {
                 idx0 = 4 * k;
-                for (j = 0; j < k; j++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + 2 * ip[m + k];
                     k1 = idx0 + 2 * ip[m + j];
                     idx1 = offa + j1;
@@ -5061,9 +4761,9 @@ public class FloatFFT_1D {
                 a[idx2 + 3] = -a[idx2 + 3];
             }
         } else {
-            for (k = 0; k < m; k++) {
+            for (int k = 0; k < m; k++) {
                 idx0 = 4 * k;
-                for (j = 0; j < k; j++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + ip[m + k];
                     k1 = idx0 + ip[m + j];
                     idx1 = offa + j1;
@@ -5367,7 +5067,7 @@ public class FloatFFT_1D {
     }
 
     private void cftf1st(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, m, mh;
+        int j0, j1, j2, j3, k, m, mh;
         float wn4r, csc1, csc3, wk1r, wk1i, wk3r, wk3i, wd1r, wd1i, wd3r, wd3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y1r, y1i, y2r, y2i, y3r, y3i;
         int idx0, idx1, idx2, idx3, idx4, idx5;
@@ -5403,7 +5103,7 @@ public class FloatFFT_1D {
         wd3r = 1;
         wd3i = 0;
         k = 0;
-        for (j = 2; j < mh - 2; j += 4) {
+        for (int j = 2; j < mh - 2; j += 4) {
             k += 4;
             idx4 = startw + k;
             wk1r = csc1 * (wd1r + w[idx4]);
@@ -5585,7 +5285,7 @@ public class FloatFFT_1D {
     }
 
     private void cftb1st(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, m, mh;
+        int j0, j1, j2, j3, k, m, mh;
         float wn4r, csc1, csc3, wk1r, wk1i, wk3r, wk3i, wd1r, wd1i, wd3r, wd3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y1r, y1i, y2r, y2i, y3r, y3i;
         int idx0, idx1, idx2, idx3, idx4, idx5;
@@ -5622,7 +5322,7 @@ public class FloatFFT_1D {
         wd3r = 1;
         wd3i = 0;
         k = 0;
-        for (j = 2; j < mh - 2; j += 4) {
+        for (int j = 2; j < mh - 2; j += 4) {
             k += 4;
             idx4 = startw + k;
             wk1r = csc1 * (wd1r + w[idx4]);
@@ -5805,25 +5505,25 @@ public class FloatFFT_1D {
 
     private void cftrec4_th(final int n, final float[] a, final int offa, final int nw, final float[] w) {
         int i;
-        int idiv4, m, nthread;
+        int idiv4, m, nthreads;
         int idx = 0;
-        nthread = 2;
+        nthreads = 2;
         idiv4 = 0;
         m = n >> 1;
         if (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_4Threads()) {
-            nthread = 4;
+            nthreads = 4;
             idiv4 = 1;
             m >>= 1;
         }
-        Future[] futures = new Future[nthread];
-        final int glob_m = m;
-        for (i = 0; i < nthread; i++) {
-            final int loc_offa = offa + i * m;
+        Future<?>[] futures = new Future[nthreads];
+        final int mf = m;
+        for (i = 0; i < nthreads; i++) {
+            final int firstIdx = offa + i * m;
             if (i != idiv4) {
-                futures[idx++] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[idx++] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int isplt, j, k, m;
-                        int idx1 = loc_offa + glob_m;
+                        int idx1 = firstIdx + mf;
                         m = n;
                         while (m > 512) {
                             m >>= 2;
@@ -5831,19 +5531,19 @@ public class FloatFFT_1D {
                         }
                         cftleaf(m, 1, a, idx1 - m, nw, w);
                         k = 0;
-                        int idx2 = loc_offa - m;
-                        for (j = glob_m - m; j > 0; j -= m) {
+                        int idx2 = firstIdx - m;
+                        for (j = mf - m; j > 0; j -= m) {
                             k++;
-                            isplt = cfttree(m, j, k, a, loc_offa, nw, w);
+                            isplt = cfttree(m, j, k, a, firstIdx, nw, w);
                             cftleaf(m, isplt, a, idx2 + j, nw, w);
                         }
                     }
                 });
             } else {
-                futures[idx++] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[idx++] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int isplt, j, k, m;
-                        int idx1 = loc_offa + glob_m;
+                        int idx1 = firstIdx + mf;
                         k = 1;
                         m = n;
                         while (m > 512) {
@@ -5853,25 +5553,17 @@ public class FloatFFT_1D {
                         }
                         cftleaf(m, 0, a, idx1 - m, nw, w);
                         k >>= 1;
-                        int idx2 = loc_offa - m;
-                        for (j = glob_m - m; j > 0; j -= m) {
+                        int idx2 = firstIdx - m;
+                        for (j = mf - m; j > 0; j -= m) {
                             k++;
-                            isplt = cfttree(m, j, k, a, loc_offa, nw, w);
+                            isplt = cfttree(m, j, k, a, firstIdx, nw, w);
                             cftleaf(m, isplt, a, idx2 + j, nw, w);
                         }
                     }
                 });
             }
         }
-        try {
-            for (int j = 0; j < nthread; j++) {
-                futures[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ConcurrencyUtils.waitForCompletion(futures);
     }
 
     private void cftrec4(int n, float[] a, int offa, int nw, float[] w) {
@@ -5982,7 +5674,7 @@ public class FloatFFT_1D {
     }
 
     private void cftmdl1(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, m, mh;
+        int j0, j1, j2, j3, k, m, mh;
         float wn4r, wk1r, wk1i, wk3r, wk3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i;
         int idx0, idx1, idx2, idx3, idx4, idx5;
@@ -6013,7 +5705,7 @@ public class FloatFFT_1D {
         a[idx3 + 1] = x1i - x3r;
         wn4r = w[startw + 1];
         k = 0;
-        for (j = 2; j < mh; j += 2) {
+        for (int j = 2; j < mh; j += 2) {
             k += 4;
             idx4 = startw + k;
             wk1r = w[idx4];
@@ -6107,7 +5799,7 @@ public class FloatFFT_1D {
     }
 
     private void cftmdl2(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, kr, m, mh;
+        int j0, j1, j2, j3, k, kr, m, mh;
         float wn4r, wk1r, wk1i, wk3r, wk3i, wd1r, wd1i, wd3r, wd3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y2r, y2i;
         int idx0, idx1, idx2, idx3, idx4, idx5, idx6;
@@ -6143,7 +5835,7 @@ public class FloatFFT_1D {
         a[idx3 + 1] = x1i - y0r;
         k = 0;
         kr = 2 * m;
-        for (j = 2; j < mh; j += 2) {
+        for (int j = 2; j < mh; j += 2) {
             k += 4;
             idx4 = startw + k;
             wk1r = w[idx4];
@@ -6799,14 +6491,14 @@ public class FloatFFT_1D {
     }
 
     private void rftfsub(int n, float[] a, int offa, int nc, float[] c, int startc) {
-        int j, k, kk, ks, m;
+        int k, kk, ks, m;
         float wkr, wki, xr, xi, yr, yi;
         int idx1, idx2;
 
         m = n >> 1;
         ks = 2 * nc / m;
         kk = 0;
-        for (j = 2; j < m; j += 2) {
+        for (int j = 2; j < m; j += 2) {
             k = n - j;
             kk += ks;
             wkr = (float) (0.5 - c[startc + nc - kk]);
@@ -6826,14 +6518,14 @@ public class FloatFFT_1D {
     }
 
     private void rftbsub(int n, float[] a, int offa, int nc, float[] c, int startc) {
-        int j, k, kk, ks, m;
+        int k, kk, ks, m;
         float wkr, wki, xr, xi, yr, yi;
         int idx1, idx2;
 
         m = n >> 1;
         ks = 2 * nc / m;
         kk = 0;
-        for (j = 2; j < m; j += 2) {
+        for (int j = 2; j < m; j += 2) {
             k = n - j;
             kk += ks;
             wkr = (float) (0.5 - c[startc + nc - kk]);
@@ -6853,44 +6545,31 @@ public class FloatFFT_1D {
 
     private void scale(final float m, final float[] a, int offa, boolean complex) {
         final float norm = (float) (1.0 / m);
-        int locn;
+        int n2;
         if (complex) {
-            locn = 2 * n;
+            n2 = 2 * n;
         } else {
-            locn = n;
+            n2 = n;
         }
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (locn >= ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            final int k = locn / np;
-            Future[] futures = new Future[np];
-            for (int i = 0; i < np; i++) {
-                final int startIdx = offa + i * k;
-                final int stopIdx;
-                if (i == np - 1) {
-                    stopIdx = offa + locn;
-                } else {
-                    stopIdx = startIdx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n2 >= ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            final int k = n2 / nthreads;
+            Future<?>[] futures = new Future[nthreads];
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = offa + i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? offa + n2 : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startIdx; i < stopIdx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             a[i] *= norm;
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            for (int i = offa; i < offa + locn; i++) {
+            for (int i = offa; i < offa + n2; i++) {
                 a[i] *= norm;
             }
 

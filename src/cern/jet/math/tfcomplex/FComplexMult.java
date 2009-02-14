@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright ï¿½ 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -39,6 +39,16 @@ public final class FComplexMult implements cern.colt.function.tfcomplex.FComplex
         return z;
     }
 
+    /**
+     * Returns the result of the function evaluation.
+     */
+    public final float[] apply(float re, float im) {
+        float[] z = new float[2];
+        z[0] = re * multiplicator[0] - im * multiplicator[1];
+        z[1] = im * multiplicator[0] + re * multiplicator[1];
+        return z;
+    }
+    
     /**
      * <tt>a / constant</tt>.
      */

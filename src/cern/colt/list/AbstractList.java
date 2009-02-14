@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -45,7 +45,7 @@ public abstract class AbstractList extends AbstractCollection {
      * Inserts all elements of the specified collection before the specified
      * position into the receiver. Shifts the element currently at that position
      * (if any) and any subsequent elements to the right (increases their
-     * indices).
+     * indexes).
      * 
      * @param index
      *            index before which to insert first element from the specified

@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,9 +8,8 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdouble.impl;
 
-import cern.colt.map.tdouble.AbstractIntDoubleMap;
-import cern.colt.map.tdouble.OpenIntDoubleHashMap;
-import cern.colt.matrix.tdcomplex.DComplexMatrix3D;
+import cern.colt.map.tdouble.AbstractLongDoubleMap;
+import cern.colt.map.tdouble.OpenLongDoubleHashMap;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
@@ -97,7 +96,7 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntDoubleMap elements;
+    protected AbstractLongDoubleMap elements;
 
     /**
      * Constructs a matrix with a copy of the given values. <tt>values</tt> is
@@ -168,8 +167,13 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
     public SparseDoubleMatrix3D(int slices, int rows, int columns, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
-        setUp(slices, rows, columns);
-        this.elements = new OpenIntDoubleHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
+        try {
+            setUp(slices, rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold slices*rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        this.elements = new OpenLongDoubleHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
     }
 
     /**
@@ -203,8 +207,13 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected SparseDoubleMatrix3D(int slices, int rows, int columns, AbstractIntDoubleMap elements, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
-        setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
+    protected SparseDoubleMatrix3D(int slices, int rows, int columns, AbstractLongDoubleMap elements, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
+        try {
+            setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
+        } catch (IllegalArgumentException exc) { // we can hold slices*rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
         this.elements = elements;
         this.isNoView = false;
     }
@@ -225,56 +234,12 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
             return super.cardinality();
     }
 
-    public void dct2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dct3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dht2Slices() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht3() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public AbstractIntDoubleMap elements() {
+    public AbstractLongDoubleMap elements() {
         return elements;
     }
 
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
-    }
-
-    public void fft3() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix3D getFft2Slices() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix3D getFft3() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix3D getIfft2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix3D getIfft3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
     }
 
     public double getQuick(int slice, int row, int column) {
@@ -287,35 +252,7 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride);
     }
 
-    public void idct2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idct3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idst2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idht3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idht2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idst3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public int index(int slice, int row, int column) {
+    public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
         // manually inlined:
@@ -326,7 +263,7 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         return new SparseDoubleMatrix3D(slices, rows, columns);
     }
 
-    public void setQuick(int slice, int row, int column, double value) {
+    public synchronized void setQuick(int slice, int row, int column, double value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
         // IndexOutOfBoundsException("slice:"+slice+", row:"+row+",
@@ -345,7 +282,12 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
     }
 
     public DoubleMatrix1D vectorize() {
-        throw new IllegalArgumentException("This method is not supported.");
+        DoubleMatrix1D v = new SparseDoubleMatrix1D(size());
+        int length = rows * columns;
+        for (int s = 0; s < slices; s++) {
+            v.viewPart(s * length, length).assign(viewSlice(s).vectorize());
+        }
+        return v;
     }
 
     protected boolean haveSharedCellsRaw(DoubleMatrix3D other) {

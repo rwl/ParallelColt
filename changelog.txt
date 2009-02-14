@@ -1,5 +1,28 @@
 Parallel Colt changelog
 
+0.7:	February 14, 2009
+	- Added iterative solvers and preconditioners (adapted from Matrix Toolkits for Java).
+	- Added HyBR solver - a Hybrid Bidiagonalization Regularization.
+	- Added nonlinear optimization package.  
+	- Added JCublas (currently used only for matrix-matrix multiplication). 		
+	- Added CCDoubleMatrix2D and CCFloatMatrix2D.
+	- Added CCMDoubleMatrix2D and CCMFloatMatrix2D.
+	- Added DenseColDoubleMatrix2D and DenseColFloatMatrix2D.
+	- Added OpenLongDoubleHashMap and OpenLongFloatHashMap.
+	- Added cern.colt.matrix.io (matrix reader/writer, adapted from Matrix Toolkits for Java).
+	- Added cern.colt.matrix.tint (matrices holding int elements).
+	- Added conversion methods in SparseDoubleMatrix2D and SparseFloatMatrix2D.
+	- Added unit tests for iterative solvers.
+	- Rewritten unit tests for matrices.		    	
+	- JLAPACK replaced by netlib-java.		
+	- Internal storage changed in SparseDoubleMatrix1D, SparseDoubleMatrix2D, SparseDoubleMatrix3D,
+	  RCMDoubleMatrix2D and their single precision equivalents.
+    - From now on, the trigonometric transforms are only supported by
+	  DenseDoubleMatrix1D, DenseDoubleMatri2D, DenseDoubleMatrix3D, DenseColDoubleMatrix1D, 
+	  DenseColDoubleMatri2D, DenseColDoubleMatrix3D and their single precision equivalents.   
+	- JTransforms updated to version 2.2. 
+	- Some refactoring and many cosmetic changes.
+		
 0.6.1:	December 12, 2008
 	- JTransforms updated to version 2.1 
 

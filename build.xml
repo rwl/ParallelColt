@@ -12,9 +12,15 @@ See the target "usage" further below for instructions on how to build the softwa
 <!-- NOTE: all directories are relative to parallelcolt/                       -->
 <!-- ================================================================= -->
 <project name="parallelcolt" default="help" basedir=".">
+	
+	<property name="version" value="0.7" />
 
-	<property name="version" value="0.6.1" />
-
+	<property name="compiler" value="javac1.6" />
+	
+	<property name="source" value="1.6" />
+	
+	<property name="target" value="1.6" />
+	
 	<property name="dist.dir" value="../${ant.project.name}-dist" />
 
 	<property name="proj.title" value="ParallelColt" />
@@ -31,7 +37,7 @@ See the target "usage" further below for instructions on how to build the softwa
 	<property name="doc.dest" value="doc" />
 
 	<!-- Location of jar files -->
-	<property name="jar.dir" value="lib" />
+	<property name="jar.dir" value="${basedir}" />
 
 	<property name="lib.dir" value="lib" />
 		
@@ -40,9 +46,11 @@ See the target "usage" further below for instructions on how to build the softwa
 	<property name="jar.filename" value="${ant.project.name}-${version}.jar" />
 
 	<!-- file patterns to be excluded from tar in dist targets -->
-	<property name="src.tar.excludes" value="*/bin/** **/lib/${jar.filename} **/doc/** **/*.jardesc" />
+	<property name="src.tar.excludes" value="**/${javac.dest}/** **/${jar.filename} **/${doc.dest}/** **/*.jardesc" />
 
-	<property name="doc.tar.includes" value="**/doc/**" />
+	<property name="doc.tar.includes" value="**/${doc.dest}/**" />
+	
+	<property name="classpath" value="${lib.dir}/junit-4.4.jar:${lib.dir}/arpack-combo-0.1.jar:${lib.dir}/netlib-java-0.9.1.jar:${lib.dir}/optimization.jar"/>
 
 	<!-- ================================================================= -->
 	<!-- Default target                                                    -->
@@ -97,7 +105,7 @@ Further individual targets used internally by above targets:
 	<!-- ================================================================= -->
 	<target name="javac" depends="clean">
 		<mkdir dir="${javac.dest}" />
-		<javac classpath="${lib.dir}/junit-4.4.jar:${lib.dir}/blas.jar:${lib.dir}/lapack.jar:${lib.dir}/f2jutil.jar:${lib.dir}/xerbla.jar" srcdir="${javac.src}" destdir="${javac.dest}" includes="**/*.java" deprecation="on" debug="off" compiler="javac1.5" source="1.5" target="1.5">
+		<javac classpath="${classpath}" srcdir="${javac.src}" destdir="${javac.dest}" includes="**/*.java" deprecation="on" debug="off" compiler="${compiler}" source="${source}" target="${target}">
 		</javac>
 
 	</target>
@@ -107,7 +115,7 @@ Further individual targets used internally by above targets:
 	<!-- ================================================================= -->
 	<target name="javac-test" depends="clean">
 		<mkdir dir="${javac.dest}" />
-		<javac classpath="${lib.dir}/junit-4.4.jar:${lib.dir}/blas.jar:${lib.dir}/lapack.jar:${lib.dir}/f2jutil.jar:${lib.dir}/xerbla.jar" srcdir="${javac.test}" destdir="${javac.dest}" includes="**/*.java" deprecation="on" debug="off" compiler="javac1.5" source="1.5" target="1.5">
+		<javac classpath="${classpath}" srcdir="${javac.test}" destdir="${javac.dest}" includes="**/*.java" deprecation="on" debug="off" compiler="${compiler}" source="${source}" target="${target}">
 		</javac>
 	</target>
 	
@@ -116,7 +124,7 @@ Further individual targets used internally by above targets:
 	<!-- ================================================================= -->
 	<target name="javac-benchmark" depends="clean">
 		<mkdir dir="${javac.dest}" />
-		<javac classpath="${lib.dir}/junit-4.4.jar:${lib.dir}/blas.jar:${lib.dir}/lapack.jar:${lib.dir}/f2jutil.jar:${lib.dir}/xerbla.jar" srcdir="${javac.benchmark}" destdir="${javac.dest}" includes="**/*.java" deprecation="on" debug="off" compiler="javac1.5" source="1.5" target="1.5">
+		<javac classpath="${classpath}" srcdir="${javac.benchmark}" destdir="${javac.dest}" includes="**/*.java" deprecation="on" debug="off" compiler="${compiler}" source="${source}" target="${target}">
 		</javac>
 	</target>
 
@@ -125,7 +133,7 @@ Further individual targets used internally by above targets:
 	<!-- ================================================================= -->
 	<target name="jar" depends="javac,javac-test,javac-benchmark">
 		<mkdir dir="${jar.dir}" />
-		<jar jarfile="${jar.dir}/${jar.filename}" basedir="${javac.dest}" index="yes" compress="yes" />
+		<jar jarfile="${jar.dir}/${jar.filename}" basedir="${javac.dest}" index="no" compress="yes" manifest="${basedir}/META-INF/MANIFEST.MF"/>
 	</target>
 
 
@@ -136,7 +144,7 @@ Further individual targets used internally by above targets:
 
 		<delete dir="${doc.dest}" />
 		<mkdir dir="${doc.dest}" />
-		<javadoc classpath="${lib.dir}/junit-4.4.jar:${lib.dir}/blas.jar:${lib.dir}/lapack.jar:${lib.dir}/f2jutil.jar:${lib.dir}/xerbla.jar" sourcepath="${javac.src}" destdir="${doc.dest}" public="true" author="true" use="true" splitIndex="true" version="true" doctitle="&lt;h2&gt;&lt;a target=_top href=http://piotr.wendykier.googlepages.com/parallelcolt &gt;Parallel Colt&lt;/a&gt; &lt;/h2&gt;&lt;h4&gt;Open Source Libraries for High Performance Scientific and Technical Computing in Java&lt;/h4&gt;&lt;hr&gt;" windowtitle="Parallel Colt ${version} - API Specification" header="&lt;b&gt;Parallel Colt ${version}&lt;/b&gt;" bottom="&lt;font size=-1 &gt;Jump to the &lt;a target=_top href=http://piotr.wendykier.googlepages.com/parallelcolt &gt;Parallel Colt Homepage&lt;/a&gt;">
+		<javadoc classpath="${classpath}" sourcepath="${javac.src}" destdir="${doc.dest}" public="true" author="true" use="true" splitIndex="true" version="true" doctitle="&lt;h2&gt;&lt;a target=_top href=http://piotr.wendykier.googlepages.com/parallelcolt &gt;Parallel Colt&lt;/a&gt; &lt;/h2&gt;&lt;h4&gt;Open Source Libraries for High Performance Scientific and Technical Computing in Java&lt;/h4&gt;&lt;hr&gt;" windowtitle="Parallel Colt ${version} - API Specification" header="&lt;b&gt;Parallel Colt ${version}&lt;/b&gt;" bottom="&lt;font size=-1 &gt;Jump to the &lt;a target=_top href=http://piotr.wendykier.googlepages.com/parallelcolt &gt;Parallel Colt Homepage&lt;/a&gt;">
 			<packageset dir="${javac.src}" />
 			<link href="http://java.sun.com/javase/6/docs/api/" />
 		</javadoc>
@@ -150,12 +158,12 @@ Further individual targets used internally by above targets:
 
 		<mkdir dir="${dist.dir}" />
 		<mkdir dir="${dist.dir}/${proj.title}" />
-		<copy todir="${dist.dir}/${proj.title}">
-			<fileset dir="${lib.dir}"> 
-				<include name="**/*.jar"/>
-			</fileset>
+		<mkdir dir="${dist.dir}/${proj.title}/${lib.dir}" />		
+		<copy todir="${dist.dir}/${proj.title}/${lib.dir}">
+			<fileset dir="${lib.dir}" /> 
 		</copy>
-		<copy file="license.txt" todir="${dist.dir}/${proj.title}"/>
+		<copy file="${jar.dir}/${jar.filename}" todir="${dist.dir}/${proj.title}"/>
+		<copy file="license.txt" todir="${dist.dir}/${proj.title}"/>		
 		<!-- ============================================================= -->
 		<!-- Generate parallelcolt-bin.zip -->
 		<zip zipfile="${dist.dir}/${ant.project.name}-${version}-bin.zip" basedir="${dist.dir}/" includes="${proj.title}/" />
@@ -179,5 +187,13 @@ Further individual targets used internally by above targets:
 		<zip zipfile="${dist.dir}/${ant.project.name}-${version}-doc.zip" basedir=".." includes="${proj.basename}/${doc.tar.includes}" />
 
 	</target>
+	
+	<target name="test" depends="jar">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes" showoutput="yes">
+			<classpath path="${classpath}:${jar.dir}/${jar.filename}"/>
+		  <formatter type="plain"/>
+		  <test name="cern.colt.AllTests"/>
+		</junit>
+    </target>
 
 </project>

@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -209,9 +209,9 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     public DoubleMatrix2D assign(final DoubleMatrix2D y, cern.colt.function.tdouble.DoubleDoubleFunction function) {
         checkShape(y);
 
-        if (function instanceof cern.jet.math.tdouble.DoublePlusMult) { // x[i] = x[i] +
+        if (function instanceof cern.jet.math.tdouble.DoublePlusMultSecond) { // x[i] = x[i] +
             // alpha*y[i]
-            final double alpha = ((cern.jet.math.tdouble.DoublePlusMult) function).multiplicator;
+            final double alpha = ((cern.jet.math.tdouble.DoublePlusMultSecond) function).multiplicator;
             if (alpha == 0)
                 return this; // nothing to do
             y.forEachNonZero(new cern.colt.function.tdouble.IntIntDoubleFunction() {
@@ -500,12 +500,12 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         DenseDoubleMatrix1D zz = (DenseDoubleMatrix1D) z;
         final double[] zElements = zz.elements;
         final int zStride = zz.stride();
-        final int zi = z.index(0);
+        final int zi = (int)z.index(0);
 
         DenseDoubleMatrix1D yy = (DenseDoubleMatrix1D) y;
         final double[] yElements = yy.elements;
         final int yStride = yy.stride();
-        final int yi = y.index(0);
+        final int yi = (int)y.index(0);
 
         if (yElements == null || zElements == null)
             throw new InternalError();
@@ -561,7 +561,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         for (int i = m; --i >= 0;)
             Crows[i] = C.viewRow(i);
 
-        final cern.jet.math.tdouble.DoublePlusMult fun = cern.jet.math.tdouble.DoublePlusMult.plusMult(0);
+        final cern.jet.math.tdouble.DoublePlusMultSecond fun = cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(0);
 
         forEachNonZero(new cern.colt.function.tdouble.IntIntDoubleFunction() {
             public double apply(int i, int j, double value) {

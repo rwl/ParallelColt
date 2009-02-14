@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -98,7 +98,7 @@ public class EmpiricalWalker extends AbstractDiscreteDistribution {
      * 
      * The O(K) algorithm goes through all the p_k's and decides if they are
      * "smalls" or "bigs" according to whether they are less than or greater
-     * than the mean value 1/K. The indices to the smalls and the bigs are put
+     * than the mean value 1/K. The indexes to the smalls and the bigs are put
      * in separate stacks, and then we work through the stacks together. For
      * each small, we pair it up with the next big in the stack (Walker always
      * wanted to pair up the smallest small with the biggest big). The small

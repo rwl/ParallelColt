@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -49,7 +49,7 @@ public class BenchmarkFloatFFT {
 
     private static int nthread = 8;
 
-    private static int niter = 100;
+    private static int niter = 200;
 
     private static int nsize = 16;
 
@@ -95,7 +95,7 @@ public class BenchmarkFloatFFT {
         } else {
             System.out.println("Default settings are used.");
         }
-        ConcurrencyUtils.setNumberOfProcessors(nthread);
+        ConcurrencyUtils.setNumberOfThreads(nthread);
         ConcurrencyUtils.setThreadsBeginN_2D(threadsBegin2D);
         ConcurrencyUtils.setThreadsBeginN_3D(threadsBegin3D);
         System.out.println("nthred = " + nthread);
@@ -137,6 +137,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatComplexForwardFFT_1D.txt", nthread, niter, doWarmup, doScaling, sizes1D, times);
 
@@ -169,6 +170,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatRealForwardFFT_1D.txt", nthread, niter, doWarmup, doScaling, sizes1D, times);
 
@@ -201,6 +203,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft2 = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatComplexForwardFFT_2D_input_1D.txt", nthread, niter, doWarmup, doScaling, sizes2D, times);
     }
@@ -232,6 +235,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft2 = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatComplexForwardFFT_2D_input_2D.txt", nthread, niter, doWarmup, doScaling, sizes2D, times);
     }
@@ -263,6 +267,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft2 = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatRealForwardFFT_2D_input_1D.txt", nthread, niter, doWarmup, doScaling, sizes2D, times);
     }
@@ -294,6 +299,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft2 = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatRealForwardFFT_2D_input_2D.txt", nthread, niter, doWarmup, doScaling, sizes2D, times);
     }
@@ -326,6 +332,7 @@ public class BenchmarkFloatFFT {
                 x = null;
                 fft3 = null;
                 System.gc();
+                ConcurrencyUtils.sleep(5000);
             }
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatComplexForwardFFT_3D_input_1D.txt", nthread, niter, doWarmup, doScaling, sizes3D, times);
@@ -358,6 +365,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft3 = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatComplexForwardFFT_3D_input_3D.txt", nthread, niter, doWarmup, doScaling, sizes3D, times);
     }
@@ -390,6 +398,7 @@ public class BenchmarkFloatFFT {
                 x = null;
                 fft3 = null;
                 System.gc();
+                ConcurrencyUtils.sleep(5000);
             }
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatRealForwardFFT_3D_input_1D.txt", nthread, niter, doWarmup, doScaling, sizes3D, times);
@@ -422,6 +431,7 @@ public class BenchmarkFloatFFT {
             x = null;
             fft3 = null;
             System.gc();
+            ConcurrencyUtils.sleep(5000);
         }
         IOUtils.writeFFTBenchmarkResultsToFile("benchmarkFloatRealForwardFFT_3D_input_3D.txt", nthread, niter, doWarmup, doScaling, sizes3D, times);
     }

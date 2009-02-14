@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdcomplex.impl;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
@@ -107,14 +106,6 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         return offsets[absRank];
     }
 
-    public void fft() {
-        throw new IllegalAccessError("This method is not supported.");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalAccessError("This method is not supported.");
-    }
-
     public double[] getQuick(int index) {
         int idx = zero + index * stride;
         return new double[] { elements[offset + offsets[idx]], elements[offset + offsets[idx] + 1] };
@@ -122,9 +113,9 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
 
     public DoubleMatrix1D getRealPart() {
         final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -134,7 +125,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     double[] tmp;
 
                     public void run() {
@@ -145,15 +136,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double[] tmp;
             for (int i = 0; i < size; i++) {
@@ -166,9 +149,9 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
 
     public DoubleMatrix1D getImaginaryPart() {
         final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -178,7 +161,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     double[] tmp;
 
                     public void run() {
@@ -189,15 +172,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double[] tmp;
             for (int i = 0; i < size; i++) {
@@ -233,7 +208,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         return false;
     }
 
-    public int index(int rank) {
+    public long index(int rank) {
         return offset + offsets[zero + rank * stride];
     }
 

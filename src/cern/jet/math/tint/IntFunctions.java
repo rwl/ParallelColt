@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -608,6 +608,22 @@ public class IntFunctions extends Object {
                 return (int) Math.pow(a, b);
             }
         };
+    }
+    
+    /**
+     * Constructs a function that returns <tt>a + b*constant</tt>. <tt>a</tt>
+     * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
+     */
+    public static IntIntFunction plusMultSecond(final int constant) {
+        return new IntPlusMultSecond(constant);
+    }
+
+    /**
+     * Constructs a function that returns <tt>a * constant + b</tt>. <tt>a</tt>
+     * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
+     */
+    public static IntIntFunction plusMultFirst(final int constant) {
+        return new IntPlusMultFirst(constant);
     }
 
     /**

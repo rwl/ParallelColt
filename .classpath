@@ -5,9 +5,7 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/junit-4.4.jar" sourcepath="src"/>
-	<classpathentry kind="lib" path="lib/blas.jar"/>
-	<classpathentry kind="lib" path="lib/f2jutil.jar"/>
-	<classpathentry kind="lib" path="lib/lapack.jar"/>
-	<classpathentry kind="lib" path="lib/xerbla.jar"/>
+	<classpathentry kind="lib" path="lib/arpack-combo-0.1.jar"/>
+	<classpathentry kind="lib" path="lib/netlib-java-0.9.1.jar" sourcepath="D:/NetBeansProjects/netlib-java-0.9.1/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

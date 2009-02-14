@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -22,18 +22,18 @@ import cern.colt.function.tfloat.FloatProcedure;
  * Function objects conveniently allow to express arbitrary functions in a
  * generic manner. Essentially, a function object is an object that can perform
  * a function on some arguments. It has a minimal interface: a method
- * <tt>apply</tt> that takes the arguments, computes something and returns
- * some result value. Function objects are comparable to function pointers in C
- * used for call-backs.
+ * <tt>apply</tt> that takes the arguments, computes something and returns some
+ * result value. Function objects are comparable to function pointers in C used
+ * for call-backs.
  * <p>
- * Unary functions are of type {@link cern.colt.function.tfloat.FloatFunction}, binary
- * functions of type {@link cern.colt.function.tfloat.FloatFloatFunction}. All can be
+ * Unary functions are of type {@link cern.colt.function.tfloat.FloatFunction}
+ * , binary functions of type
+ * {@link cern.colt.function.tfloat.FloatFloatFunction}. All can be retrieved
+ * via <tt>public 
+ static final</tt> variables named after the function. Unary predicates are of
+ * type {@link cern.colt.function.tfloat.FloatProcedure}, binary predicates of
+ * type {@link cern.colt.function.tfloat.FloatFloatProcedure}. All can be
  * retrieved via <tt>public 
- static final</tt> variables named after the
- * function. Unary predicates are of type
- * {@link cern.colt.function.tfloat.FloatProcedure}, binary predicates of type
- * {@link cern.colt.function.tfloat.FloatFloatProcedure}. All can be retrieved via
- * <tt>public 
  static final</tt> variables named <tt>isXXX</tt>.
  * 
  * <p>
@@ -96,7 +96,8 @@ import cern.colt.function.tfloat.FloatProcedure;
  * </pre>
  * 
  * <p>
- * For aliasing see {@link #functions}. Try this <table>
+ * For aliasing see {@link #functions}. Try this
+ * <table>
  * <td class="PRE">
  * 
  * <pre>
@@ -127,13 +128,14 @@ import cern.colt.function.tfloat.FloatProcedure;
  * objects in a loop over traditional code in a loop. For complex nested
  * function objects (e.g.
  * <tt>F.chain(F.abs,F.chain(F.plus,F.sin,F.chain(F.square,F.cos)))</tt>) the
- * penalty is zero, for trivial functions (e.g. <tt>F.plus</tt>) the penalty
- * is often acceptable. <center> <table border cellpadding="3" cellspacing="0"
- * align="center">
+ * penalty is zero, for trivial functions (e.g. <tt>F.plus</tt>) the penalty is
+ * often acceptable. <center>
+ * <table border cellpadding="3" cellspacing="0" * align="center">
  * <tr valign="middle" bgcolor="#33CC66" nowrap align="center">
- * <td nowrap colspan="7"> <font size="+2">Iteration Performance [million
+ * <td nowrap colspan="7"><font size="+2">Iteration Performance [million
  * function evaluations per second]</font><br>
- * <font size="-1">Pentium Pro 200 Mhz, SunJDK 1.2.2, NT, java -classic, </font></td>
+ * <font size="-1">Pentium Pro 200 Mhz, SunJDK 1.2.2, NT, java -classic, </font>
+ * </td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td nowrap bgcolor="#FF9966" rowspan="2">&nbsp;</td>
@@ -142,7 +144,7 @@ import cern.colt.function.tfloat.FloatProcedure;
  * 30000000 iterations
  * </p>
  * </td>
- * <td bgcolor="#FF9966" colspan="2"> 3000000 iterations (10 times less)</td>
+ * <td bgcolor="#FF9966" colspan="2">3000000 iterations (10 times less)</td>
  * <td bgcolor="#FF9966" colspan="2">&nbsp;</td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
@@ -164,7 +166,8 @@ import cern.colt.function.tfloat.FloatProcedure;
  * <td nowrap>&nbsp;</td>
  * <td nowrap>&nbsp;</td>
  * </tr>
- * </table></center>
+ * </table>
+ * </center>
  * 
  * 
  * @author wolfgang.hoschek@cern.ch
@@ -202,7 +205,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction acos = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.acos(a);
+            return (float)Math.acos(a);
         }
     };
 
@@ -219,7 +222,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction asin = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.asin(a);
+            return (float)Math.asin(a);
         }
     };
 
@@ -236,7 +239,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction atan = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.atan(a);
+            return (float)Math.atan(a);
         }
     };
 
@@ -253,7 +256,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction ceil = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.ceil(a);
+            return (float)Math.ceil(a);
         }
     };
 
@@ -262,7 +265,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction cos = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.cos(a);
+            return (float)Math.cos(a);
         }
     };
 
@@ -303,7 +306,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction exp = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.exp(a);
+            return (float)Math.exp(a);
         }
     };
 
@@ -312,7 +315,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction floor = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.floor(a);
+            return (float)Math.floor(a);
         }
     };
 
@@ -338,7 +341,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction inv = new FloatFunction() {
         public final float apply(float a) {
-            return 1.0f / a;
+            return (float)(1.0 / a);
         }
     };
 
@@ -347,7 +350,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction log = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.log(a);
+            return (float)Math.log(a);
         }
     };
 
@@ -365,7 +368,7 @@ public class FloatFunctions extends Object {
     public static final FloatFunction log2 = new FloatFunction() {
         // 1.0 / Math.log(2) == 1.4426950408889634
         public final float apply(float a) {
-            return (float) (Math.log(a) * 1.4426950408889634);
+            return (float)(Math.log(a) * 1.4426950408889634);
         }
     };
 
@@ -373,8 +376,8 @@ public class FloatFunctions extends Object {
      * Function that returns <tt>com.imsl.math.Sfun.logGamma(a)</tt>.
      */
     /*
-     * public static final FloatFunction logGamma = new FloatFunction() { public
-     * final float apply(float a) { return Sfun.logGamma(a); } };
+     * public static final FloatFunction logGamma = new FloatFunction() {
+     * public final float apply(float a) { return Sfun.logGamma(a); } };
      */
 
     /**
@@ -391,7 +394,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction rint = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.rint(a);
+            return (float)Math.rint(a);
         }
     };
 
@@ -409,7 +412,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction sin = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.sin(a);
+            return (float)Math.sin(a);
         }
     };
 
@@ -426,7 +429,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction sqrt = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.sqrt(a);
+            return (float)Math.sqrt(a);
         }
     };
 
@@ -444,7 +447,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFunction tan = new FloatFunction() {
         public final float apply(float a) {
-            return (float) Math.tan(a);
+            return (float)Math.tan(a);
         }
     };
 
@@ -481,7 +484,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFloatFunction atan2 = new FloatFloatFunction() {
         public final float apply(float a, float b) {
-            return (float) Math.atan2(a, b);
+            return (float)Math.atan2(a, b);
         }
     };
 
@@ -489,8 +492,9 @@ public class FloatFunctions extends Object {
      * Function that returns <tt>com.imsl.math.Sfun.logBeta(a,b)</tt>.
      */
     /*
-     * public static final FloatFloatFunction logBeta = new FloatFloatFunction() {
-     * public final float apply(float a, float b) { return Sfun.logBeta(a,b); } };
+     * public static final FloatFloatFunction logBeta = new
+     * FloatFloatFunction() { public final float apply(float a, float b) {
+     * return Sfun.logBeta(a,b); } };
      */
 
     /**
@@ -543,7 +547,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFloatFunction IEEEremainder = new FloatFloatFunction() {
         public final float apply(float a, float b) {
-            return (float) Math.IEEEremainder(a, b);
+            return (float)Math.IEEEremainder(a, b);
         }
     };
 
@@ -588,7 +592,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFloatFunction lg = new FloatFloatFunction() {
         public final float apply(float a, float b) {
-            return (float) (Math.log(a) / Math.log(b));
+            return (float)(Math.log(a) / Math.log(b));
         }
     };
 
@@ -613,11 +617,11 @@ public class FloatFunctions extends Object {
     /**
      * Function that returns <tt>a - b</tt>.
      */
-    public static final FloatFloatFunction minus = plusMult(-1);
+    public static final FloatFloatFunction minus = plusMultSecond(-1);
 
     /*
-     * new FloatFloatFunction() { public final float apply(float a, float b) {
-     * return a - b; } };
+     * new FloatFloatFunction() { public final float apply(float a, float
+     * b) { return a - b; } };
      */
 
     /**
@@ -659,13 +663,12 @@ public class FloatFunctions extends Object {
     /**
      * Function that returns <tt>a + b</tt>.
      */
-    public static final FloatFloatFunction plus = plusMult(1);
-
-    // new FloatFloatFunction() {
-    // public final float apply(float a, float b) {
-    // return a + b;
-    // }
-    // };
+    public static final FloatFloatFunction plus = plusMultSecond(1);
+//        new FloatFloatFunction() {
+//            public final float apply(float a, float b) {
+//                return a + b;
+//            }
+//        };
 
     /**
      * Function that returns <tt>Math.abs(a) + Math.abs(b)</tt>.
@@ -681,7 +684,7 @@ public class FloatFunctions extends Object {
      */
     public static final FloatFloatFunction pow = new FloatFloatFunction() {
         public final float apply(float a, float b) {
-            return (float) Math.pow(a, b);
+            return (float)Math.pow(a, b);
         }
     };
 
@@ -706,8 +709,8 @@ public class FloatFunctions extends Object {
 
     /**
      * Constructs a unary function from a binary function with the first operand
-     * (argument) fixed to the given constant <tt>c</tt>. The second operand
-     * is variable (free).
+     * (argument) fixed to the given constant <tt>c</tt>. The second operand is
+     * variable (free).
      * 
      * @param function
      *            a binary function taking operands in the form
@@ -823,14 +826,14 @@ public class FloatFunctions extends Object {
         cern.jet.math.tfloat.FloatFunctions F = cern.jet.math.tfloat.FloatFunctions.functions;
         float a = 0.5f;
         float b = 0.2f;
-        float v = (float) (Math.sin(a) + Math.pow(Math.cos(b), 2));
+        float v = (float)(Math.sin(a) + Math.pow(Math.cos(b), 2));
         System.out.println(v);
         FloatFloatFunction f = F.chain(F.plus, F.sin, F.chain(F.square, F.cos));
         // FloatFloatFunction f = F.chain(plus,sin,F.chain(square,cos));
         System.out.println(f.apply(a, b));
         FloatFloatFunction g = new FloatFloatFunction() {
             public final float apply(float x, float y) {
-                return (float) (Math.sin(x) + Math.pow(Math.cos(y), 2));
+                return (float)(Math.sin(x) + Math.pow(Math.cos(y), 2));
             }
         };
         System.out.println(g.apply(a, b));
@@ -848,7 +851,7 @@ public class FloatFunctions extends Object {
         System.out.println("\n\n");
         float a = 0.0f;
         float b = 0.0f;
-        float v = (float) (Math.abs(Math.sin(a) + Math.pow(Math.cos(b), 2)));
+        float v = (float)Math.abs(Math.sin(a) + Math.pow(Math.cos(b), 2));
         // float v = Math.sin(a) + Math.pow(Math.cos(b),2);
         // float v = a + b;
         System.out.println(v);
@@ -862,7 +865,7 @@ public class FloatFunctions extends Object {
         System.out.println(f.apply(a, b));
         FloatFloatFunction g = new FloatFloatFunction() {
             public final float apply(float x, float y) {
-                return (float) Math.abs(Math.sin(x) + Math.pow(Math.cos(y), 2));
+                return (float)Math.abs(Math.sin(x) + Math.pow(Math.cos(y), 2));
             }
             // public final float apply(float x, float y) { return x+y; }
         };
@@ -932,8 +935,8 @@ public class FloatFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>a == b ? 1 : 0</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a == b ? 1 : 0</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static FloatFunction equals(final float b) {
         return new FloatFunction() {
@@ -944,8 +947,8 @@ public class FloatFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>a > b ? 1 : 0</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a > b ? 1 : 0</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static FloatFunction greater(final float b) {
         return new FloatFunction() {
@@ -962,14 +965,14 @@ public class FloatFunctions extends Object {
     public static FloatFunction IEEEremainder(final float b) {
         return new FloatFunction() {
             public final float apply(float a) {
-                return (float) Math.IEEEremainder(a, b);
+                return (float)Math.IEEEremainder(a, b);
             }
         };
     }
 
     /**
-     * Constructs a function that returns <tt>from<=a && a<=to</tt>.
-     * <tt>a</tt> is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
+     * Constructs a function that returns <tt>from<=a && a<=to</tt>. <tt>a</tt>
+     * is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
      */
     public static FloatProcedure isBetween(final float from, final float to) {
         return new FloatProcedure() {
@@ -1016,8 +1019,8 @@ public class FloatFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>a < b ? 1 : 0</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a < b ? 1 : 0</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static FloatFunction less(final float b) {
         return new FloatFunction() {
@@ -1028,18 +1031,15 @@ public class FloatFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns
-     * <tt><tt>Math.log(a) / Math.log(b)</tt></tt>. <tt>a</tt> is a
-     * variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt><tt>Math.log(a) / Math.log(b)</tt>
+     * </tt>. <tt>a</tt> is a variable, <tt>b</tt> is fixed.
      */
     public static FloatFunction lg(final float b) {
         return new FloatFunction() {
-            private final float logInv = (float) (1 / Math.log(b)); // cached
-
-            // for speed
+            private final double logInv = 1 / Math.log(b); // cached for speed
 
             public final float apply(float a) {
-                return (float) (Math.log(a) * logInv);
+                return (float)(Math.log(a) * logInv);
             }
         };
     }
@@ -1054,8 +1054,8 @@ public class FloatFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static FloatFunction max(final float b) {
         return new FloatFunction() {
@@ -1066,8 +1066,8 @@ public class FloatFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>Math.min(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>Math.min(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static FloatFunction min(final float b) {
         return new FloatFunction() {
@@ -1090,7 +1090,7 @@ public class FloatFunctions extends Object {
      * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
      */
     public static FloatFloatFunction minusMult(final float constant) {
-        return plusMult(-constant);
+        return plusMultSecond(-constant);
     }
 
     /**
@@ -1129,26 +1129,40 @@ public class FloatFunctions extends Object {
         };
     }
 
+    public static FloatFloatFunction multSecond(final float constant) {
+
+        return new FloatFloatFunction() {
+            public final float apply(float a, float b) {
+                return b * constant;
+            }
+        };
+
+    }
+
     /**
      * Constructs a function that returns <tt>a + b*constant</tt>. <tt>a</tt>
      * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
      */
-    public static FloatFloatFunction plusMult(float constant) {
-        return new FloatPlusMult(constant);
-        /*
-         * return new FloatFloatFunction() { public final float apply(float a,
-         * float b) { return a + b*constant; } };
-         */
+    public static FloatFloatFunction plusMultSecond(final float constant) {
+        return new FloatPlusMultSecond(constant);
     }
 
     /**
-     * Constructs a function that returns <tt>Math.pow(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a * constant + b</tt>. <tt>a</tt>
+     * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
+     */
+    public static FloatFloatFunction plusMultFirst(final float constant) {
+        return new FloatPlusMultFirst(constant);
+    }
+
+    /**
+     * Constructs a function that returns <tt>Math.pow(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static FloatFunction pow(final float b) {
         return new FloatFunction() {
             public final float apply(float a) {
-                return (float) Math.pow(a, b);
+                return (float)Math.pow(a, b);
             }
         };
     }
@@ -1157,16 +1171,16 @@ public class FloatFunctions extends Object {
      * Constructs a function that returns a new uniform random number in the
      * open unit interval <code>(0.0,1.0)</code> (excluding 0.0 and 1.0).
      * Currently the engine is
-     * {@link cern.jet.random.tfloat.engine.FloatMersenneTwister} and is seeded with
-     * the current time.
+     * {@link cern.jet.random.tfloat.engine.FloatMersenneTwister} and is
+     * seeded with the current time.
      * <p>
      * Note that any random engine derived from
      * {@link cern.jet.random.tfloat.engine.FloatRandomEngine} and any random
      * distribution derived from
-     * {@link cern.jet.random.tfloat.AbstractFloatDistribution} are function objects,
-     * because they implement the proper interfaces. Thus, if you are not happy
-     * with the default, just pass your favourite random generator to function
-     * evaluating methods.
+     * {@link cern.jet.random.tfloat.AbstractFloatDistribution} are function
+     * objects, because they implement the proper interfaces. Thus, if you are
+     * not happy with the default, just pass your favourite random generator to
+     * function evaluating methods.
      */
     public static FloatFunction random() {
         return new RandomFloatFunction();
@@ -1176,7 +1190,7 @@ public class FloatFunctions extends Object {
     private static class RandomFloatFunction implements FloatFunction {
 
         public float apply(float argument) {
-            return (float) Math.random();
+            return (float)Math.random();
         }
 
     }
@@ -1193,7 +1207,7 @@ public class FloatFunctions extends Object {
     public static FloatFunction round(final float precision) {
         return new FloatFunction() {
             public final float apply(float a) {
-                return (float) (Math.rint(a / precision) * precision);
+                return (float)(Math.rint(a / precision) * precision);
             }
         };
     }

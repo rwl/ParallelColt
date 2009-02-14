@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfcomplex.impl;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
@@ -117,14 +116,6 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         return offsets[absRank];
     }
 
-    public void fft() {
-        throw new IllegalArgumentException("fft() is not supported yet");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalArgumentException("ifft() is not supported yet");
-    }
-
     /**
      * Returns the matrix cell value at coordinate <tt>index</tt>.
      * 
@@ -150,9 +141,9 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
      */
     public FloatMatrix1D getRealPart() {
         final DenseFloatMatrix1D R = new DenseFloatMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -162,7 +153,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] tmp;
 
                     public void run() {
@@ -173,15 +164,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] tmp;
             for (int i = 0; i < size; i++) {
@@ -199,9 +182,9 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
      */
     public FloatMatrix1D getImaginaryPart() {
         final DenseFloatMatrix1D Im = new DenseFloatMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -211,7 +194,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] tmp;
 
                     public void run() {
@@ -222,15 +205,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] tmp;
             for (int i = 0; i < size; i++) {
@@ -281,7 +256,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         return offset + offsets[zero + rank * stride];
     }
 

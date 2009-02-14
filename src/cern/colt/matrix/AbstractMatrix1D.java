@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -133,7 +133,7 @@ public abstract class AbstractMatrix1D extends AbstractMatrix {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         return _offset(_rank(rank));
     }
 

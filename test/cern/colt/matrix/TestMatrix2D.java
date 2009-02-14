@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -19,9 +19,9 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
 import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.DoubleBlas;
-import cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick;
 import cern.colt.matrix.tdouble.algo.DoubleMatrix2DComparator;
 import cern.colt.matrix.tdouble.algo.SmpDoubleBlas;
+import cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;

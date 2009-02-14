@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -105,7 +105,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -115,7 +115,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }
@@ -210,7 +210,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -220,7 +220,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }
@@ -315,7 +315,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -325,7 +325,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }
@@ -420,7 +420,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -430,7 +430,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }
@@ -525,7 +525,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -535,7 +535,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }
@@ -630,7 +630,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -640,7 +640,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }
@@ -733,7 +733,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, nThreads / 2);
                     }
@@ -743,7 +743,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, nThreads / 2);
                         }
@@ -838,7 +838,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -848,7 +848,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }
@@ -943,7 +943,7 @@ public class ParallelQuickSort {
             // Recursively sort non-partition-elements
             if ((s = b - a) > 1) {
                 final int s_f = s;
-                other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                other = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         quickSort(x, off, s_f, comp, nThreads / 2);
                     }
@@ -953,7 +953,7 @@ public class ParallelQuickSort {
                 if (other == null) {
                     final int s_f = s;
                     final int ns_f = n - s;
-                    other = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    other = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             quickSort(x, ns_f, s_f, comp, nThreads / 2);
                         }

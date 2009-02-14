@@ -1,3 +1,11 @@
+/*
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
+Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
+is hereby granted without fee, provided that the above copyright notice appear in all copies and 
+that both that copyright notice and this permission notice appear in supporting documentation. 
+CERN makes no representations about the suitability of this software for any purpose. 
+It is provided "as is" without expressed or implied warranty.
+ */
 package cern.colt.matrix.tfcomplex;
 
 import java.util.ArrayList;
@@ -57,9 +65,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
             return b;
         }
         float[] a = null;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             float[][] results = new float[np][2];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -70,7 +78,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<float[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
                         float[] a = f.apply(getQuick(startrow, 0));
                         int d = 1;
@@ -84,19 +92,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (float[]) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             a = f.apply(getQuick(0, 0));
             int d = 1; // first cell already done
@@ -135,9 +131,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
             return b;
         }
         float[] a = null;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             float[][] results = new float[np][2];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -148,7 +144,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<float[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
 
                     public float[] call() throws Exception {
                         float[] a = f.apply(getQuick(startrow, 0), other.getQuick(startrow, 0));
@@ -163,19 +159,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (float[]) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             a = f.apply(getQuick(0, 0), other.getQuick(0, 0));
             int d = 1; // first cell already done
@@ -198,9 +182,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -210,7 +194,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
@@ -220,15 +204,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
 
             for (int r = 0; r < rows; r++) {
@@ -252,9 +228,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -264,7 +240,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         float[] elem;
@@ -279,15 +255,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] elem;
             for (int r = 0; r < rows; r++) {
@@ -314,9 +282,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * 
      */
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -326,7 +294,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         float[] elem;
@@ -341,15 +309,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] elem;
             for (int r = 0; r < rows; r++) {
@@ -374,9 +334,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexRealFunction f) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -386,33 +346,23 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp = new float[2];
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
-                                tmp[0] = f.apply(getQuick(r, c));
-                                setQuick(r, c, tmp);
+                                float re = f.apply(getQuick(r, c));
+                                setQuick(r, c, re, 0);
                             }
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp = new float[2];
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
-                    tmp[0] = f.apply(getQuick(r, c));
-                    setQuick(r, c, tmp);
+                    float re = f.apply(getQuick(r, c));
+                    setQuick(r, c, re, 0);
                 }
             }
         }
@@ -445,9 +395,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
         } else {
             otherLoc = other;
         }
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -458,7 +408,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
@@ -468,15 +418,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
@@ -504,9 +446,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public FComplexMatrix2D assign(final FComplexMatrix2D y, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
         checkShape(y);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -516,7 +458,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
@@ -526,15 +468,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
@@ -556,9 +490,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      */
     public FComplexMatrix2D assign(final float re, final float im) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -568,7 +502,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
@@ -578,15 +512,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
@@ -615,9 +541,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     public FComplexMatrix2D assign(final float[] values) {
         if (values.length != rows * 2 * columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()=" + rows() * 2 * columns());
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -628,7 +554,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx = glob_idx;
@@ -641,15 +567,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
 
             int idx = 0;
@@ -681,11 +599,11 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != 2*columns()</tt>.
      */
     public FComplexMatrix2D assign(final float[][] values) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()=" + rows());
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -695,7 +613,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
                             float[] currentRow = values[r];
@@ -708,15 +626,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int r = 0; r < rows; r++) {
                 float[] currentRow = values[r];
@@ -730,9 +640,10 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
         return this;
     }
 
+   
     /**
      * Replaces imaginary part of the receiver with the values of another real
-     * matrix. The real part of the receiver is reset to zero. Both matrices
+     * matrix. The real part of the receiver remains unchanged. Both matrices
      * must have the same size.
      * 
      * @param other
@@ -743,9 +654,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public FComplexMatrix2D assignImaginary(final FloatMatrix2D other) {
         checkShape(other);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -756,33 +667,25 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp = new float[2];
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
-                                tmp[1] = other.getQuick(r, c);
-                                setQuick(r, c, tmp);
+                                float re = getQuick(r, c)[0];
+                                float im = other.getQuick(r, c);
+                                setQuick(r, c, re, im);
                             }
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp = new float[2];
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
-                    tmp[1] = other.getQuick(r, c);
-                    setQuick(r, c, tmp);
+                    float re = getQuick(r, c)[0];
+                    float im = other.getQuick(r, c);
+                    setQuick(r, c, re, im);
                 }
             }
         }
@@ -791,7 +694,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
 
     /**
      * Replaces real part of the receiver with the values of another real
-     * matrix. The imaginary part of the receiver is reset to zero. Both
+     * matrix. The imaginary part of the receiver remains unchanged. Both
      * matrices must have the same size.
      * 
      * @param other
@@ -802,9 +705,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public FComplexMatrix2D assignReal(final FloatMatrix2D other) {
         checkShape(other);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -815,33 +718,25 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp = new float[2];
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
-                                tmp[0] = other.getQuick(r, c);
-                                setQuick(r, c, tmp);
+                                float re = other.getQuick(r, c);
+                                float im = getQuick(r, c)[1];
+                                setQuick(r, c, re, im);
                             }
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp = new float[2];
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
-                    tmp[0] = other.getQuick(r, c);
-                    setQuick(r, c, tmp);
+                    float re = other.getQuick(r, c);
+                    float im = getQuick(r, c)[1];
+                    setQuick(r, c, re, im);
                 }
             }
         }
@@ -855,9 +750,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -868,7 +763,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Integer>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
                         float[] tmp = new float[2];
@@ -957,27 +852,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
         return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, (FComplexMatrix2D) obj);
     }
 
-    /**
-     * Computes the 2D discrete Fourier transform (DFT) of this matrix. Throws
-     * IllegalArgumentException if the row size or column size of this matrix is
-     * not a power of 2 number.
-     */
-    public abstract void fft2();
-
-    /**
-     * Computes the discrete Fourier transform (DFT) of each column of this
-     * matrix. Throws IllegalArgumentException if the column size of this matrix
-     * is not a power of 2 number.
-     */
-    public abstract void fftColumns();
-
-    /**
-     * Computes the discrete Fourier transform (DFT) of each row of this matrix.
-     * Throws IllegalArgumentException if the row size of this matrix is not a
-     * power of 2 number.
-     */
-    public abstract void fftRows();
-
+    
+    
+   
     /**
      * Assigns the result of a function to each <i>non-zero</i> cell. Use this
      * method for fast special-purpose iteration. If you want to modify another
@@ -993,9 +870,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      */
     public FComplexMatrix2D forEachNonZero(final cern.colt.function.tfcomplex.IntIntFComplexFunction function) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1005,7 +882,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < columns; c++) {
@@ -1019,15 +896,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
@@ -1070,9 +939,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public FComplexMatrix2D getConjugateTranspose() {
         final FComplexMatrix2D transpose = this.viewDice().copy();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1082,7 +951,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp = new float[2];
                         for (int r = startrow; r < stoprow; r++) {
@@ -1095,15 +964,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] tmp = new float[2];
             for (int r = 0; r < columns; r++) {
@@ -1154,7 +1015,6 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 float[] value = getQuick(r, c);
@@ -1193,37 +1053,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public abstract FloatMatrix2D getRealPart();
 
-    /**
-     * Computes the 2D inverse of the discrete Fourier transform (IDFT) of this
-     * matrix. Throws IllegalArgumentException if the row size or column size of
-     * this matrix is not a power of 2 number.
-     * 
-     * @param scale
-     *            if true then scaling is performed
-     * 
-     */
-    public abstract void ifft2(boolean scale);
-
-    /**
-     * Computes the inverse of the discrete Fourier transform (IDFT) of each
-     * column of this matrix. Throws IllegalArgumentException if the column size
-     * of this matrix is not a power of 2 number.
-     * 
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public abstract void ifftColumns(boolean scale);
-
-    /**
-     * Computes the inverse of the discrete Fourier transform (IDFT) of each row
-     * of this matrix. Throws IllegalArgumentException if the row size of this
-     * matrix is not a power of 2 number.
-     * 
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public abstract void ifftRows(boolean scale);
-
+    
+    
+    
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of rows and columns. For example,
@@ -1344,9 +1176,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public float[][] toArray() {
         final float[][] values = new float[rows][2 * columns];
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1356,7 +1188,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp = new float[2];
                         for (int r = startrow; r < stoprow; r++) {
@@ -1369,15 +1201,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] tmp = new float[2];
             for (int r = 0; r < rows; r++) {
@@ -1457,7 +1281,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     public FComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
-        int viewZero = index(0, column);
+        int viewZero = (int)index(0, column);
         int viewStride = this.rowStride;
         return like1D(viewSize, viewZero, viewStride);
     }
@@ -1549,7 +1373,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     public FComplexMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
-        int viewZero = index(row, 0);
+        int viewZero = (int)index(row, 0);
         int viewStride = this.columnStride;
         return like1D(viewSize, viewZero, viewStride);
     }
@@ -1712,9 +1536,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
         }
         if (columns != y.size() || rows > zLoc.size())
             throw new IllegalArgumentException("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zLoc.toStringShort());
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1724,7 +1548,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] s = new float[2];
 
                     public void run() {
@@ -1739,15 +1563,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] s = new float[2];
             for (int r = 0; r < rows; r++) {
@@ -1822,9 +1638,9 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
             throw new IllegalArgumentException("Incompatibe result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C_loc.toStringShort());
         if (this == C_loc || B == C_loc)
             throw new IllegalArgumentException("Matrices must not be identical");
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = p / np;
             for (int j = 0; j < np; j++) {
                 final int starta = j * k;
@@ -1834,7 +1650,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                 } else {
                     stopa = starta + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] s = new float[2];
 
                     public void run() {
@@ -1851,15 +1667,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] s = new float[2];
             for (int a = 0; a < p; a++) {

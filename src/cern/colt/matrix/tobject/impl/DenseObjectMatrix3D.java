@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -11,8 +11,6 @@ package cern.colt.matrix.tobject.impl;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import cern.colt.matrix.tfloat.FloatMatrix3D;
-import cern.colt.matrix.tfloat.impl.DenseFloatMatrix3D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 import cern.colt.matrix.tobject.ObjectMatrix3D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -180,10 +178,10 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
     public ObjectMatrix3D assign(final Object[][][] values) {
     	if (values.length != slices)
 			throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if (this.isNoView) {
 			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future[] futures = new Future[np];
+				Future<?>[] futures = new Future[np];
 				int k = slices / np;
 				for (int j = 0; j < np; j++) {
 					final int startslice = j * k;
@@ -193,7 +191,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
 					} else {
 						stopslice = startslice + k;
 					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					futures[j] = ConcurrencyUtils.submit(new Runnable() {
 						public void run() {
 							int i = startslice * sliceStride;
 							for (int s = startslice; s < stopslice; s++) {
@@ -236,9 +234,9 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
 				}
 			}
 		} else {
-			final int zero = index(0, 0, 0);
+			final int zero = (int)index(0, 0, 0);
 			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future[] futures = new Future[np];
+				Future<?>[] futures = new Future[np];
 				int k = slices / np;
 				for (int j = 0; j < np; j++) {
 					final int startslice = j * k;
@@ -248,7 +246,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
 					} else {
 						stopslice = startslice + k;
 					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 						public void run() {
 							int idx;
@@ -337,10 +335,10 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
 		}
 
 		final DenseObjectMatrix3D other_final = (DenseObjectMatrix3D) other;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if (this.isNoView && other.isNoView) { // quickest
 			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future[] futures = new Future[np];
+				Future<?>[] futures = new Future[np];
 				int k = size() / np;
 				for (int j = 0; j < np; j++) {
 					final int startidx = j * k;
@@ -350,7 +348,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
 					} else {
 						length = k;
 					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					futures[j] = ConcurrencyUtils.submit(new Runnable() {
 						public void run() {
 							System.arraycopy(other_final.elements, startidx, elements, startidx, length);
 						}
@@ -370,14 +368,14 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
 			}
 			return this;
 		} else {
-			final int zero = index(0, 0, 0);
-			final int zeroOther = other_final.index(0, 0, 0);
+			final int zero = (int)index(0, 0, 0);
+			final int zeroOther = (int)other_final.index(0, 0, 0);
 			final int sliceStrideOther = other_final.sliceStride;
 			final int rowStrideOther = other_final.rowStride;
 			final int columnStrideOther = other_final.columnStride;
 			final Object[] elemsOther = other_final.elements;
 			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future[] futures = new Future[np];
+				Future<?>[] futures = new Future[np];
 				int k = slices / np;
 				for (int j = 0; j < np; j++) {
 					final int startslice = j * k;
@@ -387,7 +385,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
 					} else {
 						stopslice = startslice + k;
 					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 						public void run() {
 							int idx;
@@ -498,7 +496,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    public int index(int slice, int row, int column) {
+    public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
         // manually inlined:

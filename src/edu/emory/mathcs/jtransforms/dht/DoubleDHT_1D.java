@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -34,7 +34,6 @@
 
 package edu.emory.mathcs.jtransforms.dht;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
@@ -87,24 +86,19 @@ public class DoubleDHT_1D {
         final double[] b = new double[n];
         System.arraycopy(a, offa, b, 0, n);
         int nd2 = n / 2;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (nd2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            final int k1 = nd2 / np;
-            Future[] futures = new Future[np];
-            for (int i = 0; i < np; i++) {
-                final int startidx = 1 + i * k1;
-                final int stopidx;
-                if (i == np - 1) {
-                    stopidx = nd2;
-                } else {
-                    stopidx = startidx + k1;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (nd2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            final int k1 = nd2 / nthreads;
+            Future<?>[] futures = new Future[nthreads];
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = 1 + i * k1;
+                final int lastIdx = (i == (nthreads - 1)) ? nd2 : firstIdx + k1;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx1, idx2;
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             idx1 = 2 * i;
                             idx2 = idx1 + 1;
                             a[offa + i] = b[idx1] - b[idx2];
@@ -114,15 +108,7 @@ public class DoubleDHT_1D {
 
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx1, idx2;
             for (int i = 1; i < nd2; i++) {
@@ -174,39 +160,27 @@ public class DoubleDHT_1D {
 
     private void scale(final double m, final double[] a, int offa) {
         final double norm = (1.0 / m);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n >= ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            final int k = n / np;
-            Future[] futures = new Future[np];
-            for (int i = 0; i < np; i++) {
-                final int startIdx = offa + i * k;
-                final int stopIdx;
-                if (i == np - 1) {
-                    stopIdx = offa + n;
-                } else {
-                    stopIdx = startIdx + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n >= ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            final int k = n / nthreads;
+            Future<?>[] futures = new Future[nthreads];
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = offa + i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? offa + n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startIdx; i < stopIdx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             a[i] *= norm;
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            for (int i = offa; i < offa + n; i++) {
+            int lastIdx = offa + n;
+            for (int i = offa; i < lastIdx; i++) {
                 a[i] *= norm;
             }
 

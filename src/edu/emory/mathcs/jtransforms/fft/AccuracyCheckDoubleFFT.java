@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -550,7 +550,7 @@ public class AccuracyCheckDoubleFFT {
 
     private static double computeRMSE(double[] a, double[] b) {
         if (a.length != b.length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size.");
         }
         double rms = 0;
         double tmp;
@@ -563,7 +563,7 @@ public class AccuracyCheckDoubleFFT {
 
     private static double computeRMSE(double[][] a, double[][] b) {
         if (a.length != b.length || a[0].length != b[0].length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size.");
         }
         double rms = 0;
         double tmp;
@@ -578,7 +578,7 @@ public class AccuracyCheckDoubleFFT {
 
     private static double computeRMSE(double[][][] a, double[][][] b) {
         if (a.length != b.length || a[0].length != b[0].length || a[0][0].length != b[0][0].length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size.");
         }
         double rms = 0;
         double tmp;
@@ -594,6 +594,7 @@ public class AccuracyCheckDoubleFFT {
     }
 
     public static void main(String[] args) {
+        //        ConcurrencyUtils.setNumberOfThreads(2);
         checkAccuracyComplexFFT_1D();
         checkAccuracyRealFFT_1D();
         checkAccuracyComplexFFT_2D();

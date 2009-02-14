@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -133,9 +133,9 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             return b;
         }
         double[] a = null;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             double[][] results = new double[np][2];
             int k = size / np;
             for (int j = 0; j < np; j++) {
@@ -146,7 +146,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
                         int idx = zero + startidx * stride;
                         double[] a = f.apply(new double[] { elements[idx], elements[idx + 1] });
@@ -158,19 +158,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (double[]) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             a = f.apply(new double[] { elements[zero], elements[zero + 1] });
             int idx = zero;
@@ -193,13 +181,13 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             b[1] = Double.NaN;
             return b;
         }
-        final int zeroOther = other.index(0);
+        final int zeroOther = (int)other.index(0);
         final int strideOther = other.stride();
         final double[] elemsOther = (double[]) other.elements();
         double[] a = null;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             double[][] results = new double[np][2];
             int k = size / np;
             for (int j = 0; j < np; j++) {
@@ -210,7 +198,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
@@ -224,19 +212,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (double[]) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
@@ -253,14 +229,14 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     public DComplexMatrix1D assign(final cern.colt.function.tdcomplex.DComplexDComplexFunction function) {
         if (this.elements == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
             if (function instanceof cern.jet.math.tdcomplex.DComplexMult) {
                 double[] multiplicator = ((cern.jet.math.tdcomplex.DComplexMult) function).multiplicator;
                 if (multiplicator[0] == 1 && multiplicator[1] == 0)
                     return this;
             }
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -270,7 +246,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] tmp = new double[2];
                         int idx = zero + startidx * stride;
@@ -285,15 +261,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double[] tmp = new double[2];
             int idx = zero;
@@ -310,9 +278,9 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     }
 
     public DComplexMatrix1D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final cern.colt.function.tdcomplex.DComplexDComplexFunction function) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -322,7 +290,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         double[] elem = new double[2];
@@ -340,15 +308,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double[] elem = new double[2];
             int idx = zero;
@@ -367,9 +327,9 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     }
 
     public DComplexMatrix1D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final double[] value) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -379,7 +339,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] elem = new double[2];
                         int idx = zero + startidx * stride;
@@ -395,15 +355,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double[] elem = new double[2];
             int idx = zero;
@@ -423,9 +375,9 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     public DComplexMatrix1D assign(final cern.colt.function.tdcomplex.DComplexRealFunction function) {
         if (this.elements == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -435,7 +387,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] tmp = new double[2];
                         int idx = zero + startidx * stride;
@@ -450,15 +402,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double[] tmp = new double[2];
             int idx = zero;
@@ -498,11 +442,11 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         final int strideOther = other.stride;
-        final int zeroOther = other.index(0);
+        final int zeroOther = (int)other.index(0);
 
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -512,7 +456,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
@@ -525,15 +469,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
@@ -553,14 +489,14 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         }
         checkSize(y);
         final double[] elemsOther = (double[]) y.elements();
-        final int zeroOther = y.index(0);
+        final int zeroOther = (int)y.index(0);
         final int strideOther = y.stride();
 
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -570,7 +506,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] tmp1 = new double[2];
                         double[] tmp2 = new double[2];
@@ -590,15 +526,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double[] tmp1 = new double[2];
             double[] tmp2 = new double[2];
@@ -620,9 +548,9 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     }
 
     public DComplexMatrix1D assign(final double re, final double im) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -632,7 +560,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startidx * stride;
                         for (int k = startidx; k < stopidx; k++) {
@@ -643,15 +571,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             for (int i = 0; i < size; i++) {
@@ -679,12 +599,12 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             return super.assignImaginary(other);
         }
         checkSize(other);
-        final int zeroOther = other.index(0);
+        final int zeroOther = (int)other.index(0);
         final int strideOther = other.stride();
         final double[] elemsOther = (double[]) other.elements();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -694,12 +614,12 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
                         for (int i = startidx; i < stopidx; i++) {
-                            elements[idx] = 0;
+//                            elements[idx] = 0;
                             elements[idx + 1] = elemsOther[idxOther];
                             idx += stride;
                             idxOther += strideOther;
@@ -707,20 +627,12 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
-                elements[idx] = 0;
+//                elements[idx] = 0;
                 elements[idx + 1] = elemsOther[idxOther];
                 idx += stride;
                 idxOther += strideOther;
@@ -734,12 +646,12 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             return super.assignReal(other);
         }
         checkSize(other);
-        final int zeroOther = other.index(0);
+        final int zeroOther = (int)other.index(0);
         final int strideOther = other.stride();
         final double[] elemsOther = (double[]) other.elements();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -749,34 +661,26 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
                         for (int i = startidx; i < stopidx; i++) {
                             elements[idx] = elemsOther[idxOther];
-                            elements[idx + 1] = 0;
+//                            elements[idx + 1] = 0;
                             idx += stride;
                             idxOther += strideOther;
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
                 elements[idx] = elemsOther[idxOther];
-                elements[idx + 1] = 0;
+//                elements[idx + 1] = 0;
                 idx += stride;
                 idxOther += strideOther;
             }
@@ -784,14 +688,26 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         return this;
     }
 
+    /**
+     * Computes the discrete Fourier transform (DFT) of this matrix. Throws
+     * IllegalArgumentException if the size of this matrix is not a power of 2
+     * number.
+     */
     public void fft() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
+    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
+    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
-        fft.complexForward(elements);
-    	ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        
+        if (isNoView) {
+            fft.complexForward(elements);
+        } else {
+            DComplexMatrix1D copy = this.copy();
+            fft.complexForward((double[]) copy.elements());
+            this.assign((double[]) copy.elements());
+        }
+    	ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     public double[] elements() {
@@ -801,11 +717,11 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     public DoubleMatrix1D getImaginaryPart() {
         final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(size);
         final double[] elemsOther = (double[]) Im.elements();
-        final int zeroOther = Im.index(0);
+        final int zeroOther = (int)Im.index(0);
         final int strideOther = Im.stride();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -815,7 +731,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
@@ -827,15 +743,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
@@ -876,11 +784,11 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     public DoubleMatrix1D getRealPart() {
         final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(size);
         final double[] elemsOther = (double[]) R.elements();
-        final int zeroOther = R.index(0);
+        final int zeroOther = (int)R.index(0);
         final int strideOther = R.stride();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -890,7 +798,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
@@ -902,15 +810,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
@@ -923,14 +823,28 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         return R;
     }
 
+    /**
+     * Computes the inverse of the discrete Fourier transform (IDFT) of this
+     * matrix. Throws IllegalArgumentException if the size of this matrix is not
+     * a power of 2 number.
+     * 
+     * @param scale
+     *            if true, then scaling is performed.
+     */
     public void ifft(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
+    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
+    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
-        fft.complexInverse(elements, scale);
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        if (isNoView) {
+            fft.complexInverse(elements, scale);
+        } else {
+            DComplexMatrix1D copy = this.copy();
+            fft.complexInverse((double[]) copy.elements(), scale);
+            this.assign((double[]) copy.elements());
+        }
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     public DComplexMatrix1D like(int size) {
@@ -947,12 +861,12 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         }
         DComplexMatrix2D M = new DenseDComplexMatrix2D(rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = M.index(0, 0);
+        final int zeroOther = (int)M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = cols / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -962,7 +876,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
@@ -979,15 +893,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idxOther;
             int idx = zero;
@@ -1010,13 +916,13 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         }
         DComplexMatrix3D M = new DenseDComplexMatrix3D(slices, rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = M.index(0, 0, 0);
+        final int zeroOther = (int)M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -1026,7 +932,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
@@ -1045,15 +951,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idxOther;
             int idx = zero;
@@ -1097,11 +995,11 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         final int strideOther = y.stride;
-        final int zeroOther = y.index(0);
+        final int zeroOther = (int)y.index(0);
 
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -1111,7 +1009,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
@@ -1129,15 +1027,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
@@ -1168,9 +1058,9 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         double[] sum = new double[2];
         if (this.elements == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             double[][] results = new double[np][2];
             int k = size / np;
             for (int j = 0; j < np; j++) {
@@ -1182,7 +1072,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                     stopidx = startidx + k;
                 }
 
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
                         double[] sum = new double[2];
                         int idx = zero + startidx * stride;
@@ -1244,7 +1134,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         return false;
     }
 
-    public int index(int rank) {
+    public long index(int rank) {
         return zero + rank * stride;
     }
 

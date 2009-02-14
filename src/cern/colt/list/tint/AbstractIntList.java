@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -381,7 +381,7 @@ public abstract class AbstractIntList extends AbstractList implements cern.colt.
      * @param index
      *            index of element to return.
      */
-    protected abstract int getQuick(int index);
+    public abstract int getQuick(int index);
 
     /**
      * Returns the index of the first occurrence of the specified element.

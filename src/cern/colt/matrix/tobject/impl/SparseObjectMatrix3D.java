@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -298,7 +298,7 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    public int index(int slice, int row, int column) {
+    public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
         // manually inlined:

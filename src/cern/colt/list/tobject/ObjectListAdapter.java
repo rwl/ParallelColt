@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -28,7 +28,7 @@ public class ObjectListAdapter extends java.util.AbstractList implements java.ut
      * Inserts the specified element at the specified position in this list
      * (optional operation). Shifts the element currently at that position (if
      * any) and any subsequent elements to the right (adds one to their
-     * indices).
+     * indexes).
      * <p>
      * 
      * @param index
@@ -68,7 +68,7 @@ public class ObjectListAdapter extends java.util.AbstractList implements java.ut
     /**
      * Removes the element at the specified position in this list (optional
      * operation). Shifts any subsequent elements to the left (subtracts one
-     * from their indices). Returns the element that was removed from the list.
+     * from their indexes). Returns the element that was removed from the list.
      * <p>
      * 
      * @param index

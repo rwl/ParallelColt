@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -171,7 +171,7 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    public int index(int slice, int row, int column) {
+    public long index(int slice, int row, int column) {
         return this.offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
     }
 
@@ -473,22 +473,6 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
         int[] viewColumnOffsets = this.columnOffsets;
 
         return new SelectedSparseFComplexMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero, viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
-    }
-
-    public void fft3() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifft3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fft2Slices() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifft2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
     }
 
     /**

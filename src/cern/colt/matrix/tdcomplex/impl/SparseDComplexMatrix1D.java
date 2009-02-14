@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -33,8 +33,8 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
-     * copied. So subsequent changes in <tt>values</tt> are not reflected in
-     * the matrix, and vice-versa.
+     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+     * matrix, and vice-versa.
      * 
      * @param values
      *            The values to be filled into the new matrix.
@@ -104,14 +104,6 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
             return super.cardinality();
     }
 
-    public void fft() {
-        throw new IllegalArgumentException("fft() is not supported yet");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalArgumentException("ifft() is not supported yet");
-    }
-
     /**
      * Returns the matrix cell value at coordinate <tt>index</tt>.
      * 
@@ -126,7 +118,13 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
      * @return the value of the specified cell.
      */
     public double[] getQuick(int index) {
-        return elements.get(zero + index * stride);
+        double[] elem = elements.get(zero + index * stride);
+        if(elem != null) {
+            return new double[] {elem[0], elem[1]};
+        }
+        else {
+            return new double[2];
+        }
     }
 
     /**
@@ -139,8 +137,7 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(DComplexMatrix1D other) {
         if (other instanceof SelectedSparseDComplexMatrix1D) {
@@ -161,18 +158,18 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         return zero + rank * stride;
     }
 
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseComplexMatrix1D</tt> the new matrix
-     * must also be of type <tt>DenseComplexMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseComplexMatrix1D</tt> the new matrix must
-     * also be of type <tt>SparseComplexMatrix1D</tt>, etc. In general, the
-     * new matrix should have internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseComplexMatrix1D</tt> the new matrix must
+     * also be of type <tt>DenseComplexMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseComplexMatrix1D</tt> the new matrix must also
+     * be of type <tt>SparseComplexMatrix1D</tt>, etc. In general, the new
+     * matrix should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -186,9 +183,9 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseComplexMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseComplexMatrix2D</tt>, if the receiver
-     * is an instance of type <tt>SparseComplexMatrix1D</tt> the new matrix
-     * must be of type <tt>SparseComplexMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseComplexMatrix2D</tt>, if the receiver is
+     * an instance of type <tt>SparseComplexMatrix1D</tt> the new matrix must be
+     * of type <tt>SparseComplexMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -201,16 +198,43 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
     }
 
     public DComplexMatrix2D reshape(int rows, int cols) {
-        throw new IllegalAccessError("reshape is not supported.");
+        if (rows * cols != size) {
+            throw new IllegalArgumentException("rows*cols != size");
+        }
+        DComplexMatrix2D M = new SparseDComplexMatrix2D(rows, cols);
+        int idx = 0;
+        for (int c = 0; c < cols; c++) {
+            for (int r = 0; r < rows; r++) {
+                double[] elem = getQuick(idx++);
+                if ((elem[0] != 0) || (elem[1] != 0)) {
+                    M.setQuick(r, c, elem);
+                }
+            }
+        }
+        return M;
     }
 
     public DComplexMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalAccessError("reshape is not supported.");
+        if (slices * rows * cols != size) {
+            throw new IllegalArgumentException("slices*rows*cols != size");
+        }
+        DComplexMatrix3D M = new SparseDComplexMatrix3D(slices, rows, cols);
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < cols; c++) {
+                for (int r = 0; r < rows; r++) {
+                    double[] elem = getQuick(idx++);
+                    if ((elem[0] != 0) || (elem[1] != 0)) {
+                        M.setQuick(s, r, c, elem);
+                    }
+                }
+            }
+        }
+        return M;
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -232,8 +256,7 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes

@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import cern.colt.matrix.Norm;
 import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfcomplex.impl.DenseFComplexMatrix1D;
@@ -19,6 +20,12 @@ import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
+import cern.colt.matrix.tfloat.algo.decomposition.FloatCholeskyDecomposition;
+import cern.colt.matrix.tfloat.algo.decomposition.FloatEigenvalueDecomposition;
+import cern.colt.matrix.tfloat.algo.decomposition.FloatLUDecomposition;
+import cern.colt.matrix.tfloat.algo.decomposition.FloatQRDecomposition;
+import cern.colt.matrix.tfloat.algo.decomposition.FloatSingularValueDecomposition;
+import cern.colt.matrix.tfloat.algo.decomposition.FloatSingularValueDecompositionDC;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix3D;
@@ -45,8 +52,8 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * tolerance. Allows ommiting to construct an Algebra object time and again.
      * 
      * Note that this Algebra object is immutable. Any attempt to assign a new
-     * Property object to it (via method <tt>setProperty</tt>), or to alter
-     * the tolerance of its property object (via
+     * Property object to it (via method <tt>setProperty</tt>), or to alter the
+     * tolerance of its property object (via
      * <tt>property().setTolerance(...)</tt>) will throw an exception.
      */
     public static final FloatAlgebra DEFAULT;
@@ -56,8 +63,8 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * tolerance. Allows ommiting to construct an Algebra object time and again.
      * 
      * Note that this Algebra object is immutable. Any attempt to assign a new
-     * Property object to it (via method <tt>setProperty</tt>), or to alter
-     * the tolerance of its property object (via
+     * Property object to it (via method <tt>setProperty</tt>), or to alter the
+     * tolerance of its property object (via
      * <tt>property().setTolerance(...)</tt>) will throw an exception.
      */
     public static final FloatAlgebra ZERO;
@@ -113,8 +120,8 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the condition of matrix <tt>A</tt>, which is the ratio of
-     * largest to smallest singular value.
+     * Returns the condition of matrix <tt>A</tt>, which is the ratio of largest
+     * to smallest singular value.
      */
     public float cond(FloatMatrix2D A) {
         return svd(A).cond();
@@ -139,14 +146,14 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     /**
      * Returns sqrt(a^2 + b^2) without under/overflow.
      */
-    protected static float hypot(float a, float b) {
+    public static float hypot(float a, float b) {
         float r;
         if (Math.abs(a) > Math.abs(b)) {
             r = b / a;
-            r = (float) (Math.abs(a) * Math.sqrt(1 + r * r));
+            r = (float)(Math.abs(a) * Math.sqrt(1 + r * r));
         } else if (b != 0) {
             r = a / b;
-            r = (float) (Math.abs(b) * Math.sqrt(1 + r * r));
+            r = (float)(Math.abs(b) * Math.sqrt(1 + r * r));
         } else {
             r = 0.0f;
         }
@@ -156,7 +163,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     /**
      * Returns sqrt(a^2 + b^2) without under/overflow.
      */
-    protected static cern.colt.function.tfloat.FloatFloatFunction hypotFunction() {
+    public static cern.colt.function.tfloat.FloatFloatFunction hypotFunction() {
         return new cern.colt.function.tfloat.FloatFloatFunction() {
             public final float apply(float a, float b) {
                 return hypot(a, b);
@@ -173,7 +180,12 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     public FloatMatrix2D inverse(FloatMatrix2D A) {
         if (property.isSquare(A) && property.isDiagonal(A)) {
             FloatMatrix2D inv = A.copy();
-            boolean isNonSingular = FloatDiagonal.inverse(inv);
+            boolean isNonSingular = true;
+            for (int i = inv.rows(); --i >= 0;) {
+                float v = inv.getQuick(i, i);
+                isNonSingular &= (v != 0);
+                inv.setQuick(i, i, 1 / v);
+            }
             if (!isNonSingular)
                 throw new IllegalArgumentException("A is singular.");
             return inv;
@@ -188,6 +200,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
         return new FloatLUDecomposition(matrix);
     }
 
+    /**
+     * Computes the Kronecker product of two complex matrices.
+     * 
+     * @param x
+     * @param y
+     * @return the Kronecker product of two complex matrices
+     */
     public FComplexMatrix1D kron(FComplexMatrix1D x, FComplexMatrix1D y) {
         int size_x = x.size();
         int size_y = y.size();
@@ -199,6 +218,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
         return C;
     }
 
+    /**
+     * Computes the Kronecker product of two arrays.
+     * 
+     * @param A
+     * @param B
+     * @return the Kronecker product of two arrays
+     */
     public FloatMatrix1D kron(float[] A, float[] B) {
         int size_a = A.length;
         int size_b = B.length;
@@ -210,6 +236,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
         return C;
     }
 
+    /**
+     * Computes the Kronecker product of two real matrices.
+     * 
+     * @param x
+     * @param y
+     * @return the Kronecker product of two real matrices
+     */
     public FloatMatrix1D kron(FloatMatrix1D x, FloatMatrix1D y) {
         int size_x = x.size();
         int size_y = y.size();
@@ -317,8 +350,8 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the one-norm of matrix <tt>A</tt>, which is the maximum
-     * absolute column sum.
+     * Returns the one-norm of matrix <tt>A</tt>, which is the maximum absolute
+     * column sum.
      */
     public float norm1(FloatMatrix2D A) {
         float max = 0;
@@ -333,7 +366,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * equivalent to <tt>Sqrt(mult(x,x))</tt>.
      */
     public float norm2(FloatMatrix1D x) {
-        return (float) Math.sqrt(x.zDotProduct(x));
+        return (float)Math.sqrt(x.zDotProduct(x));
     }
 
     /**
@@ -345,9 +378,9 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
             final int rows = X.rows();
             final int cols = X.columns();
             float sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (rows * cols >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Float result;
                 int k = rows / np;
                 for (int j = 0; j < np; j++) {
@@ -358,7 +391,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stoprow = startrow + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Float>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
                         public Float call() throws Exception {
                             float sum = 0;
                             float elem;
@@ -391,13 +424,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     }
                 }
             }
-            return (float) Math.sqrt(sum);
+            return (float)Math.sqrt(sum);
         } else {
             final float[] elems = (float[]) ((DenseFloatMatrix2D) X).elements();
             float sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (elems.length >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Float result;
                 int k = elems.length / np;
                 for (int j = 0; j < np; j++) {
@@ -408,7 +441,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stopidx = startidx + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Float>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
                         public Float call() throws Exception {
                             float sum = 0;
                             for (int l = startidx; l < stopidx; l++) {
@@ -433,7 +466,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     sum += (elems[l] * elems[l]);
                 }
             }
-            return (float) Math.sqrt(sum);
+            return (float)Math.sqrt(sum);
 
         }
     }
@@ -448,9 +481,9 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
             final int rows = X.rows();
             final int cols = X.columns();
             float sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (rows * cols >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Float result;
                 int k = slices / np;
                 for (int j = 0; j < np; j++) {
@@ -461,7 +494,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stopslice = startslice + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Float>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
                         public Float call() throws Exception {
                             float sum = 0;
                             float elem;
@@ -498,13 +531,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     }
                 }
             }
-            return (float) Math.sqrt(sum);
+            return (float)Math.sqrt(sum);
         } else {
             final float[] elems = (float[]) ((DenseFloatMatrix3D) X).elements();
             float sum = 0;
-            int np = ConcurrencyUtils.getNumberOfProcessors();
+            int np = ConcurrencyUtils.getNumberOfThreads();
             if ((np > 1) && (elems.length >= edu.emory.mathcs.utils.ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 Float result;
                 int k = elems.length / np;
                 for (int j = 0; j < np; j++) {
@@ -515,7 +548,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     } else {
                         stopidx = startidx + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Float>() {
+                    futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
                         public Float call() throws Exception {
                             float sum = 0;
                             for (int l = startidx; l < stopidx; l++) {
@@ -540,14 +573,46 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     sum += (elems[l] * elems[l]);
                 }
             }
-            return (float) Math.sqrt(sum);
+            return (float)Math.sqrt(sum);
 
         }
     }
 
+    public float norm(FloatMatrix2D A, Norm type) {
+        switch (type) {
+        case Frobenius:
+            return DEFAULT.normF(A);
+        case Infinity:
+            return DEFAULT.normInfinity(A);
+        case One:
+            return DEFAULT.norm1(A);
+        case Two:
+            return DEFAULT.norm2(A);
+        default:
+            return 0;
+        }
+
+    }
+
+    public float norm(FloatMatrix1D x, Norm type) {
+        switch (type) {
+        case Frobenius:
+            return DEFAULT.normF(x);
+        case Infinity:
+            return DEFAULT.normInfinity(x);
+        case One:
+            return DEFAULT.norm1(x);
+        case Two:
+            return DEFAULT.norm2(x);
+        default:
+            return 0;
+        }
+
+    }
+
     /**
-     * Returns the two-norm of matrix <tt>A</tt>, which is the maximum
-     * singular value; obtained from SVD.
+     * Returns the two-norm of matrix <tt>A</tt>, which is the maximum singular
+     * value; obtained from SVD.
      */
     public float norm2(FloatMatrix2D A) {
         return svd(A).norm2();
@@ -558,6 +623,16 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * <tt>Sqrt(Sum(A[i,j]<sup>2</sup>))</tt>.
      */
     public float normF(FloatMatrix2D A) {
+        if (A.size() == 0)
+            return 0;
+        return A.aggregate(hypotFunction(), cern.jet.math.tfloat.FloatFunctions.identity);
+    }
+
+    /**
+     * Returns the Frobenius norm of matrix <tt>A</tt>, which is
+     * <tt>Sqrt(Sum(A[i]<sup>2</sup>))</tt>.
+     */
+    public float normF(FloatMatrix1D A) {
         if (A.size() == 0)
             return 0;
         return A.aggregate(hypotFunction(), cern.jet.math.tfloat.FloatFunctions.identity);
@@ -580,7 +655,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                 norm += tmp * tmp;
             }
         }
-        return (float) Math.sqrt(norm);
+        return (float)Math.sqrt(norm);
     }
 
     /**
@@ -623,27 +698,28 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * <b>Example:</b>
      * 
      * <pre>
-     * 	 Reordering
-     * 	 [A,B,C,D,E] with indexes [0,4,2,3,1] yields 
-     * 	 [A,E,C,D,B]
-     * 	 In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[2], A[3]&lt;--A[3], A[4]&lt;--A[1].
+     *   Reordering
+     *   [A,B,C,D,E] with indexes [0,4,2,3,1] yields 
+     *   [A,E,C,D,B]
+     *   In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[2], A[3]&lt;--A[3], A[4]&lt;--A[1].
      * 
-     * 	 Reordering
-     * 	 [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
-     * 	 [A,E,B,C,D]
-     * 	 In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[1], A[3]&lt;--A[2], A[4]&lt;--A[3].
-     * 	
+     *   Reordering
+     *   [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
+     *   [A,E,B,C,D]
+     *   In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[1], A[3]&lt;--A[2], A[4]&lt;--A[3].
+     * 
      * </pre>
      * 
      * @param A
      *            the vector to permute.
      * @param indexes
      *            the permutation indexes, must satisfy
-     *            <tt>indexes.length==A.size() && indexes[i] >= 0 && indexes[i] < A.size()</tt>;
+     *            <tt>indexes.length==A.size() && indexes[i] >= 0 && indexes[i] < A.size()</tt>
+     *            ;
      * @param work
      *            the working storage, must satisfy
-     *            <tt>work.length >= A.size()</tt>; set <tt>work==null</tt>
-     *            if you don't care about performance.
+     *            <tt>work.length >= A.size()</tt>; set <tt>work==null</tt> if
+     *            you don't care about performance.
      * @return the modified <tt>A</tt> (for convenience only).
      * @throws IndexOutOfBoundsException
      *             if <tt>indexes.length != A.size()</tt>.
@@ -671,8 +747,8 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs and returns a new row and column permuted <i>selection view</i>
-     * of matrix <tt>A</tt>; equivalent to
+     * Constructs and returns a new row and column permuted <i>selection
+     * view</i> of matrix <tt>A</tt>; equivalent to
      * {@link FloatMatrix2D#viewSelection(int[],int[])}. The returned matrix is
      * backed by this matrix, so changes in the returned matrix are reflected in
      * this matrix, and vice-versa. Use idioms like
@@ -686,20 +762,21 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Modifies the given matrix <tt>A</tt> such that it's columns are
-     * permuted as specified; Useful for pivoting. Column <tt>A[i]</tt> will
-     * go into column <tt>A[indexes[i]]</tt>. Equivalent to
+     * Modifies the given matrix <tt>A</tt> such that it's columns are permuted
+     * as specified; Useful for pivoting. Column <tt>A[i]</tt> will go into
+     * column <tt>A[indexes[i]]</tt>. Equivalent to
      * <tt>permuteRows(transpose(A), indexes, work)</tt>.
      * 
      * @param A
      *            the matrix to permute.
      * @param indexes
      *            the permutation indexes, must satisfy
-     *            <tt>indexes.length==A.columns() && indexes[i] >= 0 && indexes[i] < A.columns()</tt>;
+     *            <tt>indexes.length==A.columns() && indexes[i] >= 0 && indexes[i] < A.columns()</tt>
+     *            ;
      * @param work
      *            the working storage, must satisfy
-     *            <tt>work.length >= A.columns()</tt>; set
-     *            <tt>work==null</tt> if you don't care about performance.
+     *            <tt>work.length >= A.columns()</tt>; set <tt>work==null</tt>
+     *            if you don't care about performance.
      * @return the modified <tt>A</tt> (for convenience only).
      * @throws IndexOutOfBoundsException
      *             if <tt>indexes.length != A.columns()</tt>.
@@ -709,34 +786,35 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Modifies the given matrix <tt>A</tt> such that it's rows are permuted
-     * as specified; Useful for pivoting. Row <tt>A[i]</tt> will go into row
+     * Modifies the given matrix <tt>A</tt> such that it's rows are permuted as
+     * specified; Useful for pivoting. Row <tt>A[i]</tt> will go into row
      * <tt>A[indexes[i]]</tt>.
      * <p>
      * <b>Example:</b>
      * 
      * <pre>
-     * 	 Reordering
-     * 	 [A,B,C,D,E] with indexes [0,4,2,3,1] yields 
-     * 	 [A,E,C,D,B]
-     * 	 In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[2], A[3]&lt;--A[3], A[4]&lt;--A[1].
+     *   Reordering
+     *   [A,B,C,D,E] with indexes [0,4,2,3,1] yields 
+     *   [A,E,C,D,B]
+     *   In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[2], A[3]&lt;--A[3], A[4]&lt;--A[1].
      * 
-     * 	 Reordering
-     * 	 [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
-     * 	 [A,E,B,C,D]
-     * 	 In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[1], A[3]&lt;--A[2], A[4]&lt;--A[3].
-     * 	
+     *   Reordering
+     *   [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
+     *   [A,E,B,C,D]
+     *   In other words A[0]&lt;--A[0], A[1]&lt;--A[4], A[2]&lt;--A[1], A[3]&lt;--A[2], A[4]&lt;--A[3].
+     * 
      * </pre>
      * 
      * @param A
      *            the matrix to permute.
      * @param indexes
      *            the permutation indexes, must satisfy
-     *            <tt>indexes.length==A.rows() && indexes[i] >= 0 && indexes[i] < A.rows()</tt>;
+     *            <tt>indexes.length==A.rows() && indexes[i] >= 0 && indexes[i] < A.rows()</tt>
+     *            ;
      * @param work
      *            the working storage, must satisfy
-     *            <tt>work.length >= A.rows()</tt>; set <tt>work==null</tt>
-     *            if you don't care about performance.
+     *            <tt>work.length >= A.rows()</tt>; set <tt>work==null</tt> if
+     *            you don't care about performance.
      * @return the modified <tt>A</tt> (for convenience only).
      * @throws IndexOutOfBoundsException
      *             if <tt>indexes.length != A.rows()</tt>.
@@ -876,8 +954,8 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the effective numerical rank of matrix <tt>A</tt>, obtained
-     * from Singular Value Decomposition.
+     * Returns the effective numerical rank of matrix <tt>A</tt>, obtained from
+     * Singular Value Decomposition.
      */
     public int rank(FloatMatrix2D A) {
         return svd(A).rank();
@@ -889,8 +967,8 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * @param property
      *            the Property object to be attached.
      * @throws UnsupportedOperationException
-     *             if <tt>this==DEFAULT && property!=this.property()</tt> -
-     *             The DEFAULT Algebra object is immutable.
+     *             if <tt>this==DEFAULT && property!=this.property()</tt> - The
+     *             DEFAULT Algebra object is immutable.
      * @throws UnsupportedOperationException
      *             if <tt>this==ZERO && property!=this.property()</tt> - The
      *             ZERO Algebra object is immutable.
@@ -910,10 +988,6 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
         x.setQuick(rows - 1, b.getQuick(rows - 1) / U.getQuick(rows - 1, rows - 1));
         float sum;
         for (int r = rows - 2; r >= 0; r--) {
-            // sum = 0;
-            // for (int c = r; c < rows; c++) {
-            // sum += U.getQuick(r, c) * x.getQuick(c);
-            // }
             sum = U.viewRow(r).zDotProduct(x);
             x.setQuick(r, (b.getQuick(r) - sum) / U.getQuick(r, r));
         }
@@ -926,13 +1000,22 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
         float sum;
         x.setQuick(0, b.getQuick(0) / L.getQuick(0, 0));
         for (int r = 1; r < rows; r++) {
-            sum = 0;
-            for (int c = 0; c < r; c++) {
-                sum += L.getQuick(r, c) * b.getQuick(c);
-            }
+            sum = L.viewRow(r).zDotProduct(x);
             x.setQuick(r, (b.getQuick(r) - sum) / L.getQuick(r, r));
         }
         return x;
+    }
+
+    /**
+     * Solves A*x = b. A has to be square.
+     * 
+     * @return x; a solution
+     */
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b) {
+        if (A.rows() != A.columns()) {
+            throw new IllegalArgumentException("This method only applies to square matrices");
+        }
+        return lu(A).solve(b);
     }
 
     /**
@@ -957,8 +1040,9 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Copies the columns of the indicated rows into a new sub matrix.
-     * <tt>sub[0..rowIndexes.length-1,0..columnTo-columnFrom] = A[rowIndexes(:),columnFrom..columnTo]</tt>;
-     * The returned matrix is <i>not backed</i> by this matrix, so changes in
+     * 
+     * <tt>sub[0..rowIndexes.length-1,0..columnTo-columnFrom] = A[rowIndexes(:),columnFrom..columnTo]</tt>
+     * ; The returned matrix is <i>not backed</i> by this matrix, so changes in
      * the returned matrix are <i>not reflected</i> in this matrix, and
      * vice-versa.
      * 
@@ -971,10 +1055,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * @param columnTo
      *            the index of the last column to copy (inclusive).
      * @return a new sub matrix; with
-     *         <tt>sub.rows()==rowIndexes.length; sub.columns()==columnTo-columnFrom+1</tt>.
+     *         <tt>sub.rows()==rowIndexes.length; sub.columns()==columnTo-columnFrom+1</tt>
+     *         .
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>columnFrom<0 || columnTo-columnFrom+1<0 || columnTo+1>matrix.columns() || for any row=rowIndexes[i]: row < 0 || row >= matrix.rows()</tt>.
+     * 
+     *             <tt>columnFrom<0 || columnTo-columnFrom+1<0 || columnTo+1>matrix.columns() || for any row=rowIndexes[i]: row < 0 || row >= matrix.rows()</tt>
+     *             .
      */
     public FloatMatrix2D subMatrix(FloatMatrix2D A, int[] rowIndexes, int columnFrom, int columnTo) {
         int width = columnTo - columnFrom + 1;
@@ -993,8 +1080,9 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Copies the rows of the indicated columns into a new sub matrix.
-     * <tt>sub[0..rowTo-rowFrom,0..columnIndexes.length-1] = A[rowFrom..rowTo,columnIndexes(:)]</tt>;
-     * The returned matrix is <i>not backed</i> by this matrix, so changes in
+     * 
+     * <tt>sub[0..rowTo-rowFrom,0..columnIndexes.length-1] = A[rowFrom..rowTo,columnIndexes(:)]</tt>
+     * ; The returned matrix is <i>not backed</i> by this matrix, so changes in
      * the returned matrix are <i>not reflected</i> in this matrix, and
      * vice-versa.
      * 
@@ -1007,10 +1095,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * @param columnIndexes
      *            the indexes of the columns to copy. May be unsorted.
      * @return a new sub matrix; with
-     *         <tt>sub.rows()==rowTo-rowFrom+1; sub.columns()==columnIndexes.length</tt>.
+     *         <tt>sub.rows()==rowTo-rowFrom+1; sub.columns()==columnIndexes.length</tt>
+     *         .
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>rowFrom<0 || rowTo-rowFrom+1<0 || rowTo+1>matrix.rows() || for any col=columnIndexes[i]: col < 0 || col >= matrix.columns()</tt>.
+     * 
+     *             <tt>rowFrom<0 || rowTo-rowFrom+1<0 || rowTo+1>matrix.rows() || for any col=columnIndexes[i]: col < 0 || col >= matrix.columns()</tt>
+     *             .
      */
     public FloatMatrix2D subMatrix(FloatMatrix2D A, int rowFrom, int rowTo, int[] columnIndexes) {
         if (rowTo - rowFrom >= A.rows())
@@ -1050,6 +1141,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * @return a new sub-range view.
      * @throws IndexOutOfBoundsException
      *             if
+     * 
      *             <tt>fromColumn<0 || toColumn-fromColumn+1<0 || toColumn>=A.columns() || fromRow<0 || toRow-fromRow+1<0 || toRow>=A.rows()</tt>
      */
     public FloatMatrix2D subMatrix(FloatMatrix2D A, int fromRow, int toRow, int fromColumn, int toColumn) {
@@ -1077,15 +1169,15 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * debugging or to quickly get the rough picture. For example,
      * 
      * <pre>
-     * 	 cond          : 14.073264490042144
-     * 	 det           : Illegal operation or error: Matrix must be square.
-     * 	 norm1         : 0.9620244354009628
-     * 	 norm2         : 3.0
-     * 	 normF         : 1.304841791648992
-     * 	 normInfinity  : 1.5406551198102534
-     * 	 rank          : 3
-     * 	 trace         : 0
-     * 	
+     *   cond          : 14.073264490042144
+     *   det           : Illegal operation or error: Matrix must be square.
+     *   norm1         : 0.9620244354009628
+     *   norm2         : 3.0
+     *   normF         : 1.304841791648992
+     *   normInfinity  : 1.5406551198102534
+     *   rank          : 3
+     *   trace         : 0
+     * 
      * </pre>
      */
     public String toString(FloatMatrix2D matrix) {
@@ -1192,151 +1284,151 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns the results of <tt>toString(A)</tt> and additionally the
-     * results of all sorts of decompositions applied to the given matrix.
-     * Useful for debugging or to quickly get the rough picture. For example,
+     * Returns the results of <tt>toString(A)</tt> and additionally the results
+     * of all sorts of decompositions applied to the given matrix. Useful for
+     * debugging or to quickly get the rough picture. For example,
      * 
      * <pre>
-     * 	 A = 3 x 3 matrix
-     * 	 249  66  68
-     * 	 104 214 108
-     * 	 144 146 293
+     *   A = 3 x 3 matrix
+     *   249  66  68
+     *   104 214 108
+     *   144 146 293
      * 
-     * 	 cond         : 3.931600417472078
-     * 	 det          : 9638870.0
-     * 	 norm1        : 497.0
-     * 	 norm2        : 473.34508217011404
-     * 	 normF        : 516.873292016525
-     * 	 normInfinity : 583.0
-     * 	 rank         : 3
-     * 	 trace        : 756.0
+     *   cond         : 3.931600417472078
+     *   det          : 9638870.0
+     *   norm1        : 497.0
+     *   norm2        : 473.34508217011404
+     *   normF        : 516.873292016525
+     *   normInfinity : 583.0
+     *   rank         : 3
+     *   trace        : 756.0
      * 
-     * 	 density                      : 1.0
-     * 	 isDiagonal                   : false
-     * 	 isDiagonallyDominantByColumn : true
-     * 	 isDiagonallyDominantByRow    : true
-     * 	 isIdentity                   : false
-     * 	 isLowerBidiagonal            : false
-     * 	 isLowerTriangular            : false
-     * 	 isNonNegative                : true
-     * 	 isOrthogonal                 : false
-     * 	 isPositive                   : true
-     * 	 isSingular                   : false
-     * 	 isSkewSymmetric              : false
-     * 	 isSquare                     : true
-     * 	 isStrictlyLowerTriangular    : false
-     * 	 isStrictlyTriangular         : false
-     * 	 isStrictlyUpperTriangular    : false
-     * 	 isSymmetric                  : false
-     * 	 isTriangular                 : false
-     * 	 isTridiagonal                : false
-     * 	 isUnitTriangular             : false
-     * 	 isUpperBidiagonal            : false
-     * 	 isUpperTriangular            : false
-     * 	 isZero                       : false
-     * 	 lowerBandwidth               : 2
-     * 	 semiBandwidth                : 3
-     * 	 upperBandwidth               : 2
+     *   density                      : 1.0
+     *   isDiagonal                   : false
+     *   isDiagonallyDominantByColumn : true
+     *   isDiagonallyDominantByRow    : true
+     *   isIdentity                   : false
+     *   isLowerBidiagonal            : false
+     *   isLowerTriangular            : false
+     *   isNonNegative                : true
+     *   isOrthogonal                 : false
+     *   isPositive                   : true
+     *   isSingular                   : false
+     *   isSkewSymmetric              : false
+     *   isSquare                     : true
+     *   isStrictlyLowerTriangular    : false
+     *   isStrictlyTriangular         : false
+     *   isStrictlyUpperTriangular    : false
+     *   isSymmetric                  : false
+     *   isTriangular                 : false
+     *   isTridiagonal                : false
+     *   isUnitTriangular             : false
+     *   isUpperBidiagonal            : false
+     *   isUpperTriangular            : false
+     *   isZero                       : false
+     *   lowerBandwidth               : 2
+     *   semiBandwidth                : 3
+     *   upperBandwidth               : 2
      * 
-     * 	 -----------------------------------------------------------------------------
-     * 	 LUDecompositionQuick(A) --&gt; isNonSingular(A), det(A), pivot, L, U, inverse(A)
-     * 	 -----------------------------------------------------------------------------
-     * 	 isNonSingular = true
-     * 	 det = 9638870.0
-     * 	 pivot = [0, 1, 2]
+     *   -----------------------------------------------------------------------------
+     *   LUDecompositionQuick(A) --&gt; isNonSingular(A), det(A), pivot, L, U, inverse(A)
+     *   -----------------------------------------------------------------------------
+     *   isNonSingular = true
+     *   det = 9638870.0
+     *   pivot = [0, 1, 2]
      * 
-     * 	 L = 3 x 3 matrix
-     * 	 1        0       0
-     * 	 0.417671 1       0
-     * 	 0.578313 0.57839 1
+     *   L = 3 x 3 matrix
+     *   1        0       0
+     *   0.417671 1       0
+     *   0.578313 0.57839 1
      * 
-     * 	 U = 3 x 3 matrix
-     * 	 249  66         68       
-     * 	 0 186.433735  79.598394
-     * 	 0   0        207.635819
+     *   U = 3 x 3 matrix
+     *   249  66         68       
+     *   0 186.433735  79.598394
+     *   0   0        207.635819
      * 
-     * 	 inverse(A) = 3 x 3 matrix
-     * 	 0.004869 -0.000976 -0.00077 
-     * 	 -0.001548  0.006553 -0.002056
-     * 	 -0.001622 -0.002786  0.004816
+     *   inverse(A) = 3 x 3 matrix
+     *   0.004869 -0.000976 -0.00077 
+     *   -0.001548  0.006553 -0.002056
+     *   -0.001622 -0.002786  0.004816
      * 
-     * 	 -----------------------------------------------------------------
-     * 	 QRDecomposition(A) --&gt; hasFullRank(A), H, Q, R, pseudo inverse(A)
-     * 	 -----------------------------------------------------------------
-     * 	 hasFullRank = true
+     *   -----------------------------------------------------------------
+     *   QRDecomposition(A) --&gt; hasFullRank(A), H, Q, R, pseudo inverse(A)
+     *   -----------------------------------------------------------------
+     *   hasFullRank = true
      * 
-     * 	 H = 3 x 3 matrix
-     * 	 1.814086 0        0
-     * 	 0.34002  1.903675 0
-     * 	 0.470797 0.428218 2
+     *   H = 3 x 3 matrix
+     *   1.814086 0        0
+     *   0.34002  1.903675 0
+     *   0.470797 0.428218 2
      * 
-     * 	 Q = 3 x 3 matrix
-     * 	 -0.814086  0.508871  0.279845
-     * 	 -0.34002  -0.808296  0.48067 
-     * 	 -0.470797 -0.296154 -0.831049
+     *   Q = 3 x 3 matrix
+     *   -0.814086  0.508871  0.279845
+     *   -0.34002  -0.808296  0.48067 
+     *   -0.470797 -0.296154 -0.831049
      * 
-     * 	 R = 3 x 3 matrix
-     * 	 -305.864349 -195.230337 -230.023539
-     * 	 0        -182.628353  467.703164
-     * 	 0           0        -309.13388 
+     *   R = 3 x 3 matrix
+     *   -305.864349 -195.230337 -230.023539
+     *   0        -182.628353  467.703164
+     *   0           0        -309.13388 
      * 
-     * 	 pseudo inverse(A) = 3 x 3 matrix
-     * 	 0.006601  0.001998 -0.005912
-     * 	 -0.005105  0.000444  0.008506
-     * 	 -0.000905 -0.001555  0.002688
+     *   pseudo inverse(A) = 3 x 3 matrix
+     *   0.006601  0.001998 -0.005912
+     *   -0.005105  0.000444  0.008506
+     *   -0.000905 -0.001555  0.002688
      * 
-     * 	 --------------------------------------------------------------------------
-     * 	 CholeskyDecomposition(A) --&gt; isSymmetricPositiveDefinite(A), L, inverse(A)
-     * 	 --------------------------------------------------------------------------
-     * 	 isSymmetricPositiveDefinite = false
+     *   --------------------------------------------------------------------------
+     *   CholeskyDecomposition(A) --&gt; isSymmetricPositiveDefinite(A), L, inverse(A)
+     *   --------------------------------------------------------------------------
+     *   isSymmetricPositiveDefinite = false
      * 
-     * 	 L = 3 x 3 matrix
-     * 	 15.779734  0         0       
-     * 	 6.590732 13.059948  0       
-     * 	 9.125629  6.573948 12.903724
+     *   L = 3 x 3 matrix
+     *   15.779734  0         0       
+     *   6.590732 13.059948  0       
+     *   9.125629  6.573948 12.903724
      * 
-     * 	 inverse(A) = Illegal operation or error: Matrix is not symmetric positive definite.
+     *   inverse(A) = Illegal operation or error: Matrix is not symmetric positive definite.
      * 
-     * 	 ---------------------------------------------------------------------
-     * 	 EigenvalueDecomposition(A) --&gt; D, V, realEigenvalues, imagEigenvalues
-     * 	 ---------------------------------------------------------------------
-     * 	 realEigenvalues = 1 x 3 matrix
-     * 	 462.796507 172.382058 120.821435
-     * 	 imagEigenvalues = 1 x 3 matrix
-     * 	 0 0 0
+     *   ---------------------------------------------------------------------
+     *   EigenvalueDecomposition(A) --&gt; D, V, realEigenvalues, imagEigenvalues
+     *   ---------------------------------------------------------------------
+     *   realEigenvalues = 1 x 3 matrix
+     *   462.796507 172.382058 120.821435
+     *   imagEigenvalues = 1 x 3 matrix
+     *   0 0 0
      * 
-     * 	 D = 3 x 3 matrix
-     * 	 462.796507   0          0       
-     * 	 0        172.382058   0       
-     * 	 0          0        120.821435
+     *   D = 3 x 3 matrix
+     *   462.796507   0          0       
+     *   0        172.382058   0       
+     *   0          0        120.821435
      * 
-     * 	 V = 3 x 3 matrix
-     * 	 -0.398877 -0.778282  0.094294
-     * 	 -0.500327  0.217793 -0.806319
-     * 	 -0.768485  0.66553   0.604862
+     *   V = 3 x 3 matrix
+     *   -0.398877 -0.778282  0.094294
+     *   -0.500327  0.217793 -0.806319
+     *   -0.768485  0.66553   0.604862
      * 
-     * 	 ---------------------------------------------------------------------
-     * 	 SingularValueDecomposition(A) --&gt; cond(A), rank(A), norm2(A), U, S, V
-     * 	 ---------------------------------------------------------------------
-     * 	 cond = 3.931600417472078
-     * 	 rank = 3
-     * 	 norm2 = 473.34508217011404
+     *   ---------------------------------------------------------------------
+     *   SingularValueDecomposition(A) --&gt; cond(A), rank(A), norm2(A), U, S, V
+     *   ---------------------------------------------------------------------
+     *   cond = 3.931600417472078
+     *   rank = 3
+     *   norm2 = 473.34508217011404
      * 
-     * 	 U = 3 x 3 matrix
-     * 	 0.46657  -0.877519  0.110777
-     * 	 0.50486   0.161382 -0.847982
-     * 	 0.726243  0.45157   0.51832 
+     *   U = 3 x 3 matrix
+     *   0.46657  -0.877519  0.110777
+     *   0.50486   0.161382 -0.847982
+     *   0.726243  0.45157   0.51832 
      * 
-     * 	 S = 3 x 3 matrix
-     * 	 473.345082   0          0       
-     * 	 0        169.137441   0       
-     * 	 0          0        120.395013
+     *   S = 3 x 3 matrix
+     *   473.345082   0          0       
+     *   0        169.137441   0       
+     *   0          0        120.395013
      * 
-     * 	 V = 3 x 3 matrix
-     * 	 0.577296 -0.808174  0.116546
-     * 	 0.517308  0.251562 -0.817991
-     * 	 0.631761  0.532513  0.563301
-     * 	
+     *   V = 3 x 3 matrix
+     *   0.577296 -0.808174  0.116546
+     *   0.517308  0.251562 -0.817991
+     *   0.631761  0.532513  0.563301
+     * 
      * </pre>
      */
     public String toVerboseString(FloatMatrix2D matrix) {
@@ -1422,19 +1514,19 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
 
     /**
      * Constructs and returns a new view which is the transposition of the given
-     * matrix <tt>A</tt>. Equivalent to
-     * {@link FloatMatrix2D#viewDice A.viewDice()}. This is a zero-copy
-     * transposition, taking O(1), i.e. constant time. The returned view is
-     * backed by this matrix, so changes in the returned view are reflected in
-     * this matrix, and vice-versa. Use idioms like
-     * <tt>result = transpose(A).copy()</tt> to generate an independent
-     * matrix.
+     * matrix <tt>A</tt>. Equivalent to {@link FloatMatrix2D#viewDice
+     * A.viewDice()}. This is a zero-copy transposition, taking O(1), i.e.
+     * constant time. The returned view is backed by this matrix, so changes in
+     * the returned view are reflected in this matrix, and vice-versa. Use
+     * idioms like <tt>result = transpose(A).copy()</tt> to generate an
+     * independent matrix.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>transpose ==></td>
      * <td valign="top">3 x 2 matrix:<br>
      * 1, 4 <br>
@@ -1443,7 +1535,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * <td>transpose ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 

@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdouble.impl;
 
-import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
@@ -138,10 +137,17 @@ public class WrapperDoubleMatrix1D extends DoubleMatrix1D {
     public DoubleMatrix1D viewFlip() {
         DoubleMatrix1D view = new WrapperDoubleMatrix1D(this) {
             public double getQuick(int index) {
-                return content.get(size - 1 - index);
+                return content.getQuick(size - 1 - index);
             }
 
             public void setQuick(int index, double value) {
+                content.setQuick(size - 1 - index, value);
+            }
+            public double get(int index) {
+                return content.get(size - 1 - index);
+            }
+
+            public void set(int index, double value) {
                 content.set(size - 1 - index, value);
             }
         };
@@ -180,10 +186,17 @@ public class WrapperDoubleMatrix1D extends DoubleMatrix1D {
         checkRange(index, width);
         DoubleMatrix1D view = new WrapperDoubleMatrix1D(this) {
             public double getQuick(int i) {
-                return content.get(index + i);
+                return content.getQuick(index + i);
             }
 
             public void setQuick(int i, double value) {
+                content.setQuick(index + i, value);
+            }
+            public double get(int i) {
+                return content.get(index + i);
+            }
+
+            public void set(int i, double value) {
                 content.set(index + i, value);
             }
         };
@@ -235,10 +248,17 @@ public class WrapperDoubleMatrix1D extends DoubleMatrix1D {
 
         DoubleMatrix1D view = new WrapperDoubleMatrix1D(this) {
             public double getQuick(int i) {
-                return content.get(idx[i]);
+                return content.getQuick(idx[i]);
             }
 
             public void setQuick(int i, double value) {
+                content.setQuick(idx[i], value);
+            }
+            public double get(int i) {
+                return content.get(idx[i]);
+            }
+
+            public void set(int i, double value) {
                 content.set(idx[i], value);
             }
         };
@@ -275,10 +295,17 @@ public class WrapperDoubleMatrix1D extends DoubleMatrix1D {
             throw new IndexOutOfBoundsException("illegal stride: " + stride);
         DoubleMatrix1D view = new WrapperDoubleMatrix1D(this) {
             public double getQuick(int index) {
-                return content.get(index * _stride);
+                return content.getQuick(index * _stride);
             }
 
             public void setQuick(int index, double value) {
+                content.setQuick(index * _stride, value);
+            }
+            public double get(int index) {
+                return content.get(index * _stride);
+            }
+
+            public void set(int index, double value) {
                 content.set(index * _stride, value);
             }
         };
@@ -286,45 +313,5 @@ public class WrapperDoubleMatrix1D extends DoubleMatrix1D {
         if (size != 0)
             view.setSize((size - 1) / _stride + 1);
         return view;
-    }
-
-    public DComplexMatrix1D getFft() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix1D getIfft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idht(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void fft() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
     }
 }

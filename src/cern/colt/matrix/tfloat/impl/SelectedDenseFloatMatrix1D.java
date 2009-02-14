@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,15 +8,14 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfloat.impl;
 
-import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
 
 /**
- * Selection view on dense 1-d matrices holding <tt>float</tt> elements.
- * First see the <a href="package-summary.html">package summary</a> and javadoc
- * <a href="package-tree.html">tree view</a> to get the broad picture.
+ * Selection view on dense 1-d matrices holding <tt>float</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
@@ -106,33 +105,8 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
         this.isNoView = false;
     }
 
-    public void dct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dht() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     public float[] elements() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void fft() {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public FComplexMatrix1D getFft() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix1D getIfft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
+        return elements;
     }
 
     /**
@@ -155,22 +129,6 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
         return elements[offset + offsets[zero + index * stride]];
     }
 
-    public void idct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idht(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the position of the element with the given relative rank within
      * the (virtual or non-virtual) internal 1-dimensional array. You may want
@@ -179,7 +137,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
         return offset + offsets[zero + rank * stride];
@@ -191,8 +149,8 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * is an instance of type <tt>DenseFloatMatrix1D</tt> the new matrix must
      * also be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
      * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * be of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -206,9 +164,9 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver
-     * is an instance of type <tt>SparseFloatMatrix1D</tt> the new matrix
-     * must be of type <tt>SparseFloatMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is
+     * an instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be
+     * of type <tt>SparseFloatMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -221,16 +179,52 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
     }
 
     public FloatMatrix2D reshape(int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (rows * cols != size) {
+            throw new IllegalArgumentException("rows*cols != size");
+        }
+        FloatMatrix2D M = new DenseFloatMatrix2D(rows, cols);
+        final float[] elemsOther = (float[]) M.elements();
+        final int zeroOther = (int)M.index(0, 0);
+        final int rowStrideOther = M.rowStride();
+        final int colStrideOther = M.columnStride();
+        int idxOther;
+        int idx = 0;
+        for (int c = 0; c < cols; c++) {
+            idxOther = zeroOther + c * colStrideOther;
+            for (int r = 0; r < rows; r++) {
+                elemsOther[idxOther] = getQuick(idx++);
+                idxOther += rowStrideOther;
+            }
+        }
+        return M;
     }
 
     public FloatMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (slices * rows * cols != size) {
+            throw new IllegalArgumentException("slices*rows*cols != size");
+        }
+        FloatMatrix3D M = new DenseFloatMatrix3D(slices, rows, cols);
+        final float[] elemsOther = (float[]) M.elements();
+        final int zeroOther = (int)M.index(0, 0, 0);
+        final int sliceStrideOther = M.sliceStride();
+        final int rowStrideOther = M.rowStride();
+        final int colStrideOther = M.columnStride();
+        int idxOther;
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < cols; c++) {
+                idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
+                for (int r = 0; r < rows; r++) {
+                    elemsOther[idxOther] = getQuick(idx++);
+                    idxOther += rowStrideOther;
+                }
+            }
+        }
+        return M;
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -264,8 +258,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
         if (other instanceof SelectedDenseFloatMatrix1D) {

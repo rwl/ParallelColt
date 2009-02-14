@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -1740,8 +1740,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(byte[] a, int fromIndex, int toIndex, ByteComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1770,8 +1770,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(char[] a, int fromIndex, int toIndex, CharComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1800,8 +1800,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(double[] a, int fromIndex, int toIndex, DoubleComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1830,8 +1830,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(float[] a, int fromIndex, int toIndex, FloatComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1860,8 +1860,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1890,8 +1890,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(long[] a, int fromIndex, int toIndex, LongComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1904,8 +1904,8 @@ public class Sorting extends Object {
      *            the array to be sorted.
      */
     public static void parallelQuickSort(Object[] a) {
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, 0, a.length, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, 0, a.length, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, 0, a.length);
         }
@@ -1929,8 +1929,8 @@ public class Sorting extends Object {
      * @see Comparator
      */
     public static void parallelQuickSort(Object[] a, Comparator c) {
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, 0, a.length, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, 0, a.length, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, 0, a.length, c);
         }
@@ -1953,8 +1953,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(Object[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex);
         }
@@ -1983,8 +1983,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(Object[] a, int fromIndex, int toIndex, Comparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -2013,8 +2013,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(short[] a, int fromIndex, int toIndex, ShortComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfProcessors()));
+        if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }

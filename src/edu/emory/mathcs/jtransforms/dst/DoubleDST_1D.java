@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -34,7 +34,6 @@
 
 package edu.emory.mathcs.jtransforms.dst;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import edu.emory.mathcs.jtransforms.dct.DoubleDCT_1D;
@@ -91,64 +90,28 @@ public class DoubleDST_1D {
         if (n == 1)
             return;
         double tmp;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            final int k = n / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = offa + j * k + 1;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = offa + n;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                    public void run() {
-                        for (int i = loc_offa; i < loc_stopa; i += 2) {
-                            a[i] = -a[i];
-                        }
-
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            int startidx = 1 + offa;
-            int stopidx = offa + n;
-            for (int i = startidx; i < stopidx; i += 2) {
-                a[i] = -a[i];
-            }
+        int nd2 = n / 2;
+        int startIdx = 1 + offa;
+        int stopIdx = offa + n;
+        for (int i = startIdx; i < stopIdx; i += 2) {
+            a[i] = -a[i];
         }
         dct.forward(a, offa, scale);
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            final int k = n / 2 / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = j * k;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = n / 2;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (nd2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            final int k = nd2 / nthreads;
+            Future<?>[] futures = new Future[nthreads];
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == (nthreads - 1)) ? nd2 : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double tmp;
                         int idx0 = offa + n - 1;
                         int idx1;
                         int idx2;
-                        for (int i = loc_offa; i < loc_stopa; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             idx2 = offa + i;
                             tmp = a[idx2];
                             idx1 = idx0 - i;
@@ -158,20 +121,12 @@ public class DoubleDST_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx0 = offa + n - 1;
             int idx1;
             int idx2;
-            for (int i = 0; i < n / 2; i++) {
+            for (int i = 0; i < nd2; i++) {
                 idx2 = offa + i;
                 tmp = a[idx2];
                 idx1 = idx0 - i;
@@ -207,25 +162,21 @@ public class DoubleDST_1D {
         if (n == 1)
             return;
         double tmp;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            final int k = n / 2 / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = j * k;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = n / 2;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+        int nd2 = n / 2;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (nd2 > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            final int k = nd2 / nthreads;
+            Future<?>[] futures = new Future[nthreads];
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == (nthreads - 1)) ? nd2 : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double tmp;
                         int idx0 = offa + n - 1;
                         int idx1, idx2;
-                        for (int i = loc_offa; i < loc_stopa; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             idx2 = offa + i;
                             tmp = a[idx2];
                             idx1 = idx0 - i;
@@ -235,59 +186,20 @@ public class DoubleDST_1D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx0 = offa + n - 1;
-            for (int i = 0; i < n / 2; i++) {
+            for (int i = 0; i < nd2; i++) {
                 tmp = a[offa + i];
                 a[offa + i] = a[idx0 - i];
                 a[idx0 - i] = tmp;
             }
         }
         dct.inverse(a, offa, scale);
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            final int k = n / np;
-            Future[] futures = new Future[np];
-            for (int j = 0; j < np; j++) {
-                final int loc_offa = offa + j * k + 1;
-                final int loc_stopa;
-                if (j == np - 1) {
-                    loc_stopa = offa + n;
-                } else {
-                    loc_stopa = loc_offa + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                    public void run() {
-                        for (int i = loc_offa; i < loc_stopa; i += 2) {
-                            a[i] = -a[i];
-                        }
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            int startidx = 1 + offa;
-            int stopidx = offa + n;
-            for (int i = startidx; i < stopidx; i += 2) {
-                a[i] = -a[i];
-            }
+        int startidx = 1 + offa;
+        int stopidx = offa + n;
+        for (int i = startidx; i < stopidx; i += 2) {
+            a[i] = -a[i];
         }
     }
 }

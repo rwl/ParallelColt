@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,18 +8,16 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfloat.impl;
 
-import cern.colt.map.tfloat.AbstractIntFloatMap;
-import cern.colt.map.tfloat.OpenIntFloatHashMap;
-import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
+import cern.colt.map.tfloat.AbstractLongFloatMap;
+import cern.colt.map.tfloat.OpenLongFloatHashMap;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
 
 /**
- * Sparse hashed 1-d matrix (aka <i>vector</i>) holding <tt>float</tt>
- * elements. First see the <a href="package-summary.html">package summary</a>
- * and javadoc <a href="package-tree.html">tree view</a> to get the broad
- * picture.
+ * Sparse hashed 1-d matrix (aka <i>vector</i>) holding <tt>float</tt> elements.
+ * First see the <a href="package-summary.html">package summary</a> and javadoc
+ * <a href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
@@ -38,10 +36,8 @@ import cern.colt.matrix.tfloat.FloatMatrix3D;
  * manually be reclaimed by calling {@link #trimToSize()}.
  * </ul>
  * <p>
- * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>.
- * <br>
- * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>.
- * <br>
+ * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>. <br>
+ * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>. <br>
  * Where <tt>nonZeros = cardinality()</tt> is the number of non-zero cells.
  * Thus, a 1000000 matrix with minLoadFactor=0.25 and maxLoadFactor=0.5 and
  * 1000000 non-zero cells consumes between 25 MB and 50 MB. The same 1000000
@@ -51,11 +47,11 @@ import cern.colt.matrix.tfloat.FloatMatrix3D;
  * <p>
  * This class offers <i>expected</i> time complexity <tt>O(1)</tt> (i.e.
  * constant time) for the basic operations <tt>get</tt>, <tt>getQuick</tt>,
- * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash
- * function disperses the elements properly among the buckets. Otherwise,
- * pathological cases, although highly improbable, can occur, degrading
- * performance to <tt>O(N)</tt> in the worst case. As such this sparse class
- * is expected to have no worse time complexity than its dense counterpart
+ * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash function
+ * disperses the elements properly among the buckets. Otherwise, pathological
+ * cases, although highly improbable, can occur, degrading performance to
+ * <tt>O(N)</tt> in the worst case. As such this sparse class is expected to
+ * have no worse time complexity than its dense counterpart
  * {@link DenseFloatMatrix1D}. However, constant factors are considerably
  * larger.
  * 
@@ -69,12 +65,12 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntFloatMap elements;
+    protected AbstractLongFloatMap elements;
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
-     * copied. So subsequent changes in <tt>values</tt> are not reflected in
-     * the matrix, and vice-versa.
+     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+     * matrix, and vice-versa.
      * 
      * @param values
      *            The values to be filled into the new matrix.
@@ -113,13 +109,15 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      *            the maximum load factor of the hash map.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
     public SparseFloatMatrix1D(int size, int initialCapacity, float minLoadFactor, float maxLoadFactor) {
         setUp(size);
-        this.elements = new OpenIntFloatHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
+        this.elements = new OpenLongFloatHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
     }
 
     /**
@@ -137,7 +135,7 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    protected SparseFloatMatrix1D(int size, AbstractIntFloatMap elements, int offset, int stride) {
+    protected SparseFloatMatrix1D(int size, AbstractLongFloatMap elements, int offset, int stride) {
         setUp(size, offset, stride);
         this.elements = elements;
         this.isNoView = false;
@@ -169,24 +167,12 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
             return super.cardinality();
     }
 
-    public void dct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dht() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the elements of this matrix.
      * 
      * @return the elements
      */
-    public AbstractIntFloatMap elements() {
+    public AbstractLongFloatMap elements() {
         return elements;
     }
 
@@ -206,19 +192,6 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      */
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
-    }
-
-    public void fft() {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public FComplexMatrix1D getFft() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix1D getIfft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
     }
 
     /**
@@ -241,22 +214,6 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
         return elements.get(zero + index * stride);
     }
 
-    public void idct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idht(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the position of the element with the given relative rank within
      * the (virtual or non-virtual) internal 1-dimensional array. You may want
@@ -265,7 +222,7 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         // overriden for manual inlining only
         // return _offset(_rank(rank));
         return zero + rank * stride;
@@ -276,9 +233,9 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      * as the receiver, having the specified size. For example, if the receiver
      * is an instance of type <tt>DenseFloatMatrix1D</tt> the new matrix must
      * also be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also be
+     * of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -292,9 +249,9 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver
-     * is an instance of type <tt>SparseFloatMatrix1D</tt> the new matrix
-     * must be of type <tt>SparseFloatMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -307,16 +264,43 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
     }
 
     public FloatMatrix2D reshape(int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (rows * cols != size) {
+            throw new IllegalArgumentException("rows*cols != size");
+        }
+        FloatMatrix2D M = new SparseFloatMatrix2D(rows, cols);
+        int idx = 0;
+        for (int c = 0; c < cols; c++) {
+            for (int r = 0; r < rows; r++) {
+                float elem = getQuick(idx++);
+                if (elem != 0) {
+                    M.setQuick(r, c, elem);
+                }
+            }
+        }
+        return M;
     }
 
     public FloatMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (slices * rows * cols != size) {
+            throw new IllegalArgumentException("slices*rows*cols != size");
+        }
+        FloatMatrix3D M = new SparseFloatMatrix3D(slices, rows, cols);
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < cols; c++) {
+                for (int r = 0; r < rows; r++) {
+                    float elem = getQuick(idx++);
+                    if (elem != 0) {
+                        M.setQuick(s, r, c, elem);
+                    }
+                }
+            }
+        }
+        return M;
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -329,7 +313,7 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    public void setQuick(int index, float value) {
+    public synchronized void setQuick(int index, float value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
         // manually inlined:
@@ -357,8 +341,8 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
      * A sequence like <tt>set(i,5); set(i,0);</tt> sets a cell to non-zero
      * state and later back to zero state. Such as sequence generates obsolete
      * memory that is automatically reclaimed from time to time or can manually
-     * be reclaimed by calling <tt>trimToSize()</tt>. Putting zeros into
-     * cells already containing zeros does not generate obsolete memory since no
+     * be reclaimed by calling <tt>trimToSize()</tt>. Putting zeros into cells
+     * already containing zeros does not generate obsolete memory since no
      * memory was allocated to them in the first place.
      */
     public void trimToSize() {
@@ -366,8 +350,7 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
         if (other instanceof SelectedSparseFloatMatrix1D) {

@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -408,7 +408,7 @@ public class BenchmarkMatrix {
 
 			public void apply(cern.colt.Timer timer) {
 				DoubleBlas smpBlas = new SmpDoubleBlas();
-				smpBlas.assign(A, B, cern.jet.math.tdouble.DoubleFunctions.plusMult(0.5));
+				smpBlas.assign(A, B, cern.jet.math.tdouble.DoubleFunctions.plusMultSecond(0.5));
 			}
 
 			public double operations() { // Mflops
@@ -525,7 +525,7 @@ public class BenchmarkMatrix {
 	 */
 	protected static Double2DProcedure funLUDecompose() {
 		return new Double2DProcedure() {
-			cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick lu = new cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick(0);
+			cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick lu = new cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick(0);
 
 			public String toString() {
 				return "LU.decompose(A) [Mflops/sec]";
@@ -551,7 +551,7 @@ public class BenchmarkMatrix {
 	 */
 	protected static Double2DProcedure funLUSolve() {
 		return new Double2DProcedure() {
-			cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick lu;
+			cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick lu;
 
 			public String toString() {
 				return "LU.solve(A) [Mflops/sec]";
@@ -563,7 +563,7 @@ public class BenchmarkMatrix {
 					cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.generateNonSingular(A);
 				}
 				super.setParameters(A, B);
-				lu = new cern.colt.matrix.tdouble.algo.DoubleLUDecompositionQuick(0);
+				lu = new cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick(0);
 				lu.decompose(A);
 			}
 

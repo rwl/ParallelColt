@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -22,18 +22,18 @@ import cern.colt.function.tdouble.DoubleProcedure;
  * Function objects conveniently allow to express arbitrary functions in a
  * generic manner. Essentially, a function object is an object that can perform
  * a function on some arguments. It has a minimal interface: a method
- * <tt>apply</tt> that takes the arguments, computes something and returns
- * some result value. Function objects are comparable to function pointers in C
- * used for call-backs.
+ * <tt>apply</tt> that takes the arguments, computes something and returns some
+ * result value. Function objects are comparable to function pointers in C used
+ * for call-backs.
  * <p>
- * Unary functions are of type {@link cern.colt.function.tdouble.DoubleFunction},
- * binary functions of type {@link cern.colt.function.tdouble.DoubleDoubleFunction}.
- * All can be retrieved via <tt>public 
- static final</tt> variables named after
- * the function. Unary predicates are of type
- * {@link cern.colt.function.tdouble.DoubleProcedure}, binary predicates of type
- * {@link cern.colt.function.tdouble.DoubleDoubleProcedure}. All can be retrieved via
- * <tt>public 
+ * Unary functions are of type {@link cern.colt.function.tdouble.DoubleFunction}
+ * , binary functions of type
+ * {@link cern.colt.function.tdouble.DoubleDoubleFunction}. All can be retrieved
+ * via <tt>public 
+ static final</tt> variables named after the function. Unary predicates are of
+ * type {@link cern.colt.function.tdouble.DoubleProcedure}, binary predicates of
+ * type {@link cern.colt.function.tdouble.DoubleDoubleProcedure}. All can be
+ * retrieved via <tt>public 
  static final</tt> variables named <tt>isXXX</tt>.
  * 
  * <p>
@@ -49,8 +49,8 @@ import cern.colt.function.tdouble.DoubleProcedure;
  * More general, any binary function can be made an unary functions by fixing
  * either the first or the second argument. See methods
  * {@link #bindArg1(DoubleDoubleFunction,double)} and
- * {@link #bindArg2(DoubleDoubleFunction,double)}. The order of arguments can
- * be swapped so that the first argument becomes the second and vice-versa. See
+ * {@link #bindArg2(DoubleDoubleFunction,double)}. The order of arguments can be
+ * swapped so that the first argument becomes the second and vice-versa. See
  * method {@link #swapArgs(DoubleDoubleFunction)}. Example:
  * <ul>
  * <li><tt>Functions.pow</tt> gives the function <tt>a<sup>b</sup></tt>.
@@ -96,7 +96,8 @@ import cern.colt.function.tdouble.DoubleProcedure;
  * </pre>
  * 
  * <p>
- * For aliasing see {@link #functions}. Try this <table>
+ * For aliasing see {@link #functions}. Try this
+ * <table>
  * <td class="PRE">
  * 
  * <pre>
@@ -127,13 +128,14 @@ import cern.colt.function.tdouble.DoubleProcedure;
  * objects in a loop over traditional code in a loop. For complex nested
  * function objects (e.g.
  * <tt>F.chain(F.abs,F.chain(F.plus,F.sin,F.chain(F.square,F.cos)))</tt>) the
- * penalty is zero, for trivial functions (e.g. <tt>F.plus</tt>) the penalty
- * is often acceptable. <center> <table border cellpadding="3" cellspacing="0"
- * align="center">
+ * penalty is zero, for trivial functions (e.g. <tt>F.plus</tt>) the penalty is
+ * often acceptable. <center>
+ * <table border cellpadding="3" cellspacing="0" * align="center">
  * <tr valign="middle" bgcolor="#33CC66" nowrap align="center">
- * <td nowrap colspan="7"> <font size="+2">Iteration Performance [million
+ * <td nowrap colspan="7"><font size="+2">Iteration Performance [million
  * function evaluations per second]</font><br>
- * <font size="-1">Pentium Pro 200 Mhz, SunJDK 1.2.2, NT, java -classic, </font></td>
+ * <font size="-1">Pentium Pro 200 Mhz, SunJDK 1.2.2, NT, java -classic, </font>
+ * </td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td nowrap bgcolor="#FF9966" rowspan="2">&nbsp;</td>
@@ -142,7 +144,7 @@ import cern.colt.function.tdouble.DoubleProcedure;
  * 30000000 iterations
  * </p>
  * </td>
- * <td bgcolor="#FF9966" colspan="2"> 3000000 iterations (10 times less)</td>
+ * <td bgcolor="#FF9966" colspan="2">3000000 iterations (10 times less)</td>
  * <td bgcolor="#FF9966" colspan="2">&nbsp;</td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
@@ -164,7 +166,8 @@ import cern.colt.function.tdouble.DoubleProcedure;
  * <td nowrap>&nbsp;</td>
  * <td nowrap>&nbsp;</td>
  * </tr>
- * </table></center>
+ * </table>
+ * </center>
  * 
  * 
  * @author wolfgang.hoschek@cern.ch
@@ -614,7 +617,7 @@ public class DoubleFunctions extends Object {
     /**
      * Function that returns <tt>a - b</tt>.
      */
-    public static final DoubleDoubleFunction minus = plusMult(-1);
+    public static final DoubleDoubleFunction minus = plusMultSecond(-1);
 
     /*
      * new DoubleDoubleFunction() { public final double apply(double a, double
@@ -660,12 +663,12 @@ public class DoubleFunctions extends Object {
     /**
      * Function that returns <tt>a + b</tt>.
      */
-    public static final DoubleDoubleFunction plus = plusMult(1);
-
-    /*
-     * new DoubleDoubleFunction() { public final double apply(double a, double
-     * b) { return a + b; } };
-     */
+    public static final DoubleDoubleFunction plus = plusMultSecond(1);
+//        new DoubleDoubleFunction() {
+//            public final double apply(double a, double b) {
+//                return a + b;
+//            }
+//        };
 
     /**
      * Function that returns <tt>Math.abs(a) + Math.abs(b)</tt>.
@@ -706,8 +709,8 @@ public class DoubleFunctions extends Object {
 
     /**
      * Constructs a unary function from a binary function with the first operand
-     * (argument) fixed to the given constant <tt>c</tt>. The second operand
-     * is variable (free).
+     * (argument) fixed to the given constant <tt>c</tt>. The second operand is
+     * variable (free).
      * 
      * @param function
      *            a binary function taking operands in the form
@@ -932,8 +935,8 @@ public class DoubleFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>a == b ? 1 : 0</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a == b ? 1 : 0</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static DoubleFunction equals(final double b) {
         return new DoubleFunction() {
@@ -944,8 +947,8 @@ public class DoubleFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>a > b ? 1 : 0</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a > b ? 1 : 0</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static DoubleFunction greater(final double b) {
         return new DoubleFunction() {
@@ -968,8 +971,8 @@ public class DoubleFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>from<=a && a<=to</tt>.
-     * <tt>a</tt> is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
+     * Constructs a function that returns <tt>from<=a && a<=to</tt>. <tt>a</tt>
+     * is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
      */
     public static DoubleProcedure isBetween(final double from, final double to) {
         return new DoubleProcedure() {
@@ -1016,8 +1019,8 @@ public class DoubleFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>a < b ? 1 : 0</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a < b ? 1 : 0</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static DoubleFunction less(final double b) {
         return new DoubleFunction() {
@@ -1028,9 +1031,8 @@ public class DoubleFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns
-     * <tt><tt>Math.log(a) / Math.log(b)</tt></tt>. <tt>a</tt> is a
-     * variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt><tt>Math.log(a) / Math.log(b)</tt>
+     * </tt>. <tt>a</tt> is a variable, <tt>b</tt> is fixed.
      */
     public static DoubleFunction lg(final double b) {
         return new DoubleFunction() {
@@ -1052,8 +1054,8 @@ public class DoubleFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static DoubleFunction max(final double b) {
         return new DoubleFunction() {
@@ -1064,8 +1066,8 @@ public class DoubleFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>Math.min(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>Math.min(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static DoubleFunction min(final double b) {
         return new DoubleFunction() {
@@ -1088,7 +1090,7 @@ public class DoubleFunctions extends Object {
      * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
      */
     public static DoubleDoubleFunction minusMult(final double constant) {
-        return plusMult(-constant);
+        return plusMultSecond(-constant);
     }
 
     /**
@@ -1127,21 +1129,35 @@ public class DoubleFunctions extends Object {
         };
     }
 
+    public static DoubleDoubleFunction multSecond(final double constant) {
+
+        return new DoubleDoubleFunction() {
+            public final double apply(double a, double b) {
+                return b * constant;
+            }
+        };
+
+    }
+
     /**
      * Constructs a function that returns <tt>a + b*constant</tt>. <tt>a</tt>
      * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
      */
-    public static DoubleDoubleFunction plusMult(double constant) {
-        return new DoublePlusMult(constant);
-        /*
-         * return new DoubleDoubleFunction() { public final double apply(double
-         * a, double b) { return a + b*constant; } };
-         */
+    public static DoubleDoubleFunction plusMultSecond(final double constant) {
+        return new DoublePlusMultSecond(constant);
     }
 
     /**
-     * Constructs a function that returns <tt>Math.pow(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a * constant + b</tt>. <tt>a</tt>
+     * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
+     */
+    public static DoubleDoubleFunction plusMultFirst(final double constant) {
+        return new DoublePlusMultFirst(constant);
+    }
+
+    /**
+     * Constructs a function that returns <tt>Math.pow(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static DoubleFunction pow(final double b) {
         return new DoubleFunction() {
@@ -1155,16 +1171,16 @@ public class DoubleFunctions extends Object {
      * Constructs a function that returns a new uniform random number in the
      * open unit interval <code>(0.0,1.0)</code> (excluding 0.0 and 1.0).
      * Currently the engine is
-     * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} and is seeded with
-     * the current time.
+     * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} and is
+     * seeded with the current time.
      * <p>
      * Note that any random engine derived from
      * {@link cern.jet.random.tdouble.engine.DoubleRandomEngine} and any random
      * distribution derived from
-     * {@link cern.jet.random.tdouble.AbstractDoubleDistribution} are function objects,
-     * because they implement the proper interfaces. Thus, if you are not happy
-     * with the default, just pass your favourite random generator to function
-     * evaluating methods.
+     * {@link cern.jet.random.tdouble.AbstractDoubleDistribution} are function
+     * objects, because they implement the proper interfaces. Thus, if you are
+     * not happy with the default, just pass your favourite random generator to
+     * function evaluating methods.
      */
     public static DoubleFunction random() {
         return new RandomDoubleFunction();

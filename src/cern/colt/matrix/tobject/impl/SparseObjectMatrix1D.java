@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tobject.impl;
 
-import cern.colt.map.tfloat.AbstractIntFloatMap;
 import cern.colt.map.tobject.AbstractIntObjectMap;
 import cern.colt.map.tobject.OpenIntObjectHashMap;
 import cern.colt.matrix.tobject.ObjectMatrix1D;
@@ -220,7 +219,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         // overriden for manual inlining only
         // return _offset(_rank(rank));
         return zero + rank * stride;

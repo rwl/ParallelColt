@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -44,6 +44,8 @@ import edu.emory.mathcs.utils.IOUtils;
  */
 public class AccuracyCheckDoubleDST {
 
+    //    private static int[] sizes1D = { 10158, 16384, 32768, 65536, 131072 };
+
     private static int[] sizes1D = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 512, 1024, 1056, 2048, 8192, 10158, 16384, 32768, 65536, 131072 };
 
     private static int[] sizes2D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 511, 512, 1024 };
@@ -60,7 +62,7 @@ public class AccuracyCheckDoubleDST {
         System.out.println("Checking accuracy of 1D DST...");
         for (int i = 0; i < sizes1D.length; i++) {
             DoubleDST_1D dst = new DoubleDST_1D(sizes1D[i]);
-            double e, err = 0;
+            double err = 0;
             double[] a = new double[sizes1D[i]];
             IOUtils.fillMatrix_1D(sizes1D[i], a);
             double[] b = new double[sizes1D[i]];
@@ -84,7 +86,7 @@ public class AccuracyCheckDoubleDST {
         System.out.println("Checking accuracy of 2D DST (double[] input)...");
         for (int i = 0; i < sizes2D.length; i++) {
             DoubleDST_2D dst2 = new DoubleDST_2D(sizes2D[i], sizes2D[i]);
-            double e, err = 0;
+            double err = 0;
             double[] a = new double[sizes2D[i] * sizes2D[i]];
             IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
             double[] b = new double[sizes2D[i] * sizes2D[i]];
@@ -105,7 +107,7 @@ public class AccuracyCheckDoubleDST {
         System.out.println("Checking accuracy of 2D DST (double[][] input)...");
         for (int i = 0; i < sizes2D.length; i++) {
             DoubleDST_2D dst2 = new DoubleDST_2D(sizes2D[i], sizes2D[i]);
-            double e, err = 0;
+            double err = 0;
             double[][] a = new double[sizes2D[i]][sizes2D[i]];
             IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
             double[][] b = new double[sizes2D[i]][sizes2D[i]];
@@ -130,7 +132,7 @@ public class AccuracyCheckDoubleDST {
         System.out.println("Checking accuracy of 3D DST (double[] input)...");
         for (int i = 0; i < sizes3D.length; i++) {
             DoubleDST_3D dst3 = new DoubleDST_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
-            double e, err = 0;
+            double err = 0;
             double[] a = new double[sizes3D[i] * sizes3D[i] * sizes3D[i]];
             IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
             double[] b = new double[sizes3D[i] * sizes3D[i] * sizes3D[i]];
@@ -152,7 +154,7 @@ public class AccuracyCheckDoubleDST {
         System.out.println("Checking accuracy of 3D DST (double[][][] input)...");
         for (int i = 0; i < sizes3D.length; i++) {
             DoubleDST_3D dst3 = new DoubleDST_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
-            double e, err = 0;
+            double err = 0;
             double[][][] a = new double[sizes3D[i]][sizes3D[i]][sizes3D[i]];
             IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
             double[][][] b = new double[sizes3D[i]][sizes3D[i]][sizes3D[i]];
@@ -174,7 +176,7 @@ public class AccuracyCheckDoubleDST {
 
     private static double computeRMSE(double[] a, double[] b) {
         if (a.length != b.length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size.");
         }
         double rms = 0;
         double tmp;
@@ -187,7 +189,7 @@ public class AccuracyCheckDoubleDST {
 
     private static double computeRMSE(double[][] a, double[][] b) {
         if (a.length != b.length || a[0].length != b[0].length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size.");
         }
         double rms = 0;
         double tmp;
@@ -202,7 +204,7 @@ public class AccuracyCheckDoubleDST {
 
     private static double computeRMSE(double[][][] a, double[][][] b) {
         if (a.length != b.length || a[0].length != b[0].length || a[0][0].length != b[0][0].length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size.");
         }
         double rms = 0;
         double tmp;

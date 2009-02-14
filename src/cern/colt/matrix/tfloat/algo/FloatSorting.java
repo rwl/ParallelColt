@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -18,17 +18,17 @@ import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 
 /**
  * Matrix quicksorts and mergesorts. Use idioms like
- * <tt>Sorting.quickSort.sort(...)</tt> and
- * <tt>Sorting.mergeSort.sort(...)</tt>.
+ * <tt>Sorting.quickSort.sort(...)</tt> and <tt>Sorting.mergeSort.sort(...)</tt>
+ * .
  * <p>
  * This is another case demonstrating one primary goal of this library:
  * Delivering easy to use, yet very efficient APIs. The sorts return convenient
- * <i>sort views</i>. This enables the usage of algorithms which scale well
- * with the problem size: For example, sorting a 1000000 x 10000 or a 1000000 x
- * 100 x 100 matrix performs just as fast as sorting a 1000000 x 1 matrix. This
- * is so, because internally the algorithms only move around integer indexes,
- * they do not physically move around entire rows or slices. The original matrix
- * is left unaffected.
+ * <i>sort views</i>. This enables the usage of algorithms which scale well with
+ * the problem size: For example, sorting a 1000000 x 10000 or a 1000000 x 100 x
+ * 100 matrix performs just as fast as sorting a 1000000 x 1 matrix. This is so,
+ * because internally the algorithms only move around integer indexes, they do
+ * not physically move around entire rows or slices. The original matrix is left
+ * unaffected.
  * <p>
  * The quicksort is a derivative of the JDK 1.2 V1.26 algorithms (which are, in
  * turn, based on Bentley's and McIlroy's fine work). The mergesort is a
@@ -101,7 +101,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * the returned view are reflected in this matrix, and vice-versa. To sort
      * ranges use sub-ranging views. To sort descending, use flip views ...
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt> 7, 1, 3, 1<br>
      </tt></td>
@@ -126,31 +127,44 @@ public class FloatSorting extends cern.colt.PersistentObject {
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
 
-        final float[] velems = (float[]) vector.elements();
-        final int zero = vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                float av = velems[idxa];
-                float bv = velems[idxb];
-                if (av != av || bv != bv)
-                    return compareNaN(av, bv); // swap NaNs to the end
-                return av < bv ? -1 : (av == bv ? 0 : 1);
-            }
-        };
+        if (vector instanceof DenseFloatMatrix1D) {
+            final float[] velems = (float[]) vector.elements();
+            final int zero = (int)vector.index(0);
+            final int stride = vector.stride();
+            IntComparator comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    int idxa = zero + a * stride;
+                    int idxb = zero + b * stride;
+                    float av = velems[idxa];
+                    float bv = velems[idxb];
+                    if (av != av || bv != bv)
+                        return compareNaN(av, bv); // swap NaNs to the end
+                    return av < bv ? -1 : (av == bv ? 0 : 1);
+                }
+            };
+            runSort(indexes, 0, indexes.length, comp);
+            return vector.viewSelection(indexes);
+        } else {
+            IntComparator comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    float av = vector.getQuick(a);
+                    float bv = vector.getQuick(b);
+                    if (av != av || bv != bv)
+                        return compareNaN(av, bv); // swap NaNs to the end
+                    return av < bv ? -1 : (av == bv ? 0 : 1);
+                }
+            };
+            runSort(indexes, 0, indexes.length, comp);
+            return vector.viewSelection(indexes);
 
-        runSort(indexes, 0, indexes.length, comp);
-
-        return vector.viewSelection(indexes);
+        }
     }
 
     /**
-     * Sorts indices of the <code>vector</code> into ascending order.
+     * Sorts indexes of the <code>vector</code> into ascending order.
      * 
      * @param vector
-     * @return sorted indices
+     * @return sorted indexes
      */
     public int[] sortIndex(final FloatMatrix1D vector) {
         int[] indexes = new int[vector.size()]; // row indexes to reorder
@@ -159,7 +173,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final float[] velems = (float[]) vector.elements();
-        final int zero = vector.index(0);
+        final int zero = (int)vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -179,12 +193,12 @@ public class FloatSorting extends cern.colt.PersistentObject {
     }
 
     /**
-     * Multithreaded method that sorts indices of the <code>vector</code>
+     * Multithreaded method that sorts indexes of the <code>vector</code>
      * according to the comparator <code>comp</code>.
      * 
      * @param vector
      * @param comp
-     * @return sorted indices
+     * @return sorted indexes
      */
     public int[] sortIndex(final FloatMatrix1D vector, IntComparator comp) {
         int[] indexes = new int[vector.size()]; // row indexes to reorder
@@ -232,7 +246,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final float[] velems = (float[]) vector.elements();
-        final int zero = vector.index(0);
+        final int zero = (int)vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -247,12 +261,12 @@ public class FloatSorting extends cern.colt.PersistentObject {
     }
 
     /**
-     * Sorts indices of the <code>vector</code> according to the comparator
+     * Sorts indexes of the <code>vector</code> according to the comparator
      * <code>c</code>.
      * 
      * @param vector
      * @param c
-     * @return sorted indices
+     * @return sorted indexes
      */
     public int[] sortIndex(final FloatMatrix1D vector, final cern.colt.function.tfloat.FloatComparator c) {
         int[] indexes = new int[vector.size()]; // row indexes to reorder
@@ -261,7 +275,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final float[] velems = (float[]) vector.elements();
-        final int zero = vector.index(0);
+        final int zero = (int)vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -292,8 +306,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * sub-ranging views. To sort columns by rows, use dice views. To sort
      * descending, use flip views ...
      * <p>
-     * <b>Example:</b> Each aggregate is the sum of a row <table border="1"
-     * cellspacing="0">
+     * <b>Example:</b> Each aggregate is the sum of a row
+     * <table border="1" * cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>4 x 2 matrix: <br>
      1, 1<br>
@@ -411,7 +425,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * sort columns by rows, use dice views. To sort descending, use flip views
      * ...
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>4 x 2 matrix: <br>
      7, 6<br>
@@ -549,8 +564,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * sub-ranging views. To sort columns by rows, use dice views. To sort
      * descending, use flip views ...
      * <p>
-     * <b>Example:</b> Each aggregate is the sum of a row <table border="1"
-     * cellspacing="0">
+     * <b>Example:</b> Each aggregate is the sum of a row
+     * <table border="1" * cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>4 x 2 matrix: <br>
      1, 1<br>
@@ -652,7 +667,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
      *         that the original matrix is left unaffected.</b>
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>row < 0 || row >= matrix.rows() || column < 0 || column >= matrix.columns()</tt>.
+     *             <tt>row < 0 || row >= matrix.rows() || column < 0 || column >= matrix.columns()</tt>
+     *             .
      */
     public FloatMatrix3D sort(FloatMatrix3D matrix, int row, int column) {
         if (row < 0 || row >= matrix.rows())
@@ -785,8 +801,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
         FloatMatrix1D matrix = new DenseFloatMatrix1D(values);
         cern.colt.function.tfloat.FloatComparator comp = new cern.colt.function.tfloat.FloatComparator() {
             public int compare(float a, float b) {
-                float as = (float) Math.sin(a);
-                float bs = (float) Math.sin(b);
+                float as = (float)Math.sin(a);
+                float bs = (float)Math.sin(b);
                 return as < bs ? -1 : as == bs ? 0 : 1;
             }
         };
@@ -798,8 +814,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
         // check whether it is really sorted
         sorted.assign(cern.jet.math.tfloat.FloatFunctions.sin);
         /*
-         * sorted.assign( new cern.colt.function.FloatFunction() { public float
-         * apply(float arg) { return Math.sin(arg); } } );
+         * sorted.assign( new cern.colt.function.FloatFunction() { public
+         * float apply(float arg) { return Math.sin(arg); } } );
          */
         System.out.println("sined  :" + sorted);
     }
@@ -910,9 +926,10 @@ public class FloatSorting extends cern.colt.PersistentObject {
         FloatMatrix2D A = FloatFactory2D.dense.make(values);
         FloatMatrix2D B, C;
         /*
-         * FloatMatrix1DComparator comp = new FloatMatrix1DComparator() { public
-         * int compare(FloatMatrix1D a, FloatMatrix1D b) { float as = a.zSum();
-         * float bs = b.zSum(); return as < bs ? -1 : as == bs ? 0 : 1; } };
+         * FloatMatrix1DComparator comp = new FloatMatrix1DComparator() {
+         * public int compare(FloatMatrix1D a, FloatMatrix1D b) { float as =
+         * a.zSum(); float bs = b.zSum(); return as < bs ? -1 : as == bs ? 0 :
+         * 1; } };
          */
         System.out.println("\n\nunsorted:" + A);
         B = quickSort.sort(A, 1);
@@ -983,7 +1000,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
     }
 
     public static void main(String[] args) {
-        edu.emory.mathcs.utils.ConcurrencyUtils.setNumberOfProcessors(2);
+        edu.emory.mathcs.utils.ConcurrencyUtils.setNumberOfThreads(2);
         zdemo8(10000000);
         System.exit(0);
     }

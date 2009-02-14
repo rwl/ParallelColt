@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,10 +8,8 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tobject.impl;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -145,9 +143,9 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 		if (elements == null)
 			throw new InternalError();
 
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startidx = j * k;
@@ -157,7 +155,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 				} else {
 					stopidx = startidx + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						// the general case x[i] = f(x[i])
@@ -169,15 +167,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			// the general case x[i] = f(x[i])
 			int idx = zero;
@@ -227,11 +217,11 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 		final Object[] elemsOther = other.elements;
 		if (elements == null || elemsOther == null)
 			throw new InternalError();
-		final int zeroOther = other.index(0);
+		final int zeroOther = (int)other.index(0);
 		final int strideOther = other.stride;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startidx = j * k;
@@ -241,7 +231,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 				} else {
 					stopidx = startidx + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						int idx = zero + startidx * stride;
 						int idxOther = zeroOther + startidx * strideOther;
@@ -253,15 +243,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			int idx = zero;
 			int idxOther = zeroOther;
@@ -317,14 +299,14 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 		if (!(y instanceof DenseObjectMatrix1D)) {
 			return super.assign(y, function);
 		}
-		final int zeroOther = y.index(0);
+		final int zeroOther = (int)y.index(0);
 		final int strideOther = y.stride();
 		final Object[] elemsOther = (Object[]) y.elements();
 		if (elements == null || elemsOther == null)
 			throw new InternalError();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startidx = j * k;
@@ -334,7 +316,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 				} else {
 					stopidx = startidx + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						int idx;
 						int idxOther;
@@ -349,15 +331,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			// specialized for speed
 			int idx;
@@ -420,7 +394,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 	 * @param rank
 	 *            the rank of the element.
 	 */
-	public int index(int rank) {
+	public long index(int rank) {
 		// overriden for manual inlining only
 		// return _offset(_rank(rank));
 		return zero + rank * stride;
@@ -500,11 +474,11 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 		final Object[] elemsOther = (Object[])y.elements();
 		if (elements == null || elemsOther == null)
 			throw new InternalError();
-		final int zeroOther = other.index(0);
+		final int zeroOther = (int)other.index(0);
 		final int strideOther = other.stride();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startidx = j * k;
@@ -514,7 +488,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 				} else {
 					stopidx = startidx + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						int idx = zero + startidx * stride;
 						int idxOther = zeroOther + startidx * strideOther;
@@ -528,15 +502,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			int idx = zero;
 			int idxOther = zeroOther;

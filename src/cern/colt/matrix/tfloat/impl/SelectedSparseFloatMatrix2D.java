@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,9 +8,8 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfloat.impl;
 
-import cern.colt.map.tfloat.AbstractIntFloatMap;
+import cern.colt.map.tfloat.AbstractLongFloatMap;
 import cern.colt.matrix.AbstractMatrix2D;
-import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 
@@ -56,7 +55,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntFloatMap elements;
+    protected AbstractLongFloatMap elements;
 
     /**
      * The offsets of the visible cells of this matrix.
@@ -81,7 +80,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseFloatMatrix2D(AbstractIntFloatMap elements, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedSparseFloatMatrix2D(AbstractLongFloatMap elements, int[] rowOffsets, int[] columnOffsets, int offset) {
         this(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
     }
 
@@ -110,7 +109,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseFloatMatrix2D(int rows, int columns, AbstractIntFloatMap elements, int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedSparseFloatMatrix2D(int rows, int columns, AbstractLongFloatMap elements, int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -122,74 +121,10 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
         this.isNoView = false;
     }
 
-    public void dct2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dctColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dctRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht2() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dhtColumns() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dhtRows() {
-        throw new IllegalArgumentException("This method is not supported.");
+    public AbstractLongFloatMap elements() {
+        return elements;
     }
     
-    public void dst2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dstColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dstRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public AbstractIntFloatMap elements() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void fft2() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getFft2() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getFftColumns() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getFftRows() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getIfft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getIfftColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getIfftRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
      * 
@@ -214,46 +149,6 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
         return elements.get(offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
     }
 
-    public void idct2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idctColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idctRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idht2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idhtColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idhtRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idst2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idstColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idstRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the position of the given coordinate within the (virtual or
      * non-virtual) internal 1-dimensional array.
@@ -263,7 +158,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    public int index(int row, int column) {
+    public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
         return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];

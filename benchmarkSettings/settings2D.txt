@@ -1,9 +1,0 @@
-ORDER of Variables: NTHREADS (e.g. 1, 2, 4); ROWS (int); COLS (int); NITERS (int)
-1, 2
-4096
-4096
-10
-
-
-
-

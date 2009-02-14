@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -198,30 +198,6 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
             return super.cardinality();
     }
 
-    public void fft2() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fftRows() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifftRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fftColumns() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifftColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
     /**
      * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
      * 
@@ -239,7 +215,13 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
      * @return the value at the specified coordinate.
      */
     public float[] getQuick(int row, int column) {
-        return this.elements.get(rowZero + row * rowStride + columnZero + column * columnStride);
+        float[] elem = this.elements.get(rowZero + row * rowStride + columnZero + column * columnStride);
+        if(elem != null) {
+            return new float[] {elem[0], elem[1]};
+        }
+        else {
+            return new float[2];
+        }
     }
 
     /**
@@ -281,7 +263,7 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    public int index(int row, int column) {
+    public long index(int row, int column) {
         return rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
@@ -380,7 +362,10 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
         int idx = 0;
         for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
-                v.setQuick(idx++, getQuick(c, r));
+                float[] elem = getQuick(r, c);
+                if((elem[0] != 0) || (elem[1] != 0)) {
+                    v.setQuick(idx++, elem);
+                }
             }
         }
         return v;

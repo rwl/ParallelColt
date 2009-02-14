@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdouble.algo;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
@@ -45,11 +44,11 @@ public class SmpDoubleBlas implements DoubleBlas {
     }
 
     public void daxpy(double alpha, DoubleMatrix1D x, DoubleMatrix1D y) {
-        y.assign(x, DoubleFunctions.plusMult(alpha));
+        y.assign(x, DoubleFunctions.plusMultSecond(alpha));
     }
 
     public void daxpy(double alpha, DoubleMatrix2D A, DoubleMatrix2D B) {
-        B.assign(A, DoubleFunctions.plusMult(alpha));
+        B.assign(A, DoubleFunctions.plusMultSecond(alpha));
     }
 
     public void dcopy(DoubleMatrix1D x, DoubleMatrix1D y) {
@@ -73,7 +72,7 @@ public class SmpDoubleBlas implements DoubleBlas {
     }
 
     public void dger(double alpha, DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix2D A) {
-        cern.jet.math.tdouble.DoublePlusMult fun = cern.jet.math.tdouble.DoublePlusMult.plusMult(0);
+        cern.jet.math.tdouble.DoublePlusMultSecond fun = cern.jet.math.tdouble.DoublePlusMultSecond.plusMult(0);
         int rows = A.rows();
         for (int i = 0; i < rows; i++) {
             fun.multiplicator = alpha * x.getQuick(i);
@@ -90,7 +89,7 @@ public class SmpDoubleBlas implements DoubleBlas {
         DoubleMatrix1D tmp = x.copy();
 
         x.assign(DoubleFunctions.mult(c));
-        x.assign(y, DoubleFunctions.plusMult(s));
+        x.assign(y, DoubleFunctions.plusMultSecond(s));
 
         y.assign(DoubleFunctions.mult(c));
         y.assign(tmp, DoubleFunctions.minusMult(s));
@@ -170,9 +169,9 @@ public class SmpDoubleBlas implements DoubleBlas {
             throw new IllegalArgumentException(A_loc.toStringShort() + ", " + x.toStringShort() + ", " + y.toStringShort());
         }
         final DoubleMatrix1D tmp = x.like();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startsize = j * k;
@@ -182,7 +181,7 @@ public class SmpDoubleBlas implements DoubleBlas {
                 } else {
                     stopsize = startsize + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int i = startsize; i < stopsize; i++) {
@@ -198,15 +197,7 @@ public class SmpDoubleBlas implements DoubleBlas {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int i = 0; i < size; i++) {
                 double sum = 0;
@@ -248,9 +239,9 @@ public class SmpDoubleBlas implements DoubleBlas {
                 y.setQuick(i, A_loc.getQuick(i, i));
             }
         }
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startsize = j * k;
@@ -260,7 +251,7 @@ public class SmpDoubleBlas implements DoubleBlas {
                 } else {
                     stopsize = startsize + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int i = startsize; i < stopsize; i++) {
@@ -281,15 +272,7 @@ public class SmpDoubleBlas implements DoubleBlas {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int i = 0; i < size; i++) {
                 double sum = 0;

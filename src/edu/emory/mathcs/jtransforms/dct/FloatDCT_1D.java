@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -34,15 +34,14 @@
 
 package edu.emory.mathcs.jtransforms.dct;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
- * Computes 1D Discrete Cosine Transform (DCT) of single precision data. The
- * size of data can be arbitrary number. This is a parallel implementation of
+ * Computes 1D Discrete Cosine Transform (DCT) of single precision data. The size
+ * of data can be an arbitrary number. This is a parallel implementation of
  * split-radix and mixed-radix algorithms optimized for SMP systems. <br>
  * <br>
  * This code is derived from General Purpose FFT Package written by Takuya Ooura
@@ -67,9 +66,7 @@ public class FloatDCT_1D {
 
     private FloatFFT_1D fft;
 
-    private static final float pi = 3.14159265358979311599796346854418516f;
-
-    private static final float two_pi = 6.28318530717958623199592693708837032f;
+    private static final double PI = 3.14159265358979311599796346854418516;
 
     /**
      * Creates new instance of FloatDCT_1D.
@@ -150,57 +147,21 @@ public class FloatDCT_1D {
             final int twon = 2 * n;
             final float[] t = new float[twon];
             System.arraycopy(a, offa, t, 0, n);
-            int np = ConcurrencyUtils.getNumberOfProcessors();
-            if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-                np = 2;
-                final int k = n / np;
-                Future[] futures = new Future[np];
-                for (int j = 0; j < np; j++) {
-                    final int startIdx = n + j * k;
-                    final int stopIdx;
-                    if (j == np - 1) {
-                        stopIdx = twon;
-                    } else {
-                        stopIdx = startIdx + k;
-                    }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                        public void run() {
-                            for (int i = startIdx; i < stopIdx; i++) {
-                                t[i] = t[twon - i - 1];
-                            }
-                        }
-                    });
-                }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                for (int i = n; i < twon; i++) {
-                    t[i] = t[twon - i - 1];
-                }
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            for (int i = n; i < twon; i++) {
+                t[i] = t[twon - i - 1];
             }
             fft.realForward(t);
-            if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-                np = 2;
-                final int k = n / np;
-                Future[] futures = new Future[np];
-                for (int j = 0; j < np; j++) {
-                    final int startIdx = j * k;
-                    final int stopIdx;
-                    if (j == np - 1) {
-                        stopIdx = n;
-                    } else {
-                        stopIdx = startIdx + k;
-                    }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                nthreads = 2;
+                final int k = n / nthreads;
+                Future<?>[] futures = new Future[nthreads];
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == (nthreads - 1)) ? n : firstIdx + k;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int i = startIdx; i < stopIdx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int twoi = 2 * i;
                                 int idx = offa + i;
                                 a[idx] = w[twoi] * t[twoi] - w[twoi + 1] * t[twoi + 1];
@@ -209,15 +170,7 @@ public class FloatDCT_1D {
                         }
                     });
                 }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
             } else {
                 for (int i = 0; i < n; i++) {
                     int twoi = 2 * i;
@@ -226,7 +179,7 @@ public class FloatDCT_1D {
                 }
             }
             if (scale) {
-                scale((float) (1 / Math.sqrt(twon)), a, offa);
+                scale((float) (1.0 / Math.sqrt(twon)), a, offa);
                 a[offa] = (float) (a[offa] / Math.sqrt(2.0));
             }
         }
@@ -285,22 +238,17 @@ public class FloatDCT_1D {
                 a[offa] = (float) (a[offa] * Math.sqrt(2.0));
             }
             final float[] t = new float[twon];
-            int np = ConcurrencyUtils.getNumberOfProcessors();
-            if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-                np = 2;
-                final int k = n / np;
-                Future[] futures = new Future[np];
-                for (int j = 0; j < np; j++) {
-                    final int startIdx = j * k;
-                    final int stopIdx;
-                    if (j == np - 1) {
-                        stopIdx = n;
-                    } else {
-                        stopIdx = startIdx + k;
-                    }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                nthreads = 2;
+                final int k = n / nthreads;
+                Future<?>[] futures = new Future[nthreads];
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == (nthreads - 1)) ? n : firstIdx + k;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int i = startIdx; i < stopIdx; i++) {
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 int twoi = 2 * i;
                                 float elem = a[offa + i];
                                 t[twoi] = w[twoi] * elem;
@@ -309,15 +257,7 @@ public class FloatDCT_1D {
                         }
                     });
                 }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
             } else {
                 for (int i = 0; i < n; i++) {
                     int twoi = 2 * i;
@@ -336,8 +276,8 @@ public class FloatDCT_1D {
     private float[] makect(int n) {
         int twon = 2 * n;
         int idx;
-        float delta = (float) (pi / twon);
-        float deltaj;
+        double delta = PI / twon;
+        double deltaj;
         float[] c = new float[twon];
         c[0] = 1;
         for (int j = 1; j < n; j++) {
@@ -351,14 +291,14 @@ public class FloatDCT_1D {
 
     private void makewt(int nw) {
         int j, nwh, nw0, nw1;
-        float delta, wn4r, wk1r, wk1i, wk3r, wk3i;
-        float delta2, deltaj, deltaj3;
+        float wn4r, wk1r, wk1i, wk3r, wk3i;
+        double delta, delta2, deltaj, deltaj3;
 
         ip[0] = nw;
         ip[1] = 1;
         if (nw > 2) {
             nwh = nw >> 1;
-            delta = (float) (0.785398163397448278999490867136046290 / nwh);
+            delta = 0.785398163397448278999490867136046290 / nwh;
             delta2 = delta * 2;
             wn4r = (float) Math.cos(delta * nwh);
             w[0] = 1;
@@ -433,12 +373,12 @@ public class FloatDCT_1D {
 
     private void makect(int nc, float[] c, int startc) {
         int j, nch;
-        float delta, deltaj;
+        double delta, deltaj;
 
         ip[1] = nc;
         if (nc > 1) {
             nch = nc >> 1;
-            delta = (float) (0.785398163397448278999490867136046290 / nch);
+            delta = 0.785398163397448278999490867136046290 / nch;
             c[startc] = (float) Math.cos(delta * nch);
             c[startc + nch] = (float) (0.5 * c[startc]);
             for (j = 1; j < nch; j++) {
@@ -449,13 +389,11 @@ public class FloatDCT_1D {
         }
     }
 
-    /* -------- child routines -------- */
-
     private void cftfsub(int n, float[] a, int offa, int[] ip, int nw, float[] w) {
         if (n > 8) {
             if (n > 32) {
                 cftf1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);
@@ -483,7 +421,7 @@ public class FloatDCT_1D {
         if (n > 8) {
             if (n > 32) {
                 cftb1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfProcessors() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);
@@ -508,7 +446,7 @@ public class FloatDCT_1D {
     }
 
     private void bitrv2(int n, int[] ip, float[] a, int offa) {
-        int j, j1, k, k1, l, m, nh, nm;
+        int j1, k1, l, m, nh, nm;
         float xr, xi, yr, yi;
         int idx1, idx2;
 
@@ -519,8 +457,8 @@ public class FloatDCT_1D {
         nh = n >> 1;
         nm = 4 * m;
         if (l == 8) {
-            for (k = 0; k < m; k++) {
-                for (j = 0; j < k; j++) {
+            for (int k = 0; k < m; k++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + 2 * ip[m + k];
                     k1 = 4 * k + 2 * ip[m + j];
                     idx1 = offa + j1;
@@ -789,8 +727,8 @@ public class FloatDCT_1D {
                 a[idx2 + 1] = xi;
             }
         } else {
-            for (k = 0; k < m; k++) {
-                for (j = 0; j < k; j++) {
+            for (int k = 0; k < m; k++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + ip[m + k];
                     k1 = 4 * k + ip[m + j];
                     idx1 = offa + j1;
@@ -918,7 +856,7 @@ public class FloatDCT_1D {
     }
 
     private void bitrv2conj(int n, int[] ip, float[] a, int offa) {
-        int j, j1, k, k1, l, m, nh, nm;
+        int j1, k1, l, m, nh, nm;
         float xr, xi, yr, yi;
         int idx1, idx2;
 
@@ -929,8 +867,8 @@ public class FloatDCT_1D {
         nh = n >> 1;
         nm = 4 * m;
         if (l == 8) {
-            for (k = 0; k < m; k++) {
-                for (j = 0; j < k; j++) {
+            for (int k = 0; k < m; k++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + 2 * ip[m + k];
                     k1 = 4 * k + 2 * ip[m + j];
                     idx1 = offa + j1;
@@ -1203,8 +1141,8 @@ public class FloatDCT_1D {
                 a[idx2 + 3] = -a[idx2 + 3];
             }
         } else {
-            for (k = 0; k < m; k++) {
-                for (j = 0; j < k; j++) {
+            for (int k = 0; k < m; k++) {
+                for (int j = 0; j < k; j++) {
                     j1 = 4 * j + ip[m + k];
                     k1 = 4 * k + ip[m + j];
                     idx1 = offa + j1;
@@ -1508,7 +1446,7 @@ public class FloatDCT_1D {
     }
 
     private void cftf1st(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, m, mh;
+        int j0, j1, j2, j3, k, m, mh;
         float wn4r, csc1, csc3, wk1r, wk1i, wk3r, wk3i, wd1r, wd1i, wd3r, wd3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y1r, y1i, y2r, y2i, y3r, y3i;
         int idx0, idx1, idx2, idx3, idx4, idx5;
@@ -1544,7 +1482,7 @@ public class FloatDCT_1D {
         wd3r = 1;
         wd3i = 0;
         k = 0;
-        for (j = 2; j < mh - 2; j += 4) {
+        for (int j = 2; j < mh - 2; j += 4) {
             k += 4;
             idx4 = startw + k;
             wk1r = csc1 * (wd1r + w[idx4]);
@@ -1726,7 +1664,7 @@ public class FloatDCT_1D {
     }
 
     private void cftb1st(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, m, mh;
+        int j0, j1, j2, j3, k, m, mh;
         float wn4r, csc1, csc3, wk1r, wk1i, wk3r, wk3i, wd1r, wd1i, wd3r, wd3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y1r, y1i, y2r, y2i, y3r, y3i;
         int idx0, idx1, idx2, idx3, idx4, idx5;
@@ -1763,7 +1701,7 @@ public class FloatDCT_1D {
         wd3r = 1;
         wd3i = 0;
         k = 0;
-        for (j = 2; j < mh - 2; j += 4) {
+        for (int j = 2; j < mh - 2; j += 4) {
             k += 4;
             idx4 = startw + k;
             wk1r = csc1 * (wd1r + w[idx4]);
@@ -1945,7 +1883,6 @@ public class FloatDCT_1D {
     }
 
     private void cftrec4_th(final int n, final float[] a, final int offa, final int nw, final float[] w) {
-        int i;
         int idiv4, m, nthread;
         int idx = 0;
         nthread = 2;
@@ -1956,15 +1893,15 @@ public class FloatDCT_1D {
             idiv4 = 1;
             m >>= 1;
         }
-        Future[] futures = new Future[nthread];
-        final int glob_m = m;
-        for (i = 0; i < nthread; i++) {
-            final int loc_offa = offa + i * m;
+        Future<?>[] futures = new Future[nthread];
+        final int mf = m;
+        for (int i = 0; i < nthread; i++) {
+            final int firstIdx = offa + i * m;
             if (i != idiv4) {
-                futures[idx++] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[idx++] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int isplt, j, k, m;
-                        int idx1 = loc_offa + glob_m;
+                        int isplt, k, m;
+                        int idx1 = firstIdx + mf;
                         m = n;
                         while (m > 512) {
                             m >>= 2;
@@ -1972,19 +1909,19 @@ public class FloatDCT_1D {
                         }
                         cftleaf(m, 1, a, idx1 - m, nw, w);
                         k = 0;
-                        int idx2 = loc_offa - m;
-                        for (j = glob_m - m; j > 0; j -= m) {
+                        int idx2 = firstIdx - m;
+                        for (int j = mf - m; j > 0; j -= m) {
                             k++;
-                            isplt = cfttree(m, j, k, a, loc_offa, nw, w);
+                            isplt = cfttree(m, j, k, a, firstIdx, nw, w);
                             cftleaf(m, isplt, a, idx2 + j, nw, w);
                         }
                     }
                 });
             } else {
-                futures[idx++] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[idx++] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int isplt, j, k, m;
-                        int idx1 = loc_offa + glob_m;
+                        int isplt, k, m;
+                        int idx1 = firstIdx + mf;
                         k = 1;
                         m = n;
                         while (m > 512) {
@@ -1994,29 +1931,21 @@ public class FloatDCT_1D {
                         }
                         cftleaf(m, 0, a, idx1 - m, nw, w);
                         k >>= 1;
-                        int idx2 = loc_offa - m;
-                        for (j = glob_m - m; j > 0; j -= m) {
+                        int idx2 = firstIdx - m;
+                        for (int j = mf - m; j > 0; j -= m) {
                             k++;
-                            isplt = cfttree(m, j, k, a, loc_offa, nw, w);
+                            isplt = cfttree(m, j, k, a, firstIdx, nw, w);
                             cftleaf(m, isplt, a, idx2 + j, nw, w);
                         }
                     }
                 });
             }
         }
-        try {
-            for (int j = 0; j < nthread; j++) {
-                futures[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ConcurrencyUtils.waitForCompletion(futures);
     }
 
     private void cftrec4(int n, float[] a, int offa, int nw, float[] w) {
-        int isplt, j, k, m;
+        int isplt, k, m;
         int idx1 = offa + n;
         m = n;
         while (m > 512) {
@@ -2026,7 +1955,7 @@ public class FloatDCT_1D {
         cftleaf(m, 1, a, idx1 - m, nw, w);
         k = 0;
         int idx2 = offa - m;
-        for (j = n - m; j > 0; j -= m) {
+        for (int j = n - m; j > 0; j -= m) {
             k++;
             isplt = cfttree(m, j, k, a, offa, nw, w);
             cftleaf(m, isplt, a, idx2 + j, nw, w);
@@ -2122,7 +2051,7 @@ public class FloatDCT_1D {
     }
 
     private void cftmdl1(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, m, mh;
+        int j0, j1, j2, j3, k, m, mh;
         float wn4r, wk1r, wk1i, wk3r, wk3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i;
         int idx0, idx1, idx2, idx3, idx4, idx5;
@@ -2153,7 +2082,7 @@ public class FloatDCT_1D {
         a[idx3 + 1] = x1i - x3r;
         wn4r = w[startw + 1];
         k = 0;
-        for (j = 2; j < mh; j += 2) {
+        for (int j = 2; j < mh; j += 2) {
             k += 4;
             idx4 = startw + k;
             wk1r = w[idx4];
@@ -2247,7 +2176,7 @@ public class FloatDCT_1D {
     }
 
     private void cftmdl2(int n, float[] a, int offa, float[] w, int startw) {
-        int j, j0, j1, j2, j3, k, kr, m, mh;
+        int j0, j1, j2, j3, k, kr, m, mh;
         float wn4r, wk1r, wk1i, wk3r, wk3i, wd1r, wd1i, wd3r, wd3i;
         float x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y2r, y2i;
         int idx0, idx1, idx2, idx3, idx4, idx5, idx6;
@@ -2283,7 +2212,7 @@ public class FloatDCT_1D {
         a[idx3 + 1] = x1i - y0r;
         k = 0;
         kr = 2 * m;
-        for (j = 2; j < mh; j += 2) {
+        for (int j = 2; j < mh; j += 2) {
             k += 4;
             idx4 = startw + k;
             wk1r = w[idx4];
@@ -2918,13 +2847,13 @@ public class FloatDCT_1D {
     }
 
     private void rftfsub(int n, float[] a, int offa, int nc, float[] c, int startc) {
-        int j, k, kk, ks, m;
+        int k, kk, ks, m;
         float wkr, wki, xr, xi, yr, yi;
         int idx1, idx2;
         m = n >> 1;
         ks = 2 * nc / m;
         kk = 0;
-        for (j = 2; j < m; j += 2) {
+        for (int j = 2; j < m; j += 2) {
             k = n - j;
             kk += ks;
             wkr = (float) (0.5 - c[startc + nc - kk]);
@@ -2943,13 +2872,13 @@ public class FloatDCT_1D {
     }
 
     private void rftbsub(int n, float[] a, int offa, int nc, float[] c, int startc) {
-        int j, k, kk, ks, m;
+        int k, kk, ks, m;
         float wkr, wki, xr, xi, yr, yi;
         int idx1, idx2;
         m = n >> 1;
         ks = 2 * nc / m;
         kk = 0;
-        for (j = 2; j < m; j += 2) {
+        for (int j = 2; j < m; j += 2) {
             k = n - j;
             kk += ks;
             wkr = (float) (0.5 - c[startc + nc - kk]);
@@ -2968,14 +2897,14 @@ public class FloatDCT_1D {
     }
 
     private void dctsub(int n, float[] a, int offa, int nc, float[] c, int startc) {
-        int j, k, kk, ks, m;
+        int k, kk, ks, m;
         float wkr, wki, xr;
         int idx0, idx1, idx2;
 
         m = n >> 1;
         ks = nc / n;
         kk = 0;
-        for (j = 1; j < m; j++) {
+        for (int j = 1; j < m; j++) {
             k = n - j;
             kk += ks;
             idx0 = startc + kk;
@@ -2991,43 +2920,28 @@ public class FloatDCT_1D {
     }
 
     private void scale(final float m, final float[] a, final int offa) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        if ((np > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
-            np = 2;
-            final int k = n / np;
-            Future[] futures = new Future[np];
-            for (int i = 0; i < np; i++) {
-                final int starta = i * k;
-                final int stopa;
-                if (i == np - 1) {
-                    stopa = n;
-                } else {
-                    stopa = starta + k;
-                }
-                futures[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+            nthreads = 2;
+            final int k = n / nthreads;
+            Future<?>[] futures = new Future[nthreads];
+            for (int i = 0; i < nthreads; i++) {
+                final int firstIdx = offa + i * k;
+                final int lastIdx = (i == (nthreads - 1)) ? offa + n : firstIdx + k;
+                futures[i] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int startidx = offa + starta;
-                        int stopidx = offa + stopa;
-                        for (int i = startidx; i < stopidx; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             a[i] *= m;
                         }
 
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            int startidx = offa;
-            int stopidx = offa + n;
-            for (int i = startidx; i < stopidx; i++) {
+            int firstIdx = offa;
+            int lastIdx = offa + n;
+            for (int i = firstIdx; i < lastIdx; i++) {
                 a[i] *= m;
             }
         }

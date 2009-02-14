@@ -690,6 +690,28 @@ public class IOUtils {
         }
     }
 
+
+
+    /**
+     * Saves elements of <code>x</code> in a file <code>filename</code>,
+     * assuming that it is 2D real array.
+     * 
+     * @param x
+     * @param filename
+     */
+    public static void writeToFileReal_1D(int[] x, String filename) {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+            for (int j = 0; j < x.length; j++) {
+                out.write(Integer.toString(x[j]));
+                out.newLine();
+            }
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Saves elements of <code>x</code> in a file <code>filename</code>,
      * assuming that it is 2D real array.
@@ -720,28 +742,54 @@ public class IOUtils {
 
     /**
      * Saves elements of <code>x</code> in a file <code>filename</code>,
-     * assuming that it is 3D real array.
      * 
-     * @param n1
-     * @param n2
-     * @param n3
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_3D(int n1, int n2, int n3, double[] x, String filename) {
-        int sliceStride = n2 * n3;
-        int rowStride = n3;
+    public static void writeToFileReal_2D(double[][] x, String filename) {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+            for (int i = 0; i < x.length; i++) {
+                for (int j = 0; j < x[0].length; j++) {
+                    if (Math.abs(x[i][j]) < 5e-5) {
+                        out.write("0\t");
+                    } else {
+                        out.write(String.format(FF, x[i][j]) + "\t");
+                    }
+                }
+                out.newLine();
+            }
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
+    /**
+     * Saves elements of <code>x</code> in a file <code>filename</code>,
+     * assuming that it is 3D real array.
+     * 
+     * @param slices
+     * @param rows
+     * @param columns
+     * @param x
+     * @param filename
+     */
+    public static void writeToFileReal_3D(int slices, int rows, int columns, double[] x, String filename) {
+        int sliceStride = rows * columns;
+        int rowStride = columns;
 
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
-            for (int k = 0; k < n3; k++) {
+            for (int s = 0; s < slices; s++) {
                 out.newLine();
-                out.write("(:,:," + k + ")=");
+                out.write("(" + s + ",:,:)=");
                 out.newLine();
                 out.newLine();
-                for (int i = 0; i < n1; i++) {
-                    for (int j = 0; j < n2; j++) {
-                        out.write(String.format(FF, x[i * sliceStride + j * rowStride + k]) + "\t");
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        out.write(String.format(FF, x[s * sliceStride + r * rowStride + c]) + "\t");
                     }
                     out.newLine();
                 }

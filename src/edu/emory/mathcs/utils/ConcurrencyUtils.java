@@ -33,9 +33,22 @@
  * ***** END LICENSE BLOCK ***** */
 package edu.emory.mathcs.utils;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+
+import jcuda.jcublas.JCublas;
+import cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction;
+import cern.colt.function.tdouble.DoubleDoubleFunction;
+import cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction;
+import cern.colt.function.tfloat.FloatFloatFunction;
+import cern.colt.function.tint.IntIntFunction;
+import cern.colt.function.tobject.ObjectObjectFunction;
 
 /**
  * Utility methods.
@@ -43,9 +56,11 @@ import java.util.concurrent.ThreadFactory;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class ConcurrencyUtils {
-    public static ExecutorService threadPool = Executors.newCachedThreadPool(new CustomThreadFactory(new CustomExceptionHandler()));
+    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool(new CustomThreadFactory(new CustomExceptionHandler()));
 
-    private static int np = concurrency();
+    private static int NTHREADS = getNumberOfProcessors();
+
+    private static boolean USE_JCUBLAS = checkJCublas();
 
     private static int THREADS_BEGIN_N_1D_FFT_2THREADS = 8192;
 
@@ -61,7 +76,6 @@ public class ConcurrencyUtils {
         public void uncaughtException(Thread t, Throwable e) {
             e.printStackTrace();
         }
-
     }
 
     private static class CustomThreadFactory implements ThreadFactory {
@@ -81,28 +95,293 @@ public class ConcurrencyUtils {
     };
 
     /**
+     * Causes the currently executing thread to sleep (temporarily cease
+     * execution) for the specified number of milliseconds.
+     * 
+     * @param millis
+     */
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Submits a value-returning task for execution and returns a Future
+     * representing the pending results of the task.
+     * 
+     * @param <T>
+     * @param task task for execution
+     * @return a handle to the task submitted for execution
+     */
+    public static <T> Future<T> submit(Callable<T> task) {
+        return THREAD_POOL.submit(task);
+    }
+
+    /**
+     * Submits a Runnable task for execution and returns a Future representing
+     * that task.
+     * 
+     * @param task task for execution
+     * @return a handle to the task submitted for execution
+     */
+    public static Future<?> submit(Runnable task) {
+        return THREAD_POOL.submit(task);
+    }
+
+    /**
      * Returns the number of available processors
      * 
      * @return number of available processors
      */
-    public static int concurrency() {
+    public static int getNumberOfProcessors() {
         return Runtime.getRuntime().availableProcessors();
-        //        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        //        if (availableProcessors > 1) {
-        //            return prevPow2(availableProcessors);
-        //        } else {
-        //            return 1;
-        //        }
     }
 
     /**
-     * Returns the number of available processors ( = number of threads used in
-     * calculations).
+     * Checks if JCublas is available
      * 
-     * @return the number of available processors
+     * @return true if JCublas is available
      */
-    public static int getNumberOfProcessors() {
-        return np;
+    public static boolean checkJCublas() {
+        int result;
+        try {
+            result = JCublas.cublasInit(false);
+        } catch (URISyntaxException e) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        } catch (UnsatisfiedLinkError e) {
+            return false;
+        }
+        if (result == JCublas.CUBLAS_STATUS_SUCCESS) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    /**
+     * Returns the current number of threads.
+     * 
+     * @return the current number of threads.
+     */
+    public static int getNumberOfThreads() {
+        return NTHREADS;
+    }
+
+    /**
+     * Waits for all threads to complete computation.
+     * 
+     * @param futures
+     *            handles to running threads
+     */
+    public static void waitForCompletion(Future<?>[] futures) {
+        int size = futures.length;
+        try {
+            for (int j = 0; j < size; j++) {
+                futures[j].get();
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Waits for all threads to complete computation and aggregates the result.
+     * 
+     * @param futures
+     *            handles to running threads
+     * @param aggr
+     *            an aggregation function
+     * @return the result of aggregation
+     */
+    public static double waitForCompletion(Future<?>[] futures, DoubleDoubleFunction aggr) {
+        int size = futures.length;
+        Double[] results = new Double[size];
+        double a = 0;
+        try {
+            for (int j = 0; j < size; j++) {
+                results[j] = (Double) futures[j].get();
+            }
+            a = results[0];
+            for (int j = 1; j < size; j++) {
+                a = aggr.apply(a, results[j]);
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
+    /**
+     * Waits for all threads to complete computation and aggregates the result.
+     * 
+     * @param futures
+     *            handles to running threads
+     * @param aggr
+     *            an aggregation function
+     * @return the result of aggregation
+     */
+    public static int waitForCompletion(Future<?>[] futures, IntIntFunction aggr) {
+        int size = futures.length;
+        Integer[] results = new Integer[size];
+        int a = 0;
+        try {
+            for (int j = 0; j < size; j++) {
+                results[j] = (Integer) futures[j].get();
+            }
+            a = results[0];
+            for (int j = 1; j < size; j++) {
+                a = aggr.apply(a, results[j]);
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
+    /**
+     * Waits for all threads to complete computation and aggregates the result.
+     * 
+     * @param futures
+     *            handles to running threads
+     * @param aggr
+     *            an aggregation function
+     * @return the result of aggregation
+     */
+    public static Object waitForCompletion(Future<?>[] futures, ObjectObjectFunction aggr) {
+        int size = futures.length;
+        Object[] results = new Object[size];
+        Object a = null;
+        try {
+            for (int j = 0; j < size; j++) {
+                results[j] = (Integer) futures[j].get();
+            }
+            a = results[0];
+            for (int j = 1; j < size; j++) {
+                a = aggr.apply(a, results[j]);
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
+    /**
+     * Waits for all threads to complete computation and aggregates the result.
+     * 
+     * @param futures
+     *            handles to running threads
+     * @param aggr
+     *            an aggregation function
+     * @return the result of aggregation
+     */
+    public static double[] waitForCompletion(Future<?>[] futures, DComplexDComplexDComplexFunction aggr) {
+        int size = futures.length;
+        double[][] results = new double[size][2];
+        double[] a = null;
+        try {
+            for (int j = 0; j < size; j++) {
+                results[j] = (double[]) futures[j].get();
+            }
+            a = results[0];
+            for (int j = 1; j < size; j++) {
+                a = aggr.apply(a, results[j]);
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
+    /**
+     * Waits for all threads to complete computation and aggregates the result.
+     * 
+     * @param futures
+     *            handles to running threads
+     * @param aggr
+     *            an aggregation function
+     * @return the result of aggregation
+     */
+    public static float[] waitForCompletion(Future<?>[] futures, FComplexFComplexFComplexFunction aggr) {
+        int size = futures.length;
+        float[][] results = new float[size][2];
+        float[] a = null;
+        try {
+            for (int j = 0; j < size; j++) {
+                results[j] = (float[]) futures[j].get();
+            }
+            a = results[0];
+            for (int j = 1; j < size; j++) {
+                a = aggr.apply(a, results[j]);
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
+    /**
+     * Waits for all threads to complete computation and aggregates the result.
+     * 
+     * @param futures
+     *            handles to running threads
+     * @param aggr
+     *            an aggregation function
+     * @return the result of aggregation
+     */
+    public static float waitForCompletion(Future<?>[] futures, FloatFloatFunction aggr) {
+        int size = futures.length;
+        Float[] results = new Float[size];
+        float a = 0;
+        try {
+            for (int j = 0; j < size; j++) {
+                results[j] = (Float) futures[j].get();
+            }
+            a = results[0];
+            for (int j = 1; j < size; j++) {
+                a = aggr.apply(a, results[j]);
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
+    /**
+     * Returns true if JCUBLAS is used.
+     * 
+     * @return true if JCUBLAS is used
+     */
+    public static boolean getUseJCublas() {
+        return USE_JCUBLAS;
+    }
+
+    /**
+     * If <code>useJCublas</code> is true then JCUBLAS is used.
+     * 
+     * @param useJCublas
+     */
+    public static void setUseJCublas(boolean useJCublas) {
+        USE_JCUBLAS = useJCublas;
     }
 
     /**
@@ -228,20 +507,14 @@ public class ConcurrencyUtils {
     }
 
     /**
-     * Sets the number of available processors ( = number of threads used in
-     * calculations). If n is not a power of 2, then the number of available
-     * processors is set to the closest power of two less than n.
+     * Sets the number of threads
      * 
      * @param n
-     * @return the number of available processors
      */
-    public static int setNumberOfProcessors(int n) {
-        if (n > 0) {
-            np = n;
-        } else {
-            np = concurrency();
-        }
-        return np;
+    public static void setNumberOfThreads(int n) {
+        if (n < 1)
+            throw new IllegalArgumentException("n must be greater or equal 1");
+        NTHREADS = n;
     }
 
     /**

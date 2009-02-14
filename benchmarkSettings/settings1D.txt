@@ -1,8 +1,0 @@
-ORDER of Variables: NTHREADS (e.g. 1, 2, 4); SIZE (int); NITERS (int)
-1, 2
-16777216
-10
-
-
-
-

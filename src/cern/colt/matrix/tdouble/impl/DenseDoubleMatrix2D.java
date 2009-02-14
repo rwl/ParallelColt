@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,13 +8,17 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdouble.impl;
 
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import jcuda.jcublas.JCublas;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
-import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
+import cern.colt.matrix.io.MatrixInfo;
+import cern.colt.matrix.io.MatrixSize;
+import cern.colt.matrix.io.MatrixVectorReader;
 import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
@@ -82,7 +86,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     private DoubleDST_2D dst2;
 
     private DoubleDHT_2D dht2;
-    
+
     /**
      * The elements of this matrix. elements are stored in row major, i.e.
      * index==row*columns + column columnOf(index)==index%columns
@@ -148,43 +152,85 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
      * @param columnStride
      *            the number of elements between two columns, i.e.
      *            <tt>index(i,j+1)-index(i,j)</tt>.
+     * @param isView
+     *            if true then a matrix view is constructed
      * @throws IllegalArgumentException
      *             if
      *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             or flip's are illegal.
      */
-    public DenseDoubleMatrix2D(int rows, int columns, double[] elements, int rowZero, int columnZero, int rowStride, int columnStride) {
+    public DenseDoubleMatrix2D(int rows, int columns, double[] elements, int rowZero, int columnZero, int rowStride, int columnStride, boolean isView) {
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
         this.elements = elements;
-        this.isNoView = false;
+        this.isNoView = !isView;
+    }
+
+    /**
+     * Constructs a matrix from MatrixVectorReader.
+     * @param r matrix reader
+     * @throws IOException
+     */
+    public DenseDoubleMatrix2D(MatrixVectorReader r) throws IOException {
+        MatrixInfo info;
+        if (r.hasInfo())
+            info = r.readMatrixInfo();
+        else
+            info = new MatrixInfo(true, MatrixInfo.MatrixField.Real, MatrixInfo.MatrixSymmetry.General);
+
+        if (info.isPattern())
+            throw new UnsupportedOperationException("Pattern matrices are not supported");
+        if (info.isDense())
+            throw new UnsupportedOperationException("Dense matrices are not supported");
+        if (info.isComplex())
+            throw new UnsupportedOperationException("Complex matrices are not supported");
+
+        MatrixSize size = r.readMatrixSize(info);
+        setUp(size.numRows(), size.numColumns());
+        this.elements = new double[rows * columns];
+        int numEntries = size.numEntries();
+        int[] columnindexes = new int[numEntries];
+        int[] rowindexes = new int[numEntries];
+        double[] values = new double[numEntries];
+        r.readCoordinate(rowindexes, columnindexes, values);
+        for (int i = 0; i < numEntries; i++) {
+            set(rowindexes[i], columnindexes[i], values[i]);
+        }
+        if (info.isSymmetric()) {
+            for (int i = 0; i < numEntries; i++) {
+                if (rowindexes[i] != columnindexes[i]) {
+                    set(columnindexes[i], rowindexes[i], values[i]);
+                }
+            }
+        } else if (info.isSkewSymmetric()) {
+            for (int i = 0; i < numEntries; i++) {
+                if (rowindexes[i] != columnindexes[i]) {
+                    set(columnindexes[i], rowindexes[i], -values[i]);
+                }
+            }
+        }
     }
 
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleFunction f) {
         if (size() == 0)
             return Double.NaN;
-        final int zero = index(0, 0);
+        final int zero = (int) index(0, 0);
         double a = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
-            Double[] results = new Double[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                final int startrow = rows - j * k;
+                final int stoprow = (j == (np - 1)) ? 0 : startrow - k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
                     public Double call() throws Exception {
-                        double a = f.apply(elements[zero + startrow * rowStride]);
+                        double a = f.apply(elements[zero + (startrow - 1) * rowStride + (columns - 1) * columnStride]);
                         int d = 1;
-                        for (int r = startrow; r < stoprow; r++) {
-                            for (int c = d; c < columns; c++) {
-                                a = aggr.apply(a, f.apply(elements[zero + r * rowStride + c * columnStride]));
+                        for (int r = startrow; --r >= stoprow;) {
+                            int ridx = zero + r * rowStride;
+                            for (int c = columns - d; --c >= 0;) {
+                                a = aggr.apply(a, f.apply(elements[ridx + c * columnStride]));
                             }
                             d = 0;
                         }
@@ -192,25 +238,14 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Double) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
-            a = f.apply(elements[zero]);
-            int d = 1; // first cell already done
-            for (int r = 0; r < rows; r++) {
-                for (int c = d; c < columns; c++) {
-                    a = aggr.apply(a, f.apply(elements[zero + r * rowStride + c * columnStride]));
+            a = f.apply(elements[zero + (rows - 1) * rowStride + (columns - 1) * columnStride]);
+            int d = 1;
+            for (int r = rows; --r >= 0;) {
+                int ridx = zero + r * rowStride;
+                for (int c = columns - d; --c >= 0;) {
+                    a = aggr.apply(a, f.apply(elements[ridx + c * columnStride]));
                 }
                 d = 0;
             }
@@ -221,11 +256,11 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleFunction f, final cern.colt.function.tdouble.DoubleProcedure cond) {
         if (size() == 0)
             return Double.NaN;
-        final int zero = index(0, 0);
+        final int zero = (int) index(0, 0);
         double a = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             Double[] results = new Double[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -236,7 +271,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
                     public Double call() throws Exception {
                         double elem = elements[zero + startrow * rowStride];
@@ -258,19 +293,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Double) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             double elem = elements[zero];
             if (cond.apply(elem) == true) {
@@ -293,14 +316,14 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleFunction f, final IntArrayList rowList, final IntArrayList columnList) {
         if (size() == 0)
             return Double.NaN;
-        final int zero = index(0, 0);
+        final int zero = (int) index(0, 0);
         final int size = rowList.size();
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
         double a = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             Double[] results = new Double[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
@@ -311,7 +334,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
                     public Double call() throws Exception {
                         double a = f.apply(elements[zero + rowElements[startidx] * rowStride + columnElements[startidx] * columnStride]);
@@ -324,19 +347,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Double) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             double elem;
             a = f.apply(elements[zero + rowElements[0] * rowStride + columnElements[0] * columnStride]);
@@ -355,15 +366,15 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         checkShape(other);
         if (size() == 0)
             return Double.NaN;
-        final int zero = index(0, 0);
-        final int zeroOther = other.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
         final int rowStrideOther = other.rowStride();
         final int colStrideOther = other.columnStride();
         final double[] elemsOther = (double[]) other.elements();
         double a = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             Double[] results = new Double[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -374,7 +385,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
                     public Double call() throws Exception {
                         double a = f.apply(elements[zero + startrow * rowStride], elemsOther[zeroOther + startrow * rowStrideOther]);
@@ -389,19 +400,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Double) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             int d = 1; // first cell already done
             a = f.apply(elements[zero], elemsOther[zeroOther]);
@@ -419,8 +418,8 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         final double[] elems = this.elements;
         if (elems == null)
             throw new InternalError();
-        final int zero = index(0, 0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] =
                 // mult*x[i]
@@ -430,7 +429,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 if (multiplicator == 0)
                     return assign(0);
             }
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -440,7 +439,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx = zero + startrow * rowStride;
@@ -470,17 +469,9 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            int idx = zero;
+            int idx = zero + (rows - 1) * rowStride + (columns - 1) * columnStride;
             // specialization for speed
             if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] =
                 // mult*x[i]
@@ -489,20 +480,20 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     return this;
                 if (multiplicator == 0)
                     return assign(0);
-                for (int r = 0; r < rows; r++) { // the general case
-                    for (int i = idx, c = 0; c < columns; c++) {
+                for (int r = rows; --r >= 0;) { // the general case
+                    for (int i = idx, c = columns; --c >= 0;) {
                         elems[i] *= multiplicator;
-                        i += columnStride;
+                        i -= columnStride;
                     }
-                    idx += rowStride;
+                    idx -= rowStride;
                 }
             } else { // the general case x[i] = f(x[i])
-                for (int r = 0; r < rows; r++) {
-                    for (int i = idx, c = 0; c < columns; c++) {
+                for (int r = rows; --r >= 0;) {
+                    for (int i = idx, c = columns; --c >= 0;) {
                         elems[i] = function.apply(elems[i]);
-                        i += columnStride;
+                        i -= columnStride;
                     }
-                    idx += rowStride;
+                    idx -= rowStride;
                 }
             }
         }
@@ -510,10 +501,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     public DoubleMatrix2D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final cern.colt.function.tdouble.DoubleFunction function) {
-        final int zero = index(0, 0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -523,7 +514,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         double elem;
@@ -541,15 +532,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double elem;
             int idx = zero;
@@ -568,10 +551,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     public DoubleMatrix2D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final double value) {
-        final int zero = index(0, 0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -581,7 +564,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         double elem;
@@ -599,15 +582,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             double elem;
             int idx = zero;
@@ -627,10 +602,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DoubleMatrix2D assign(final double value) {
         final double[] elems = this.elements;
-        final int zero = index(0, 0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -640,7 +615,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         for (int r = startrow; r < stoprow; r++) {
@@ -653,15 +628,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             for (int r = 0; r < rows; r++) {
@@ -678,41 +645,33 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     public DoubleMatrix2D assign(final double[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " rows()*columns()=" + rows() * columns());
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if (this.isNoView) {
-        	if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-				Future[] futures = new Future[np];
-				int k = size() / np;
-				for (int j = 0; j < np; j++) {
-					final int startidx = j * k;
-					final int length;
-					if (j == np - 1) {
-						length = size() - startidx;
-					} else {
-						length = k;
-					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-						public void run() {
-							System.arraycopy(values, startidx, elements, startidx, length);
-						}
-					});
-				}
-				try {
-					for (int j = 0; j < np; j++) {
-						futures[j].get();
-					}
-				} catch (ExecutionException ex) {
-					ex.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.arraycopy(values, 0, this.elements, 0, values.length);
-			}
-        } else {
-            final int zero = index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
+                int k = size() / np;
+                for (int j = 0; j < np; j++) {
+                    final int startidx = j * k;
+                    final int length;
+                    if (j == np - 1) {
+                        length = size() - startidx;
+                    } else {
+                        length = k;
+                    }
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                        public void run() {
+                            System.arraycopy(values, startidx, elements, startidx, length);
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+            } else {
+                System.arraycopy(values, 0, this.elements, 0, values.length);
+            }
+        } else {
+            final int zero = (int) index(0, 0);
+            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                Future<?>[] futures = new Future[np];
                 int k = rows / np;
                 for (int j = 0; j < np; j++) {
                     final int startrow = j * k;
@@ -723,7 +682,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     } else {
                         stoprow = startrow + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
                             int idxOther = glob_idxOther;
@@ -738,15 +697,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                         }
                     });
                 }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
             } else {
 
                 int idxOther = 0;
@@ -766,10 +717,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     public DoubleMatrix2D assign(final double[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()=" + rows());
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if (this.isNoView) {
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 int k = rows / np;
                 for (int j = 0; j < np; j++) {
                     final int startrow = j * k;
@@ -779,7 +730,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     } else {
                         stoprow = startrow + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             int i = startrow * rowStride;
                             for (int r = startrow; r < stoprow; r++) {
@@ -792,15 +743,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                         }
                     });
                 }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
             } else {
                 int i = 0;
                 for (int r = 0; r < rows; r++) {
@@ -812,9 +755,9 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 }
             }
         } else {
-            final int zero = index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future[] futures = new Future[np];
+                Future<?>[] futures = new Future[np];
                 int k = rows / np;
                 for (int j = 0; j < np; j++) {
                     final int startrow = j * k;
@@ -824,7 +767,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     } else {
                         stoprow = startrow + k;
                     }
-                    futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
                             int idx = zero + startrow * rowStride;
@@ -841,15 +784,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                         }
                     });
                 }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                ConcurrencyUtils.waitForCompletion(futures);
             } else {
                 int idx = zero;
                 for (int r = 0; r < rows; r++) {
@@ -878,37 +813,29 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         if (other_final == this)
             return this; // nothing to do
         checkShape(other_final);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if (this.isNoView && other_final.isNoView) { // quickest
-        	if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-				Future[] futures = new Future[np];
-				int k = size() / np;
-				for (int j = 0; j < np; j++) {
-					final int startidx = j * k;
-					final int length;
-					if (j == np - 1) {
-						length = size() - startidx;
-					} else {
-						length = k;
-					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-						public void run() {
-							System.arraycopy(other_final.elements, startidx, elements, startidx, length);
-						}
-					});
-				}
-				try {
-					for (int j = 0; j < np; j++) {
-						futures[j].get();
-					}
-				} catch (ExecutionException ex) {
-					ex.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} else {
-	        	System.arraycopy(other_final.elements, 0, this.elements, 0, this.elements.length);
-			}
+            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                Future<?>[] futures = new Future[np];
+                int k = size() / np;
+                for (int j = 0; j < np; j++) {
+                    final int startidx = j * k;
+                    final int length;
+                    if (j == np - 1) {
+                        length = size() - startidx;
+                    } else {
+                        length = k;
+                    }
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                        public void run() {
+                            System.arraycopy(other_final.elements, startidx, elements, startidx, length);
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+            } else {
+                System.arraycopy(other_final.elements, 0, this.elements, 0, this.elements.length);
+            }
             return this;
         }
         DenseDoubleMatrix2D other = (DenseDoubleMatrix2D) source;
@@ -924,12 +851,12 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         final double[] elemsOther = other.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = other.index(0, 0);
-        final int zero = index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -939,7 +866,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         int idxOther = zeroOther + startrow * rowStrideOther;
@@ -955,15 +882,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
@@ -991,19 +910,19 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         final double[] elemsOther = other.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = other.index(0, 0);
-        final int zero = index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            if (function instanceof cern.jet.math.tdouble.DoublePlusMult) {
-                double multiplicator = ((cern.jet.math.tdouble.DoublePlusMult) function).multiplicator;
+            if (function instanceof cern.jet.math.tdouble.DoublePlusMultSecond) {
+                double multiplicator = ((cern.jet.math.tdouble.DoublePlusMultSecond) function).multiplicator;
                 if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
                     return this;
                 }
             }
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1013,7 +932,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx;
@@ -1045,8 +964,8 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                                 idx += rowStride;
                                 idxOther += rowStrideOther;
                             }
-                        } else if (function instanceof cern.jet.math.tdouble.DoublePlusMult) {
-                            double multiplicator = ((cern.jet.math.tdouble.DoublePlusMult) function).multiplicator;
+                        } else if (function instanceof cern.jet.math.tdouble.DoublePlusMultSecond) {
+                            double multiplicator = ((cern.jet.math.tdouble.DoublePlusMultSecond) function).multiplicator;
                             if (multiplicator == 1) {
                                 // x[i] = x[i] + y[i]
                                 idx = zero + startrow * rowStride;
@@ -1105,15 +1024,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx;
             int idxOther;
@@ -1144,8 +1055,8 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     idx += rowStride;
                     idxOther += rowStrideOther;
                 }
-            } else if (function instanceof cern.jet.math.tdouble.DoublePlusMult) {
-                double multiplicator = ((cern.jet.math.tdouble.DoublePlusMult) function).multiplicator;
+            } else if (function instanceof cern.jet.math.tdouble.DoublePlusMultSecond) {
+                double multiplicator = ((cern.jet.math.tdouble.DoublePlusMultSecond) function).multiplicator;
                 if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
                     return this;
                 } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
@@ -1210,13 +1121,13 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
         final double[] elemsOther = (double[]) y.elements();
-        final int zeroOther = y.index(0, 0);
-        final int zero = index(0, 0);
+        final int zeroOther = (int) y.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = y.columnStride();
         final int rowStrideOther = y.rowStride();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startidx = j * k;
@@ -1226,7 +1137,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopidx = startidx + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx;
@@ -1240,15 +1151,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx;
             int idxOther;
@@ -1264,10 +1167,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     public DoubleMatrix2D assign(final float[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*columns()=" + rows() * columns());
-        final int zero = index(0, 0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1278,7 +1181,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx = zero + startrow * rowStride;
@@ -1293,15 +1196,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idxOther = 0;
             int idx = zero;
@@ -1318,10 +1213,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        final int zero = index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -1332,7 +1227,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Integer>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
                         int idx = zero + startrow * rowStride;
@@ -1375,9 +1270,20 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         return cardinality;
     }
 
+    /**
+     * Computes the 2D discrete cosine transform (DCT-II) of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dct2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (dct2 == null) {
             dct2 = new DoubleDCT_2D(rows, columns);
         }
@@ -1388,15 +1294,27 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             dct2.forward((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the discrete cosine transform (DCT-II) of each column of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dctColumns(final boolean scale) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -1406,40 +1324,44 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int c = startcol; c < stopcol; c++) {
-                            viewColumn(c).dct(scale);
+                            ((DenseDoubleMatrix1D) viewColumn(c)).dct(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                viewColumn(c).dct(scale);
+                ((DenseDoubleMatrix1D) viewColumn(c)).dct(scale);
             }
         }
     }
 
+    /**
+     * Computes the discrete cosine transform (DCT-II) of each row of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dctRows(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1449,36 +1371,36 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
-                            viewRow(r).dct(scale);
+                            ((DenseDoubleMatrix1D) viewRow(r)).dct(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                viewRow(r).dct(scale);
+                ((DenseDoubleMatrix1D) viewRow(r)).dct(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
-    
+
+    /**
+     * Computes the 2D discrete Hartley transform (DHT) of this matrix.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dht2() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (dht2 == null) {
             dht2 = new DoubleDHT_2D(rows, columns);
         }
@@ -1489,17 +1411,26 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             dht2.forward((double[]) copy.elements());
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the discrete Hartley transform (DHT) of each column of this
+     * matrix.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dhtColumns() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -1509,41 +1440,41 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int c = startcol; c < stopcol; c++) {
-                            viewColumn(c).dht();
+                            ((DenseDoubleMatrix1D) viewColumn(c)).dht();
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                viewColumn(c).dht();
+                ((DenseDoubleMatrix1D) viewColumn(c)).dht();
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the discrete Hartley transform (DHT) of each row of this matrix.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dhtRows() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1553,37 +1484,40 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
-                            viewRow(r).dht();
+                            ((DenseDoubleMatrix1D) viewRow(r)).dht();
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                viewRow(r).dht();
+                ((DenseDoubleMatrix1D) viewRow(r)).dht();
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the 2D discrete sine transform (DST-II) of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dst2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	if (dst2 == null) {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        if (dst2 == null) {
             dst2 = new DoubleDST_2D(rows, columns);
         }
         if (isNoView == true) {
@@ -1593,17 +1527,29 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             dst2.forward((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the discrete sine transform (DST-II) of each column of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dstColumns(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -1613,44 +1559,44 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        DoubleMatrix1D column;
                         for (int c = startcol; c < stopcol; c++) {
-                            column = viewColumn(c).copy();
-                            column.dst(scale);
-                            viewColumn(c).assign(column);
+                            ((DenseDoubleMatrix1D) viewColumn(c)).dst(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                viewColumn(c).dst(scale);
+                ((DenseDoubleMatrix1D) viewColumn(c)).dst(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the discrete sine transform (DST-II) of each row of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void dstRows(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1660,43 +1606,64 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        DoubleMatrix1D row;
                         for (int r = startrow; r < stoprow; r++) {
-                            row = viewRow(r).copy();
-                            row.dst(scale);
-                            viewRow(r).assign(row);
+                            ((DenseDoubleMatrix1D) viewRow(r)).dst(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                viewRow(r).dst(scale);
+                ((DenseDoubleMatrix1D) viewRow(r)).dst(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     public double[] elements() {
         return elements;
     }
 
+    /**
+     * Computes the 2D discrete Fourier transform (DFT) of this matrix. The
+     * physical layout of the output data is as follows:
+     * 
+     * <pre>
+     * this[k1][2*k2] = Re[k1][k2] = Re[rows-k1][columns-k2], 
+     * this[k1][2*k2+1] = Im[k1][k2] = -Im[rows-k1][columns-k2], 
+     *       0&lt;k1&lt;rows, 0&lt;k2&lt;columns/2, 
+     * this[0][2*k2] = Re[0][k2] = Re[0][columns-k2], 
+     * this[0][2*k2+1] = Im[0][k2] = -Im[0][columns-k2], 
+     *       0&lt;k2&lt;columns/2, 
+     * this[k1][0] = Re[k1][0] = Re[rows-k1][0], 
+     * this[k1][1] = Im[k1][0] = -Im[rows-k1][0], 
+     * this[rows-k1][1] = Re[k1][columns/2] = Re[rows-k1][columns/2], 
+     * this[rows-k1][0] = -Im[k1][columns/2] = Im[rows-k1][columns/2], 
+     *       0&lt;k1&lt;rows/2, 
+     * this[0][0] = Re[0][0], 
+     * this[0][1] = Re[0][columns/2], 
+     * this[rows/2][0] = Re[rows/2][0], 
+     * this[rows/2][1] = Re[rows/2][columns/2]
+     * </pre>
+     * 
+     * This method computes only half of the elements of the real transform. The
+     * other half satisfies the symmetry condition. If you want the full real
+     * forward transform, use <code>getFft2</code>. To get back the original
+     * data, use <code>ifft2</code>.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void fft2() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
@@ -1707,14 +1674,14 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             fft2.realForward((double[]) copy.elements());
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
-        final int zero = index(0, 0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1724,7 +1691,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         for (int r = startrow; r < stoprow; r++) {
@@ -1740,15 +1707,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             for (int r = 0; r < rows; r++) {
@@ -1765,10 +1724,20 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    public DComplexMatrix2D getFft2() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	if (fft2 == null) {
+    /**
+     * Returns new complex matrix which is the 2D discrete Fourier transform
+     * (DFT) of this matrix.
+     * 
+     * @return the 2D discrete Fourier transform (DFT) of this matrix.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     */
+    public DenseDComplexMatrix2D getFft2() {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
         final double[] elems;
@@ -1777,11 +1746,11 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         } else {
             elems = (double[]) this.copy().elements();
         }
-        DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
+        DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         final double[] cElems = (double[]) ((DenseDComplexMatrix2D) C).elements();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1791,7 +1760,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
@@ -1800,34 +1769,36 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int r = 0; r < rows; r++) {
                 System.arraycopy(elems, r * columns, cElems, r * columns, columns);
             }
         }
         fft2.realForwardFull(cElems);
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
         return C;
     }
 
-    public DComplexMatrix2D getFftColumns() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+    /**
+     * Returns new complex matrix which is the discrete Fourier transform (DFT)
+     * of each column of this matrix.
+     * 
+     * @return the discrete Fourier transform (DFT) of each column of this
+     *         matrix.
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     */
+    public DenseDComplexMatrix2D getFftColumns() {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        final DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -1837,43 +1808,44 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int c = startcol; c < stopcol; c++) {
-                        	C.viewColumn(c).assign(viewColumn(c).getFft());
+                            C.viewColumn(c).assign(((DenseDoubleMatrix1D) viewColumn(c)).getFft());
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                C.viewColumn(c).assign(viewColumn(c).getFft());
+                C.viewColumn(c).assign(((DenseDoubleMatrix1D) viewColumn(c)).getFft());
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
         return C;
     }
 
-    public DComplexMatrix2D getFftRows() {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-        final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+    /**
+     * Returns new complex matrix which is the discrete Fourier transform (DFT)
+     * of each row of this matrix.
+     * 
+     * @return the discrete Fourier transform (DFT) of each row of this matrix.
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     */
+    public DenseDComplexMatrix2D getFftRows() {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        final DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1883,38 +1855,40 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
-                        	 C.viewRow(r).assign(viewRow(r).getFft());
+                            C.viewRow(r).assign(((DenseDoubleMatrix1D) viewRow(r)).getFft());
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                C.viewRow(r).assign(viewRow(r).getFft());
+                C.viewRow(r).assign(((DenseDoubleMatrix1D) viewRow(r)).getFft());
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
-        return C;        
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        return C;
     }
 
-    public DComplexMatrix2D getIfft2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
+    /**
+     * Returns new complex matrix which is the 2D inverse of the discrete
+     * Fourier transform (IDFT) of this matrix.
+     * 
+     * @return the 2D inverse of the discrete Fourier transform (IDFT) of this
+     *         matrix.
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     */
+    public DenseDComplexMatrix2D getIfft2(boolean scale) {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         final double[] cElems = (double[]) ((DenseDComplexMatrix2D) C).elements();
         final double[] elems;
         if (isNoView == true) {
@@ -1922,9 +1896,9 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         } else {
             elems = (double[]) this.copy().elements();
         }
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -1934,7 +1908,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
@@ -1943,15 +1917,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int r = 0; r < rows; r++) {
                 System.arraycopy(elems, r * columns, cElems, r * columns, columns);
@@ -1961,19 +1927,29 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
         fft2.realInverseFull(cElems, scale);
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
         return C;
     }
 
-    public DComplexMatrix2D getIfftColumns(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+    /**
+     * Returns new complex matrix which is the inverse of the discrete Fourier
+     * transform (IDFT) of each column of this matrix.
+     * 
+     * @return the inverse of the discrete Fourier transform (IDFT) of each
+     *         column of this matrix.
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     */
+    public DenseDComplexMatrix2D getIfftColumns(final boolean scale) {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        final DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -1983,43 +1959,45 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int c = startcol; c < stopcol; c++) {
-                            C.viewColumn(c).assign(viewColumn(c).getIfft(scale));
+                            C.viewColumn(c).assign(((DenseDoubleMatrix1D) viewColumn(c)).getIfft(scale));
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                C.viewColumn(c).assign(viewColumn(c).getIfft(scale));
+                C.viewColumn(c).assign(((DenseDoubleMatrix1D) viewColumn(c)).getIfft(scale));
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
         return C;
     }
 
-    public DComplexMatrix2D getIfftRows(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-        final DComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+    /**
+     * Returns new complex matrix which is the inverse of the discrete Fourier
+     * transform (IDFT) of each row of this matrix.
+     * 
+     * @return the inverse of the discrete Fourier transform (IDFT) of each row
+     *         of this matrix.
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     */
+    public DenseDComplexMatrix2D getIfftRows(final boolean scale) {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        final DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -2029,30 +2007,22 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
-                            C.viewRow(r).assign(viewRow(r).getIfft(scale));
+                            C.viewRow(r).assign(((DenseDoubleMatrix1D) viewRow(r)).getIfft(scale));
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                C.viewRow(r).assign(viewRow(r).getIfft(scale));
+                C.viewRow(r).assign(((DenseDoubleMatrix1D) viewRow(r)).getIfft(scale));
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
         return C;
     }
 
@@ -2060,7 +2030,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 double value = elements[i];
@@ -2079,7 +2049,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 double value = elements[i];
@@ -2098,7 +2068,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 double value = elements[i];
@@ -2117,9 +2087,21 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         return elements[rowZero + row * rowStride + columnZero + column * columnStride];
     }
 
+    /**
+     * Computes the 2D inverse of the discrete cosine transform (DCT-III) of
+     * this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idct2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (dct2 == null) {
             dct2 = new DoubleDCT_2D(rows, columns);
         }
@@ -2130,17 +2112,29 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             dct2.inverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the inverse of the discrete cosine transform (DCT-III) of each
+     * column of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idctColumns(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -2150,41 +2144,45 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int c = startcol; c < stopcol; c++) {
-                            viewColumn(c).idct(scale);;
+                            ((DenseDoubleMatrix1D) viewColumn(c)).idct(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                viewColumn(c).idct(scale);
+                ((DenseDoubleMatrix1D) viewColumn(c)).idct(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the inverse of the discrete cosine transform (DCT-III) of each
+     * row of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idctRows(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -2194,36 +2192,40 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
-                            viewRow(r).idct(scale);
+                            ((DenseDoubleMatrix1D) viewRow(r)).idct(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                viewRow(r).idct(scale);
+                ((DenseDoubleMatrix1D) viewRow(r)).idct(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
-    
+
+    /**
+     * Computes the 2D inverse of the discrete Hartley transform (IDHT) of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idht2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	if (dht2 == null) {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        if (dht2 == null) {
             dht2 = new DoubleDHT_2D(rows, columns);
         }
         if (isNoView == true) {
@@ -2233,17 +2235,29 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             dht2.inverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the inverse of the discrete Hartley transform (IDHT) of each
+     * column of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idhtColumns(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -2253,41 +2267,45 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int c = startcol; c < stopcol; c++) {
-                            viewColumn(c).idht(scale);
+                            ((DenseDoubleMatrix1D) viewColumn(c)).idht(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                viewColumn(c).idht(scale);
+                ((DenseDoubleMatrix1D) viewColumn(c)).idht(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the inverse of the discrete Hartley transform (IDHT) of each row
+     * of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idhtRows(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -2297,36 +2315,40 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
-                            viewRow(r).idht(scale);
+                            ((DenseDoubleMatrix1D) viewRow(r)).idht(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                viewRow(r).idht(scale);
+                ((DenseDoubleMatrix1D) viewRow(r)).idht(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the 2D inverse of the discrete sine transform (DST-III) of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idst2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	if (dst2 == null) {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        if (dst2 == null) {
             dst2 = new DoubleDST_2D(rows, columns);
         }
         if (isNoView == true) {
@@ -2336,17 +2358,29 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             dst2.inverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the inverse of the discrete sine transform (DST-III) of each
+     * column of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idstColumns(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -2356,41 +2390,45 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int c = startcol; c < stopcol; c++) {
-                            viewColumn(c).idst(scale);
+                            ((DenseDoubleMatrix1D) viewColumn(c)).idst(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int c = 0; c < columns; c++) {
-                viewColumn(c).idst(scale);
+                ((DenseDoubleMatrix1D) viewColumn(c)).idst(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the inverse of the discrete sine transform (DST-III) of each row
+     * of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
     public void idstRows(final boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
-    	int np = ConcurrencyUtils.getNumberOfProcessors();
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
             ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -2400,35 +2438,61 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int r = startrow; r < stoprow; r++) {
-                            viewRow(r).idst(scale);
+                            ((DenseDoubleMatrix1D) viewRow(r)).idst(scale);
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
             ConcurrencyUtils.resetThreadsBeginN_FFT();
         } else {
             for (int r = 0; r < rows; r++) {
-                viewRow(r).idst(scale);
+                ((DenseDoubleMatrix1D) viewRow(r)).idst(scale);
             }
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
+    /**
+     * Computes the 2D inverse of the discrete Fourier transform (IDFT) of this
+     * matrix. The physical layout of the input data has to be as follows:
+     * 
+     * <pre>
+     * this[k1][2*k2] = Re[k1][k2] = Re[rows-k1][columns-k2], 
+     * this[k1][2*k2+1] = Im[k1][k2] = -Im[rows-k1][columns-k2], 
+     *       0&lt;k1&lt;rows, 0&lt;k2&lt;columns/2, 
+     * this[0][2*k2] = Re[0][k2] = Re[0][columns-k2], 
+     * this[0][2*k2+1] = Im[0][k2] = -Im[0][columns-k2], 
+     *       0&lt;k2&lt;columns/2, 
+     * this[k1][0] = Re[k1][0] = Re[rows-k1][0], 
+     * this[k1][1] = Im[k1][0] = -Im[rows-k1][0], 
+     * this[rows-k1][1] = Re[k1][columns/2] = Re[rows-k1][columns/2], 
+     * this[rows-k1][0] = -Im[k1][columns/2] = Im[rows-k1][columns/2], 
+     *       0&lt;k1&lt;rows/2, 
+     * this[0][0] = Re[0][0], 
+     * this[0][1] = Re[0][columns/2], 
+     * this[rows/2][0] = Re[rows/2][0], 
+     * this[rows/2][1] = Re[rows/2][columns/2]
+     * </pre>
+     * 
+     * This method computes only half of the elements of the real transform. The
+     * other half satisfies the symmetry condition. If you want the full real
+     * inverse transform, use <code>getIfft2</code>.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     */
     public void ifft2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfProcessors();
-    	ConcurrencyUtils.setNumberOfProcessors(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
@@ -2439,10 +2503,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             fft2.realInverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfProcessors(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
-    public int index(int row, int column) {
+    public long index(int row, int column) {
         return rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
@@ -2457,11 +2521,11 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     public double[] getMaxLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = index(0, 0);
+        final int zero = (int) index(0, 0);
         double maxValue = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             double[][] results = new double[np][2];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -2472,7 +2536,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
                         double maxValue = elements[zero + startrow * rowStride];
                         int rowLocation = startrow;
@@ -2535,11 +2599,11 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     public double[] getMinLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = index(0, 0);
+        final int zero = (int) index(0, 0);
         double minValue = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             double[][] results = new double[np][2];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
@@ -2550,7 +2614,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
                         int rowLocation = startrow;
                         int columnLocation = 0;
@@ -2616,10 +2680,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public double[][] toArray() {
         final double[][] values = new double[rows][columns];
-        int np = ConcurrencyUtils.getNumberOfProcessors();
-        final int zero = index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -2629,7 +2693,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         for (int r = startrow; r < stoprow; r++) {
@@ -2643,15 +2707,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             for (int r = 0; r < rows; r++) {
@@ -2668,13 +2724,13 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     public DoubleMatrix1D vectorize() {
         final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(size());
-        final int zero = index(0, 0);
-        final int zeroOther = v.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) v.index(0);
         final int strideOther = v.stride();
         final double[] elemsOther = (double[]) v.elements();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = columns / np;
             for (int j = 0; j < np; j++) {
                 final int startcol = j * k;
@@ -2685,7 +2741,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stopcol = startcol + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx = 0;
@@ -2701,15 +2757,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             int idxOther = zeroOther;
@@ -2755,8 +2803,8 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         if (elems == null || B_elems == null)
             throw new InternalError();
 
-        int A_index = index(1, 1);
-        int B_index = BB.index(1, 1);
+        int A_index = (int) index(1, 1);
+        int B_index = (int) BB.index(1, 1);
         for (int i = 1; i < r; i++) {
             double a00, a01, a02;
             double a10, a11, a12;
@@ -2805,14 +2853,14 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     public DoubleMatrix1D zMult(final DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta, final boolean transposeA) {
+        if (transposeA)
+            return viewDice().zMult(y, z, alpha, beta, false);
         final DoubleMatrix1D z_loc;
         if (z == null) {
-            z_loc = new DenseDoubleMatrix1D(this.rows);
+            z_loc = new DenseDoubleMatrix1D(rows);
         } else {
             z_loc = z;
         }
-        if (transposeA)
-            return viewDice().zMult(y, z_loc, alpha, beta, false);
         if (!(y instanceof DenseDoubleMatrix1D && z_loc instanceof DenseDoubleMatrix1D))
             return super.zMult(y, z_loc, alpha, beta, transposeA);
 
@@ -2825,12 +2873,12 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
             throw new InternalError();
         final int strideY = y.stride();
         final int strideZ = z_loc.stride();
-        final int zero = index(0, 0);
-        final int zeroY = y.index(0);
-        final int zeroZ = z_loc.index(0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        final int zeroY = (int) y.index(0);
+        final int zeroZ = (int) z_loc.index(0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -2840,7 +2888,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idxZero = zero + startrow * rowStride;
                         int idxZeroZ = zeroZ + startrow * strideZ;
@@ -2860,15 +2908,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idxZero = zero;
             int idxZeroZ = zeroZ;
@@ -2886,103 +2926,129 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 idxZeroZ += strideZ;
             }
         }
-        z = z_loc;
-        return z;
+        return z_loc;
     }
 
     public DoubleMatrix2D zMult(final DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, final double beta, final boolean transposeA, final boolean transposeB) {
-        final int m = rows;
-        final int n = columns;
-        final int p = B.columns();
-        if (C == null)
-            C = new DenseDoubleMatrix2D(m, p);
-        /*
-         * determine how to split and parallelize best into blocks if more
-         * B.columns than tasks --> split B.columns, as follows:
-         * 
-         * xx|xx|xxx B xx|xx|xxx xx|xx|xxx A xxx xx|xx|xxx C xxx xx|xx|xxx xxx
-         * xx|xx|xxx xxx xx|xx|xxx xxx xx|xx|xxx
-         * 
-         * if less B.columns than tasks --> split A.rows, as follows:
-         * 
-         * xxxxxxx B xxxxxxx xxxxxxx A xxx xxxxxxx C xxx xxxxxxx --- ------- xxx
-         * xxxxxxx xxx xxxxxxx --- ------- xxx xxxxxxx
-         */
-        if (transposeA)
-            return viewDice().zMult(B, C, alpha, beta, false, transposeB);
-        if (B instanceof SparseDoubleMatrix2D || B instanceof RCDoubleMatrix2D) {
-            // exploit quick sparse mult
-            // A*B = (B' * A')'
-            if (C == null) {
-                return B.zMult(this, null, alpha, beta, !transposeB, true).viewDice();
-            } else {
-                B.zMult(this, C.viewDice(), alpha, beta, !transposeB, true);
-                return C;
-            }
+        final int rowsA = rows;
+        final int colsA = columns;
+        final int rowsB = B.rows();
+        final int colsB = B.columns();
+        final int rowsC = transposeA ? colsA : rowsA;
+        final int colsC = transposeB ? rowsB : colsB;
+
+        if (C == null) {
+            C = new DenseDoubleMatrix2D(rowsC, colsC);
         }
-        if (transposeB)
-            return this.zMult(B.viewDice(), C, alpha, beta, transposeA, false);
+        
+        if (ConcurrencyUtils.getUseJCublas()) {
+            //CUBLAS matrices are column-ordered
+            double[] elemsA = (double[]) this.viewDice().copy().elements();
+            double[] elemsB = (double[]) B.viewDice().copy().elements();
+            double[] elemsC = (double[]) C.viewDice().copy().elements();
 
-        if (!(C instanceof DenseDoubleMatrix2D))
-            return super.zMult(B, C, alpha, beta, transposeA, transposeB);
+            JCublas.cublasAlloc(this.size(), 8, "d_A");
+            JCublas.cublasAlloc(B.size(), 8, "d_B");
+            JCublas.cublasAlloc(C.size(), 8, "d_C");
+            JCublas.cublasSetVector(this.size(), elemsA, 1, "d_A", 1);
+            JCublas.cublasSetVector(B.size(), elemsB, 1, "d_B", 1);
+            JCublas.cublasSetVector(C.size(), elemsC, 1, "d_C", 1);
 
-        if (B.rows() != n)
-            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + this.toStringShort() + ", " + B.toStringShort());
-        if (C.rows() != m || C.columns() != p)
-            throw new IllegalArgumentException("Incompatibe result matrix: " + this.toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
-        if (this == C || B == C)
-            throw new IllegalArgumentException("Matrices must not be identical");
-
-        long flops = 2L * m * n * p;
-        int noOfTasks = (int) Math.min(flops / 30000, ConcurrencyUtils.getNumberOfProcessors()); // each
-        /* thread should process at least 30000 flops */
-        boolean splitB = (p >= noOfTasks);
-        int width = splitB ? p : m;
-        noOfTasks = Math.min(width, noOfTasks);
-
-        if (noOfTasks < 2) { /*
-                              * parallelization doesn't pay off (too much start
-                              * up overhead)
-                              */
-            return this.zMultSeq(B, C, alpha, beta, transposeA, transposeB);
-        }
-
-        // set up concurrent tasks
-        int span = width / noOfTasks;
-        final Future[] subTasks = new Future[noOfTasks];
-        for (int i = 0; i < noOfTasks; i++) {
-            final int offset = i * span;
-            if (i == noOfTasks - 1)
-                span = width - span * i; // last span may be a bit larger
-
-            final DoubleMatrix2D AA, BB, CC;
-            if (splitB) {
-                // split B along columns into blocks
-                AA = this;
-                BB = B.viewPart(0, offset, n, span);
-                CC = C.viewPart(0, offset, m, span);
-            } else {
-                // split A along rows into blocks
-                AA = this.viewPart(offset, 0, span, n);
-                BB = B;
-                CC = C.viewPart(offset, 0, span, p);
+            int m = transposeA ? colsA : rowsA;
+            int n = transposeB ? rowsB : colsB;
+            int k = transposeA ? rowsA : colsA;
+            int lda = transposeA ? k : m;
+            int ldb = transposeB ? n : k;
+            int ldc = m;
+            JCublas.cublasDgemm(transposeA ? 't' : 'n', transposeB ? 't' : 'n', m, n, k, alpha, "d_A", lda, "d_B", ldb, beta, "d_C", ldc);
+            JCublas.cublasGetVector(C.size(), "d_C", 1, elemsC, 1);
+            JCublas.cublasFree("d_A");
+            JCublas.cublasFree("d_B");
+            JCublas.cublasFree("d_C");
+            int error = JCublas.cublasGetError();
+            if (error != JCublas.CUBLAS_STATUS_SUCCESS) {
+                throw new InternalError("Error occured while using CUBLAS library: " + error);
             }
+            C.viewDice().assign(elemsC);
+        } else {
 
-            subTasks[i] = ConcurrencyUtils.threadPool.submit(new Runnable() {
-                public void run() {
-                    ((DenseDoubleMatrix2D) AA).zMultSeq(BB, CC, alpha, beta, transposeA, transposeB);
+            /*
+            * determine how to split and parallelize best into blocks if more
+            * B.columns than tasks --> split B.columns, as follows:
+            * 
+            * xx|xx|xxx B xx|xx|xxx xx|xx|xxx A xxx xx|xx|xxx C xxx xx|xx|xxx xxx
+            * xx|xx|xxx xxx xx|xx|xxx xxx xx|xx|xxx
+            * 
+            * if less B.columns than tasks --> split A.rows, as follows:
+            * 
+            * xxxxxxx B xxxxxxx xxxxxxx A xxx xxxxxxx C xxx xxxxxxx --- ------- xxx
+            * xxxxxxx xxx xxxxxxx --- ------- xxx xxxxxxx
+            */
+            if (transposeA)
+                return viewDice().zMult(B, C, alpha, beta, false, transposeB);
+            if (B instanceof SparseDoubleMatrix2D || B instanceof RCDoubleMatrix2D) {
+                // exploit quick sparse mult
+                // A*B = (B' * A')'
+                if (C == null) {
+                    return B.zMult(this, null, alpha, beta, !transposeB, true).viewDice();
+                } else {
+                    B.zMult(this, C.viewDice(), alpha, beta, !transposeB, true);
+                    return C;
                 }
-            });
-        }
-
-        try {
-            for (int j = 0; j < noOfTasks; j++) {
-                subTasks[j].get();
             }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            if (transposeB)
+                return this.zMult(B.viewDice(), C, alpha, beta, transposeA, false);
+
+            if (!(C instanceof DenseDoubleMatrix2D))
+                return super.zMult(B, C, alpha, beta, transposeA, transposeB);
+
+            if (B.rows() != colsA)
+                throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + this.toStringShort() + ", " + B.toStringShort());
+            if (C.rows() != rowsA || C.columns() != colsB)
+                throw new IllegalArgumentException("Incompatibe result matrix: " + this.toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
+            if (this == C || B == C)
+                throw new IllegalArgumentException("Matrices must not be identical");
+
+            long flops = 2L * rowsA * colsA * colsB;
+            int noOfTasks = (int) Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each
+            /* thread should process at least 30000 flops */
+            boolean splitB = (colsB >= noOfTasks);
+            int width = splitB ? colsB : rowsA;
+            noOfTasks = Math.min(width, noOfTasks);
+
+            if (noOfTasks < 2) { //parallelization doesn't pay off (too much start up overhead)
+                return this.zMultSeq(B, C, alpha, beta, transposeA, transposeB);
+            }
+
+            // set up concurrent tasks
+            int span = width / noOfTasks;
+            final Future<?>[] subTasks = new Future[noOfTasks];
+            for (int i = 0; i < noOfTasks; i++) {
+                final int offset = i * span;
+                if (i == noOfTasks - 1)
+                    span = width - span * i; // last span may be a bit larger
+
+                final DoubleMatrix2D AA, BB, CC;
+                if (splitB) {
+                    // split B along columns into blocks
+                    AA = this;
+                    BB = B.viewPart(0, offset, colsA, span);
+                    CC = C.viewPart(0, offset, rowsA, span);
+                } else {
+                    // split A along rows into blocks
+                    AA = this.viewPart(offset, 0, span, colsA);
+                    BB = B;
+                    CC = C.viewPart(offset, 0, span, colsB);
+                }
+
+                subTasks[i] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        ((DenseDoubleMatrix2D) AA).zMultSeq(BB, CC, alpha, beta, transposeA, transposeB);
+                    }
+                });
+            }
+
+            ConcurrencyUtils.waitForCompletion(subTasks);
         }
         return C;
     }
@@ -2991,10 +3057,10 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         double sum = 0;
         if (elements == null)
             throw new InternalError();
-        final int zero = index(0, 0);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        final int zero = (int) index(0, 0);
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -3004,7 +3070,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
                     public Double call() throws Exception {
                         double sum = 0;
@@ -3054,14 +3120,15 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     protected DoubleMatrix1D like1D(int size, int zero, int stride) {
-        return new DenseDoubleMatrix1D(size, this.elements, zero, stride);
+        return new DenseDoubleMatrix1D(size, this.elements, (int) zero, stride, true);
     }
 
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDoubleMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }
 
-    protected DoubleMatrix2D zMultSeq(DoubleMatrix2D B, DoubleMatrix2D C, double alpha, double beta, boolean transposeA, boolean transposeB) {
+
+    private DoubleMatrix2D zMultSeq(DoubleMatrix2D B, DoubleMatrix2D C, double alpha, double beta, boolean transposeA, boolean transposeB) {
         if (transposeA)
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);
         if (B instanceof SparseDoubleMatrix2D || B instanceof RCDoubleMatrix2D) {
@@ -3080,8 +3147,9 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         int m = rows;
         int n = columns;
         int p = B.columns();
-        if (C == null)
+        if (C == null) {
             C = new DenseDoubleMatrix2D(m, p);
+        }
         if (!(C instanceof DenseDoubleMatrix2D))
             return super.zMult(B, C, alpha, beta, transposeA, transposeB);
         if (B.rows() != n)
@@ -3121,9 +3189,9 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         if (m % m_optimal != 0)
             blocks++;
         for (; --blocks >= 0;) {
-            int jB = BB.index(0, 0);
-            int indexA = index(rr, 0);
-            int jC = CC.index(rr, 0);
+            int jB = (int) BB.index(0, 0);
+            int indexA = (int) index(rr, 0);
+            int jC = (int) CC.index(rr, 0);
             rr += m_optimal;
             if (blocks == 0)
                 m_optimal += m - rr;

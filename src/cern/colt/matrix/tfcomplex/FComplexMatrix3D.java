@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -64,9 +64,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
             return b;
         }
         float[] a = null;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             float[][] results = new float[np][2];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
@@ -77,7 +77,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<float[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
 
                     public float[] call() throws Exception {
                         float[] a = f.apply(getQuick(startslice, 0, 0));
@@ -94,19 +94,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (float[]) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             a = f.apply(getQuick(0, 0, 0));
             int d = 1; // first cell already done
@@ -147,9 +135,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
             return b;
         }
         float[] a = null;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             float[][] results = new float[np][2];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
@@ -160,7 +148,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<float[]>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
 
                     public float[] call() throws Exception {
                         float[] a = f.apply(getQuick(startslice, 0, 0), other.getQuick(startslice, 0, 0));
@@ -177,19 +165,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (float[]) futures[j].get();
-                }
-                a = results[0];
-                for (int j = 1; j < np; j++) {
-                    a = aggr.apply(a, results[j]);
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
             a = f.apply(getQuick(0, 0, 0), other.getQuick(0, 0, 0));
             int d = 1; // first cell already done
@@ -214,9 +190,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -226,7 +202,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
                             for (int r = 0; r < rows; r++) {
@@ -238,15 +214,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
             for (int s = 0; s < slices; s++) {
@@ -270,9 +238,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexRealFunction function) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -282,7 +250,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp = new float[2];
                         for (int s = startslice; s < stopslice; s++) {
@@ -296,15 +264,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
             float[] tmp = new float[2];
@@ -332,9 +292,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -344,7 +304,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         float[] elem;
@@ -361,15 +321,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] elem;
             for (int s = 0; s < slices; s++) {
@@ -398,9 +350,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * 
      */
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -410,7 +362,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         float[] elem;
@@ -427,15 +379,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] elem;
             for (int s = 0; s < slices; s++) {
@@ -478,9 +422,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
         } else {
             other_loc = other;
         }
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -490,7 +434,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
                             for (int r = 0; r < rows; r++) {
@@ -502,15 +446,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
                 for (int r = 0; r < rows; r++) {
@@ -540,9 +476,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      */
     public FComplexMatrix3D assign(final FComplexMatrix3D y, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction function) {
         checkShape(y);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -552,7 +488,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
                             for (int r = 0; r < rows; r++) {
@@ -564,15 +500,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
                 for (int r = 0; r < rows; r++) {
@@ -597,9 +525,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * @return <tt>this</tt> (for convenience only).
      */
     public FComplexMatrix3D assign(final float re, final float im) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -609,7 +537,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         for (int s = startslice; s < stopslice; s++) {
@@ -622,15 +550,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
             for (int s = 0; s < slices; s++) {
@@ -664,9 +584,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     public FComplexMatrix3D assign(final float[] values) {
         if (values.length != slices * rows * 2 * columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "slices()*rows()*2*columns()=" + slices() * rows() * 2 * columns());
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -677,7 +597,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx = glob_idx;
                         for (int s = startslice; s < stopslice; s++) {
@@ -691,15 +611,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
             int idx = 0;
@@ -738,9 +650,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     public FComplexMatrix3D assign(final float[][][] values) {
         if (values.length != slices)
             throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -750,7 +662,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
                             float[][] currentSlice = values[s];
@@ -768,15 +680,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
             for (int s = 0; s < slices; s++) {
@@ -798,7 +702,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
 
     /**
      * Replaces imaginary part of the receiver with the values of another real
-     * matrix. The real part of the receiver is reset to zero. Both matrices
+     * matrix. The real part of the receiver remains unchanged. Both matrices
      * must have the same size.
      * 
      * @param other
@@ -809,9 +713,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      */
     public FComplexMatrix3D assignImaginary(final FloatMatrix3D other) {
         checkShape(other);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -821,36 +725,28 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp = new float[2];
                         for (int s = startslice; s < stopslice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
-                                    tmp[1] = other.getQuick(s, r, c);
-                                    setQuick(s, r, c, tmp);
+                                    float re = getQuick(s, r, c)[0];
+                                    float im = other.getQuick(s, r, c);
+                                    setQuick(s, r, c, re, im);
                                 }
                             }
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp = new float[2];
             for (int s = 0; s < slices; s++) {
                 for (int r = 0; r < rows; r++) {
                     for (int c = 0; c < columns; c++) {
-                        tmp[1] = other.getQuick(s, r, c);
-                        setQuick(s, r, c, tmp);
+                        float re = getQuick(s, r, c)[0];
+                        float im = other.getQuick(s, r, c);
+                        setQuick(s, r, c, re, im);
                     }
                 }
             }
@@ -860,7 +756,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
 
     /**
      * Replaces real part of the receiver with the values of another real
-     * matrix. The imaginary part of the receiver is reset to zero. Both
+     * matrix. The imaginary part of the receiver remains unchanged. Both
      * matrices must have the same size.
      * 
      * @param other
@@ -871,9 +767,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      */
     public FComplexMatrix3D assignReal(final FloatMatrix3D other) {
         checkShape(other);
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -883,36 +779,28 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp = new float[2];
                         for (int s = startslice; s < stopslice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
-                                    tmp[0] = other.getQuick(s, r, c);
-                                    setQuick(s, r, c, tmp);
+                                    float re = other.getQuick(s, r, c);
+                                    float im = getQuick(s, r, c)[1];
+                                    setQuick(s, r, c, re, im);
                                 }
                             }
                         }
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp = new float[2];
             for (int s = 0; s < slices; s++) {
                 for (int r = 0; r < rows; r++) {
                     for (int c = 0; c < columns; c++) {
-                        tmp[0] = other.getQuick(s, r, c);
-                        setQuick(s, r, c, tmp);
+                        float re = other.getQuick(s, r, c);
+                        float im = getQuick(s, r, c)[1];
+                        setQuick(s, r, c, re, im);
                     }
                 }
             }
@@ -927,9 +815,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      */
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
@@ -940,7 +828,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Integer>() {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
                         float[] tmp = new float[2];
@@ -1033,20 +921,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
         return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, (FComplexMatrix3D) obj);
     }
 
-    /**
-     * Computes the 2D discrete Fourier transform (DFT) of each slice of this
-     * matrix. Throws IllegalArgumentException if the column size or a the row
-     * size of a slice is not a power of 2 number.
-     */
-    public abstract void fft2Slices();
-
-    /**
-     * Computes the 3D discrete Fourier transform (DFT) of this matrix. Throws
-     * IllegalArgumentException if the slice size or the row size or the column
-     * size of this matrix is not a power of 2 number.
-     */
-    public abstract void fft3();
-
+    
+    
     /**
      * Returns the matrix cell value at coordinate <tt>[slice,row,column]</tt>.
      * 
@@ -1152,25 +1028,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      */
     public abstract FloatMatrix3D getRealPart();
 
-    /**
-     * Computes the 2D inverse of the discrete Fourier transform (IDFT) of each
-     * slice of this matrix. Throws IllegalArgumentException if the column size
-     * or the row size of a slice is not a power of 2 number.
-     * 
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public abstract void ifft2Slices(boolean scale);
 
-    /**
-     * Computes the 3D inverse of the discrete Fourier transform (IDFT) of this
-     * matrix. Throws IllegalArgumentException if slice the size or the row size
-     * or the column size of this matrix is not a power of 2 number.
-     * 
-     * @param scale
-     *            if true then scaling is performed
-     */
-    public abstract void ifft3(boolean scale);
 
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
@@ -1288,9 +1146,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      */
     public float[][][] toArray() {
         final float[][][] values = new float[slices][rows][2 * columns];
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = slices / np;
             for (int j = 0; j < np; j++) {
                 final int startslice = j * k;
@@ -1300,7 +1158,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                 } else {
                     stopslice = startslice + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp = new float[2];
                         for (int s = startslice; s < stopslice; s++) {
@@ -1317,15 +1175,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             float[] tmp = new float[2];
             for (int s = 0; s < slices; s++) {

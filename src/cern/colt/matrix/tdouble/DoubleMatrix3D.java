@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -15,7 +15,6 @@ import java.util.concurrent.Future;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix3D;
-import cern.colt.matrix.tdcomplex.DComplexMatrix3D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
@@ -88,9 +87,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		if (size() == 0)
 			return Double.NaN;
 		double a = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Double[] results = new Double[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -101,7 +100,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
 					public Double call() throws Exception {
 						double a = f.apply(getQuick(startslice, 0, 0));
@@ -118,19 +117,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					results[j] = (Double) futures[j].get();
-				}
-				a = results[0];
-				for (int j = 1; j < np; j++) {
-					a = aggr.apply(a, results[j]);
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			a = ConcurrencyUtils.waitForCompletion(futures, aggr);
 		} else {
 			a = f.apply(getQuick(0, 0, 0));
 			int d = 1; // first cell already done
@@ -165,9 +152,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		if (size() == 0)
 			return Double.NaN;
 		double a = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Double[] results = new Double[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -178,7 +165,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
 					public Double call() throws Exception {
 						double elem = getQuick(startslice, 0, 0);
@@ -202,19 +189,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					results[j] = (Double) futures[j].get();
-				}
-				a = results[0];
-				for (int j = 1; j < np; j++) {
-					a = aggr.apply(a, results[j]);
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			a = ConcurrencyUtils.waitForCompletion(futures, aggr);
 		} else {
 			double elem = getQuick(0, 0, 0);
 			if (cond.apply(elem) == true) {
@@ -237,7 +212,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	}
 
 	/**
-	 * Applies a function to all cells with a given indices and aggregates the
+	 * Applies a function to all cells with a given indexes and aggregates the
 	 * results.
 	 * 
 	 * @param aggr
@@ -247,11 +222,11 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 * @param f
 	 *            a function transforming the current cell value.
 	 * @param sliceList
-	 *            slice indices.
+	 *            slice indexes.
 	 * @param rowList
-	 *            row indices.
+	 *            row indexes.
 	 * @param columnList
-	 *            column indices.
+	 *            column indexes.
 	 * @return the aggregated measure.
 	 * @see cern.jet.math.tdouble.DoubleFunctions
 	 */
@@ -265,9 +240,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		final int[] rowElements = rowList.elements();
 		final int[] columnElements = columnList.elements();
 		double a = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Double[] results = new Double[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
@@ -278,7 +253,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopidx = startidx + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
 					public Double call() throws Exception {
 						double a = f.apply(getQuick(sliceElements[startidx], rowElements[startidx], columnElements[startidx]));
@@ -291,19 +266,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					results[j] = (Double) futures[j].get();
-				}
-				a = results[0];
-				for (int j = 1; j < np; j++) {
-					a = aggr.apply(a, results[j]);
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			a = ConcurrencyUtils.waitForCompletion(futures, aggr);
 		} else {
 			a = f.apply(getQuick(sliceElements[0], rowElements[0], columnElements[0]));
 			double elem;
@@ -371,9 +334,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		if (size() == 0)
 			return Double.NaN;
 		double a = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Double[] results = new Double[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -384,7 +347,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Double>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 					public Double call() throws Exception {
 						double a = f.apply(getQuick(startslice, 0, 0), other.getQuick(startslice, 0, 0));
 						int d = 1;
@@ -400,19 +363,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					results[j] = (Double) futures[j].get();
-				}
-				a = results[0].doubleValue();
-				for (int j = 1; j < np; j++) {
-					a = aggr.apply(a, results[j].doubleValue());
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			a = ConcurrencyUtils.waitForCompletion(futures, aggr);
 		} else {
 			a = f.apply(getQuick(0, 0, 0), other.getQuick(0, 0, 0));
 			int d = 1; // first cell already done
@@ -457,9 +408,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 * @see cern.jet.math.tdouble.DoubleFunctions
 	 */
 	public DoubleMatrix3D assign(final cern.colt.function.tdouble.DoubleFunction function) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -469,7 +420,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						for (int s = startslice; s < stopslice; s++) {
 							for (int r = 0; r < rows; r++) {
@@ -481,15 +432,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 
 		} else {
 			for (int s = 0; s < slices; s++) {
@@ -511,9 +454,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 * @return <tt>this</tt> (for convenience only).
 	 */
 	public DoubleMatrix3D assign(final double value) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -523,7 +466,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						for (int s = startslice; s < stopslice; s++) {
 							for (int r = 0; r < rows; r++) {
@@ -535,15 +478,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int s = 0; s < slices; s++) {
 				for (int r = 0; r < rows; r++) {
@@ -572,9 +507,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	public DoubleMatrix3D assign(final double[] values) {
 		if (values.length != slices * rows * columns)
 			throw new IllegalArgumentException("Must have same length: length=" + values.length + "slices()*rows()*columns()=" + slices() * rows() * columns());
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -585,7 +520,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						int idx = glob_idx;
 						for (int s = startslice; s < stopslice; s++) {
@@ -598,15 +533,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			int idx = 0;
 			for (int s = 0; s < slices; s++) {
@@ -643,9 +570,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	public DoubleMatrix3D assign(final double[][][] values) {
 		if (values.length != slices)
 			throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -655,7 +582,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int s = startslice; s < stopslice; s++) {
@@ -674,15 +601,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 
 		} else {
 			for (int s = 0; s < slices; s++) {
@@ -714,9 +633,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 * @see cern.jet.math.tdouble.DoubleFunctions
 	 */
 	public DoubleMatrix3D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final cern.colt.function.tdouble.DoubleFunction f) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -726,7 +645,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						double elem;
@@ -743,15 +662,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			double elem;
 			for (int s = 0; s < slices; s++) {
@@ -780,9 +691,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 * 
 	 */
 	public DoubleMatrix3D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final double value) {
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -792,7 +703,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						double elem;
@@ -809,15 +720,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			double elem;
 			for (int s = 0; s < slices; s++) {
@@ -860,9 +763,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		} else {
 			otherLoc = other;
 		}
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -872,7 +775,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int s = startslice; s < stopslice; s++) {
@@ -885,15 +788,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int s = 0; s < slices; s++) {
 				for (int r = 0; r < rows; r++) {
@@ -947,9 +842,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 */
 	public DoubleMatrix3D assign(final DoubleMatrix3D y, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
 		checkShape(y);
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -959,7 +854,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int s = startslice; s < stopslice; s++) {
@@ -972,15 +867,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int s = 0; s < slices; s++) {
 				for (int r = 0; r < rows; r++) {
@@ -995,7 +882,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	}
 
 	/**
-	 * Assigns the result of a function to all cells with a given indices
+	 * Assigns the result of a function to all cells with a given indexes
 	 * 
 	 * @param y
 	 *            the secondary matrix to operate on.
@@ -1004,11 +891,11 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 *            value of <tt>this</tt>, and as second argument the current
 	 *            cell's value of <tt>y</tt>, *
 	 * @param sliceList
-	 *            slice indices.
+	 *            slice indexes.
 	 * @param rowList
-	 *            row indices.
+	 *            row indexes.
 	 * @param columnList
-	 *            column indices.
+	 *            column indexes.
 	 * @return <tt>this</tt> (for convenience only).
 	 * @throws IllegalArgumentException
 	 *             if
@@ -1021,9 +908,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		final int[] sliceElements = sliceList.elements();
 		final int[] rowElements = rowList.elements();
 		final int[] columnElements = columnList.elements();
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = size / np;
 			for (int j = 0; j < np; j++) {
 				final int startidx = j * k;
@@ -1033,7 +920,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopidx = startidx + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						for (int i = startidx; i < stopidx; i++) {
@@ -1042,15 +929,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int i = 0; i < size; i++) {
 				setQuick(sliceElements[i], rowElements[i], columnElements[i], function.apply(getQuick(sliceElements[i], rowElements[i], columnElements[i]), y.getQuick(sliceElements[i], rowElements[i], columnElements[i])));
@@ -1066,9 +945,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 */
 	public int cardinality() {
 		int cardinality = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			Integer[] results = new Integer[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -1079,7 +958,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Integer>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
 					public Integer call() throws Exception {
 						int cardinality = 0;
 						for (int s = startslice; s < stopslice; s++) {
@@ -1134,87 +1013,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		return like().assign(this);
 	}
 
-	/**
-	 * Computes the 2D discrete cosine transform (DCT-II) of each slice of this
-	 * matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 * 
-	 */
-	public abstract void dct2Slices(boolean scale);
-
-	/**
-	 * Computes the 3D discrete cosine transform (DCT-II) of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 * 
-	 */
-	public abstract void dct3(boolean scale);
-
-	/**
-	 * Computes the 2D discrete Hartley transform (DHT) of each slice of this
-	 * matrix.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 * 
-	 */
-	public abstract void dht2Slices();
-
-	/**
-	 * Computes the 3D discrete Hartley transform (DHT) of this matrix.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 * 
-	 */
-	public abstract void dht3();
-
-	/**
-	 * Computes the 2D discrete sine transform (DST-II) of each slice of this
-	 * matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 * 
-	 */
-	public abstract void dst2Slices(boolean scale);
-
-	/**
-	 * Computes the 3D discrete sine transform (DST-II) of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 * 
-	 */
-	public abstract void dst3(boolean scale);
-
+	
 	/**
 	 * Returns the elements of this matrix.
 	 * 
@@ -1257,64 +1056,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		return cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.equals(this, (DoubleMatrix3D) obj);
 	}
 
-	/**
-	 * Computes the 3D discrete Fourier transform (DFT) of this matrix. The
-	 * physical layout of the output data is as follows:
-	 * 
-	 * <pre>
-	 * this[k1][k2][2*k3] = Re[k1][k2][k3]
-	 *                 = Re[(n1-k1)%n1][(n2-k2)%n2][n3-k3], 
-	 * this[k1][k2][2*k3+1] = Im[k1][k2][k3]
-	 *                   = -Im[(n1-k1)%n1][(n2-k2)%n2][n3-k3], 
-	 *     0&lt;=k1&lt;n1, 0&lt;=k2&lt;n2, 0&lt;k3&lt;n3/2, 
-	 * this[k1][k2][0] = Re[k1][k2][0]
-	 *              = Re[(n1-k1)%n1][n2-k2][0], 
-	 * this[k1][k2][1] = Im[k1][k2][0]
-	 *              = -Im[(n1-k1)%n1][n2-k2][0], 
-	 * this[k1][n2-k2][1] = Re[(n1-k1)%n1][k2][n3/2]
-	 *                 = Re[k1][n2-k2][n3/2], 
-	 * this[k1][n2-k2][0] = -Im[(n1-k1)%n1][k2][n3/2]
-	 *                 = Im[k1][n2-k2][n3/2], 
-	 *     0&lt;=k1&lt;n1, 0&lt;k2&lt;n2/2, 
-	 * this[k1][0][0] = Re[k1][0][0]
-	 *             = Re[n1-k1][0][0], 
-	 * this[k1][0][1] = Im[k1][0][0]
-	 *             = -Im[n1-k1][0][0], 
-	 * this[k1][n2/2][0] = Re[k1][n2/2][0]
-	 *                = Re[n1-k1][n2/2][0], 
-	 * this[k1][n2/2][1] = Im[k1][n2/2][0]
-	 *                = -Im[n1-k1][n2/2][0], 
-	 * this[n1-k1][0][1] = Re[k1][0][n3/2]
-	 *                = Re[n1-k1][0][n3/2], 
-	 * this[n1-k1][0][0] = -Im[k1][0][n3/2]
-	 *                = Im[n1-k1][0][n3/2], 
-	 * this[n1-k1][n2/2][1] = Re[k1][n2/2][n3/2]
-	 *                   = Re[n1-k1][n2/2][n3/2], 
-	 * this[n1-k1][n2/2][0] = -Im[k1][n2/2][n3/2]
-	 *                   = Im[n1-k1][n2/2][n3/2], 
-	 *     0&lt;k1&lt;n1/2, 
-	 * this[0][0][0] = Re[0][0][0], 
-	 * this[0][0][1] = Re[0][0][n3/2], 
-	 * this[0][n2/2][0] = Re[0][n2/2][0], 
-	 * this[0][n2/2][1] = Re[0][n2/2][n3/2], 
-	 * this[n1/2][0][0] = Re[n1/2][0][0], 
-	 * this[n1/2][0][1] = Re[n1/2][0][n3/2], 
-	 * this[n1/2][n2/2][0] = Re[n1/2][n2/2][0], 
-	 * this[n1/2][n2/2][1] = Re[n1/2][n2/2][n3/2]
-	 * </pre>
-	 * 
-	 * 
-	 * This method computes only half of the elements of the real transform. The
-	 * other half satisfies the symmetry condition. If you want the full real
-	 * forward transform, use <code>getFft3</code>. To get back the original
-	 * data, use <code>ifft3</code>.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 */
-	public abstract void fft3();
-
+	
 	/**
 	 * Returns the matrix cell value at coordinate <tt>[slice,row,column]</tt>.
 	 * 
@@ -1344,65 +1086,10 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		return this;
 	}
 
-	/**
-	 * Returns new complex matrix which is the 2D discrete Fourier transform
-	 * (DFT) of each slice of this matrix.
-	 * 
-	 * @return the 2D discrete Fourier transform (DFT) of each slice of this
-	 *         matrix.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract DComplexMatrix3D getFft2Slices();
-
-	/**
-	 * Returns new complex matrix which is the 3D discrete Fourier transform
-	 * (DFT) of this matrix.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 * @return the 3D discrete Fourier transform (DFT) of this matrix.
-	 */
-	public abstract DComplexMatrix3D getFft3();
-
-	/**
-	 * Returns new complex matrix which is the 2D inverse of the discrete
-	 * Fourier transform (IDFT) of each slice of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @return the 2D inverse of the discrete Fourier transform (IDFT) of each
-	 *         slice of this matrix.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 */
-	public abstract DComplexMatrix3D getIfft2Slices(boolean scale);
-
-	/**
-	 * Returns new complex matrix which is the 3D inverse of the discrete
-	 * Fourier transform (IDFT) of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @return the 3D inverse of the discrete Fourier transform (IDFT) of this
-	 *         matrix.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract DComplexMatrix3D getIfft3(boolean scale);
-
+	
+	
+	
+	
 	/**
 	 * Fills the coordinates and values of cells having negative values into the
 	 * specified lists. Fills into the lists, starting at index 0. After this
@@ -1560,149 +1247,13 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		return false;
 	}
 
-	/**
-	 * Computes the 2D inverse of the discrete cosine transform (DCT-III) of
-	 * each slice of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idct2Slices(boolean scale);
-
-	/**
-	 * Computes the 3D inverse of the discrete cosine transform (DCT-III) of
-	 * this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idct3(boolean scale);
-
-	/**
-	 * Computes the 2D inverse of the discrete Hartley transform (IDHT) of each
-	 * slice of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idht2Slices(boolean scale);
-
-	/**
-	 * Computes the 3D inverse of the discrete Hartley transform (IDHT) of this
-	 * matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idht3(boolean scale);
-
-	/**
-	 * Computes the 2D inverse of the discrete sine transform (DST-III) of each
-	 * slice of this matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idst2Slices(boolean scale);
-
-	/**
-	 * Computes the 3D inverse of the discrete sine transform (DST-III) of this
-	 * matrix.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 * 
-	 */
-	public abstract void idst3(boolean scale);
-
-	/**
-	 * Computes the 3D inverse of the discrete Fourier transform (IDFT) of this
-	 * matrix. The physical layout of the input data has to be as follows:
-	 * 
-	 * <pre>
-	 * this[k1][k2][2*k3] = Re[k1][k2][k3]
-	 *                 = Re[(n1-k1)%n1][(n2-k2)%n2][n3-k3], 
-	 * this[k1][k2][2*k3+1] = Im[k1][k2][k3]
-	 *                   = -Im[(n1-k1)%n1][(n2-k2)%n2][n3-k3], 
-	 *     0&lt;=k1&lt;n1, 0&lt;=k2&lt;n2, 0&lt;k3&lt;n3/2, 
-	 * this[k1][k2][0] = Re[k1][k2][0]
-	 *              = Re[(n1-k1)%n1][n2-k2][0], 
-	 * this[k1][k2][1] = Im[k1][k2][0]
-	 *              = -Im[(n1-k1)%n1][n2-k2][0], 
-	 * this[k1][n2-k2][1] = Re[(n1-k1)%n1][k2][n3/2]
-	 *                 = Re[k1][n2-k2][n3/2], 
-	 * this[k1][n2-k2][0] = -Im[(n1-k1)%n1][k2][n3/2]
-	 *                 = Im[k1][n2-k2][n3/2], 
-	 *     0&lt;=k1&lt;n1, 0&lt;k2&lt;n2/2, 
-	 * this[k1][0][0] = Re[k1][0][0]
-	 *             = Re[n1-k1][0][0], 
-	 * this[k1][0][1] = Im[k1][0][0]
-	 *             = -Im[n1-k1][0][0], 
-	 * this[k1][n2/2][0] = Re[k1][n2/2][0]
-	 *                = Re[n1-k1][n2/2][0], 
-	 * this[k1][n2/2][1] = Im[k1][n2/2][0]
-	 *                = -Im[n1-k1][n2/2][0], 
-	 * this[n1-k1][0][1] = Re[k1][0][n3/2]
-	 *                = Re[n1-k1][0][n3/2], 
-	 * this[n1-k1][0][0] = -Im[k1][0][n3/2]
-	 *                = Im[n1-k1][0][n3/2], 
-	 * this[n1-k1][n2/2][1] = Re[k1][n2/2][n3/2]
-	 *                   = Re[n1-k1][n2/2][n3/2], 
-	 * this[n1-k1][n2/2][0] = -Im[k1][n2/2][n3/2]
-	 *                   = Im[n1-k1][n2/2][n3/2], 
-	 *     0&lt;k1&lt;n1/2, 
-	 * this[0][0][0] = Re[0][0][0], 
-	 * this[0][0][1] = Re[0][0][n3/2], 
-	 * this[0][n2/2][0] = Re[0][n2/2][0], 
-	 * this[0][n2/2][1] = Re[0][n2/2][n3/2], 
-	 * this[n1/2][0][0] = Re[n1/2][0][0], 
-	 * this[n1/2][0][1] = Re[n1/2][0][n3/2], 
-	 * this[n1/2][n2/2][0] = Re[n1/2][n2/2][0], 
-	 * this[n1/2][n2/2][1] = Re[n1/2][n2/2][n3/2]
-	 * </pre>
-	 * 
-	 * This method computes only half of the elements of the real transform. The
-	 * other half satisfies the symmetry condition. If you want the full real
-	 * inverse transform, use <code>getIfft3</code>.
-	 * 
-	 * @param scale
-	 *            if true then scaling is performed
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if the slice size or the row size or the column size of this
-	 *             matrix is not a power of 2 number.
-	 */
-	public abstract void ifft3(boolean scale);
-
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * Construct and returns a new empty matrix <i>of the same dynamic type</i>
 	 * as the receiver, having the same number of slices, rows and columns. For
@@ -1775,9 +1326,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		int rowLocation = 0;
 		int columnLocation = 0;
 		double maxValue = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			double[][] results = new double[np][2];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -1788,7 +1339,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 					public double[] call() throws Exception {
 						int sliceLocation = startslice;
 						int rowLocation = 0;
@@ -1867,9 +1418,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 		int rowLocation = 0;
 		int columnLocation = 0;
 		double minValue = 0;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			double[][] results = new double[np][2];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
@@ -1880,7 +1431,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<double[]>() {
+				futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 					public double[] call() throws Exception {
 						int sliceLocation = startslice;
 						int rowLocation = 0;
@@ -2026,9 +1577,9 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 	 */
 	public double[][][] toArray() {
 		final double[][][] values = new double[slices][rows][columns];
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = slices / np;
 			for (int j = 0; j < np; j++) {
 				final int startslice = j * k;
@@ -2038,7 +1589,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 				} else {
 					stopslice = startslice + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						for (int s = startslice; s < stopslice; s++) {
 							double[][] currentSlice = values[s];
@@ -2052,15 +1603,7 @@ public abstract class DoubleMatrix3D extends AbstractMatrix3D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			for (int s = 0; s < slices; s++) {
 				double[][] currentSlice = values[s];

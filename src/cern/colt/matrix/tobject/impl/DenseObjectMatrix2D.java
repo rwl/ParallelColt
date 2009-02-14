@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -11,8 +11,6 @@ package cern.colt.matrix.tobject.impl;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import cern.colt.matrix.tfloat.FloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
 import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -158,10 +156,10 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 	public ObjectMatrix2D assign(final Object[][] values) {
 		if (values.length != rows)
 			throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()=" + rows());
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if (this.isNoView) {
 			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-				Future[] futures = new Future[np];
+				Future<?>[] futures = new Future[np];
 				int k = rows / np;
 				for (int j = 0; j < np; j++) {
 					final int startrow = j * k;
@@ -171,7 +169,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 					} else {
 						stoprow = startrow + k;
 					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					futures[j] = ConcurrencyUtils.submit(new Runnable() {
 						public void run() {
 							int i = startrow * rowStride;
 							for (int r = startrow; r < stoprow; r++) {
@@ -204,9 +202,9 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 				}
 			}
 		} else {
-			final int zero = index(0, 0);
+			final int zero = (int)index(0, 0);
 			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-				Future[] futures = new Future[np];
+				Future<?>[] futures = new Future[np];
 				int k = rows / np;
 				for (int j = 0; j < np; j++) {
 					final int startrow = j * k;
@@ -216,7 +214,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 					} else {
 						stoprow = startrow + k;
 					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 						public void run() {
 							int idx = zero + startrow * rowStride;
@@ -292,10 +290,10 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 		final Object[] elems = this.elements;
 		if (elems == null)
 			throw new InternalError();
-		final int zero = index(0, 0);
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		final int zero = (int)index(0, 0);
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = rows / np;
 			for (int j = 0; j < np; j++) {
 				final int startrow = j * k;
@@ -305,7 +303,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 				} else {
 					stoprow = startrow + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						int idx = zero + startrow * rowStride;
@@ -320,15 +318,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			int idx = zero;
 			for (int r = 0; r < rows; r++) {
@@ -367,10 +357,10 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 		if (other_final == this)
 			return this; // nothing to do
 		checkShape(other_final);
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if (this.isNoView && other_final.isNoView) { // quickest
 			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-				Future[] futures = new Future[np];
+				Future<?>[] futures = new Future[np];
 				int k = size() / np;
 				for (int j = 0; j < np; j++) {
 					final int startidx = j * k;
@@ -380,7 +370,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 					} else {
 						length = k;
 					}
-					futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+					futures[j] = ConcurrencyUtils.submit(new Runnable() {
 						public void run() {
 							System.arraycopy(other_final.elements, startidx, elements, startidx, length);
 						}
@@ -413,12 +403,12 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 		final Object[] elemsOther = other.elements;
 		if (elements == null || elemsOther == null)
 			throw new InternalError();
-		final int zeroOther = other.index(0, 0);
-		final int zero = index(0, 0);
+		final int zeroOther = (int)other.index(0, 0);
+		final int zero = (int)index(0, 0);
 		final int columnStrideOther = other.columnStride;
 		final int rowStrideOther = other.rowStride;
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = rows / np;
 			for (int j = 0; j < np; j++) {
 				final int startrow = j * k;
@@ -428,7 +418,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 				} else {
 					stoprow = startrow + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						int idx = zero + startrow * rowStride;
 						int idxOther = zeroOther + startrow * rowStrideOther;
@@ -444,15 +434,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 					}
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			int idx = zero;
 			int idxOther = zeroOther;
@@ -518,13 +500,13 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 		final Object[] elemsOther = other.elements();
 		if (elements == null || elemsOther == null)
 			throw new InternalError();
-		final int zeroOther = other.index(0, 0);
-		final int zero = index(0, 0);
+		final int zeroOther = (int)other.index(0, 0);
+		final int zero = (int)index(0, 0);
 		final int columnStrideOther = other.columnStride;
 		final int rowStrideOther = other.rowStride;
-		int np = ConcurrencyUtils.getNumberOfProcessors();
+		int np = ConcurrencyUtils.getNumberOfThreads();
 		if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-			Future[] futures = new Future[np];
+			Future<?>[] futures = new Future[np];
 			int k = rows / np;
 			for (int j = 0; j < np; j++) {
 				final int startrow = j * k;
@@ -534,7 +516,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 				} else {
 					stoprow = startrow + k;
 				}
-				futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
 					public void run() {
 						int idx;
@@ -554,15 +536,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 
 				});
 			}
-			try {
-				for (int j = 0; j < np; j++) {
-					futures[j].get();
-				}
-			} catch (ExecutionException ex) {
-				ex.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ConcurrencyUtils.waitForCompletion(futures);
 		} else {
 			int idx;
 			int idxOther;
@@ -639,7 +613,7 @@ public class DenseObjectMatrix2D extends ObjectMatrix2D {
 	 * @param column
 	 *            the index of the column-coordinate.
 	 */
-	public int index(int row, int column) {
+	public long index(int row, int column) {
 		// return super.index(row,column);
 		// manually inlined for speed:
 		return rowZero + row * rowStride + columnZero + column * columnStride;

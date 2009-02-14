@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -158,23 +158,13 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      * @return the value at the specified coordinate.
      */
     public float[] getQuick(int slice, int row, int column) {
-        return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride);
-    }
-
-    public void fft3() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifft3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void fft2Slices() {
-        throw new IllegalArgumentException("This method is not supported yet");
-    }
-
-    public void ifft2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported yet");
+        float[] elem = elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride);
+        if(elem != null) {
+            return new float[] {elem[0], elem[1]};
+        }
+        else {
+            return new float[2];
+        }
     }
 
     /**
@@ -212,7 +202,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    public int index(int slice, int row, int column) {
+    public long index(int slice, int row, int column) {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
@@ -349,7 +339,12 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      *         matrix on top of one another
      */
     public FComplexMatrix1D vectorize() {
-        throw new IllegalArgumentException("This method is not supported yet");
+        FComplexMatrix1D v = new SparseFComplexMatrix1D(size());
+        int length = rows * columns;
+        for (int s = 0; s < slices; s++) {
+            v.viewPart(s * length, length).assign(viewSlice(s).vectorize());
+        }
+        return v;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright ï¿½ 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -76,6 +76,10 @@ public class FComplex extends FloatConstants {
         return (float) Math.atan2(x[1], x[0]);
     }
 
+    public static final float arg(float re, float im) {
+        return (float) Math.atan2(im, re);
+    }
+    
     public static final float[] asin(float[] x) {
         float[] z = new float[2];
 

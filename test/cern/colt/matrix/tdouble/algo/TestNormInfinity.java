@@ -2,7 +2,6 @@ package cern.colt.matrix.tdouble.algo;
 
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
 
 class TestNormInfinity {
 

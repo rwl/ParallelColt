@@ -10,4 +10,13 @@ public interface DComplexDComplexFunction {
      * @return the result of the function.
      */
     abstract public double[] apply(double[] x);
+    
+    /**
+     * Applies a function to a complex argument.
+     * 
+     * @param re real part of an argument passed to the function
+     * @param im imaginary part of an argument passed to the function
+     * @return the result of the function.
+     */
+    abstract public double[] apply(double re, double im);
 }

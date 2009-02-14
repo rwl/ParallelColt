@@ -15,7 +15,7 @@
  *
  * The Initial Developer of the Original Code is
  * Piotr Wendykier, Emory University.
- * Portions created by the Initial Developer are Copyright (C) 2007
+ * Portions created by the Initial Developer are Copyright (C) 2007-2009
  * the Initial Developer. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -60,7 +60,7 @@ public class AccuracyCheckDoubleDHT {
         System.out.println("Checking accuracy of 1D DHT...");
         for (int i = 0; i < sizes1D.length; i++) {
             DoubleDHT_1D fht = new DoubleDHT_1D(sizes1D[i]);
-            double e, err = 0.0;
+            double err = 0.0;
             double[] a = new double[sizes1D[i]];
             IOUtils.fillMatrix_1D(sizes1D[i], a);
             double[] b = new double[sizes1D[i]];
@@ -84,7 +84,7 @@ public class AccuracyCheckDoubleDHT {
         System.out.println("Checking accuracy of 2D DHT (double[] input)...");
         for (int i = 0; i < sizes2D.length; i++) {
             DoubleDHT_2D fht2 = new DoubleDHT_2D(sizes2D[i], sizes2D[i]);
-            double e, err = 0.0;
+            double err = 0.0;
             double[] a = new double[sizes2D[i] * sizes2D[i]];
             IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
             double[] b = new double[sizes2D[i] * sizes2D[i]];
@@ -105,7 +105,7 @@ public class AccuracyCheckDoubleDHT {
         System.out.println("Checking accuracy of 2D DHT (double[][] input)...");
         for (int i = 0; i < sizes2D.length; i++) {
             DoubleDHT_2D fht2 = new DoubleDHT_2D(sizes2D[i], sizes2D[i]);
-            double e, err = 0.0;
+            double err = 0.0;
             double[][] a = new double[sizes2D[i]][sizes2D[i]];
             IOUtils.fillMatrix_2D(sizes2D[i], sizes2D[i], a);
             double[][] b = new double[sizes2D[i]][sizes2D[i]];
@@ -130,7 +130,7 @@ public class AccuracyCheckDoubleDHT {
         System.out.println("Checking accuracy of 3D DHT (double[] input)...");
         for (int i = 0; i < sizes3D.length; i++) {
             DoubleDHT_3D dht3 = new DoubleDHT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
-            double e, err = 0.0;
+            double err = 0.0;
             double[] a = new double[sizes3D[i] * sizes3D[i] * sizes3D[i]];
             IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
             double[] b = new double[sizes3D[i] * sizes3D[i] * sizes3D[i]];
@@ -152,7 +152,7 @@ public class AccuracyCheckDoubleDHT {
         System.out.println("Checking accuracy of 3D DHT (double[][][] input)...");
         for (int i = 0; i < sizes3D.length; i++) {
             DoubleDHT_3D dht3 = new DoubleDHT_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
-            double e, err = 0.0;
+            double err = 0.0;
             double[][][] a = new double[sizes3D[i]][sizes3D[i]][sizes3D[i]];
             IOUtils.fillMatrix_3D(sizes3D[i], sizes3D[i], sizes3D[i], a);
             double[][][] b = new double[sizes3D[i]][sizes3D[i]][sizes3D[i]];
@@ -174,7 +174,7 @@ public class AccuracyCheckDoubleDHT {
 
     private static double computeRMSE(double[] a, double[] b) {
         if (a.length != b.length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size");
         }
         double rms = 0;
         double tmp;
@@ -187,7 +187,7 @@ public class AccuracyCheckDoubleDHT {
 
     private static double computeRMSE(double[][] a, double[][] b) {
         if (a.length != b.length || a[0].length != b[0].length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size");
         }
         double rms = 0;
         double tmp;
@@ -202,7 +202,7 @@ public class AccuracyCheckDoubleDHT {
 
     private static double computeRMSE(double[][][] a, double[][][] b) {
         if (a.length != b.length || a[0].length != b[0].length || a[0][0].length != b[0][0].length) {
-            throw new IllegalArgumentException("a.length != b.length");
+            throw new IllegalArgumentException("Arrays are not the same size");
         }
         double rms = 0;
         double tmp;

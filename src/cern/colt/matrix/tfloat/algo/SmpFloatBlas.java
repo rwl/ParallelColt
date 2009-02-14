@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfloat.algo;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.tfloat.FloatMatrix1D;
@@ -45,11 +44,11 @@ public class SmpFloatBlas implements FloatBlas {
     }
 
     public void daxpy(float alpha, FloatMatrix1D x, FloatMatrix1D y) {
-        y.assign(x, FloatFunctions.plusMult(alpha));
+        y.assign(x, FloatFunctions.plusMultSecond(alpha));
     }
 
     public void daxpy(float alpha, FloatMatrix2D A, FloatMatrix2D B) {
-        B.assign(A, FloatFunctions.plusMult(alpha));
+        B.assign(A, FloatFunctions.plusMultSecond(alpha));
     }
 
     public void dcopy(FloatMatrix1D x, FloatMatrix1D y) {
@@ -73,7 +72,7 @@ public class SmpFloatBlas implements FloatBlas {
     }
 
     public void dger(float alpha, FloatMatrix1D x, FloatMatrix1D y, FloatMatrix2D A) {
-        cern.jet.math.tfloat.FloatPlusMult fun = cern.jet.math.tfloat.FloatPlusMult.plusMult(0);
+        cern.jet.math.tfloat.FloatPlusMultSecond fun = cern.jet.math.tfloat.FloatPlusMultSecond.plusMult(0);
         int rows = A.rows();
         for (int i = 0; i < rows; i++) {
             fun.multiplicator = alpha * x.getQuick(i);
@@ -90,7 +89,7 @@ public class SmpFloatBlas implements FloatBlas {
         FloatMatrix1D tmp = x.copy();
 
         x.assign(FloatFunctions.mult(c));
-        x.assign(y, FloatFunctions.plusMult(s));
+        x.assign(y, FloatFunctions.plusMultSecond(s));
 
         y.assign(FloatFunctions.mult(c));
         y.assign(tmp, FloatFunctions.minusMult(s));
@@ -110,7 +109,7 @@ public class SmpFloatBlas implements FloatBlas {
 
             ra = a / scale;
             rb = b / scale;
-            r = (float) (scale * Math.sqrt(ra * ra + rb * rb));
+            r = (float)(scale * Math.sqrt(ra * ra + rb * rb));
             r = sign(1.0f, roe) * r;
             c = a / r;
             s = b / r;
@@ -118,7 +117,7 @@ public class SmpFloatBlas implements FloatBlas {
             if (Math.abs(a) > Math.abs(b))
                 z = s;
             if ((Math.abs(b) >= Math.abs(a)) && (c != 0.0))
-                z = 1.0f / c;
+                z = (float)(1.0 / c);
 
         } else {
 
@@ -170,9 +169,9 @@ public class SmpFloatBlas implements FloatBlas {
             throw new IllegalArgumentException(A_loc.toStringShort() + ", " + x.toStringShort() + ", " + y.toStringShort());
         }
         final FloatMatrix1D tmp = x.like();
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startsize = j * k;
@@ -182,7 +181,7 @@ public class SmpFloatBlas implements FloatBlas {
                 } else {
                     stopsize = startsize + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int i = startsize; i < stopsize; i++) {
@@ -198,15 +197,7 @@ public class SmpFloatBlas implements FloatBlas {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int i = 0; i < size; i++) {
                 float sum = 0;
@@ -248,9 +239,9 @@ public class SmpFloatBlas implements FloatBlas {
                 y.setQuick(i, A_loc.getQuick(i, i));
             }
         }
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = size / np;
             for (int j = 0; j < np; j++) {
                 final int startsize = j * k;
@@ -260,7 +251,7 @@ public class SmpFloatBlas implements FloatBlas {
                 } else {
                     stopsize = startsize + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         for (int i = startsize; i < stopsize; i++) {
@@ -281,15 +272,7 @@ public class SmpFloatBlas implements FloatBlas {
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int i = 0; i < size; i++) {
                 float sum = 0;

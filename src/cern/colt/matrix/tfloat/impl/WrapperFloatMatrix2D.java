@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,9 +8,11 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tfloat.impl;
 
-import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
+import java.util.concurrent.Future;
+
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
+import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  * 2-d matrix holding <tt>float</tt> elements; either a view wrapping another
@@ -34,73 +36,8 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         this.content = newContent;
     }
 
-    public void dct2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dctColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dctRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dht2() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dhtColumns() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dhtRows() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dstColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dstRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     public Object elements() {
         return content.elements();
-    }
-
-    public void fft2() {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public FComplexMatrix2D getFft2() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getFftColumns() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getFftRows() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getIfft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getIfftColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix2D getIfftRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
     }
 
     /**
@@ -121,46 +58,6 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      */
     public float getQuick(int row, int column) {
         return content.getQuick(row, column);
-    }
-
-    public void idct2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idctColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idctRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idht2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idhtColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idhtRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idst2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idstColumns(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idstRows(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft2(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
     }
 
     /**
@@ -229,7 +126,42 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      *         one another.
      */
     public FloatMatrix1D vectorize() {
-        return content.vectorize();
+        final DenseFloatMatrix1D v = new DenseFloatMatrix1D(size());
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            Future<?>[] futures = new Future[np];
+            int k = columns / np;
+            for (int j = 0; j < np; j++) {
+                final int startcol = j * k;
+                final int stopcol;
+                final int startidx = j * k * rows;
+                if (j == np - 1) {
+                    stopcol = columns;
+                } else {
+                    stopcol = startcol + k;
+                }
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        int idx = startidx;
+                        for (int c = startcol; c < stopcol; c++) {
+                            for (int r = 0; r < rows; r++) {
+                                v.setQuick(idx++, getQuick(r, c));
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            int idx = 0;
+            for (int c = 0; c < columns; c++) {
+                for (int r = 0; r < rows; r++) {
+                    v.setQuick(idx++, getQuick(r, c));
+                }
+            }
+        }
+        return v;
     }
 
     /**
@@ -290,12 +222,20 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
     public FloatMatrix2D viewColumnFlip() {
         if (columns == 0)
             return this;
-        FloatMatrix2D view = new WrapperFloatMatrix2D(this) {
+        WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
             public float getQuick(int row, int column) {
-                return content.get(row, columns - 1 - column);
+                return content.getQuick(row, columns - 1 - column);
             }
 
             public void setQuick(int row, int column, float value) {
+                content.setQuick(row, columns - 1 - column, value);
+            }
+            
+            public float get(int row, int column) {
+                return content.get(row, columns - 1 - column);
+            }
+
+            public void set(int row, int column, float value) {
                 content.set(row, columns - 1 - column, value);
             }
         };
@@ -334,18 +274,41 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * @return a new dice view.
      */
     public FloatMatrix2D viewDice() {
-        FloatMatrix2D view = new WrapperFloatMatrix2D(this) {
+        WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
             public float getQuick(int row, int column) {
-                return content.get(column, row);
+                return content.getQuick(column, row);
             }
 
             public void setQuick(int row, int column, float value) {
+                content.setQuick(column, row, value);
+            }
+            public float get(int row, int column) {
+                return content.get(column, row);
+            }
+
+            public void set(int row, int column, float value) {
                 content.set(column, row, value);
             }
         };
         view.setNrows(columns);
         view.setNcolumns(rows);
         return view;
+    }
+    
+    /**
+     * Sets the number of rows of this matrix
+     * @param columns
+     */
+    public void setNcolumns(int columns) {
+        this.columns = columns;
+    }
+    
+    /**
+     * Sets the number of rows of this matrix
+     * @param rows
+     */
+    public void setNrows(int rows) {
+        this.rows = rows;
     }
 
     /**
@@ -386,18 +349,24 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      */
     public FloatMatrix2D viewPart(final int row, final int column, int height, int width) {
         checkBox(row, column, height, width);
-        FloatMatrix2D view = new WrapperFloatMatrix2D(this) {
+        WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
             public float getQuick(int i, int j) {
-                return content.get(row + i, column + j);
+                return content.getQuick(row + i, column + j);
             }
 
             public void setQuick(int i, int j, float value) {
+                content.setQuick(row + i, column + j, value);
+            }
+            public float get(int i, int j) {
+                return content.get(row + i, column + j);
+            }
+
+            public void set(int i, int j, float value) {
                 content.set(row + i, column + j, value);
             }
         };
         view.setNrows(height);
         view.setNcolumns(width);
-
         return view;
     }
 
@@ -430,7 +399,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         checkRow(row);
         return new DelegateFloatMatrix1D(this, row);
     }
-
+    
     /**
      * Constructs and returns a new <i>flip view</i> along the row axis. What
      * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what
@@ -460,12 +429,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
     public FloatMatrix2D viewRowFlip() {
         if (rows == 0)
             return this;
-        FloatMatrix2D view = new WrapperFloatMatrix2D(this) {
+        WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
             public float getQuick(int row, int column) {
-                return content.get(rows - 1 - row, column);
+                return content.getQuick(rows - 1 - row, column);
             }
 
             public void setQuick(int row, int column, float value) {
+                content.setQuick(rows - 1 - row, column, value);
+            }
+            public float get(int row, int column) {
+                return content.get(rows - 1 - row, column);
+            }
+
+            public void set(int row, int column, float value) {
                 content.set(rows - 1 - row, column, value);
             }
         };
@@ -536,18 +512,24 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         final int[] rix = rowIndexes;
         final int[] cix = columnIndexes;
 
-        FloatMatrix2D view = new WrapperFloatMatrix2D(this) {
+        WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
             public float getQuick(int i, int j) {
-                return content.get(rix[i], cix[j]);
+                return content.getQuick(rix[i], cix[j]);
             }
 
             public void setQuick(int i, int j, float value) {
+                content.setQuick(rix[i], cix[j], value);
+            }
+            public float get(int i, int j) {
+                return content.get(rix[i], cix[j]);
+            }
+
+            public void set(int i, int j, float value) {
                 content.set(rix[i], cix[j], value);
             }
         };
         view.setNrows(rowIndexes.length);
         view.setNcolumns(columnIndexes.length);
-
         return view;
     }
 
@@ -572,12 +554,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
     public FloatMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
         if (_rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
-        FloatMatrix2D view = new WrapperFloatMatrix2D(this) {
+        WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
             public float getQuick(int row, int column) {
-                return content.get(_rowStride * row, _columnStride * column);
+                return content.getQuick(_rowStride * row, _columnStride * column);
             }
 
             public void setQuick(int row, int column, float value) {
+                content.setQuick(_rowStride * row, _columnStride * column, value);
+            }
+            public float get(int row, int column) {
+                return content.get(_rowStride * row, _columnStride * column);
+            }
+
+            public void set(int row, int column, float value) {
                 content.set(_rowStride * row, _columnStride * column, value);
             }
         };

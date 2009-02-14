@@ -1,14 +1,10 @@
 package cern.colt.matrix.tdouble.impl;
 
 import cern.colt.Timer;
-import cern.colt.matrix.BenchmarkMatrixKernel;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix3D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleFactory3D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.DoubleMatrix3D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class BenchmarkFFT {
 
@@ -20,7 +16,7 @@ public class BenchmarkFFT {
 		Timer t = new Timer();
 		double[] times = new double[sizes2D.length];
 		for (int i = 0; i < sizes2D.length; i++) {
-			DoubleMatrix2D A = DoubleFactory2D.dense.random(sizes2D[i], sizes2D[i]);
+			DenseDoubleMatrix2D A = (DenseDoubleMatrix2D)DoubleFactory2D.dense.random(sizes2D[i], sizes2D[i]);
 			// warm-up
 			DComplexMatrix2D Ac = A.getFft2();
 			Ac = A.getFft2();
@@ -38,7 +34,7 @@ public class BenchmarkFFT {
 		Timer t = new Timer();
 		double[] times = new double[sizes3D.length];
 		for (int i = 0; i < sizes3D.length; i++) {
-			DoubleMatrix3D A = DoubleFactory3D.dense.random(sizes3D[i], sizes3D[i], sizes3D[i]);
+			DenseDoubleMatrix3D A = (DenseDoubleMatrix3D)DoubleFactory3D.dense.random(sizes3D[i], sizes3D[i], sizes3D[i]);
 			// warm-up
 			DComplexMatrix3D Ac = A.getFft3();
 			Ac = A.getFft3();

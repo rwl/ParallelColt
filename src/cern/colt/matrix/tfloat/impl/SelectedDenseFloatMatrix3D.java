@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -9,7 +9,6 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tfloat.impl;
 
 import cern.colt.matrix.AbstractMatrix3D;
-import cern.colt.matrix.tfcomplex.FComplexMatrix3D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
@@ -104,52 +103,8 @@ class SelectedDenseFloatMatrix3D extends FloatMatrix3D {
         this.isNoView = false;
     }
 
-    public void dct2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dct3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dht2Slices() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht3() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     public float[] elements() {
-        throw new IllegalAccessError("getElements() is not supported for SelectedDenseFloatMatrix3D.");
-    }
-
-    public void fft3() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix3D getFft2Slices() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix3D getFft3() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix3D getIfft2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public FComplexMatrix3D getIfft3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
+        return elements;
     }
 
     /**
@@ -180,34 +135,6 @@ class SelectedDenseFloatMatrix3D extends FloatMatrix3D {
         return elements[offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]];
     }
 
-    public void idct2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idct3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idht2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idht3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idst2Slices(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idst3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft3(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the position of the given coordinate within the (virtual or
      * non-virtual) internal 1-dimensional array.
@@ -219,7 +146,7 @@ class SelectedDenseFloatMatrix3D extends FloatMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    public int index(int slice, int row, int column) {
+    public long index(int slice, int row, int column) {
         // return this.offset + super.index(slice,row,column);
         // manually inlined:
         return this.offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];

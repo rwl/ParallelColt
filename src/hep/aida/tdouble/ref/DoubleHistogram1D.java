@@ -3,7 +3,6 @@ package hep.aida.tdouble.ref;
 import hep.aida.tdouble.DoubleIAxis;
 import hep.aida.tdouble.DoubleIHistogram1D;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -135,9 +134,9 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
     }
 
     public void fill_2D(final double[] data, final int rows, final int columns, final int zero, final int rowStride, final int columnStride) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -147,7 +146,7 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         double[] errors_loc = new double[errors.length];
@@ -188,15 +187,7 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             for (int r = 0; r < rows; r++) {
@@ -218,9 +209,9 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
     }
 
     public void fill_2D(final double[] data, final double[] weights, final int rows, final int columns, final int zero, final int rowStride, final int columnStride) {
-        int np = ConcurrencyUtils.getNumberOfProcessors();
+        int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future[] futures = new Future[np];
+            Future<?>[] futures = new Future[np];
             int k = rows / np;
             for (int j = 0; j < np; j++) {
                 final int startrow = j * k;
@@ -230,7 +221,7 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
                 } else {
                     stoprow = startrow + k;
                 }
-                futures[j] = ConcurrencyUtils.threadPool.submit(new Runnable() {
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int idx = zero + startrow * rowStride;
@@ -273,15 +264,7 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
                     }
                 });
             }
-            try {
-                for (int j = 0; j < np; j++) {
-                    futures[j].get();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            ConcurrencyUtils.waitForCompletion(futures);
         } else {
             int idx = zero;
             for (int r = 0; r < rows; r++) {

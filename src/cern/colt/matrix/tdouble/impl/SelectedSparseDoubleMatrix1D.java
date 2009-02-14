@@ -1,5 +1,5 @@
 /*
-Copyright © 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -8,8 +8,7 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdouble.impl;
 
-import cern.colt.map.tdouble.AbstractIntDoubleMap;
-import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
+import cern.colt.map.tdouble.AbstractLongDoubleMap;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
@@ -55,7 +54,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntDoubleMap elements;
+    protected AbstractLongDoubleMap elements;
 
     /**
      * The offsets of visible indexes of this matrix.
@@ -75,7 +74,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
      * @param indexes
      *            The indexes of the cells that shall be visible.
      */
-    protected SelectedSparseDoubleMatrix1D(AbstractIntDoubleMap elements, int[] offsets) {
+    protected SelectedSparseDoubleMatrix1D(AbstractLongDoubleMap elements, int[] offsets) {
         this(offsets.length, elements, 0, 1, offsets, 0);
     }
 
@@ -95,7 +94,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
      *            the offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseDoubleMatrix1D(int size, AbstractIntDoubleMap elements, int zero, int stride, int[] offsets, int offset) {
+    protected SelectedSparseDoubleMatrix1D(int size, AbstractLongDoubleMap elements, int zero, int stride, int[] offsets, int offset) {
         setUp(size, zero, stride);
 
         this.elements = elements;
@@ -104,33 +103,8 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
         this.isNoView = false;
     }
 
-    public void dct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void dst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public AbstractIntDoubleMap elements() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void fft() {
-        throw new IllegalArgumentException("This method is not supported.");
-
-    }
-
-    public DComplexMatrix1D getFft() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public DComplexMatrix1D getIfft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
+    public AbstractLongDoubleMap elements() {
+        return elements;
     }
 
     /**
@@ -153,22 +127,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
         return elements.get(offset + offsets[zero + index * stride]);
     }
 
-    public void idct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void idht(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-    
-    public void idst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void ifft(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the position of the element with the given relative rank within
      * the (virtual or non-virtual) internal 1-dimensional array. You may want
@@ -177,7 +135,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    public int index(int rank) {
+    public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
         return offset + offsets[zero + rank * stride];
@@ -219,11 +177,33 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
     }
 
     public DoubleMatrix2D reshape(int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (rows * cols != size) {
+            throw new IllegalArgumentException("rows*cols != size");
+        }
+        DoubleMatrix2D M = new SparseDoubleMatrix2D(rows, cols);
+        int idx = 0;
+        for (int c = 0; c < cols; c++) {
+            for (int r = 0; r < rows; r++) {
+                M.setQuick(r, c, getQuick(idx++));
+            }
+        }
+        return M;
     }
 
     public DoubleMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+        if (slices * rows * cols != size) {
+            throw new IllegalArgumentException("slices*rows*cols != size");
+        }
+        DoubleMatrix3D M = new SparseDoubleMatrix3D(slices, rows, cols);
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < cols; c++) {
+                for (int r = 0; r < rows; r++) {
+                    M.setQuick(s, r, c, getQuick(idx++));
+                }
+            }
+        }
+        return M;
     }
 
     /**
