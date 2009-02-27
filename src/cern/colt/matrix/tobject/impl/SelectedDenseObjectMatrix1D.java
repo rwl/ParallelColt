@@ -12,9 +12,9 @@ import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 
 /**
- * Selection view on dense 1-d matrices holding <tt>Object</tt> elements.
- * First see the <a href="package-summary.html">package summary</a> and javadoc
- * <a href="package-tree.html">tree view</a> to get the broad picture.
+ * Selection view on dense 1-d matrices holding <tt>Object</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
@@ -113,7 +113,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
-    
+
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -139,8 +139,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(ObjectMatrix1D other) {
         if (other instanceof SelectedDenseObjectMatrix1D) {
@@ -173,8 +172,8 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      * is an instance of type <tt>DenseObjectMatrix1D</tt> the new matrix must
      * also be of type <tt>DenseObjectMatrix1D</tt>, if the receiver is an
      * instance of type <tt>SparseObjectMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseObjectMatrix1D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * be of type <tt>SparseObjectMatrix1D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -188,9 +187,9 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseObjectMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseObjectMatrix2D</tt>, if the receiver
-     * is an instance of type <tt>SparseObjectMatrix1D</tt> the new matrix
-     * must be of type <tt>SparseObjectMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseObjectMatrix2D</tt>, if the receiver is
+     * an instance of type <tt>SparseObjectMatrix1D</tt> the new matrix must be
+     * of type <tt>SparseObjectMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -203,8 +202,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes

@@ -1,6 +1,5 @@
 package cern.colt.matrix.tdouble.impl;
 
-
 public class DenseColDoubleMatrix2DViewTest extends DenseColDoubleMatrix2DTest {
 
     public DenseColDoubleMatrix2DViewTest(String arg0) {

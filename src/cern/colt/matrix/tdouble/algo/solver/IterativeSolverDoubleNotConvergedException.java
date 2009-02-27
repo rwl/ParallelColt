@@ -20,7 +20,6 @@
 
 package cern.colt.matrix.tdouble.algo.solver;
 
-
 /**
  * Exception for lack of convergence in a linear problem. Contains the final
  * computed residual.
@@ -50,8 +49,7 @@ public class IterativeSolverDoubleNotConvergedException extends DoubleNotConverg
      *            Associated iteration monitor, for extracting residual and
      *            iteration number
      */
-    public IterativeSolverDoubleNotConvergedException(Reason reason, String message,
-            DoubleIterationMonitor iter) {
+    public IterativeSolverDoubleNotConvergedException(Reason reason, String message, DoubleIterationMonitor iter) {
         super(reason, message);
         this.r = iter.residual();
         this.iterations = iter.iterations();
@@ -66,8 +64,7 @@ public class IterativeSolverDoubleNotConvergedException extends DoubleNotConverg
      *            Associated iteration monitor, for extracting residual and
      *            iteration number
      */
-    public IterativeSolverDoubleNotConvergedException(Reason reason,
-            DoubleIterationMonitor iter) {
+    public IterativeSolverDoubleNotConvergedException(Reason reason, DoubleIterationMonitor iter) {
         super(reason);
         this.r = iter.residual();
         this.iterations = iter.iterations();

@@ -20,7 +20,6 @@
 
 package cern.colt.matrix.tfloat.algo.solver;
 
-
 /**
  * Exception for lack of convergence in a linear problem. Contains the final
  * computed residual.
@@ -50,8 +49,7 @@ public class IterativeSolverFloatNotConvergedException extends FloatNotConverged
      *            Associated iteration monitor, for extracting residual and
      *            iteration number
      */
-    public IterativeSolverFloatNotConvergedException(Reason reason, String message,
-            FloatIterationMonitor iter) {
+    public IterativeSolverFloatNotConvergedException(Reason reason, String message, FloatIterationMonitor iter) {
         super(reason, message);
         this.r = iter.residual();
         this.iterations = iter.iterations();
@@ -66,8 +64,7 @@ public class IterativeSolverFloatNotConvergedException extends FloatNotConverged
      *            Associated iteration monitor, for extracting residual and
      *            iteration number
      */
-    public IterativeSolverFloatNotConvergedException(Reason reason,
-            FloatIterationMonitor iter) {
+    public IterativeSolverFloatNotConvergedException(Reason reason, FloatIterationMonitor iter) {
         super(reason);
         this.r = iter.residual();
         this.iterations = iter.iterations();

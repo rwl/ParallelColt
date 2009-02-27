@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix;
 
-
 /**
  * Abstract base class for flexible, well human readable matrix print
  * formatting. Value type independent. A single cell is formatted via a format
@@ -16,10 +15,10 @@ package cern.colt.matrix;
  * <p>
  * A column can be broader than specified by the parameter
  * <tt>minColumnWidth</tt> (because a cell may not fit into that width) but a
- * column is never smaller than <tt>minColumnWidth</tt>. Normally one does
- * not need to specify <tt>minColumnWidth</tt>. Cells in a row are separated
- * by a separator string, similar separators can be set for rows and slices. For
- * more info, see the concrete subclasses.
+ * column is never smaller than <tt>minColumnWidth</tt>. Normally one does not
+ * need to specify <tt>minColumnWidth</tt>. Cells in a row are separated by a
+ * separator string, similar separators can be set for rows and slices. For more
+ * info, see the concrete subclasses.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
@@ -373,8 +372,7 @@ public abstract class AbstractFormatter extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns a String with the given character repeated <tt>length</tt>
-     * times.
+     * Returns a String with the given character repeated <tt>length</tt> times.
      */
     protected String repeat(char character, int length) {
         if (character == ' ')
@@ -436,8 +434,7 @@ public abstract class AbstractFormatter extends cern.colt.PersistentObject {
      * with a summary of its shape.
      * 
      * @param printShape
-     *            <tt>true</tt> shape summary is printed, otherwise not
-     *            printed.
+     *            <tt>true</tt> shape summary is printed, otherwise not printed.
      */
     public void setPrintShape(boolean printShape) {
         this.printShape = printShape;
@@ -508,7 +505,7 @@ public abstract class AbstractFormatter extends cern.colt.PersistentObject {
     public static String shape(AbstractMatrix3D matrix) {
         return matrix.slices() + " x " + matrix.rows() + " x " + matrix.columns() + " matrix";
     }
-    
+
     /**
      * Returns a single string representation of the given string matrix.
      * 

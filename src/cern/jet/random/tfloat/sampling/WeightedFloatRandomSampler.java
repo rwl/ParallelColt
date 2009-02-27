@@ -15,8 +15,8 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
 /**
  * Conveniently computes a stable subsequence of elements from a given input
  * sequence; Picks (samples) exactly one random element from successive blocks
- * of <tt>weight</tt> input elements each. For example, if weight==2 (a block
- * is 2 elements), and the input is 5*2=10 elements long, then picks 5 random
+ * of <tt>weight</tt> input elements each. For example, if weight==2 (a block is
+ * 2 elements), and the input is 5*2=10 elements long, then picks 5 random
  * elements from the 10 elements such that one element is randomly picked from
  * the first block, one element from the second block, ..., one element from the
  * last block. weight == 1.0 --> all elements are picked (sampled). weight ==

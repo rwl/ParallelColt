@@ -14,7 +14,7 @@ public class DenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
         B = new DenseDComplexMatrix2D(NROWS, NCOLUMNS);
         Bt = new DenseDComplexMatrix2D(NCOLUMNS, NROWS);
     }
-    
+
     public void testFft2() {
         DComplexMatrix2D Acopy = A.copy();
         ((DenseDComplexMatrix2D) A).fft2();
@@ -36,7 +36,7 @@ public class DenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
             }
         }
     }
-    
+
     public void testFftRows() {
         DComplexMatrix2D Acopy = A.copy();
         ((DenseDComplexMatrix2D) A).fftRows();

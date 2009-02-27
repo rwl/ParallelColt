@@ -359,7 +359,7 @@ public abstract class AbstractLongDoubleMap extends AbstractDoubleMap {
         int size = keyList.size();
         valueList.setSize(size);
         final double[] valueListElements = valueList.elements();
-        final long[] keyListElements = keyList.elements();        
+        final long[] keyListElements = keyList.elements();
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
             Future<?>[] futures = new Future[nthreads];

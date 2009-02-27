@@ -82,8 +82,7 @@ public class BenchmarkDenseDComplexMatrix2D {
         noViewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
         viewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
     }
-    
-    
+
     @Test
     public void testAggregateDComplexDComplexDComplexFunctionDComplexDComplexFunction() {
         /* No view */
@@ -122,7 +121,6 @@ public class BenchmarkDenseDComplexMatrix2D {
 
     }
 
-  
     @Test
     public void testAggregateDComplexMatrix2DDComplexDComplexDComplexFunctionDComplexDComplexDComplexFunction() {
         /* No view */
@@ -406,12 +404,11 @@ public class BenchmarkDenseDComplexMatrix2D {
 
     }
 
-   
     @Test
     public void testAssignDComplexProcedureDoubleArray() {
         /* No view */
         DComplexMatrix2D A = new DenseDComplexMatrix2D(a_2d);
-        double[] value = new double[] {-1, -2};
+        double[] value = new double[] { -1, -2 };
         DComplexProcedure procedure = new DComplexProcedure() {
             public boolean apply(double[] element) {
                 if (DComplex.abs(element) > 0.1) {
@@ -613,11 +610,11 @@ public class BenchmarkDenseDComplexMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDComplexMatrix2D)Av).fft2();
+            ((DenseDComplexMatrix2D) Av).fft2();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_2d);
                 t.reset().start();
-                ((DenseDComplexMatrix2D)Av).fft2();
+                ((DenseDComplexMatrix2D) Av).fft2();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -628,7 +625,7 @@ public class BenchmarkDenseDComplexMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testFftColumns() {
         /* No view */
@@ -652,11 +649,11 @@ public class BenchmarkDenseDComplexMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDComplexMatrix2D)Av).fftColumns();
+            ((DenseDComplexMatrix2D) Av).fftColumns();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_2d);
                 t.reset().start();
-                ((DenseDComplexMatrix2D)Av).fftColumns();
+                ((DenseDComplexMatrix2D) Av).fftColumns();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -692,11 +689,11 @@ public class BenchmarkDenseDComplexMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDComplexMatrix2D)Av).fftRows();
+            ((DenseDComplexMatrix2D) Av).fftRows();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_2d);
                 t.reset().start();
-                ((DenseDComplexMatrix2D)Av).fftRows();
+                ((DenseDComplexMatrix2D) Av).fftRows();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -724,9 +721,9 @@ public class BenchmarkDenseDComplexMatrix2D {
             // warm-up
             A.forEachNonZero(function);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-            	A.assign(a_2d);
-            	t.reset().start();
-            	A.forEachNonZero(function);
+                A.assign(a_2d);
+                t.reset().start();
+                A.forEachNonZero(function);
                 t.stop();
                 noViewTimes[i] += t.millis();
             }
@@ -740,8 +737,8 @@ public class BenchmarkDenseDComplexMatrix2D {
             // warm-up
             Av.forEachNonZero(function);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-            	Av.assign(a_2d);
-            	t.reset().start();
+                Av.assign(a_2d);
+                t.reset().start();
                 Av.forEachNonZero(function);
                 t.stop();
                 viewTimes[i] += t.millis();
@@ -753,7 +750,7 @@ public class BenchmarkDenseDComplexMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testGetConjugateTranspose() {
         /* No view */
@@ -791,7 +788,6 @@ public class BenchmarkDenseDComplexMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-
 
     @Test
     public void testGetRealPart() {
@@ -868,8 +864,6 @@ public class BenchmarkDenseDComplexMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
-    
 
     @Test
     public void testGetNonZerosIntArrayListIntArrayListArrayList() {
@@ -944,11 +938,11 @@ public class BenchmarkDenseDComplexMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDComplexMatrix2D)Av).ifft2(true);
+            ((DenseDComplexMatrix2D) Av).ifft2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_2d);
                 t.reset().start();
-                ((DenseDComplexMatrix2D)Av).ifft2(true);
+                ((DenseDComplexMatrix2D) Av).ifft2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -959,7 +953,7 @@ public class BenchmarkDenseDComplexMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testIfftColumns() {
         /* No view */
@@ -983,11 +977,11 @@ public class BenchmarkDenseDComplexMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDComplexMatrix2D)Av).ifftColumns(true);
+            ((DenseDComplexMatrix2D) Av).ifftColumns(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_2d);
                 t.reset().start();
-                ((DenseDComplexMatrix2D)Av).ifftColumns(true);
+                ((DenseDComplexMatrix2D) Av).ifftColumns(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1023,11 +1017,11 @@ public class BenchmarkDenseDComplexMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDComplexMatrix2D)Av).ifftRows(true);
+            ((DenseDComplexMatrix2D) Av).ifftRows(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_2d);
                 t.reset().start();
-                ((DenseDComplexMatrix2D)Av).ifftRows(true);
+                ((DenseDComplexMatrix2D) Av).ifftRows(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1159,10 +1153,10 @@ public class BenchmarkDenseDComplexMatrix2D {
         /* No view */
         DComplexMatrix2D A = new DenseDComplexMatrix2D(a_2d);
         DComplexMatrix1D y = new DenseDComplexMatrix1D(A.columns());
-        double[] alpha = new double[] {3, 4};
-        double[] beta = new double[] {5, 6};
+        double[] alpha = new double[] { 3, 4 };
+        double[] beta = new double[] { 5, 6 };
         for (int i = 0; i < y.size(); i++) {
-            y.set(i, new double[] {Math.random(), Math.random()});
+            y.set(i, new double[] { Math.random(), Math.random() });
         }
         DComplexMatrix1D z = new DenseDComplexMatrix1D(A.rows());
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
@@ -1209,8 +1203,8 @@ public class BenchmarkDenseDComplexMatrix2D {
         DComplexMatrix2D B = new DenseDComplexMatrix2D(b_2d);
         B = B.viewDice().copy();
         DComplexMatrix2D C = new DenseDComplexMatrix2D(BenchmarkMatrixKernel.MATRIX_SIZE_2D[0], BenchmarkMatrixKernel.MATRIX_SIZE_2D[0]);
-        double[] alpha = new double[] {3, 4};
-        double[] beta = new double[] {5, 6};
+        double[] alpha = new double[] { 3, 4 };
+        double[] beta = new double[] { 5, 6 };
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 

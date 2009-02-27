@@ -42,7 +42,7 @@ public class DenseDoubleMatrix3DTest extends DoubleMatrix3DTest {
             }
         }
     }
-    
+
     public void testDht3() {
         DoubleMatrix3D Acopy = A.copy();
         ((DenseDoubleMatrix3D) A).dht3();
@@ -55,11 +55,11 @@ public class DenseDoubleMatrix3DTest extends DoubleMatrix3DTest {
             }
         }
     }
-    
+
     public void testFft3() {
-    	int nslices = 16;
-    	int nrows = 32;
-    	int ncolumns = 64;
+        int nslices = 16;
+        int nrows = 32;
+        int ncolumns = 64;
         DoubleMatrix3D A = new DenseDoubleMatrix3D(nslices, nrows, ncolumns);
         DoubleMatrix3D Acopy = A.copy();
         ((DenseDoubleMatrix3D) A).fft3();
@@ -72,11 +72,11 @@ public class DenseDoubleMatrix3DTest extends DoubleMatrix3DTest {
             }
         }
     }
-    
+
     public void testDct2Slices() {
         DoubleMatrix3D Acopy = A.copy();
-        ((DenseDoubleMatrix3D)A).dct2Slices(true);
-        ((DenseDoubleMatrix3D)A).idct2Slices(true);
+        ((DenseDoubleMatrix3D) A).dct2Slices(true);
+        ((DenseDoubleMatrix3D) A).idct2Slices(true);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
@@ -88,8 +88,8 @@ public class DenseDoubleMatrix3DTest extends DoubleMatrix3DTest {
 
     public void testDst2Slices() {
         DoubleMatrix3D Acopy = A.copy();
-        ((DenseDoubleMatrix3D)A).dst2Slices(true);
-        ((DenseDoubleMatrix3D)A).idst2Slices(true);
+        ((DenseDoubleMatrix3D) A).dst2Slices(true);
+        ((DenseDoubleMatrix3D) A).idst2Slices(true);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
@@ -98,11 +98,11 @@ public class DenseDoubleMatrix3DTest extends DoubleMatrix3DTest {
             }
         }
     }
-    
+
     public void testDft2Slices() {
         DoubleMatrix3D Acopy = A.copy();
-        ((DenseDoubleMatrix3D)A).dht2Slices();
-        ((DenseDoubleMatrix3D)A).idht2Slices(true);
+        ((DenseDoubleMatrix3D) A).dht2Slices();
+        ((DenseDoubleMatrix3D) A).idht2Slices(true);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
@@ -113,62 +113,59 @@ public class DenseDoubleMatrix3DTest extends DoubleMatrix3DTest {
     }
 
     public void testGetFft3() {
-        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D)A).getFft3();
-        ((DenseDComplexMatrix3D)Ac).ifft3(true);
+        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D) A).getFft3();
+        ((DenseDComplexMatrix3D) Ac).ifft3(true);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    double[] elem  = Ac.getQuick(s, r, c);
+                    double[] elem = Ac.getQuick(s, r, c);
                     assertEquals(A.getQuick(s, r, c), elem[0], TOL);
-                    assertEquals(0, elem[1], TOL);                    
+                    assertEquals(0, elem[1], TOL);
                 }
             }
         }
     }
-
 
     public void testGetIfft3() {
-        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D)A).getIfft3(true);
-        ((DenseDComplexMatrix3D)Ac).fft3();
+        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D) A).getIfft3(true);
+        ((DenseDComplexMatrix3D) Ac).fft3();
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    double[] elem  = Ac.getQuick(s, r, c);
-                    assertEquals(A.getQuick(s, r, c),  elem[0], TOL);
-                    assertEquals(0, elem[1], TOL);                    
+                    double[] elem = Ac.getQuick(s, r, c);
+                    assertEquals(A.getQuick(s, r, c), elem[0], TOL);
+                    assertEquals(0, elem[1], TOL);
                 }
             }
         }
     }
-    
+
     public void testGetFft2Slices() {
-        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D)A).getFft2Slices();
-        ((DenseDComplexMatrix3D)Ac).ifft2Slices(true);
+        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D) A).getFft2Slices();
+        ((DenseDComplexMatrix3D) Ac).ifft2Slices(true);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    double[] elem  = Ac.getQuick(s, r, c);
+                    double[] elem = Ac.getQuick(s, r, c);
                     assertEquals(0, Math.abs(A.getQuick(s, r, c) - elem[0]), TOL);
-                    assertEquals(0, elem[1], TOL);                    
+                    assertEquals(0, elem[1], TOL);
                 }
             }
         }
     }
 
     public void testGetIfft2Slices() {
-        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D)A).getIfft2Slices(true);
-        ((DenseDComplexMatrix3D)Ac).fft2Slices();
+        DComplexMatrix3D Ac = ((DenseDoubleMatrix3D) A).getIfft2Slices(true);
+        ((DenseDComplexMatrix3D) Ac).fft2Slices();
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    double[] elem  = Ac.getQuick(s, r, c);
+                    double[] elem = Ac.getQuick(s, r, c);
                     assertEquals(0, Math.abs(A.getQuick(s, r, c) - elem[0]), TOL);
-                    assertEquals(0, elem[1], TOL);                    
+                    assertEquals(0, elem[1], TOL);
                 }
             }
         }
     }
 
-    
-    
 }

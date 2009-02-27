@@ -52,11 +52,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  * <pre>
  * for (int slice = 0; slice &lt; slices; slice++) {
- *  for (int row = 0; row &lt; rows; row++) {
- *      for (int column = 0; column &lt; columns; column++) {
- *          matrix.setQuick(slice, row, column, someValue);
- *      }
- *  }
+ *     for (int row = 0; row &lt; rows; row++) {
+ *         for (int column = 0; column &lt; columns; column++) {
+ *             matrix.setQuick(slice, row, column, someValue);
+ *         }
+ *     }
  * }
  * </pre>
  * 
@@ -64,11 +64,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  * <pre>
  * for (int column = 0; column &lt; columns; column++) {
- *  for (int row = 0; row &lt; rows; row++) {
- *      for (int slice = 0; slice &lt; slices; slice++) {
- *          matrix.setQuick(slice, row, column, someValue);
- *      }
- *  }
+ *     for (int row = 0; row &lt; rows; row++) {
+ *         for (int slice = 0; slice &lt; slices; slice++) {
+ *             matrix.setQuick(slice, row, column, someValue);
+ *         }
+ *     }
  * }
  * </pre>
  * 
@@ -169,7 +169,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
      *            the number of elements between two columns, i.e.
      *            <tt>index(k,i,j+1)-index(k,i,j)</tt>.
      * @param isView
-     *             if true then a matrix view is constructed
+     *            if true then a matrix view is constructed
      * @throws IllegalArgumentException
      *             if <tt>(float)slices*columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException
@@ -185,7 +185,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         if (size() == 0)
             return Float.NaN;
         float a = 0;
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
@@ -236,7 +236,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         if (size() == 0)
             return Float.NaN;
         float a = 0;
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
@@ -305,7 +305,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         final int[] sliceElements = sliceList.elements();
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         float a = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_3D())) {
@@ -353,8 +353,8 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         if (size() == 0)
             return Float.NaN;
         float a = 0;
-        final int zero = (int)index(0,0,0);
-        final int zeroOther = (int)other.index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
+        final int zeroOther = (int) other.index(0, 0, 0);
         final int sliceStrideOther = other.sliceStride();
         final int rowStrideOther = other.rowStride();
         final int colStrideOther = other.columnStride();
@@ -413,7 +413,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
     }
 
     public FloatMatrix3D assign(final cern.colt.function.tfloat.FloatFunction function) {
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
@@ -459,7 +459,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
     }
 
     public FloatMatrix3D assign(final float value) {
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
@@ -530,7 +530,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
                 System.arraycopy(values, 0, this.elements, 0, values.length);
             }
         } else {
-            final int zero = (int)index(0,0,0);
+            final int zero = (int) index(0, 0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
                 Future<?>[] futures = new Future[np];
                 int k = slices / np;
@@ -628,7 +628,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
                 }
             }
         } else {
-            final int zero = (int)index(0,0,0);
+            final int zero = (int) index(0, 0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
                 Future<?>[] futures = new Future[np];
                 int k = slices / np;
@@ -687,7 +687,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
     }
 
     public FloatMatrix3D assign(final cern.colt.function.tfloat.FloatProcedure cond, final cern.colt.function.tfloat.FloatFunction f) {
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
@@ -739,9 +739,9 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         }
         return this;
     }
-    
+
     public FloatMatrix3D assign(final cern.colt.function.tfloat.FloatProcedure cond, final float value) {
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
@@ -839,8 +839,8 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             }
             return this;
         } else {
-            final int zero = (int)index(0,0,0);
-            final int zeroOther = (int)other_final.index(0,0,0);
+            final int zero = (int) index(0, 0, 0);
+            final int zeroOther = (int) other_final.index(0, 0, 0);
             final int sliceStrideOther = other_final.sliceStride;
             final int rowStrideOther = other_final.rowStride;
             final int columnStrideOther = other_final.columnStride;
@@ -901,8 +901,8 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             return this;
         }
         checkShape(y);
-        final int zero = (int)index(0,0,0);
-        final int zeroOther = (int)y.index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
+        final int zeroOther = (int) y.index(0, 0, 0);
         final int sliceStrideOther = y.sliceStride();
         final int rowStrideOther = y.rowStride();
         final int columnStrideOther = y.columnStride();
@@ -963,8 +963,8 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             return this;
         }
         checkShape(y);
-        final int zero = (int)index(0,0,0);
-        final int zeroOther = (int)y.index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
+        final int zeroOther = (int) y.index(0, 0, 0);
         final int sliceStrideOther = y.sliceStride();
         final int rowStrideOther = y.rowStride();
         final int columnStrideOther = y.columnStride();
@@ -1009,7 +1009,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
     public int cardinality() {
         int cardinality = 0;
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
@@ -1072,7 +1072,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return cardinality;
     }
 
-       /**
+    /**
      * Computes the 2D discrete cosine transform (DCT-II) of each slice of this
      * matrix.
      * 
@@ -1104,7 +1104,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            ((DenseFloatMatrix2D)viewSlice(s)).dct2(scale);
+                            ((DenseFloatMatrix2D) viewSlice(s)).dct2(scale);
                         }
                     }
                 });
@@ -1112,7 +1112,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                ((DenseFloatMatrix2D)viewSlice(s)).dct2(scale);
+                ((DenseFloatMatrix2D) viewSlice(s)).dct2(scale);
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
@@ -1172,7 +1172,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            ((DenseFloatMatrix2D)viewSlice(s)).dht2();
+                            ((DenseFloatMatrix2D) viewSlice(s)).dht2();
                         }
                     }
                 });
@@ -1180,7 +1180,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                ((DenseFloatMatrix2D)viewSlice(s)).dht2();
+                ((DenseFloatMatrix2D) viewSlice(s)).dht2();
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
@@ -1246,7 +1246,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            ((DenseFloatMatrix2D)viewSlice(s)).dst2(scale);
+                            ((DenseFloatMatrix2D) viewSlice(s)).dst2(scale);
                         }
                     }
                 });
@@ -1254,7 +1254,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                ((DenseFloatMatrix2D)viewSlice(s)).dst2(scale);
+                ((DenseFloatMatrix2D) viewSlice(s)).dst2(scale);
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
@@ -1396,7 +1396,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            C.viewSlice(s).assign(((DenseFloatMatrix2D)viewSlice(s)).getFft2());
+                            C.viewSlice(s).assign(((DenseFloatMatrix2D) viewSlice(s)).getFft2());
                         }
                     }
                 });
@@ -1404,14 +1404,13 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                C.viewSlice(s).assign(((DenseFloatMatrix2D)viewSlice(s)).getFft2());
+                C.viewSlice(s).assign(((DenseFloatMatrix2D) viewSlice(s)).getFft2());
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
         return C;
     }
 
-    
     /**
      * Returns new complex matrix which is the 3D discrete Fourier transform
      * (DFT) of this matrix.
@@ -1512,7 +1511,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            C.viewSlice(s).assign(((DenseFloatMatrix2D)viewSlice(s)).getIfft2(scale));
+                            C.viewSlice(s).assign(((DenseFloatMatrix2D) viewSlice(s)).getIfft2(scale));
                         }
                     }
                 });
@@ -1520,7 +1519,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                C.viewSlice(s).assign(((DenseFloatMatrix2D)viewSlice(s)).getIfft2(scale));
+                C.viewSlice(s).assign(((DenseFloatMatrix2D) viewSlice(s)).getIfft2(scale));
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
@@ -1603,7 +1602,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int zero = (int)index(0,0,0);
+        int zero = (int) index(0, 0, 0);
 
         int idx;
         for (int s = 0; s < slices; s++) {
@@ -1629,7 +1628,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int zero = (int)index(0,0,0);
+        int zero = (int) index(0, 0, 0);
 
         int idx;
         for (int s = 0; s < slices; s++) {
@@ -1655,7 +1654,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int zero = (int)index(0,0,0);
+        int zero = (int) index(0, 0, 0);
 
         int idx;
         for (int s = 0; s < slices; s++) {
@@ -1711,7 +1710,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            ((DenseFloatMatrix2D)viewSlice(s)).idct2(scale);
+                            ((DenseFloatMatrix2D) viewSlice(s)).idct2(scale);
                         }
                     }
                 });
@@ -1719,7 +1718,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                ((DenseFloatMatrix2D)viewSlice(s)).idct2(scale);
+                ((DenseFloatMatrix2D) viewSlice(s)).idct2(scale);
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
@@ -1784,7 +1783,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            ((DenseFloatMatrix2D)viewSlice(s)).idht2(scale);
+                            ((DenseFloatMatrix2D) viewSlice(s)).idht2(scale);
                         }
                     }
                 });
@@ -1792,7 +1791,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                ((DenseFloatMatrix2D)viewSlice(s)).idht2(scale);
+                ((DenseFloatMatrix2D) viewSlice(s)).idht2(scale);
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
@@ -1857,7 +1856,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
                     public void run() {
                         for (int s = startslice; s < stopslice; s++) {
-                            ((DenseFloatMatrix2D)viewSlice(s)).idst2(scale);
+                            ((DenseFloatMatrix2D) viewSlice(s)).idst2(scale);
                         }
                     }
                 });
@@ -1865,7 +1864,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int s = 0; s < slices; s++) {
-                ((DenseFloatMatrix2D)viewSlice(s)).idst2(scale);
+                ((DenseFloatMatrix2D) viewSlice(s)).idst2(scale);
             }
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
@@ -1981,7 +1980,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
     }
 
     public float[] getMaxLocation() {
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
         int row_loc = 0;
         int col_loc = 0;
@@ -2069,7 +2068,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
     }
 
     public float[] getMinLocation() {
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
         int row_loc = 0;
         int col_loc = 0;
@@ -2163,7 +2162,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
     public float[][][] toArray() {
         final float[][][] values = new float[slices][rows][columns];
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];
             int k = slices / np;
@@ -2245,8 +2244,8 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
             throw new InternalError();
 
         for (int k = 1; k < slices - 1; k++) {
-            int A_index = (int)index(k, 1, 1);
-            int B_index = (int)BB.index(k, 1, 1);
+            int A_index = (int) index(k, 1, 1);
+            int B_index = (int) BB.index(k, 1, 1);
 
             for (int i = 1; i < r; i++) {
                 int A002 = A_index - A_ss - A_rs - A_cs;
@@ -2358,7 +2357,7 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
     public float zSum() {
         float sum = 0;
-        final int zero = (int)index(0,0,0);
+        final int zero = (int) index(0, 0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             Future<?>[] futures = new Future[np];

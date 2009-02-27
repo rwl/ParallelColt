@@ -101,8 +101,8 @@ public class Partitioning extends Object {
 
     /**
      * Same as {@link #dualPartition(int[],int[],int,int,int[],int,int,int[])}
-     * except that it <i>synchronously</i> partitions <tt>double[]</tt>
-     * rather than <tt>int[]</tt> arrays.
+     * except that it <i>synchronously</i> partitions <tt>double[]</tt> rather
+     * than <tt>int[]</tt> arrays.
      */
     public static void dualPartition(double[] list, double[] secondary, int from, int to, double[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
         double splitter; // int, double --> template type dependent
@@ -345,17 +345,17 @@ public class Partitioning extends Object {
      * <p>
      * Lets call the generic data <tt>g</tt> (it may be a matrix, one array,
      * three linked lists or whatever). Lets call the generic splitters
-     * <tt>s</tt>. This class takes a user comparison function operating on
-     * two indexes <tt>(a,b)</tt>, namely an {@link IntComparator}. The
-     * comparison function determines whether <tt>s[a]</tt> is equal, less or
-     * greater than <tt>g[b]</tt>. This method can then decide to swap the
-     * data <tt>g[b]</tt> with the data <tt>g[c]</tt> (yes, <tt>c</tt>,
-     * not <tt>a</tt>). It calls a user provided {@link cern.colt.Swapper}
-     * object that knows how to swap the data of these two indexes.
+     * <tt>s</tt>. This class takes a user comparison function operating on two
+     * indexes <tt>(a,b)</tt>, namely an {@link IntComparator}. The comparison
+     * function determines whether <tt>s[a]</tt> is equal, less or greater than
+     * <tt>g[b]</tt>. This method can then decide to swap the data <tt>g[b]</tt>
+     * with the data <tt>g[c]</tt> (yes, <tt>c</tt>, not <tt>a</tt>). It calls a
+     * user provided {@link cern.colt.Swapper} object that knows how to swap the
+     * data of these two indexes.
      * <p>
      * Again, note the details: Comparisons compare <tt>s[a]</tt> with
-     * <tt>g[b]</tt>. Swaps swap <tt>g[b]</tt> with <tt>g[c]</tt>. Prior
-     * to calling this method, the generic splitters <tt>s</tt> must be sorted
+     * <tt>g[b]</tt>. Swaps swap <tt>g[b]</tt> with <tt>g[c]</tt>. Prior to
+     * calling this method, the generic splitters <tt>s</tt> must be sorted
      * ascending and must not contain multiple equal values. These preconditions
      * are not checked; be sure that they are met.
      * 
@@ -401,14 +401,14 @@ public class Partitioning extends Object {
      * @param swapper
      *            an object that knows how to swap the elements at any two
      *            indexes (a,b). Takes as first argument the index <tt>b</tt>
-     *            within the generic data <tt>g</tt>. Takes as second
-     *            argument the index <tt>c</tt> within the generic data
-     *            <tt>g</tt>.
+     *            within the generic data <tt>g</tt>. Takes as second argument
+     *            the index <tt>c</tt> within the generic data <tt>g</tt>.
      * 
-     * <p>
-     * Tip: Normally you will have <tt>splitIndexes.length == s.length</tt> as
-     * well as <tt>from==0, to==g.length-1</tt> and
-     * <tt>splitFrom==0, splitTo==s.length-1</tt>.
+     *            <p>
+     *            Tip: Normally you will have
+     *            <tt>splitIndexes.length == s.length</tt> as well as
+     *            <tt>from==0, to==g.length-1</tt> and
+     *            <tt>splitFrom==0, splitTo==s.length-1</tt>.
      * 
      * @see Sorting#binarySearchFromTo(int,int,IntComparator)
      */
@@ -492,8 +492,8 @@ public class Partitioning extends Object {
 
     /**
      * Same as {@link #partition(int[],int,int,int)} except that it
-     * <i>generically</i> partitions arbitrary shaped data (for example
-     * matrices or multiple arrays) rather than <tt>int[]</tt> arrays.
+     * <i>generically</i> partitions arbitrary shaped data (for example matrices
+     * or multiple arrays) rather than <tt>int[]</tt> arrays.
      */
     private static int genericPartition(int from, int to, int splitter, IntComparator comp, Swapper swapper) {
         for (int i = from - 1; ++i <= to;) {
@@ -647,8 +647,8 @@ public class Partitioning extends Object {
      * <b>Example:</b>
      * <p>
      * <tt>list = (7, 4, 5, 50, 6, 4, 3, 6), splitters = (5, 10, 30)</tt>
-     * defines the three intervals <tt>[-infinity,5), [5,10), [10,30)</tt>.
-     * Lets define to sort the entire list (<tt>from=0, to=7</tt>) using all
+     * defines the three intervals <tt>[-infinity,5), [5,10), [10,30)</tt>. Lets
+     * define to sort the entire list (<tt>from=0, to=7</tt>) using all
      * splitters (<tt>splitFrom==0, splitTo=2</tt>).
      * <p>
      * The method modifies the list to be
@@ -657,18 +657,18 @@ public class Partitioning extends Object {
      * <ul>
      * <li>All values <tt>list[0..2]</tt> fall into <tt>[-infinity,5)</tt>.
      * <li>All values <tt>list[3..6]</tt> fall into <tt>[5,10)</tt>.
-     * <li>All values <tt>list[7..6]</tt> fall into <tt>[10,30)</tt>, i.e.
-     * no elements, since <tt>7>6</tt>.
+     * <li>All values <tt>list[7..6]</tt> fall into <tt>[10,30)</tt>, i.e. no
+     * elements, since <tt>7>6</tt>.
      * <li>All values <tt>list[7 .. 7=list.length-1]</tt> fall into
      * <tt>[30,infinity]</tt>.
      * <li>In general, all values
-     * <tt>list[splitIndexes[j-1]+1 .. splitIndexes[j]]</tt> fall into
-     * interval <tt>j</tt>.
+     * <tt>list[splitIndexes[j-1]+1 .. splitIndexes[j]]</tt> fall into interval
+     * <tt>j</tt>.
      * </ul>
      * As can be seen, the list is partially sorted such that values falling
      * into a certain interval are placed next to each other. Note that
-     * <i>within</i> an interval, elements are entirelly unsorted. They are
-     * only sorted across interval boundaries. In particular, this partitioning
+     * <i>within</i> an interval, elements are entirelly unsorted. They are only
+     * sorted across interval boundaries. In particular, this partitioning
      * algorithm is not <i>stable</i>: the relative order of elements is not
      * preserved (Producing a stable algorithm would require no more than minor
      * modifications to method partition(int[],int,int,int)).
@@ -679,14 +679,14 @@ public class Partitioning extends Object {
      * <p>
      * <b>Performance:</b>
      * <p>
-     * Let <tt>N=to-from+1</tt> be the number of elements to be partitioned.
-     * Let <tt>k=splitTo-splitFrom+1</tt> be the number of splitter elements.
-     * Then we have the following time complexities
+     * Let <tt>N=to-from+1</tt> be the number of elements to be partitioned. Let
+     * <tt>k=splitTo-splitFrom+1</tt> be the number of splitter elements. Then
+     * we have the following time complexities
      * <ul>
      * <li>Worst case: <tt>O( N * log(k) )</tt>.
      * <li>Average case: <tt>O( N * log(k) )</tt>.
-     * <li>Best case: <tt>O( N )</tt>. In general, the more uniform (skewed)
-     * the data is spread across intervals, the more performance approaches the
+     * <li>Best case: <tt>O( N )</tt>. In general, the more uniform (skewed) the
+     * data is spread across intervals, the more performance approaches the
      * worst (best) case. If no elements fall into the given intervals, running
      * time is linear.
      * </ul>
@@ -875,8 +875,8 @@ public class Partitioning extends Object {
      * </ul>
      * As can be seen, the list is partially sorted such that values falling
      * into a certain interval are placed next to each other. Note that
-     * <i>within</i> an interval, elements are entirelly unsorted. They are
-     * only sorted across interval boundaries. In particular, this partitioning
+     * <i>within</i> an interval, elements are entirelly unsorted. They are only
+     * sorted across interval boundaries. In particular, this partitioning
      * algorithm is not <i>stable</i>.
      * <p>
      * More formally, this method guarantees that upon return there holds:
@@ -889,8 +889,8 @@ public class Partitioning extends Object {
      * <b>Performance:</b>
      * <p>
      * Let <tt>N=to-from+1</tt> be the number of elements to be partially
-     * sorted. Then the time complexity is <tt>O( N )</tt>. No temporary
-     * memory is allocated; the sort is in-place.
+     * sorted. Then the time complexity is <tt>O( N )</tt>. No temporary memory
+     * is allocated; the sort is in-place.
      * 
      * <p>
      * 
@@ -1088,7 +1088,8 @@ public class Partitioning extends Object {
 
     /**
      * Equivalent to
-     * <tt>partition(list.elements(), from, to, splitters.elements(), 0, splitters.size()-1, splitIndexes.elements())</tt>.
+     * <tt>partition(list.elements(), from, to, splitters.elements(), 0, splitters.size()-1, splitIndexes.elements())</tt>
+     * .
      */
     public static void partition(DoubleArrayList list, int from, int to, DoubleArrayList splitters, IntArrayList splitIndexes) {
         partition(list.elements(), from, to, splitters.elements(), 0, splitters.size() - 1, splitIndexes.elements());
@@ -1096,7 +1097,8 @@ public class Partitioning extends Object {
 
     /**
      * Equivalent to
-     * <tt>partition(list.elements(), from, to, splitters.elements(), 0, splitters.size()-1, splitIndexes.elements())</tt>.
+     * <tt>partition(list.elements(), from, to, splitters.elements(), 0, splitters.size()-1, splitIndexes.elements())</tt>
+     * .
      */
     public static void partition(IntArrayList list, int from, int to, IntArrayList splitters, IntArrayList splitIndexes) {
         partition(list.elements(), from, to, splitters.elements(), 0, splitters.size() - 1, splitIndexes.elements());
@@ -1105,8 +1107,8 @@ public class Partitioning extends Object {
     /**
      * Same as
      * {@link #triplePartition(int[],int[],int[],int,int,int[],int,int,int[])}
-     * except that it <i>synchronously</i> partitions <tt>double[]</tt>
-     * rather than <tt>int[]</tt> arrays.
+     * except that it <i>synchronously</i> partitions <tt>double[]</tt> rather
+     * than <tt>int[]</tt> arrays.
      */
     public static void triplePartition(double[] list, double[] secondary, double[] tertiary, int from, int to, double[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
         double splitter; // int, double --> template type dependent
@@ -1226,11 +1228,11 @@ public class Partitioning extends Object {
      * <p>
      * Image having a large list of 3-dimensional points. If memory consumption
      * and performance matter, it is a good idea to physically lay them out as
-     * three 1-dimensional arrays (using something like <tt>Point3D</tt>
-     * objects would be prohibitively expensive, both in terms of time and
-     * space). Now imagine wanting to histogram the points. We may want to
-     * partially sort the points by x-coordinate into intervals. This method
-     * efficiently does the job.
+     * three 1-dimensional arrays (using something like <tt>Point3D</tt> objects
+     * would be prohibitively expensive, both in terms of time and space). Now
+     * imagine wanting to histogram the points. We may want to partially sort
+     * the points by x-coordinate into intervals. This method efficiently does
+     * the job.
      * <p>
      * <b>Performance:</b>
      * <p>

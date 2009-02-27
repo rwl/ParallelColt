@@ -81,8 +81,7 @@ public class VectorInfo {
      */
     private void validate() {
         if (isDense() && isPattern())
-            throw new IllegalArgumentException(
-                    "Vector cannot be dense with pattern storage");
+            throw new IllegalArgumentException("Vector cannot be dense with pattern storage");
     }
 
     /**
@@ -142,8 +141,8 @@ public class VectorInfo {
     }
 
     /**
-     * Returns <code>true</code> if the vector does not store any numbers,
-     * else <code>false</code>
+     * Returns <code>true</code> if the vector does not store any numbers, else
+     * <code>false</code>
      */
     public boolean isPattern() {
         return field == VectorField.Pattern;

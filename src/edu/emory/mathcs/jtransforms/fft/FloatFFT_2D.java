@@ -44,13 +44,13 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * is a parallel implementation of split-radix and mixed-radix algorithms
  * optimized for SMP systems. <br>
  * <br>
- * This code is derived from General Purpose FFT Package written by Takuya Ooura
- * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
+ * Part of the code is derived from General Purpose FFT Package written by
+ * Takuya Ooura (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 
  */
-public class FloatFFT_2D {
+public strictfp class FloatFFT_2D {
 
     private int rows;
 
@@ -138,8 +138,8 @@ public class FloatFFT_2D {
                 xdft2d0_subth1(0, -1, a, true);
                 cdft2d_subth(-1, a, true);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexForward(a, i * columns);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexForward(a, r * columns);
                 }
                 cdft2d_sub(-1, a, true);
             }
@@ -154,8 +154,8 @@ public class FloatFFT_2D {
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int i = firstRow; i < lastRow; i++) {
-                                fftColumns.complexForward(a, i * rowStride);
+                            for (int r = firstRow; r < lastRow; r++) {
+                                fftColumns.complexForward(a, r * rowStride);
                             }
                         }
                     });
@@ -189,8 +189,8 @@ public class FloatFFT_2D {
                 }
                 ConcurrencyUtils.waitForCompletion(futures);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexForward(a, i * rowStride);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexForward(a, r * rowStride);
                 }
                 float[] temp = new float[2 * rows];
                 for (int c = 0; c < columns; c++) {
@@ -247,8 +247,8 @@ public class FloatFFT_2D {
                 xdft2d0_subth1(0, -1, a, true);
                 cdft2d_subth(-1, a, true);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexForward(a[i]);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexForward(a[r]);
                 }
                 cdft2d_sub(-1, a, true);
             }
@@ -262,8 +262,8 @@ public class FloatFFT_2D {
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int i = firstRow; i < lastRow; i++) {
-                                fftColumns.complexForward(a[i]);
+                            for (int r = firstRow; r < lastRow; r++) {
+                                fftColumns.complexForward(a[r]);
                             }
                         }
                     });
@@ -295,8 +295,8 @@ public class FloatFFT_2D {
                 }
                 ConcurrencyUtils.waitForCompletion(futures);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexForward(a[i]);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexForward(a[r]);
                 }
                 float[] temp = new float[2 * rows];
                 for (int c = 0; c < columns; c++) {
@@ -355,8 +355,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(1, a, scale);
             } else {
 
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexInverse(a, i * columns, scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexInverse(a, r * columns, scale);
                 }
                 cdft2d_sub(1, a, scale);
             }
@@ -371,8 +371,8 @@ public class FloatFFT_2D {
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int i = firstRow; i < lastRow; i++) {
-                                fftColumns.complexInverse(a, i * rowspan, scale);
+                            for (int r = firstRow; r < lastRow; r++) {
+                                fftColumns.complexInverse(a, r * rowspan, scale);
                             }
                         }
                     });
@@ -406,8 +406,8 @@ public class FloatFFT_2D {
                 }
                 ConcurrencyUtils.waitForCompletion(futures);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexInverse(a, i * rowspan, scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexInverse(a, r * rowspan, scale);
                 }
                 float[] temp = new float[2 * rows];
                 for (int c = 0; c < columns; c++) {
@@ -469,8 +469,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(1, a, scale);
             } else {
 
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexInverse(a[i], scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexInverse(a[r], scale);
                 }
                 cdft2d_sub(1, a, scale);
             }
@@ -484,8 +484,8 @@ public class FloatFFT_2D {
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            for (int i = firstRow; i < lastRow; i++) {
-                                fftColumns.complexInverse(a[i], scale);
+                            for (int r = firstRow; r < lastRow; r++) {
+                                fftColumns.complexInverse(a[r], scale);
                             }
                         }
                     });
@@ -517,8 +517,8 @@ public class FloatFFT_2D {
                 }
                 ConcurrencyUtils.waitForCompletion(futures);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.complexInverse(a[i], scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.complexInverse(a[r], scale);
                 }
                 float[] temp = new float[2 * rows];
                 for (int c = 0; c < columns; c++) {
@@ -593,8 +593,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(-1, a, true);
                 rdft2d_sub(1, a);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realForward(a, i * columns);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realForward(a, r * columns);
                 }
                 cdft2d_sub(-1, a, true);
                 rdft2d_sub(1, a);
@@ -656,8 +656,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(-1, a, true);
                 rdft2d_sub(1, a);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realForward(a[i]);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realForward(a[r]);
                 }
                 cdft2d_sub(-1, a, true);
                 rdft2d_sub(1, a);
@@ -697,8 +697,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(-1, a, true);
                 rdft2d_sub(1, a);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realForward(a, i * columns);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realForward(a, r * columns);
                 }
                 cdft2d_sub(-1, a, true);
                 rdft2d_sub(1, a);
@@ -741,8 +741,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(-1, a, true);
                 rdft2d_sub(1, a);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realForward(a[i]);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realForward(a[r]);
                 }
                 cdft2d_sub(-1, a, true);
                 rdft2d_sub(1, a);
@@ -810,8 +810,8 @@ public class FloatFFT_2D {
             } else {
                 rdft2d_sub(-1, a);
                 cdft2d_sub(1, a, scale);
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realInverse(a, i * columns, scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realInverse(a, r * columns, scale);
                 }
             }
         }
@@ -875,8 +875,8 @@ public class FloatFFT_2D {
             } else {
                 rdft2d_sub(-1, a);
                 cdft2d_sub(1, a, scale);
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realInverse(a[i], scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realInverse(a[r], scale);
                 }
             }
         }
@@ -916,8 +916,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(1, a, scale);
                 rdft2d_sub(1, a);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realInverse2(a, i * columns, scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realInverse2(a, r * columns, scale);
                 }
                 cdft2d_sub(1, a, scale);
                 rdft2d_sub(1, a);
@@ -962,8 +962,8 @@ public class FloatFFT_2D {
                 cdft2d_subth(1, a, scale);
                 rdft2d_sub(1, a);
             } else {
-                for (int i = 0; i < rows; i++) {
-                    fftColumns.realInverse2(a[i], 0, scale);
+                for (int r = 0; r < rows; r++) {
+                    fftColumns.realInverse2(a[r], 0, scale);
                 }
                 cdft2d_sub(1, a, scale);
                 rdft2d_sub(1, a);
@@ -1079,8 +1079,8 @@ public class FloatFFT_2D {
             ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
-            for (int i = 0; i < rows; i++) {
-                fftColumns.realForward(a[i]);
+            for (int r = 0; r < rows; r++) {
+                fftColumns.realForward(a[r]);
             }
 
             for (int r = 0; r < rows; r++) {
@@ -1250,8 +1250,8 @@ public class FloatFFT_2D {
             }
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            for (int i = 0; i < rows; i++) {
-                fftColumns.realForward(a, i * columns);
+            for (int r = 0; r < rows; r++) {
+                fftColumns.realForward(a, r * columns);
             }
             for (int r = 0; r < rows; r++) {
                 temp[0][r] = a[r * columns]; //first column is always real
@@ -1420,8 +1420,8 @@ public class FloatFFT_2D {
             ConcurrencyUtils.waitForCompletion(futures);
 
         } else {
-            for (int i = 0; i < rows; i++) {
-                fftColumns.realInverse2(a[i], 0, scale);
+            for (int r = 0; r < rows; r++) {
+                fftColumns.realInverse2(a[r], 0, scale);
             }
 
             for (int r = 0; r < rows; r++) {
@@ -1591,8 +1591,8 @@ public class FloatFFT_2D {
             }
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            for (int i = 0; i < rows; i++) {
-                fftColumns.realInverse2(a, i * columns, scale);
+            for (int r = 0; r < rows; r++) {
+                fftColumns.realInverse2(a, r * columns, scale);
             }
             for (int r = 0; r < rows; r++) {
                 temp[0][r] = a[r * columns]; //first column is always real

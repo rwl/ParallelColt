@@ -1,6 +1,5 @@
 package cern.colt.matrix.tdouble.impl;
 
-
 public class CCMDoubleMatrix2DViewTest extends CCMDoubleMatrix2DTest {
 
     public CCMDoubleMatrix2DViewTest(String arg0) {

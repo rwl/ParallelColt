@@ -11,8 +11,8 @@ package cern.colt.function.tfloat;
 /**
  * A comparison function which imposes a <i>total ordering</i> on some
  * collection of elements. Comparators can be passed to a sort method (such as
- * <tt>cern.colt.Sorting.quickSort</tt>) to allow precise control over the
- * sort order.
+ * <tt>cern.colt.Sorting.quickSort</tt>) to allow precise control over the sort
+ * order.
  * <p>
  * 
  * Note: It is generally a good idea for comparators to implement
@@ -35,9 +35,8 @@ public interface FloatComparator {
      * <p>
      * 
      * The implementor must ensure that <tt>sgn(compare(x, y)) ==
-     * -sgn(compare(y, x))</tt>
-     * for all <tt>x</tt> and <tt>y</tt>. (This implies that
-     * <tt>compare(x, y)</tt> must throw an exception if and only if
+     * -sgn(compare(y, x))</tt> for all <tt>x</tt> and <tt>y</tt>. (This implies
+     * that <tt>compare(x, y)</tt> must throw an exception if and only if
      * <tt>compare(y, x)</tt> throws an exception.)
      * <p>
      * 
@@ -65,13 +64,13 @@ public interface FloatComparator {
      * <tt>true</tt> <i>only</i> if the specified Object is also a comparator
      * and it imposes the same ordering as this comparator. Thus,
      * <code>comp1.equals(comp2)</code> implies that <tt>sgn(comp1.compare(o1,
-     * o2))==sgn(comp2.compare(o1, o2))</tt>
-     * for every element <tt>o1</tt> and <tt>o2</tt>.
+     * o2))==sgn(comp2.compare(o1, o2))</tt> for every element <tt>o1</tt> and
+     * <tt>o2</tt>.
      * <p>
      * 
      * Note that it is <i>always</i> safe <i>not</i> to override
-     * <tt>Object.equals(Object)</tt>. However, overriding this method may,
-     * in some cases, improve performance by allowing programs to determine that
+     * <tt>Object.equals(Object)</tt>. However, overriding this method may, in
+     * some cases, improve performance by allowing programs to determine that
      * two distinct Comparators impose the same order.
      * 
      * @param obj

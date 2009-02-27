@@ -172,7 +172,9 @@ public class CCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
 
     /**
-     * Constructs a matrix with indexes and values given in compressed-column format.
+     * Constructs a matrix with indexes and values given in compressed-column
+     * format.
+     * 
      * @param rows
      * @param columns
      * @param columnPointers
@@ -243,9 +245,10 @@ public class CCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         values = new DoubleArrayList(nzmax);
         columnPointers = new int[columns + 1];
     }
-    
+
     /**
      * Constructs a matrix with indexes and values given in coordinate format.
+     * 
      * @param rows
      * @param columns
      * @param rowIndexes
@@ -262,7 +265,7 @@ public class CCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
         int nnz = rowIndexes.size();
         int[] rowIndexesElements = rowIndexes.elements();
-        int[] columnIndexesElements = columnIndexes.elements();        
+        int[] columnIndexesElements = columnIndexes.elements();
         double[] valuesElements = values.elements();
 
         int[] idxs = new int[nnz];
@@ -282,7 +285,47 @@ public class CCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         this.rowIndexes = new IntArrayList(idxs);
         this.values = new DoubleArrayList(vals);
     }
-    
+
+    /**
+     * Constructs a matrix with indexes given in coordinate format and a single
+     * value.
+     * 
+     * @param rows
+     * @param columns
+     * @param rowIndexes
+     * @param columnIndexes
+     * @param value
+     */
+    public CCDoubleMatrix2D(int rows, int columns, IntArrayList rowIndexes, IntArrayList columnIndexes, double value) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        int nnz = rowIndexes.size();
+        int[] rowIndexesElements = rowIndexes.elements();
+        int[] columnIndexesElements = columnIndexes.elements();
+
+        int[] idxs = new int[nnz];
+        double[] vals = new double[nnz];
+        int[] starts = new int[columns + 1];
+        int[] w = new int[columns];
+        int r;
+        for (int k = 0; k < nnz; k++) {
+            w[columnIndexesElements[k]]++;
+        }
+        cumsum(starts, w, columns);
+        for (int k = 0; k < nnz; k++) {
+            idxs[r = w[columnIndexesElements[k]]++] = rowIndexesElements[k];
+            vals[r] = value;
+        }
+        this.columnPointers = starts;
+        this.rowIndexes = new IntArrayList(idxs);
+        this.values = new DoubleArrayList(vals);
+    }
+
     private float cumsum(int[] p, int[] c, int n) {
         int nz = 0;
         float nz2 = 0;

@@ -19,8 +19,8 @@ import cern.colt.matrix.tint.IntMatrix3D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
- * Dense 1-d matrix (aka <i>vector</i>) holding <tt>int</tt> elements. First
- * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * Dense 1-d matrix (aka <i>vector</i>) holding <tt>int</tt> elements. First see
+ * the <a href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
@@ -150,7 +150,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         checkSize(other);
         if (size == 0)
             throw new IllegalArgumentException("size == 0");
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final int[] elemsOther = (int[]) other.elements();
         int a = 0;
@@ -240,18 +240,18 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
-        } else {            
+        } else {
             int idx = zero - stride;
             // specialization for speed
             if (function instanceof cern.jet.math.tint.IntMult) {
                 // x[i] = mult*x[i]
-                for (int k = size; --k>=0;) {
-                    elements[idx+= stride] *= multiplicator;
-                }                
+                for (int k = size; --k >= 0;) {
+                    elements[idx += stride] *= multiplicator;
+                }
             } else {
                 // the general case x[i] = f(x[i])
-                for (int k = size; --k>=0;) {
-                    elements[idx+= stride] = function.apply(elements[idx]);
+                for (int k = size; --k >= 0;) {
+                    elements[idx += stride] = function.apply(elements[idx]);
                 }
             }
         }
@@ -460,7 +460,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         final int[] elemsOther = other.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -506,7 +506,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             return this;
         }
         checkSize(y);
-        final int zeroOther = (int)y.index(0);
+        final int zeroOther = (int) y.index(0);
         final int strideOther = y.stride();
         final int[] elemsOther = (int[]) y.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -720,7 +720,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
         return cardinality;
     }
-
 
     public int[] elements() {
         return elements;
@@ -962,7 +961,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
         IntMatrix2D M = new DenseIntMatrix2D(rows, cols);
         final int[] elemsOther = (int[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0);
+        final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1015,7 +1014,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
         IntMatrix3D M = new DenseIntMatrix3D(slices, rows, cols);
         final int[] elemsOther = (int[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0, 0);
+        final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
@@ -1083,7 +1082,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         final int[] elemsOther = y.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -1133,15 +1132,15 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         else
             super.toArray(values);
     }
-    
+
     public int zDotProduct(IntMatrix1D y) {
         if (!(y instanceof DenseIntMatrix1D)) {
             return super.zDotProduct(y);
         }
         DenseIntMatrix1D yy = (DenseIntMatrix1D) y;
         final int[] elemsOther = yy.elements;
-        int zeroThis = (int)index(0);
-        int zeroOther = (int)yy.index(0);
+        int zeroThis = (int) index(0);
+        int zeroOther = (int) yy.index(0);
         int strideOther = yy.stride;
         if (elements == null || elemsOther == null)
             throw new InternalError();
@@ -1221,8 +1220,8 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         if (y.size() < tail)
             tail = y.size();
         final int[] elemsOther = yy.elements;
-        int zeroThis = (int)index(from);
-        int zeroOther = (int)yy.index(from);
+        int zeroThis = (int) index(from);
+        int zeroOther = (int) yy.index(from);
         int strideOther = yy.stride;
         if (elements == null || elemsOther == null)
             throw new InternalError();

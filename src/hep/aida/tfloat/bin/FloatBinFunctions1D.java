@@ -160,7 +160,8 @@ public class FloatBinFunctions1D extends Object {
      * Function that returns <tt>bin.quantile(percentage)</tt>.
      * 
      * @param percentage
-     *            the percentage of the quantile (<tt>0 <= percentage <= 1</tt>).
+     *            the percentage of the quantile (<tt>0 <= percentage <= 1</tt>
+     *            ).
      */
     public static FloatBinFunction1D quantile(final float percentage) {
         return new FloatBinFunction1D() {

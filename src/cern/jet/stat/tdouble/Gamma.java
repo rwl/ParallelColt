@@ -14,7 +14,7 @@ import cern.jet.math.tdouble.Polynomial;
  * Gamma and Beta functions.
  * <p>
  * <b>Implementation:</b>
- * <dt> Some code taken and adapted from the <A
+ * <dt>Some code taken and adapted from the <A
  * HREF="http://www.sci.usq.edu.au/staff/leighb/graph/Top.html">Java 2D Graph
  * Package 2.4</A>, which in turn is a port from the <A
  * HREF="http://people.ne.mediaone.net/moshier/index.html#Cephes">Cephes 2.2</A>

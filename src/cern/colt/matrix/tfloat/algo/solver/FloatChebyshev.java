@@ -88,8 +88,7 @@ public class FloatChebyshev extends AbstractFloatIterativeSolver {
             throw new IllegalArgumentException("eigmin > eigmax");
     }
 
-    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
-            throws IterativeSolverFloatNotConvergedException {
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         checkSizes(A, b, x);
 
         float alpha = 0, beta = 0, c = 0, d = 0;
@@ -104,11 +103,11 @@ public class FloatChebyshev extends AbstractFloatIterativeSolver {
 
             if (iter.isFirst()) {
                 p.assign(z);
-                alpha = (float)(2.0 / d);
+                alpha = (float) (2.0 / d);
             } else {
-                beta = (float)((alpha * c) / 2.0);
-                beta *= beta; 
-                alpha = (float)(1.0 / (d - beta));
+                beta = (float) ((alpha * c) / 2.0);
+                beta *= beta;
+                alpha = (float) (1.0 / (d - beta));
                 p.assign(z, FloatFunctions.plusMultFirst(beta));
             }
 

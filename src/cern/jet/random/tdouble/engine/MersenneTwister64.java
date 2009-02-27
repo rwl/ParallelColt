@@ -11,8 +11,8 @@ package cern.jet.random.tdouble.engine;
 import java.util.Date;
 
 /**
- * Same as <tt>MersenneTwister</tt> except that method <tt>raw()</tt>
- * returns 64 bit random numbers instead of 32 bit random numbers.
+ * Same as <tt>MersenneTwister</tt> except that method <tt>raw()</tt> returns 64
+ * bit random numbers instead of 32 bit random numbers.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99

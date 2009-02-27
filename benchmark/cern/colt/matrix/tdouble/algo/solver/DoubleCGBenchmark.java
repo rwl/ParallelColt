@@ -1,7 +1,5 @@
 package cern.colt.matrix.tdouble.algo.solver;
 
-
-
 /**
  * Benchmark of DoubleCG
  */

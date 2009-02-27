@@ -949,11 +949,7 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
     public FloatMatrix2D copy() {
         return like().assign(this);
     }
-   
-         
-    
 
-    
     /**
      * Returns the elements of this matrix.
      * 
@@ -995,7 +991,7 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
 
         return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, (FloatMatrix2D) obj);
     }
-   
+
     /**
      * Assigns the result of a function to each <i>non-zero</i> cell;
      * <tt>x[row,col] = function(x[row,col])</tt>. Use this method for fast
@@ -1080,11 +1076,7 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
     protected FloatMatrix2D getContent() {
         return this;
     }
-    
-    
-   
-    
-    
+
     /**
      * Fills the coordinates and values of cells having negative values into the
      * specified lists. Fills into the lists, starting at index 0. After this
@@ -1229,10 +1221,7 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
     protected boolean haveSharedCellsRaw(FloatMatrix2D other) {
         return false;
     }
-               
-    
-    
-    
+
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of rows and columns. For example,
@@ -1256,8 +1245,8 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
      * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -1271,9 +1260,9 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseFloatMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -1463,11 +1452,11 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
         }
         return new float[] { minValue, rowLocation, columnLocation };
     }
-    
+
     /**
      * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
-     * If the matrix contains negative elements then all the values are shifted to
-     * ensure non-negativity.
+     * If the matrix contains negative elements then all the values are shifted
+     * to ensure non-negativity.
      */
     public void normalize() {
         float min = getMinLocation()[0];
@@ -1475,14 +1464,13 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
             assign(FloatFunctions.minus(min));
         }
         if (getMaxLocation()[0] == 0) {
-            assign((float)(1.0 / size()));
+            assign((float) (1.0 / size()));
         } else {
             float sumScaleFactor = zSum();
-            sumScaleFactor = (float)(1.0 / sumScaleFactor);
+            sumScaleFactor = (float) (1.0 / sumScaleFactor);
             assign(FloatFunctions.mult(sumScaleFactor));
         }
     }
-
 
     /**
      * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
@@ -1503,7 +1491,6 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
             throw new IndexOutOfBoundsException("row:" + row + ", column:" + column);
         setQuick(row, column, value);
     }
-    
 
     /**
      * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
@@ -1636,7 +1623,7 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
     public FloatMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
-        int viewZero = (int)index(0, column);
+        int viewZero = (int) index(0, column);
         int viewStride = this.rowStride;
         return like1D(viewSize, viewZero, viewStride);
     }
@@ -1777,7 +1764,7 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
     public FloatMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
-        int viewZero = (int)index(row, 0);
+        int viewZero = (int) index(row, 0);
         int viewStride = this.columnStride;
         return like1D(viewSize, viewZero, viewStride);
     }
@@ -1974,8 +1961,8 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
      * Sorts the matrix rows into ascending order, according to the <i>natural
      * ordering</i> of the matrix values in the given column. This sort is
      * guaranteed to be <i>stable</i>. For further information, see
-     * {@link cern.colt.matrix.tfloat.algo.FloatSorting#sort(FloatMatrix2D,int)}. For
-     * more advanced sorting functionality, see
+     * {@link cern.colt.matrix.tfloat.algo.FloatSorting#sort(FloatMatrix2D,int)}
+     * . For more advanced sorting functionality, see
      * {@link cern.colt.matrix.tfloat.algo.FloatSorting}.
      * 
      * @return a new sorted vector (matrix) view.
@@ -2140,11 +2127,11 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
         if (transposeA)
             return viewDice().zMult(y, z, alpha, beta, false);
         final FloatMatrix1D z_loc;
-        if (z == null) {            
+        if (z == null) {
             z_loc = new DenseFloatMatrix1D(rows);
         } else {
             z_loc = z;
-        }        
+        }
         if (columns != y.size() || rows > z_loc.size())
             throw new IllegalArgumentException("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + z_loc.toStringShort());
 
@@ -2224,7 +2211,7 @@ public abstract class FloatMatrix2D extends AbstractMatrix2D {
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);
         if (transposeB)
             return this.zMult(B.viewDice(), C, alpha, beta, transposeA, false);
-        
+
         final int m = rows;
         final int n = columns;
         final int p = B.columns;

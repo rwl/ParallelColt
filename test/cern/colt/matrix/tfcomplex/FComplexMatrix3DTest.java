@@ -51,7 +51,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    A.setQuick(s, r, c, new float[] { (float)Math.random(), (float)Math.random() });
+                    A.setQuick(s, r, c, new float[] { (float) Math.random(), (float) Math.random() });
                 }
             }
         }
@@ -59,7 +59,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    B.setQuick(s, r, c, new float[] { (float)Math.random(), (float)Math.random() });
+                    B.setQuick(s, r, c, new float[] { (float) Math.random(), (float) Math.random() });
                 }
             }
         }
@@ -164,7 +164,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testAssignComplexProcedureFloatArray() {
         FComplexMatrix3D Acopy = A.copy();
-        float[] value = new float[] { (float)Math.random(), (float)Math.random() };
+        float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.assign(new FComplexProcedure() {
             public boolean apply(float[] element) {
                 if (FComplex.abs(element) > 3) {
@@ -203,7 +203,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testAssignFloatArray() {
         float[] expected = new float[2 * A.size()];
         for (int i = 0; i < 2 * A.size(); i++) {
-            expected[i] = (float)Math.random();
+            expected[i] = (float) Math.random();
         }
         A.assign(expected);
         int idx = 0;
@@ -223,7 +223,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < 2 * NCOLUMNS; c++) {
-                    expected[s][r][c] = (float)Math.random();
+                    expected[s][r][c] = (float) Math.random();
                 }
             }
         }
@@ -241,7 +241,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     }
 
     public void testAssignFloatFloat() {
-        float[] value = new float[] { (float)Math.random(), (float)Math.random() };
+        float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.assign(value[0], value[1]);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
@@ -286,7 +286,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     }
 
     public void testEqualsFloatArray() {
-        float[] value = new float[] { (float)Math.random(), (float)Math.random() };
+        float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.assign(value[0], value[1]);
         boolean eq = A.equals(value);
         assertTrue(eq);

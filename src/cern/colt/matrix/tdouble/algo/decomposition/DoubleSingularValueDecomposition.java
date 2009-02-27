@@ -14,10 +14,10 @@ import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
 
 /**
- * For an <tt>m x n</tt> matrix <tt>A</tt> with <tt>m >= n</tt>, the
- * singular value decomposition is an <tt>m x n</tt> orthogonal matrix
- * <tt>U</tt>, an <tt>n x n</tt> diagonal matrix <tt>S</tt>, and an
- * <tt>n x n</tt> orthogonal matrix <tt>V</tt> so that <tt>A = U*S*V'</tt>.
+ * For an <tt>m x n</tt> matrix <tt>A</tt> with <tt>m >= n</tt>, the singular
+ * value decomposition is an <tt>m x n</tt> orthogonal matrix <tt>U</tt>, an
+ * <tt>n x n</tt> diagonal matrix <tt>S</tt>, and an <tt>n x n</tt> orthogonal
+ * matrix <tt>V</tt> so that <tt>A = U*S*V'</tt>.
  * <P>
  * The singular values, <tt>sigma[k] = S[k][k]</tt>, are ordered so that
  * <tt>sigma[0] >= sigma[1] >= ... >= sigma[n-1]</tt>.
@@ -503,8 +503,8 @@ public class DoubleSingularValueDecomposition implements java.io.Serializable {
     }
 
     /**
-     * Returns the diagonal of <tt>S</tt>, which is a one-dimensional array
-     * of singular values
+     * Returns the diagonal of <tt>S</tt>, which is a one-dimensional array of
+     * singular values
      * 
      * @return diagonal of <tt>S</tt>.
      */
@@ -562,7 +562,7 @@ public class DoubleSingularValueDecomposition implements java.io.Serializable {
      * <pre>
      * 	 rank          : 3
      * 	 trace         : 0
-     * 	
+     * 
      * </pre>
      */
     public String toString() {

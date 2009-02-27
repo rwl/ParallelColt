@@ -12,8 +12,9 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 
 /**
  * Exponential Distribution (aka Negative Exponential Distribution); See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node78.html#SECTION000780000000000000000">
- * math definition</A> <A
+ * HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node78.html#SECTION000780000000000000000"
+ * > math definition</A> <A
  * HREF="http://www.statsoft.com/textbook/glose.html#Exponential Distribution">
  * animated definition</A>.
  * <p>
@@ -22,8 +23,8 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * 
  * @author wolfgang.hoschek@cern.ch

@@ -39,8 +39,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * <p>
  * <b>Memory requirements:</b>
  * <p>
- * <tt>memory [bytes] = 4*(sliceIndexes.length+rowIndexes.length+columnIndexes.length)</tt>.
- * Thus, an index view with 100 x 100 x 100 indexes additionally uses 8 KB.
+ * <tt>memory [bytes] = 4*(sliceIndexes.length+rowIndexes.length+columnIndexes.length)</tt>
+ * . Thus, an index view with 100 x 100 x 100 indexes additionally uses 8 KB.
  * <p>
  * <b>Time complexity:</b>
  * <p>
@@ -180,14 +180,15 @@ class SelectedDenseDComplexMatrix3D extends DComplexMatrix3D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if <tt>other != null</tt> and at
-     * least one of the following conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+     * following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
      * <li><tt>this == other</tt>
-     * </ul> *
+     * </ul>
+     * *
      * 
      * @param other
      *            matrix
@@ -370,17 +371,17 @@ class SelectedDenseDComplexMatrix3D extends DComplexMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and rows of the given column. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and rows of the given column. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param column
      *            the index of the column to fix.
@@ -410,17 +411,17 @@ class SelectedDenseDComplexMatrix3D extends DComplexMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and columns of the given row. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and columns of the given row. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param row
      *            the index of the row to fix.
@@ -465,17 +466,17 @@ class SelectedDenseDComplexMatrix3D extends DComplexMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the rows and columns of the given slice. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the rows and columns of the given slice. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param slice
      *            the index of the slice to fix.
@@ -561,7 +562,6 @@ class SelectedDenseDComplexMatrix3D extends DComplexMatrix3D {
         }
         return Im;
     }
-
 
     /**
      * Returns the real part of this matrix

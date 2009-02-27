@@ -37,7 +37,6 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
         return content.elements();
     }
 
-
     /**
      * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
      * 
@@ -61,12 +60,11 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseIntMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseIntMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseIntMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseIntMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * example, if the receiver is an instance of type <tt>DenseIntMatrix2D</tt>
+     * the new matrix must also be of type <tt>DenseIntMatrix2D</tt>, if the
+     * receiver is an instance of type <tt>SparseIntMatrix2D</tt> the new matrix
+     * must also be of type <tt>SparseIntMatrix2D</tt>, etc. In general, the new
+     * matrix should have internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -81,10 +79,10 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseIntMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseIntMatrix1D</tt>, if the receiver
-     * is an instance of type <tt>SparseIntMatrix2D</tt> the new matrix
-     * must be of type <tt>SparseIntMatrix1D</tt>, etc.
+     * receiver is an instance of type <tt>DenseIntMatrix2D</tt> the new matrix
+     * must be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance
+     * of type <tt>SparseIntMatrix2D</tt> the new matrix must be of type
+     * <tt>SparseIntMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -95,8 +93,8 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -131,14 +129,15 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the rows of
      * the given column. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>viewColumn(0) ==></td>
      * <td valign="top">Matrix1D of size 2:<br>
      * 1, 4</td>
@@ -157,17 +156,18 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the column axis.
-     * What used to be column <tt>0</tt> is now column <tt>columns()-1</tt>,
-     * ..., what used to be column <tt>columns()-1</tt> is now column
-     * <tt>0</tt>. The returned view is backed by this matrix, so changes in
-     * the returned view are reflected in this matrix, and vice-versa.
+     * Constructs and returns a new <i>flip view</i> along the column axis. What
+     * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
+     * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
+     * returned view is backed by this matrix, so changes in the returned view
+     * are reflected in this matrix, and vice-versa.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>columnFlip ==></td>
      * <td valign="top">2 x 3 matrix:<br>
      * 3, 2, 1 <br>
@@ -175,7 +175,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * <td>columnFlip ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 
@@ -202,18 +202,19 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * axes; example: 3 x 4 matrix --> 4 x 3 matrix. The view has both
      * dimensions exchanged; what used to be columns become rows, what used to
      * be rows become columns. In other words:
-     * <tt>view.get(row,column)==this.get(column,row)</tt>. This is a
-     * zero-copy transposition, taking O(1), i.e. constant time. The returned
-     * view is backed by this matrix, so changes in the returned view are
-     * reflected in this matrix, and vice-versa. Use idioms like
+     * <tt>view.get(row,column)==this.get(column,row)</tt>. This is a zero-copy
+     * transposition, taking O(1), i.e. constant time. The returned view is
+     * backed by this matrix, so changes in the returned view are reflected in
+     * this matrix, and vice-versa. Use idioms like
      * <tt>result = viewDice(A).copy()</tt> to generate an independent
      * transposed matrix.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>transpose ==></td>
      * <td valign="top">3 x 2 matrix:<br>
      * 1, 4 <br>
@@ -222,7 +223,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * <td>transpose ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 
@@ -242,17 +243,19 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
         view.setNcolumns(rows);
         return view;
     }
-    
+
     /**
      * Sets the number of rows of this matrix
+     * 
      * @param columns
      */
     public void setNcolumns(int columns) {
         this.columns = columns;
     }
-    
+
     /**
      * Sets the number of rows of this matrix
+     * 
      * @param rows
      */
     public void setNrows(int rows) {
@@ -273,11 +276,11 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * <p>
      * The view contains the cells from <tt>[row,column]</tt> to
      * <tt>[row+height-1,column+width-1]</tt>, all inclusive. and has
-     * <tt>view.rows() == height; view.columns() == width;</tt>. A view's
-     * legal coordinates are again zero based, as usual. In other words, legal
+     * <tt>view.rows() == height; view.columns() == width;</tt>. A view's legal
+     * coordinates are again zero based, as usual. In other words, legal
      * coordinates of the view range from <tt>[0,0]</tt> to
-     * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As
-     * usual, any attempt to access a cell at a coordinate
+     * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As usual,
+     * any attempt to access a cell at a coordinate
      * <tt>column&lt;0 || column&gt;=view.columns() || row&lt;0 || row&gt;=view.rows()</tt>
      * will throw an <tt>IndexOutOfBoundsException</tt>.
      * 
@@ -316,14 +319,15 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the columns
      * of the given row. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>viewRow(0) ==></td>
      * <td valign="top">Matrix1D of size 3:<br>
      * 1, 2, 3</td>
@@ -344,16 +348,17 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
 
     /**
      * Constructs and returns a new <i>flip view</i> along the row axis. What
-     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what
-     * used to be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned
-     * view is backed by this matrix, so changes in the returned view are
-     * reflected in this matrix, and vice-versa.
+     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
+     * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
+     * backed by this matrix, so changes in the returned view are reflected in
+     * this matrix, and vice-versa.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>rowFlip ==></td>
      * <td valign="top">2 x 3 matrix:<br>
      * 4, 5, 6 <br>
@@ -361,7 +366,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * <td>rowFlip ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 
@@ -402,7 +407,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * 	 view = 2 x 4 matrix:
      * 	 2, 1, 2, 1
      * 	 5, 4, 5, 4
-     * 	
+     * 
      * </pre>
      * 
      * Note that modifying the index arguments after this call has returned has
@@ -512,9 +517,9 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseIntMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseIntMatrix2D</tt> the new matrix must be of type
+     * instance of type <tt>DenseIntMatrix2D</tt> the new matrix must be of type
+     * <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of type
+     * <tt>SparseIntMatrix2D</tt> the new matrix must be of type
      * <tt>SparseIntMatrix1D</tt>, etc.
      * 
      * @param size

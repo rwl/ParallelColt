@@ -20,18 +20,17 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b> Walker's algorithm. Generating a random number takes
  * <tt>O(1)</tt>, i.e. constant time, as opposed to commonly used algorithms
  * with logarithmic time complexity. Preprocessing time (on object construction)
- * is <tt>O(k)</tt> where <tt>k</tt> is the number of elements of the
- * provided empirical pdf. Space complexity is <tt>O(k)</tt>.
+ * is <tt>O(k)</tt> where <tt>k</tt> is the number of elements of the provided
+ * empirical pdf. Space complexity is <tt>O(k)</tt>.
  * <p>
- * This is a port of <A
- * HREF="http://sourceware.cygnus.com/cgi-bin/cvsweb.cgi/gsl/randist/discrete.c?cvsroot=gsl">discrete.c</A>
- * which was written by James Theiler and is distributed with <A
+ * This is a port of <A HREF="http://sourceware.cygnus.com/cgi-bin/cvsweb.cgi/gsl/randist/discrete.c?cvsroot=gsl"
+ * >discrete.c</A> which was written by James Theiler and is distributed with <A
  * HREF="http://sourceware.cygnus.com/gsl/">GSL 0.4.1</A>. Theiler's
  * implementation in turn is based upon
  * <p>

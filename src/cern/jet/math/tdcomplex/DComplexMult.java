@@ -1,5 +1,5 @@
 /*
-Copyright � 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -49,7 +49,6 @@ public final class DComplexMult implements cern.colt.function.tdcomplex.DComplex
         return z;
     }
 
-    
     /**
      * <tt>a / constant</tt>.
      */

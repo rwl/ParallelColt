@@ -19,8 +19,8 @@ package cern.colt.matrix.tbit;
  * performance is critical and you are absolutely sure that indexes are within
  * bounds.</b>
  * <p>
- * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt> holds
- * bits of a bitvector. Each long value holds 64 bits. The i-th bit is stored in
+ * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt> holds bits
+ * of a bitvector. Each long value holds 64 bits. The i-th bit is stored in
  * bits[i/64] at bit position i % 64 (where bit position 0 refers to the least
  * significant bit and 63 refers to the most significant bit).
  * 
@@ -89,8 +89,8 @@ public class QuickBitVector extends Object {
 
     /**
      * Returns from the bitvector the value of the bit with the specified index.
-     * The value is <tt>true</tt> if the bit with the index <tt>bitIndex</tt>
-     * is currently set; otherwise, returns <tt>false</tt>.
+     * The value is <tt>true</tt> if the bit with the index <tt>bitIndex</tt> is
+     * currently set; otherwise, returns <tt>false</tt>.
      * 
      * @param bits
      *            the bitvector.
@@ -104,12 +104,11 @@ public class QuickBitVector extends Object {
 
     /**
      * Returns a long value representing bits of a bitvector from index
-     * <tt>from</tt> to index <tt>to</tt>. Bits are returned as a long
-     * value with the return value having bit 0 set to bit <code>from</code>,
-     * ..., bit <code>to-from</code> set to bit <code>to</code>. All other
-     * bits of return value are set to 0. If <tt>from &gt; to</tt> then
-     * returns zero (<tt>0L</tt>). Precondition (not checked):
-     * <tt>to-from+1 &lt;= 64</tt>.
+     * <tt>from</tt> to index <tt>to</tt>. Bits are returned as a long value
+     * with the return value having bit 0 set to bit <code>from</code>, ..., bit
+     * <code>to-from</code> set to bit <code>to</code>. All other bits of return
+     * value are set to 0. If <tt>from &gt; to</tt> then returns zero (
+     * <tt>0L</tt>). Precondition (not checked): <tt>to-from+1 &lt;= 64</tt>.
      * 
      * @param bits
      *            the bitvector.
@@ -166,7 +165,7 @@ public class QuickBitVector extends Object {
      * 	 0x7fffffff --&gt; 0
      * 	 0x00000001 --&gt; 0
      * 	 0x00000000 --&gt; 32
-     * 	
+     * 
      * </pre>
      */
     static public int leastSignificantBit(int value) {
@@ -177,8 +176,8 @@ public class QuickBitVector extends Object {
     }
 
     /**
-     * Constructs a low level bitvector that holds <tt>size</tt> elements,
-     * with each element taking <tt>bitsPerElement</tt> bits.
+     * Constructs a low level bitvector that holds <tt>size</tt> elements, with
+     * each element taking <tt>bitsPerElement</tt> bits.
      * 
      * @param size
      *            the number of elements to be stored in the bitvector (must be
@@ -203,7 +202,7 @@ public class QuickBitVector extends Object {
      * 	 0x7fffffff --&gt; 30
      * 	 0x00000001 --&gt; 0
      * 	 0x00000000 --&gt; -1
-     * 	
+     * 
      * </pre>
      */
     static public int mostSignificantBit(int value) {
@@ -253,8 +252,8 @@ public class QuickBitVector extends Object {
     }
 
     /**
-     * Sets the bit with index <tt>bitIndex</tt> in the bitvector
-     * <tt>bits</tt> to the state specified by <tt>value</tt>.
+     * Sets the bit with index <tt>bitIndex</tt> in the bitvector <tt>bits</tt>
+     * to the state specified by <tt>value</tt>.
      * 
      * @param bits
      *            the bitvector.
@@ -272,12 +271,11 @@ public class QuickBitVector extends Object {
 
     /**
      * Sets bits of a bitvector from index <code>from</code> to index
-     * <code>to</code> to the bits of <code>value</code>. Bit
-     * <code>from</code> is set to bit 0 of <code>value</code>, ..., bit
-     * <code>to</code> is set to bit <code>to-from</code> of
-     * <code>value</code>. All other bits stay unaffected. If
-     * <tt>from &gt; to</tt> then does nothing. Precondition (not checked):
-     * <tt>to-from+1 &lt;= 64</tt>.
+     * <code>to</code> to the bits of <code>value</code>. Bit <code>from</code>
+     * is set to bit 0 of <code>value</code>, ..., bit <code>to</code> is set to
+     * bit <code>to-from</code> of <code>value</code>. All other bits stay
+     * unaffected. If <tt>from &gt; to</tt> then does nothing. Precondition (not
+     * checked): <tt>to-from+1 &lt;= 64</tt>.
      * 
      * @param bits
      *            the bitvector.

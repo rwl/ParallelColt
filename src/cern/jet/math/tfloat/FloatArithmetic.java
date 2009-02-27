@@ -44,6 +44,7 @@ public class FloatArithmetic extends FloatConstants {
      * <li>k==1<tt>: <tt>n</tt>.
      * <li>else: <tt>(n * n-1 * ... * n-k+1 ) / ( 1 * 2 * ... * k )</tt>.
      * </ul>
+     * 
      * @return the binomial coefficient.
      */
     public static float binomial(float n, long k) {
@@ -73,6 +74,7 @@ public class FloatArithmetic extends FloatConstants {
      * <li>k==1 || k==n-1<tt>: <tt>n</tt>.
      * <li>else: <tt>(n * n-1 * ... * n-k+1 ) / ( 1 * 2 * ... * k )</tt>.
      * </ul>
+     * 
      * @return the binomial coefficient.
      */
     public static float binomial(long n, long k) {
@@ -112,10 +114,9 @@ public class FloatArithmetic extends FloatConstants {
     }
 
     /**
-     * Returns the smallest <code>long &gt;= value</code>.
-     * <dt>Examples: <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method
-     * is safer than using (long) Math.ceil(value), because of possible rounding
-     * error.
+     * Returns the smallest <code>long &gt;= value</code>. <dt>Examples:
+     * <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method is safer than
+     * using (long) Math.ceil(value), because of possible rounding error.
      */
     public static long ceil(float value) {
         return Math.round(Math.ceil(value));
@@ -236,12 +237,10 @@ public class FloatArithmetic extends FloatConstants {
     }
 
     /**
-     * Returns the largest <code>long &lt;= value</code>.
-     * <dt>Examples: <code>
+     * Returns the largest <code>long &lt;= value</code>. <dt>Examples: <code>
      * 1.0 -> 1, 1.2 -> 1, 1.9 -> 1 <dt>
-     * 2.0 -> 2, 2.2 -> 2, 2.9 -> 2 </code>
-     * <dt> This method is safer than using (long) Math.floor(value), because of
-     * possible rounding error.
+     * 2.0 -> 2, 2.2 -> 2, 2.9 -> 2 </code> <dt>This method is safer than using
+     * (long) Math.floor(value), because of possible rounding error.
      */
     public static long floor(float value) {
         return Math.round(Math.floor(value));

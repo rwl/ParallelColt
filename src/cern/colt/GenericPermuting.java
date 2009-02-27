@@ -21,15 +21,15 @@ package cern.colt;
  * method. Then there holds <tt>after[i] == before[indexes[i]]</tt>.
  * <p>
  * Similar to {@link GenericSorting}, this class has no idea what kind of data
- * it is reordering. It can decide to swap the data at index <tt>a</tt> with
- * the data at index <tt>b</tt>. It calls a user provided
- * {@link cern.colt.Swapper} object that knows how to swap the data of these
- * indexes.
+ * it is reordering. It can decide to swap the data at index <tt>a</tt> with the
+ * data at index <tt>b</tt>. It calls a user provided {@link cern.colt.Swapper}
+ * object that knows how to swap the data of these indexes.
  * <p>
  * For convenience, some non-generic variants are also provided. Further a
  * method to generate the p-th lexicographical permutation indexes.
  * <p>
- * <b>Example:</b> <table>
+ * <b>Example:</b>
+ * <table>
  * <td class="PRE">
  * 
  * <pre>
@@ -48,7 +48,8 @@ package cern.colt;
  * </td>
  * </table>
  * <p>
- * Here are some example swappers: <table>
+ * Here are some example swappers:
+ * <table>
  * <td class="PRE">
  * 
  * <pre>
@@ -109,24 +110,24 @@ public class GenericPermuting extends Object {
 
     /**
      * Returns the <tt>p</tt>-th permutation of the sequence
-     * <tt>[0,1,...,N-1]</tt>. A small but smart and efficient routine,
-     * ported from <A
-     * HREF="http://www.hep.net/wwwmirrors/cernlib/CNASDOC/shortwrups_html3/node255.html">
-     * Cernlib</A>. The <A
-     * HREF="ftp://asisftp.cern.ch/cernlib/share/pro/src/mathlib/gen/v/permu.F">
+     * <tt>[0,1,...,N-1]</tt>. A small but smart and efficient routine, ported
+     * from <A HREF=
+     * "http://www.hep.net/wwwmirrors/cernlib/CNASDOC/shortwrups_html3/node255.html"
+     * > Cernlib</A>. The <A HREF=
+     * "ftp://asisftp.cern.ch/cernlib/share/pro/src/mathlib/gen/v/permu.F">
      * Fortran source</A>. A sequence of <tt>N</tt> distinct elements has
      * <tt>N!</tt> permutations, which are enumerated in lexicographical order
      * <tt>1 .. N!</tt>.
      * <p>
      * This is, for example, useful for Monte-Carlo-tests where one might want
      * to compute <tt>k</tt> distinct and random permutations of a sequence,
-     * obtaining <tt>p</tt> from {@link cern.jet.random.tdouble.sampling} without
-     * replacement or a random engine like
+     * obtaining <tt>p</tt> from {@link cern.jet.random.tdouble.sampling}
+     * without replacement or a random engine like
      * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister}. <br>
-     * Note: When <tt>N!</tt> exceeds the 64-bit range (i.e. for
-     * <tt>N > 20</tt>), this method has <i>different</i> behaviour: it
-     * makes a sequence <tt>[0,1,...,N-1]</tt> and randomizes it, seeded with
-     * parameter <tt>p</tt>.
+     * Note: When <tt>N!</tt> exceeds the 64-bit range (i.e. for <tt>N > 20</tt>
+     * ), this method has <i>different</i> behaviour: it makes a sequence
+     * <tt>[0,1,...,N-1]</tt> and randomizes it, seeded with parameter
+     * <tt>p</tt>.
      * <p>
      * <b>Examples:</b>
      * 
@@ -146,12 +147,12 @@ public class GenericPermuting extends Object {
      * 	 permutation(20! -1 ,20) --&gt; [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0, 1]
      * 	 permutation(20!    ,20) --&gt; [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
      * 	
-     * <br>
+     * &lt;br&gt;
      * 	 // not exactly enumerated, rather randomly shuffled
      * 	 permutation(1,21) --&gt; [18, 20, 11, 0, 15, 1, 19, 13, 3, 6, 16, 17, 9, 5, 12, 4, 7, 14, 8, 10, 2]
      * 	 permutation(2,21) --&gt; [1, 9, 4, 16, 14, 13, 11, 20, 10, 8, 18, 0, 15, 3, 17, 5, 12, 2, 6, 7, 19]
      * 	 permutation(3,21) --&gt; [12, 0, 19, 1, 20, 5, 8, 16, 6, 14, 2, 4, 3, 17, 11, 13, 9, 10, 15, 18, 7]
-     * 	
+     * 
      * </pre>
      * 
      * @param p
@@ -216,9 +217,9 @@ public class GenericPermuting extends Object {
     }
 
     /**
-     * A non-generic variant of reordering, specialized for <tt>int[]</tt>,
-     * same semantics. Quicker than generic reordering. Also for convenience
-     * (forget about the Swapper object).
+     * A non-generic variant of reordering, specialized for <tt>int[]</tt>, same
+     * semantics. Quicker than generic reordering. Also for convenience (forget
+     * about the Swapper object).
      */
     public static void permute(int[] list, int[] indexes) {
         int[] copy = (int[]) list.clone();
@@ -244,7 +245,7 @@ public class GenericPermuting extends Object {
      * 	 [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
      * 	 [A,E,B,C,D]
      * 	 In other words g[0]&lt;--g[0], g[1]&lt;--g[4], g[2]&lt;--g[1], g[3]&lt;--g[2], g[4]&lt;--g[3].
-     * 	
+     * 
      * </pre>
      * 
      * <p>
@@ -265,9 +266,9 @@ public class GenericPermuting extends Object {
 
     /**
      * Generically reorders arbitrary shaped generic data <tt>g</tt> such that
-     * <tt>g[i] == g[indexes[i]]</tt>. (The generic data may be one array, a
-     * 2-d matrix, two linked lists or whatever). This class swaps elements
-     * around, in a way that avoids stumbling over its own feet.
+     * <tt>g[i] == g[indexes[i]]</tt>. (The generic data may be one array, a 2-d
+     * matrix, two linked lists or whatever). This class swaps elements around,
+     * in a way that avoids stumbling over its own feet.
      * <p>
      * <b>Example:</b>
      * 
@@ -281,7 +282,7 @@ public class GenericPermuting extends Object {
      * 	 [A,B,C,D,E] with indexes [0,4,1,2,3] yields 
      * 	 [A,E,B,C,D]
      * 	 In other words g[0]&lt;--g[0], g[1]&lt;--g[4], g[2]&lt;--g[1], g[3]&lt;--g[2], g[4]&lt;--g[3].
-     * 	
+     * 
      * </pre>
      * 
      * <p>

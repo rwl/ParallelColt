@@ -23,7 +23,6 @@ package cern.colt.matrix.tfloat.algo.solver;
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 
-
 /**
  * Monitors the iterative solution process for convergence and divergence. Can
  * also report the current progress.
@@ -64,8 +63,7 @@ public interface FloatIterationMonitor {
      *            State-vector
      * @return True if converged
      */
-    boolean converged(FloatMatrix1D r, FloatMatrix1D x)
-            throws IterativeSolverFloatNotConvergedException;
+    boolean converged(FloatMatrix1D r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException;
 
     /**
      * Checks for convergence
@@ -76,8 +74,7 @@ public interface FloatIterationMonitor {
      *            State-vector
      * @return True if converged
      */
-    boolean converged(float r, FloatMatrix1D x)
-            throws IterativeSolverFloatNotConvergedException;
+    boolean converged(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException;
 
     /**
      * Checks for convergence
@@ -124,7 +121,7 @@ public interface FloatIterationMonitor {
      *            Maximum number of iterations
      */
     public void setMaxIterations(int maxIter);
-    
+
     /**
      * Returns the maximum number of iterations
      */

@@ -18,7 +18,6 @@ public class DenseFloatMatrix2DTest extends FloatMatrix2DTest {
         Bt = new DenseFloatMatrix2D(NCOLUMNS, NROWS);
     }
 
-
     public void testAssignFloatArray() {
         float[] expected = new float[NROWS * NCOLUMNS];
         for (int i = 0; i < NROWS * NCOLUMNS; i++) {
@@ -124,8 +123,8 @@ public class DenseFloatMatrix2DTest extends FloatMatrix2DTest {
     }
 
     public void testFft2() {
-    	int nrows = 64;
-    	int ncolumns = 128; 
+        int nrows = 64;
+        int ncolumns = 128;
         FloatMatrix2D A = new DenseFloatMatrix2D(nrows, ncolumns);
         FloatMatrix2D Acopy = A.copy();
         ((DenseFloatMatrix2D) A).fft2();

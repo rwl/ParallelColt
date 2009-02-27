@@ -27,22 +27,24 @@ package corejava;
  * @version 1.22 2002-11-16
  * @author Cay Horstmann
  * 
- * 1998-09-14: Fixed a number of bugs. 1.Formatting the most extreme negative
- * number (-9223372036854775808L) printed with 2 leading minus signs. 2.Printing
- * 0 with a %e or %g format did not work. 3.Printing numbers that were closer to
- * 1 than the number of requested decimal places rounded down rather than up,
- * e.g. formatting 1.999 with %.2f printed 1.00. (This one is pretty serious, of
- * course.) 4.Printing with precision 0 (e.g %10.0f) didn't work. 5.Printing a
- * string with a precision that exceeded the string length (e.g. print "Hello"
- * with %20.10s) caused a StringIndexOutOfBounds error. 1998-10-21: Changed
- * method names from print to printf 2000-06-09: Moved to package com.horstmann;
- * no longer part of Core Java 2000-06-09: Fixed a number of bugs. 1.Printing
- * 100.0 with %e printed 10.0e1, not 1.0e2 2.Printing Inf and NaN didn't work.
- * 2000-06-09: Coding guideline cleanup 2002-11-16: Move to package
- * com.horstmann.format; licensed under LGPL
+ *         1998-09-14: Fixed a number of bugs. 1.Formatting the most extreme
+ *         negative number (-9223372036854775808L) printed with 2 leading minus
+ *         signs. 2.Printing 0 with a %e or %g format did not work. 3.Printing
+ *         numbers that were closer to 1 than the number of requested decimal
+ *         places rounded down rather than up, e.g. formatting 1.999 with %.2f
+ *         printed 1.00. (This one is pretty serious, of course.) 4.Printing
+ *         with precision 0 (e.g %10.0f) didn't work. 5.Printing a string with a
+ *         precision that exceeded the string length (e.g. print "Hello" with
+ *         %20.10s) caused a StringIndexOutOfBounds error. 1998-10-21: Changed
+ *         method names from print to printf 2000-06-09: Moved to package
+ *         com.horstmann; no longer part of Core Java 2000-06-09: Fixed a number
+ *         of bugs. 1.Printing 100.0 with %e printed 10.0e1, not 1.0e2
+ *         2.Printing Inf and NaN didn't work. 2000-06-09: Coding guideline
+ *         cleanup 2002-11-16: Move to package com.horstmann.format; licensed
+ *         under LGPL
  */
 public class Format {
-    /**
+/**
      * Formats the number following <tt>printf</tt> conventions. Main
      * limitation: Can only handle one format parameter at a time Use multiple
      * Format objects to format more than one number

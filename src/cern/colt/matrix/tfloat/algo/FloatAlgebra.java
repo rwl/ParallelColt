@@ -150,10 +150,10 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
         float r;
         if (Math.abs(a) > Math.abs(b)) {
             r = b / a;
-            r = (float)(Math.abs(a) * Math.sqrt(1 + r * r));
+            r = (float) (Math.abs(a) * Math.sqrt(1 + r * r));
         } else if (b != 0) {
             r = a / b;
-            r = (float)(Math.abs(b) * Math.sqrt(1 + r * r));
+            r = (float) (Math.abs(b) * Math.sqrt(1 + r * r));
         } else {
             r = 0.0f;
         }
@@ -366,7 +366,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
      * equivalent to <tt>Sqrt(mult(x,x))</tt>.
      */
     public float norm2(FloatMatrix1D x) {
-        return (float)Math.sqrt(x.zDotProduct(x));
+        return (float) Math.sqrt(x.zDotProduct(x));
     }
 
     /**
@@ -424,7 +424,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     }
                 }
             }
-            return (float)Math.sqrt(sum);
+            return (float) Math.sqrt(sum);
         } else {
             final float[] elems = (float[]) ((DenseFloatMatrix2D) X).elements();
             float sum = 0;
@@ -466,7 +466,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     sum += (elems[l] * elems[l]);
                 }
             }
-            return (float)Math.sqrt(sum);
+            return (float) Math.sqrt(sum);
 
         }
     }
@@ -531,7 +531,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     }
                 }
             }
-            return (float)Math.sqrt(sum);
+            return (float) Math.sqrt(sum);
         } else {
             final float[] elems = (float[]) ((DenseFloatMatrix3D) X).elements();
             float sum = 0;
@@ -573,7 +573,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                     sum += (elems[l] * elems[l]);
                 }
             }
-            return (float)Math.sqrt(sum);
+            return (float) Math.sqrt(sum);
 
         }
     }
@@ -655,7 +655,7 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
                 norm += tmp * tmp;
             }
         }
-        return (float)Math.sqrt(norm);
+        return (float) Math.sqrt(norm);
     }
 
     /**

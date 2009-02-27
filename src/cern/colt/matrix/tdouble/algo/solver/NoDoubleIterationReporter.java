@@ -22,7 +22,6 @@ package cern.colt.matrix.tdouble.algo.solver;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
-
 /**
  * An iteration reporter which does nothing.
  */

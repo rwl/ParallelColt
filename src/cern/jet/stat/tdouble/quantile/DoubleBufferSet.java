@@ -413,12 +413,13 @@ class DoubleBufferSet extends BufferSet {
 
     /**
      * Returns how many percent of the elements contained in the receiver are
-     * <tt>&lt;= element</tt>. Does linear interpolation if the element is
-     * not contained but lies in between two contained elements.
+     * <tt>&lt;= element</tt>. Does linear interpolation if the element is not
+     * contained but lies in between two contained elements.
      * 
      * @param the
      *            element to search for.
-     * @return the percentage <tt>p</tt> of elements <tt>&lt;= element</tt> (<tt>0.0 &lt;= p &lt;=1.0)</tt>.
+     * @return the percentage <tt>p</tt> of elements <tt>&lt;= element</tt> (
+     *         <tt>0.0 &lt;= p &lt;=1.0)</tt>.
      */
     public double phi(double element) {
         double elementsLessThanOrEqualToElement = 0.0;

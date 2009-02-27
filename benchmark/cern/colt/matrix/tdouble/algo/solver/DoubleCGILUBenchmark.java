@@ -3,7 +3,6 @@ package cern.colt.matrix.tdouble.algo.solver;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoubleILU;
 import cern.colt.matrix.tdouble.impl.RCDoubleMatrix2D;
 
-
 /**
  * Benchmark of DoubleCG with ILU
  */
@@ -16,7 +15,7 @@ public class DoubleCGILUBenchmark extends DoubleCGBenchmark {
     @Override
     protected void createSolver() throws Exception {
         super.createSolver();
-        M = new DoubleILU((RCDoubleMatrix2D)new RCDoubleMatrix2D(A.rows(), A.columns()).assign(A));
+        M = new DoubleILU((RCDoubleMatrix2D) new RCDoubleMatrix2D(A.rows(), A.columns()).assign(A));
     }
 
 }

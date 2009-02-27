@@ -17,8 +17,8 @@ import cern.colt.matrix.AbstractMatrix3D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
- * Abstract base class for 3-d matrices holding <tt>int</tt> elements. First
- * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * Abstract base class for 3-d matrices holding <tt>int</tt> elements. First see
+ * the <a href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * A matrix has a number of slices, rows and columns, which are assigned upon
@@ -1082,7 +1082,6 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
         return this;
     }
 
-    
     /**
      * Fills the coordinates and values of cells having negative values into the
      * specified lists. Fills into the lists, starting at index 0. After this
@@ -1243,12 +1242,11 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of slices, rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseIntMatrix3D</tt> the new matrix must also be of type
-     * <tt>DenseIntMatrix3D</tt>, if the receiver is an instance of type
-     * <tt>SparseIntMatrix3D</tt> the new matrix must also be of type
-     * <tt>SparseIntMatrix3D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * example, if the receiver is an instance of type <tt>DenseIntMatrix3D</tt>
+     * the new matrix must also be of type <tt>DenseIntMatrix3D</tt>, if the
+     * receiver is an instance of type <tt>SparseIntMatrix3D</tt> the new matrix
+     * must also be of type <tt>SparseIntMatrix3D</tt>, etc. In general, the new
+     * matrix should have internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1263,8 +1261,8 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
      * <tt>DenseIntMatrix3D</tt> the new matrix must also be of type
      * <tt>DenseIntMatrix3D</tt>, if the receiver is an instance of type
      * <tt>SparseIntMatrix3D</tt> the new matrix must also be of type
-     * <tt>SparseIntMatrix3D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseIntMatrix3D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param slices
      *            the number of slices the matrix shall have.
@@ -1279,9 +1277,9 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseIntMatrix3D</tt> the new matrix must also be
-     * of type <tt>DenseIntMatrix2D</tt>, if the receiver is an instance of
-     * type <tt>SparseIntMatrix3D</tt> the new matrix must also be of type
+     * instance of type <tt>DenseIntMatrix3D</tt> the new matrix must also be of
+     * type <tt>DenseIntMatrix2D</tt>, if the receiver is an instance of type
+     * <tt>SparseIntMatrix3D</tt> the new matrix must also be of type
      * <tt>SparseIntMatrix2D</tt>, etc.
      * 
      * @param rows
@@ -1784,9 +1782,9 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
      * <pre>
      * // extract and view all slices which have an aggregate sum &gt; 1000
      * matrix.viewSelection(new IntMatrix2DProcedure() {
-     *  public final boolean apply(IntMatrix2D m) {
-     *      return m.zSum &gt; 1000;
-     *  }
+     *     public final boolean apply(IntMatrix2D m) {
+     *         return m.zSum &gt; 1000;
+     *     }
      * });
      * </pre>
      * 

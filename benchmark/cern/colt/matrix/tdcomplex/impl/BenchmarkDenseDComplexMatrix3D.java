@@ -21,72 +21,71 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class BenchmarkDenseDComplexMatrix3D {
 
-	private static Timer t = new Timer();
+    private static Timer t = new Timer();
 
-	private static final String outputFile = "BenchmarkDenseDComplexMatrix3D.txt";
+    private static final String outputFile = "BenchmarkDenseDComplexMatrix3D.txt";
 
-	private static double[][][] a_3d, b_3d;
+    private static double[][][] a_3d, b_3d;
 
-	private static double[] a_1d, b_1d;
+    private static double[] a_1d, b_1d;
 
-	private static double[] noViewTimes;
+    private static double[] noViewTimes;
 
-	private static double[] viewTimes;
+    private static double[] viewTimes;
 
-	public static void main(String[] args) {
-		org.junit.runner.JUnitCore.main("cern.colt.matrix.tdcomplex.impl.BenchmarkDenseDComplexMatrix3D");
-	}
+    public static void main(String[] args) {
+        org.junit.runner.JUnitCore.main("cern.colt.matrix.tdcomplex.impl.BenchmarkDenseDComplexMatrix3D");
+    }
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		BenchmarkMatrixKernel.readSettings3D();
-		Random rand = new Random(0);
-		ConcurrencyUtils.setThreadsBeginN_3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[0] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[1] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]);
-		a_1d = new double[2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[0] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[1] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
-		a_3d = new double[BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]][BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]][2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
-		int idx = 0;
-		for (int s = 0; s < BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]; s++) {
-			for (int r = 0; r < BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]; r++) {
-				for (int c = 0; c < 2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]; c++) {
-					a_3d[s][r][c] = rand.nextDouble();
-					a_1d[idx++] = a_3d[s][r][c];
-				}
-			}
-		}
-		b_1d = new double[2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[0] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[1] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
-		b_3d = new double[BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]][BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]][2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
-		idx = 0;
-		for (int s = 0; s < BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]; s++) {
-			for (int r = 0; r < BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]; r++) {
-				for (int c = 0; c < 2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]; c++) {
-					b_3d[s][r][c] = rand.nextDouble();
-					b_1d[idx++] = b_3d[s][r][c];
-				}
-			}
-		}
-		BenchmarkMatrixKernel.writePropertiesToFile(outputFile, BenchmarkMatrixKernel.MATRIX_SIZE_3D);
-		BenchmarkMatrixKernel.displayProperties(BenchmarkMatrixKernel.MATRIX_SIZE_3D);
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        BenchmarkMatrixKernel.readSettings3D();
+        Random rand = new Random(0);
+        ConcurrencyUtils.setThreadsBeginN_3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[0] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[1] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]);
+        a_1d = new double[2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[0] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[1] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
+        a_3d = new double[BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]][BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]][2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
+        int idx = 0;
+        for (int s = 0; s < BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]; s++) {
+            for (int r = 0; r < BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]; r++) {
+                for (int c = 0; c < 2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]; c++) {
+                    a_3d[s][r][c] = rand.nextDouble();
+                    a_1d[idx++] = a_3d[s][r][c];
+                }
+            }
+        }
+        b_1d = new double[2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[0] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[1] * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
+        b_3d = new double[BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]][BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]][2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]];
+        idx = 0;
+        for (int s = 0; s < BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]; s++) {
+            for (int r = 0; r < BenchmarkMatrixKernel.MATRIX_SIZE_3D[1]; r++) {
+                for (int c = 0; c < 2 * BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]; c++) {
+                    b_3d[s][r][c] = rand.nextDouble();
+                    b_1d[idx++] = b_3d[s][r][c];
+                }
+            }
+        }
+        BenchmarkMatrixKernel.writePropertiesToFile(outputFile, BenchmarkMatrixKernel.MATRIX_SIZE_3D);
+        BenchmarkMatrixKernel.displayProperties(BenchmarkMatrixKernel.MATRIX_SIZE_3D);
 
-	}
+    }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		a_1d = null;
-		a_3d = null;
-		b_1d = null;
-		b_3d = null;
-		ConcurrencyUtils.resetThreadsBeginN();
-		System.gc();
-	}
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+        a_1d = null;
+        a_3d = null;
+        b_1d = null;
+        b_3d = null;
+        ConcurrencyUtils.resetThreadsBeginN();
+        System.gc();
+    }
 
-	@Before
+    @Before
     public void setUpBefore() {
         noViewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
         viewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
     }
-    
-	
-	@Test
+
+    @Test
     public void testAggregateDComplexDComplexDComplexFunctionDComplexDComplexFunction() {
         /* No view */
         DComplexMatrix3D A = new DenseDComplexMatrix3D(a_3d);
@@ -124,7 +123,6 @@ public class BenchmarkDenseDComplexMatrix3D {
 
     }
 
-  
     @Test
     public void testAggregateDComplexMatrix3DDComplexDComplexDComplexFunctionDComplexDComplexDComplexFunction() {
         /* No view */
@@ -168,7 +166,7 @@ public class BenchmarkDenseDComplexMatrix3D {
     @Test
     public void testAssignDoubleDouble() {
         /* No view */
-        DComplexMatrix3D A = new DenseDComplexMatrix3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[0], BenchmarkMatrixKernel.MATRIX_SIZE_3D[1],BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]);
+        DComplexMatrix3D A = new DenseDComplexMatrix3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[0], BenchmarkMatrixKernel.MATRIX_SIZE_3D[1], BenchmarkMatrixKernel.MATRIX_SIZE_3D[2]);
         double value = Math.random();
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
@@ -408,12 +406,11 @@ public class BenchmarkDenseDComplexMatrix3D {
 
     }
 
-   
     @Test
     public void testAssignDComplexProcedureDoubleArray() {
         /* No view */
         DComplexMatrix3D A = new DenseDComplexMatrix3D(a_3d);
-        double[] value = new double[] {-1, -2};
+        double[] value = new double[] { -1, -2 };
         DComplexProcedure procedure = new DComplexProcedure() {
             public boolean apply(double[] element) {
                 if (DComplex.abs(element) > 0.1) {
@@ -508,7 +505,6 @@ public class BenchmarkDenseDComplexMatrix3D {
 
     }
 
-
     @Test
     public void testCardinality() {
         /* No view */
@@ -567,16 +563,16 @@ public class BenchmarkDenseDComplexMatrix3D {
             noViewTimes[i] /= BenchmarkMatrixKernel.NITERS;
         }
         /* View */
-        DComplexMatrix3D Av = new DenseDComplexMatrix3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[2], BenchmarkMatrixKernel.MATRIX_SIZE_3D[1], BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]).viewDice(2,1,0).assign(a_3d);
+        DComplexMatrix3D Av = new DenseDComplexMatrix3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[2], BenchmarkMatrixKernel.MATRIX_SIZE_3D[1], BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]).viewDice(2, 1, 0).assign(a_3d);
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDComplexMatrix3D)Av).fft3();
+            ((DenseDComplexMatrix3D) Av).fft3();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_3d);
                 t.reset().start();
-                ((DenseDComplexMatrix3D)Av).fft3();
+                ((DenseDComplexMatrix3D) Av).fft3();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -587,7 +583,7 @@ public class BenchmarkDenseDComplexMatrix3D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testFft2Slices() {
         /* No view */
@@ -611,11 +607,11 @@ public class BenchmarkDenseDComplexMatrix3D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDComplexMatrix3D)Av).fft2Slices();
+            ((DenseDComplexMatrix3D) Av).fft2Slices();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_3d);
                 t.reset().start();
-                ((DenseDComplexMatrix3D)Av).fft2Slices();
+                ((DenseDComplexMatrix3D) Av).fft2Slices();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -703,8 +699,6 @@ public class BenchmarkDenseDComplexMatrix3D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
-    
 
     @Test
     public void testGetNonZerosIntArrayListIntArrayListIntArrayListArrayList() {
@@ -721,7 +715,7 @@ public class BenchmarkDenseDComplexMatrix3D {
             A.getNonZeros(sliceList, rowList, colList, valueList);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 sliceList.clear();
-            	rowList.clear();
+                rowList.clear();
                 colList.clear();
                 valueList.clear();
                 t.reset().start();
@@ -742,8 +736,8 @@ public class BenchmarkDenseDComplexMatrix3D {
             // warm-up
             Av.getNonZeros(sliceList, rowList, colList, valueList);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                sliceList.clear();                
-            	rowList.clear();
+                sliceList.clear();
+                rowList.clear();
                 colList.clear();
                 valueList.clear();
                 t.reset().start();
@@ -783,11 +777,11 @@ public class BenchmarkDenseDComplexMatrix3D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDComplexMatrix3D)Av).ifft3(true);
+            ((DenseDComplexMatrix3D) Av).ifft3(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_3d);
                 t.reset().start();
-                ((DenseDComplexMatrix3D)Av).ifft3(true);
+                ((DenseDComplexMatrix3D) Av).ifft3(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -798,7 +792,7 @@ public class BenchmarkDenseDComplexMatrix3D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testIfft2Slices() {
         /* No view */
@@ -822,11 +816,11 @@ public class BenchmarkDenseDComplexMatrix3D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDComplexMatrix3D)Av).ifft2Slices(true);
+            ((DenseDComplexMatrix3D) Av).ifft2Slices(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a_3d);
                 t.reset().start();
-                ((DenseDComplexMatrix3D)Av).ifft2Slices(true);
+                ((DenseDComplexMatrix3D) Av).ifft2Slices(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -933,7 +927,7 @@ public class BenchmarkDenseDComplexMatrix3D {
             noViewTimes[i] /= BenchmarkMatrixKernel.NITERS;
         }
         /* View */
-        DComplexMatrix3D Av = new DenseDComplexMatrix3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[2], BenchmarkMatrixKernel.MATRIX_SIZE_3D[1], BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]).viewDice(2,1,0).assign(a_3d);
+        DComplexMatrix3D Av = new DenseDComplexMatrix3D(BenchmarkMatrixKernel.MATRIX_SIZE_3D[2], BenchmarkMatrixKernel.MATRIX_SIZE_3D[1], BenchmarkMatrixKernel.MATRIX_SIZE_3D[0]).viewDice(2, 1, 0).assign(a_3d);
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 

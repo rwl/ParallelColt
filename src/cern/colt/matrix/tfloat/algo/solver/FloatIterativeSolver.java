@@ -24,10 +24,9 @@ import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatPreconditioner;
 
-
 /**
- * Iterative linear solver. Solves <code>Ax=b</code> for <code>x</code>,
- * and it supports preconditioning and convergence monitoring.
+ * Iterative linear solver. Solves <code>Ax=b</code> for <code>x</code>, and it
+ * supports preconditioning and convergence monitoring.
  */
 public interface FloatIterativeSolver {
 
@@ -42,8 +41,7 @@ public interface FloatIterativeSolver {
      *            Solution is stored here. Also used as initial guess
      * @return The solution vector x
      */
-    FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
-            throws IterativeSolverFloatNotConvergedException;
+    FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException;
 
     /**
      * Sets preconditioner

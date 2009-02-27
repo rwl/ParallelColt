@@ -405,8 +405,8 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
 
     /**
      * Returns the first key the given value is associated with. It is often a
-     * good idea to first check with {@link #containsValue(float)} whether
-     * there exists an association from a key to this value. Search order is
+     * good idea to first check with {@link #containsValue(float)} whether there
+     * exists an association from a key to this value. Search order is
      * guaranteed to be <i>identical</i> to the order used by method
      * {@link #forEachKey(LongProcedure)}.
      * 
@@ -516,7 +516,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
              * distinct="+distinct+", capacity="+table.length+" to
              * newCapacity="+newCapacity+" ...");
              */
-//            System.out.println("Rehashing in put");                    
+            //            System.out.println("Rehashing in put");                    
             rehash(newCapacity);
             return put(key, value);
         }
@@ -531,7 +531,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
         if (this.freeEntries < 1) { // delta
             int newCapacity = chooseGrowCapacity(this.distinct + 1, this.minLoadFactor, this.maxLoadFactor);
             rehash(newCapacity);
-//            System.out.println("Rehashing in put");  
+            //            System.out.println("Rehashing in put");  
         }
 
         return true;
@@ -612,7 +612,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
              * capacity="+table.length+" to newCapacity="+newCapacity+" ..."); }
              */
             rehash(newCapacity);
-//            System.out.println("Rehashing in removeKey");  
+            //            System.out.println("Rehashing in removeKey");  
         }
 
         return true;

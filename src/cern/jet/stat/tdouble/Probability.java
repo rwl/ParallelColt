@@ -14,7 +14,7 @@ import cern.jet.math.tdouble.Polynomial;
  * Custom tailored numerical integration of certain probability distributions.
  * <p>
  * <b>Implementation:</b>
- * <dt> Some code taken and adapted from the <A
+ * <dt>Some code taken and adapted from the <A
  * HREF="http://www.sci.usq.edu.au/staff/leighb/graph/Top.html">Java 2D Graph
  * Package 2.4</A>, which in turn is a port from the <A
  * HREF="http://people.ne.mediaone.net/moshier/index.html#Cephes">Cephes 2.2</A>
@@ -64,8 +64,7 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
     }
 
     /**
-     * Returns the area from zero to <tt>x</tt> under the beta density
-     * function.
+     * Returns the area from zero to <tt>x</tt> under the beta density function.
      * 
      * <pre>
      *                          x
@@ -90,8 +89,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
     }
 
     /**
-     * Returns the area under the right hand tail (from <tt>x</tt> to
-     * infinity) of the beta density function.
+     * Returns the area under the right hand tail (from <tt>x</tt> to infinity)
+     * of the beta density function.
      * 
      * This function is identical to the incomplete beta integral function
      * <tt>Gamma.incompleteBeta(b, a, x)</tt>.
@@ -181,8 +180,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
     }
 
     /**
-     * Returns the area under the left hand tail (from 0 to <tt>x</tt>) of
-     * the Chi square probability density function with <tt>v</tt> degrees of
+     * Returns the area under the left hand tail (from 0 to <tt>x</tt>) of the
+     * Chi square probability density function with <tt>v</tt> degrees of
      * freedom.
      * 
      * <pre>
@@ -215,9 +214,9 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
     }
 
     /**
-     * Returns the area under the right hand tail (from <tt>x</tt> to
-     * infinity) of the Chi square probability density function with <tt>v</tt>
-     * degrees of freedom.
+     * Returns the area under the right hand tail (from <tt>x</tt> to infinity)
+     * of the Chi square probability density function with <tt>v</tt> degrees of
+     * freedom.
      * 
      * <pre>
      *                                  inf.
@@ -233,7 +232,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
      * 
      * The incomplete gamma integral is used, according to the formula
      * 
-     * <tt>y = chiSquareComplemented( v, x ) = incompleteGammaComplement( v/2.0, x/2.0 )</tt>.
+     * <tt>y = chiSquareComplemented( v, x ) = incompleteGammaComplement( v/2.0, x/2.0 )</tt>
+     * .
      * 
      * 
      * The arguments must both be positive.
@@ -268,8 +268,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
      * Code adapted from the <A
      * HREF="http://www.sci.usq.edu.au/staff/leighb/graph/Top.html">Java 2D
      * Graph Package 2.4</A>, which in turn is a port from the <A
-     * HREF="http://people.ne.mediaone.net/moshier/index.html#Cephes">Cephes 2.2</A>
-     * Math Library (C).
+     * HREF="http://people.ne.mediaone.net/moshier/index.html#Cephes">Cephes
+     * 2.2</A> Math Library (C).
      * 
      * @param x
      *            the argument to the function.
@@ -310,8 +310,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
      * Code adapted from the <A
      * HREF="http://www.sci.usq.edu.au/staff/leighb/graph/Top.html">Java 2D
      * Graph Package 2.4</A>, which in turn is a port from the <A
-     * HREF="http://people.ne.mediaone.net/moshier/index.html#Cephes">Cephes 2.2</A>
-     * Math Library (C).
+     * HREF="http://people.ne.mediaone.net/moshier/index.html#Cephes">Cephes
+     * 2.2</A> Math Library (C).
      * 
      * @param a
      *            the argument to the function.
@@ -403,8 +403,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
     }
 
     /**
-     * Returns the integral from <tt>x</tt> to infinity of the gamma
-     * probability density function:
+     * Returns the integral from <tt>x</tt> to infinity of the gamma probability
+     * density function:
      * 
      * <pre>
      *               inf.
@@ -451,7 +451,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
      * The terms are not computed individually; instead the incomplete beta
      * integral is employed, according to the formula
      * <p>
-     * <tt>y = negativeBinomial( k, n, p ) = Gamma.incompleteBeta( n, k+1, p )</tt>.
+     * <tt>y = negativeBinomial( k, n, p ) = Gamma.incompleteBeta( n, k+1, p )</tt>
+     * .
      * 
      * All arguments must be positive,
      * 
@@ -581,8 +582,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
     /**
      * Returns the value, <tt>x</tt>, for which the area under the Normal
      * (Gaussian) probability density function (integrated from minus infinity
-     * to <tt>x</tt>) is equal to the argument <tt>y</tt> (assumes mean is
-     * zero, variance is one); formerly named <tt>ndtri</tt>.
+     * to <tt>x</tt>) is equal to the argument <tt>y</tt> (assumes mean is zero,
+     * variance is one); formerly named <tt>ndtri</tt>.
      * <p>
      * For small arguments <tt>0 < y < exp(-2)</tt>, the program computes
      * <tt>z = sqrt( -2.0 * log(y) )</tt>; then the approximation is
@@ -679,7 +680,8 @@ public class Probability extends cern.jet.math.tdouble.DoubleConstants {
      * The terms are not summed directly; instead the incomplete gamma integral
      * is employed, according to the formula
      * <p>
-     * <tt>y = poissonComplemented( k, m ) = Gamma.incompleteGamma( k+1, m )</tt>.
+     * <tt>y = poissonComplemented( k, m ) = Gamma.incompleteGamma( k+1, m )</tt>
+     * .
      * 
      * The arguments must both be positive.
      * 

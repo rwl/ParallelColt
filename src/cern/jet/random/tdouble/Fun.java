@@ -11,10 +11,10 @@ package cern.jet.random.tdouble;
 /**
  * Contains various mathematical helper methods.
  * 
- * <b>Implementation:</b> High performance implementation.
- * <dt>This is a port of <tt>gen_fun.cpp</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library.
+ * <b>Implementation:</b> High performance implementation. <dt>This is a port of
+ * <tt>gen_fun.cpp</tt> from the <A
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99

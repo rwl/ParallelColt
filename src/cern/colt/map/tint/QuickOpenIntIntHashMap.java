@@ -62,7 +62,9 @@ public class QuickOpenIntIntHashMap extends OpenIntIntHashMap {
      *            the maximum load factor.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      */
     public QuickOpenIntIntHashMap(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         setUp(initialCapacity, minLoadFactor, maxLoadFactor);
@@ -76,10 +78,9 @@ public class QuickOpenIntIntHashMap extends OpenIntIntHashMap {
      *            the key the value shall be associated with.
      * @param value
      *            the value to be associated.
-     * @return <tt>true</tt> if the receiver did not already contain such a
-     *         key; <tt>false</tt> if the receiver did already contain such a
-     *         key - the new value has now replaced the formerly associated
-     *         value.
+     * @return <tt>true</tt> if the receiver did not already contain such a key;
+     *         <tt>false</tt> if the receiver did already contain such a key -
+     *         the new value has now replaced the formerly associated value.
      */
     public boolean put(int key, int value) {
         /*

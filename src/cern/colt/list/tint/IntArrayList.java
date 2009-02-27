@@ -84,7 +84,8 @@ public class IntArrayList extends AbstractIntList {
      * @param element
      *            element to be inserted.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>).
+     *                index is out of range (
+     *                <tt>index &lt; 0 || index &gt; size()</tt>).
      */
     public void beforeInsert(int index, int element) {
         // overridden for performance only.
@@ -118,10 +119,10 @@ public class IntArrayList extends AbstractIntList {
      *         otherwise, <tt>(-(<i>insertion point</i>) - 1)</tt>. The
      *         <i>insertion point</i> is defined as the the point at which the
      *         value would be inserted into the receiver: the index of the first
-     *         element greater than the key, or <tt>receiver.size()</tt>, if
-     *         all elements in the receiver are less than the specified key.
-     *         Note that this guarantees that the return value will be &gt;= 0
-     *         if and only if the key is found.
+     *         element greater than the key, or <tt>receiver.size()</tt>, if all
+     *         elements in the receiver are less than the specified key. Note
+     *         that this guarantees that the return value will be &gt;= 0 if and
+     *         only if the key is found.
      * @see cern.colt.Sorting
      * @see java.util.Arrays
      */
@@ -142,8 +143,8 @@ public class IntArrayList extends AbstractIntList {
     }
 
     /**
-     * Returns a deep copy of the receiver; uses <code>clone()</code> and
-     * casts the result.
+     * Returns a deep copy of the receiver; uses <code>clone()</code> and casts
+     * the result.
      * 
      * @return a deep copy of the receiver.
      */
@@ -155,8 +156,8 @@ public class IntArrayList extends AbstractIntList {
      * Sorts the specified range of the receiver into ascending numerical order.
      * 
      * The sorting algorithm is a count sort. This algorithm offers guaranteed
-     * <dt>Performance: O(Max(n,max-min+1)).
-     * <dt>Space requirements: int[max-min+1] buffer.
+     * <dt>Performance: O(Max(n,max-min+1)). <dt>Space requirements:
+     * int[max-min+1] buffer.
      * <p>
      * This algorithm is only applicable if max-min+1 is not large! But if
      * applicable, it usually outperforms quicksort by a factor of 3-4.
@@ -217,10 +218,11 @@ public class IntArrayList extends AbstractIntList {
      * Sets the receiver's elements to be the specified array (not a copy of
      * it).
      * 
-     * The size and capacity of the list is the length of the array. <b>WARNING:</b>
-     * For efficiency reasons and to keep memory usage low, <b>the array is not
-     * copied</b>. So if subsequently you modify the specified array directly
-     * via the [] operator, be sure you know what you're doing.
+     * The size and capacity of the list is the length of the array.
+     * <b>WARNING:</b> For efficiency reasons and to keep memory usage low,
+     * <b>the array is not copied</b>. So if subsequently you modify the
+     * specified array directly via the [] operator, be sure you know what
+     * you're doing.
      * 
      * @param elements
      *            the new elements to be stored.
@@ -283,8 +285,8 @@ public class IntArrayList extends AbstractIntList {
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
      *            returns <tt>false</tt>, otherwise continues.
-     * @return <tt>false</tt> if the procedure stopped before all elements
-     *         where iterated over, <tt>true</tt> otherwise.
+     * @return <tt>false</tt> if the procedure stopped before all elements where
+     *         iterated over, <tt>true</tt> otherwise.
      */
     public boolean forEach(IntProcedure procedure) {
         // overridden for performance only.
@@ -343,7 +345,9 @@ public class IntArrayList extends AbstractIntList {
      * @return the index of the first occurrence of the element in the receiver;
      *         returns <code>-1</code> if the element is not found.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public int indexOfFromTo(int element, int from, int to) {
         // overridden for performance only.
@@ -363,8 +367,8 @@ public class IntArrayList extends AbstractIntList {
     /**
      * Returns the index of the last occurrence of the specified element.
      * Returns <code>-1</code> if the receiver does not contain this element.
-     * Searches beginning at <code>to</code>, inclusive until
-     * <code>from</code>, inclusive. Tests for identity.
+     * Searches beginning at <code>to</code>, inclusive until <code>from</code>,
+     * inclusive. Tests for identity.
      * 
      * @param element
      *            element to search for.
@@ -375,7 +379,9 @@ public class IntArrayList extends AbstractIntList {
      * @return the index of the last occurrence of the element in the receiver;
      *         returns <code>-1</code> if the element is not found.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public int lastIndexOfFromTo(int element, int from, int to) {
         // overridden for performance only.
@@ -402,7 +408,9 @@ public class IntArrayList extends AbstractIntList {
      *            the index of the last element (inclusive).
      * @return a new list
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public AbstractIntList partFromTo(int from, int to) {
         if (size == 0)
@@ -597,11 +605,11 @@ public class IntArrayList extends AbstractIntList {
 
     /**
      * Replaces the element at the specified position in the receiver with the
-     * specified element; <b>WARNING:</b> Does not check preconditions.
-     * Provided with invalid parameters this method may access invalid indexes
-     * without throwing any exception! <b>You should only use this method when
-     * you are absolutely sure that the index is within bounds.</b>
-     * Precondition (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
+     * specified element; <b>WARNING:</b> Does not check preconditions. Provided
+     * with invalid parameters this method may access invalid indexes without
+     * throwing any exception! <b>You should only use this method when you are
+     * absolutely sure that the index is within bounds.</b> Precondition
+     * (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
      * 
      * @param index
      *            index of element to replace.
@@ -621,7 +629,9 @@ public class IntArrayList extends AbstractIntList {
      * @param to
      *            the index of the last element (inclusive) to be permuted.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void shuffleFromTo(int from, int to) {
         // overridden for performance only.
@@ -663,7 +673,8 @@ public class IntArrayList extends AbstractIntList {
      * @param to
      *            the index of the last element (inclusive) to be sorted.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 ||
+     *                from&gt;to || to&gt;=size())</tt>).
      */
     public void sortFromTo(int from, int to) {
         /*

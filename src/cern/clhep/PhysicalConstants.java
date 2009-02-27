@@ -10,11 +10,10 @@ package cern.clhep;
 
 /**
  * High Energy Physics coherent Physical Constants. This class is a Java port of
- * the <a
- * href="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Units/PhysicalConstants_h.html">C++
- * version</a> found in <a href="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP
- * 1.4.0</a>, which in turn has been provided by Geant4 (a simulation toolkit
- * for HEP).
+ * the <a href="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Units/PhysicalConstants_h.html"
+ * >C++ version</a> found in <a
+ * href="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</a>, which in turn
+ * has been provided by Geant4 (a simulation toolkit for HEP).
  * <p>
  * For aliasing see {@link #physicalConstants}.
  * 

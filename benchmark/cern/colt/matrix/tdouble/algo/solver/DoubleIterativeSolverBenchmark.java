@@ -127,7 +127,7 @@ public abstract class DoubleIterativeSolverBenchmark extends TestCase {
                 String matrixPath = line;
                 MatrixVectorReader reader = new MatrixVectorReader(new BufferedReader(new FileReader(matrixPath)));
                 SparseDoubleMatrix2D Aco = new SparseDoubleMatrix2D(reader);
-                A = Aco.convertToRCDoubleMatrix2D();              
+                A = Aco.convertToRCDoubleMatrix2D();
                 line = input.readLine();
                 repeat = Integer.parseInt(line.trim());
                 line = input.readLine();

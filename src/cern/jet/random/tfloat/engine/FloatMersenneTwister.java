@@ -17,16 +17,16 @@ import java.util.Date;
  * intervals <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> and
  * <tt>[Long.MIN_VALUE,Long.MAX_VALUE]</tt>, respectively, as well as
  * <tt>float</tt>'s and <tt>float</tt>'s in the open unit intervals
- * <tt>(0.0f,1.0f)</tt> and <tt>(0.0,1.0)</tt>, respectively. The seed can
- * be any 32-bit integer except <tt>0</tt>. Shawn J. Cokus commented that
- * perhaps the seed should preferably be odd.
+ * <tt>(0.0f,1.0f)</tt> and <tt>(0.0,1.0)</tt>, respectively. The seed can be
+ * any 32-bit integer except <tt>0</tt>. Shawn J. Cokus commented that perhaps
+ * the seed should preferably be odd.
  * <p>
  * <b>Quality:</b> MersenneTwister is designed to pass the k-distribution test.
- * It has an astronomically large period of 2<sup>19937</sup>-1 (=10<sup>6001</sup>)
- * and 623-dimensional equidistribution up to 32-bit accuracy. It passes many
- * stringent statistical tests, including the <A
- * HREF="http://stat.fsu.edu/~geo/diehard.html">diehard</A> test of G.
- * Marsaglia and the load test of P. Hellekalek and S. Wegenkittl.
+ * It has an astronomically large period of 2<sup>19937</sup>-1
+ * (=10<sup>6001</sup>) and 623-dimensional equidistribution up to 32-bit
+ * accuracy. It passes many stringent statistical tests, including the <A
+ * HREF="http://stat.fsu.edu/~geo/diehard.html">diehard</A> test of G. Marsaglia
+ * and the load test of P. Hellekalek and S. Wegenkittl.
  * <p>
  * <b>Performance:</b> Its speed is comparable to other modern generators (in
  * particular, as fast as <tt>java.util.Random.nextFloat()</tt>). 2.5 million
@@ -68,11 +68,11 @@ import java.util.Date;
  * <p>
  * The correctness of this implementation has been verified against the
  * published output sequence <a
- * href="http://www.math.keio.ac.jp/~nisimura/random/real2/mt19937-2.out">mt19937-2.out</a>
- * of the C-implementation <a
- * href="http://www.math.keio.ac.jp/~nisimura/random/real2/mt19937-2.c">mt19937-2.c</a>.
- * (Call <tt>test(1000)</tt> to print the sequence).
- * <dt> Note that this implementation is <b>not synchronized</b>.
+ * href="http://www.math.keio.ac.jp/~nisimura/random/real2/mt19937-2.out"
+ * >mt19937-2.out</a> of the C-implementation <a
+ * href="http://www.math.keio.ac.jp/~nisimura/random/real2/mt19937-2.c"
+ * >mt19937-2.c</a>. (Call <tt>test(1000)</tt> to print the sequence).
+ * <dt>Note that this implementation is <b>not synchronized</b>.
  * <p>
  * <b>Details:</b> MersenneTwister is designed with consideration of the flaws
  * of various existing generators in mind. It is an improved version of TT800, a
@@ -83,55 +83,56 @@ import java.util.Date;
  * times as <tt>k</tt> successive values over the period length, for each
  * <tt>k &lt;= 623</tt> (except for the zero vector, which appears one time
  * less). If one looks at only the first <tt>n &lt;= 16</tt> bits of each
- * number, then the property holds for even larger <tt>k</tt>, as shown in
- * the following table (taken from the publication cited above): <div
- * align="center"> <table width="75%" border="1" cellspacing="0"
- * cellpadding="0">
+ * number, then the property holds for even larger <tt>k</tt>, as shown in the
+ * following table (taken from the publication cited above): <div
+ * align="center">
+ * <table width="75%" border="1" cellspacing="0" * cellpadding="0">
  * <tr>
- * <td width="2%"> <div align="center">n</div> </td>
- * <td width="6%"> <div align="center">1</div> </td>
- * <td width="5%"> <div align="center">2</div> </td>
- * <td width="5%"> <div align="center">3</div> </td>
- * <td width="5%"> <div align="center">4</div> </td>
- * <td width="5%"> <div align="center">5</div> </td>
- * <td width="5%"> <div align="center">6</div> </td>
- * <td width="5%"> <div align="center">7</div> </td>
- * <td width="5%"> <div align="center">8</div> </td>
- * <td width="5%"> <div align="center">9</div> </td>
- * <td width="5%"> <div align="center">10</div> </td>
- * <td width="5%"> <div align="center">11</div> </td>
- * <td width="10%"> <div align="center">12 .. 16</div> </td>
- * <td width="10%"> <div align="center">17 .. 32</div> </td>
+ * <td width="2%"><div align="center">n</div></td>
+ * <td width="6%"><div align="center">1</div></td>
+ * <td width="5%"><div align="center">2</div></td>
+ * <td width="5%"><div align="center">3</div></td>
+ * <td width="5%"><div align="center">4</div></td>
+ * <td width="5%"><div align="center">5</div></td>
+ * <td width="5%"><div align="center">6</div></td>
+ * <td width="5%"><div align="center">7</div></td>
+ * <td width="5%"><div align="center">8</div></td>
+ * <td width="5%"><div align="center">9</div></td>
+ * <td width="5%"><div align="center">10</div></td>
+ * <td width="5%"><div align="center">11</div></td>
+ * <td width="10%"><div align="center">12 .. 16</div></td>
+ * <td width="10%"><div align="center">17 .. 32</div></td>
  * </tr>
  * <tr>
- * <td width="2%"> <div align="center">k</div> </td>
- * <td width="6%"> <div align="center">19937</div> </td>
- * <td width="5%"> <div align="center">9968</div> </td>
- * <td width="5%"> <div align="center">6240</div> </td>
- * <td width="5%"> <div align="center">4984</div> </td>
- * <td width="5%"> <div align="center">3738</div> </td>
- * <td width="5%"> <div align="center">3115</div> </td>
- * <td width="5%"> <div align="center">2493</div> </td>
- * <td width="5%"> <div align="center">2492</div> </td>
- * <td width="5%"> <div align="center">1869</div> </td>
- * <td width="5%"> <div align="center">1869</div> </td>
- * <td width="5%"> <div align="center">1248</div> </td>
- * <td width="10%"> <div align="center">1246</div> </td>
- * <td width="10%"> <div align="center">623</div> </td>
+ * <td width="2%"><div align="center">k</div></td>
+ * <td width="6%"><div align="center">19937</div></td>
+ * <td width="5%"><div align="center">9968</div></td>
+ * <td width="5%"><div align="center">6240</div></td>
+ * <td width="5%"><div align="center">4984</div></td>
+ * <td width="5%"><div align="center">3738</div></td>
+ * <td width="5%"><div align="center">3115</div></td>
+ * <td width="5%"><div align="center">2493</div></td>
+ * <td width="5%"><div align="center">2492</div></td>
+ * <td width="5%"><div align="center">1869</div></td>
+ * <td width="5%"><div align="center">1869</div></td>
+ * <td width="5%"><div align="center">1248</div></td>
+ * <td width="10%"><div align="center">1246</div></td>
+ * <td width="10%"><div align="center">623</div></td>
  * </tr>
- * </table> </div>
+ * </table>
+ * </div>
  * <p>
  * MersenneTwister generates random numbers in batches of 624 numbers at a time,
  * so the caching and pipelining of modern systems is exploited. The generator
  * is implemented to generate the output by using the fastest arithmetic
  * operations only: 32-bit additions and bit operations (no division, no
  * multiplication, no mod). These operations generate sequences of 32 random
- * bits (<tt>int</tt>'s). <tt>long</tt>'s are formed by concatenating two
- * 32 bit <tt>int</tt>'s. <tt>float</tt>'s are formed by dividing the
- * interval <tt>[0.0,1.0]</tt> into 2<sup>32</sup> sub intervals, then
- * randomly choosing one subinterval. <tt>float</tt>'s are formed by dividing
- * the interval <tt>[0.0,1.0]</tt> into 2<sup>64</sup> sub intervals, then
- * randomly choosing one subinterval.
+ * bits (<tt>int</tt>'s). <tt>long</tt>'s are formed by concatenating two 32 bit
+ * <tt>int</tt>'s. <tt>float</tt>'s are formed by dividing the interval
+ * <tt>[0.0,1.0]</tt> into 2<sup>32</sup> sub intervals, then randomly choosing
+ * one subinterval. <tt>float</tt>'s are formed by dividing the interval
+ * <tt>[0.0,1.0]</tt> into 2<sup>64</sup> sub intervals, then randomly choosing
+ * one subinterval.
  * <p>
  * 
  * @author wolfgang.hoschek@cern.ch
@@ -151,14 +152,14 @@ public class FloatMersenneTwister extends FloatRandomEngine {
     private static final int MATRIX_A = 0x9908b0df; /* constant vector a */
 
     private static final int UPPER_MASK = 0x80000000; /*
-                                                         * most significant w-r
-                                                         * bits
-                                                         */
+                                                            * most significant w-r
+                                                            * bits
+                                                            */
 
     private static final int LOWER_MASK = 0x7fffffff; /*
-                                                         * least significant r
-                                                         * bits
-                                                         */
+                                                            * least significant r
+                                                            * bits
+                                                            */
 
     /* for tempering */
     private static final int TEMPERING_MASK_B = 0x9d2c5680;

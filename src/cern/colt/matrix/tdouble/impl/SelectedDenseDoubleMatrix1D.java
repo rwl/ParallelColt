@@ -184,7 +184,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
         }
         DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0);
+        final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int idxOther;
@@ -205,7 +205,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
         }
         DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0, 0);
+        final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();

@@ -16,9 +16,9 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
  * For an <tt>m x n</tt> matrix <tt>A</tt> with <tt>m >= n</tt>, the LU
  * decomposition is an <tt>m x n</tt> unit lower triangular matrix <tt>L</tt>,
  * an <tt>n x n</tt> upper triangular matrix <tt>U</tt>, and a permutation
- * vector <tt>piv</tt> of length <tt>m</tt> so that <tt>A(piv,:) = L*U</tt>;
- * If <tt>m < n</tt>, then <tt>L</tt> is <tt>m x m</tt> and <tt>U</tt>
- * is <tt>m x n</tt>.
+ * vector <tt>piv</tt> of length <tt>m</tt> so that <tt>A(piv,:) = L*U</tt>; If
+ * <tt>m < n</tt>, then <tt>L</tt> is <tt>m x m</tt> and <tt>U</tt> is
+ * <tt>m x n</tt>.
  * <P>
  * The LU decomposition with pivoting always exists, even if the matrix is
  * singular, so the constructor will never fail. The primary use of the LU
@@ -93,8 +93,8 @@ public class DoubleLUDecomposition implements java.io.Serializable {
     /**
      * Returns whether the matrix is nonsingular (has an inverse).
      * 
-     * @return true if <tt>U</tt>, and hence <tt>A</tt>, is nonsingular;
-     *         false otherwise.
+     * @return true if <tt>U</tt>, and hence <tt>A</tt>, is nonsingular; false
+     *         otherwise.
      */
     public boolean isNonsingular() {
         return quick.isNonsingular();
@@ -110,7 +110,8 @@ public class DoubleLUDecomposition implements java.io.Serializable {
      * @exception IllegalArgumentException
      *                if </tt>B.rows() != A.rows()</tt>.
      * @exception IllegalArgumentException
-     *                if A is singular, that is, if <tt>!this.isNonsingular()</tt>.
+     *                if A is singular, that is, if
+     *                <tt>!this.isNonsingular()</tt>.
      * @exception IllegalArgumentException
      *                if <tt>A.rows() < A.columns()</tt>.
      */
@@ -125,12 +126,13 @@ public class DoubleLUDecomposition implements java.io.Serializable {
      * Solves <tt>A*x = b</tt>.
      * 
      * @param b
-     *            A vector of size <tt>A.rows()</tt> 
+     *            A vector of size <tt>A.rows()</tt>
      * @return <tt>x</tt> so that <tt>L*U*x = b(piv)</tt>.
      * @exception IllegalArgumentException
      *                if </tt>b.size() != A.rows()</tt>.
      * @exception IllegalArgumentException
-     *                if A is singular, that is, if <tt>!this.isNonsingular()</tt>.
+     *                if A is singular, that is, if
+     *                <tt>!this.isNonsingular()</tt>.
      * @exception IllegalArgumentException
      *                if <tt>A.rows() < A.columns()</tt>.
      */
@@ -140,7 +142,7 @@ public class DoubleLUDecomposition implements java.io.Serializable {
         quick.solve(x);
         return x;
     }
-    
+
     /**
      * Returns a String with (propertyName, propertyValue) pairs. Useful for
      * debugging or to quickly get the rough picture. For example,
@@ -148,7 +150,7 @@ public class DoubleLUDecomposition implements java.io.Serializable {
      * <pre>
      * 	 rank          : 3
      * 	 trace         : 0
-     * 	
+     * 
      * </pre>
      */
     public String toString() {

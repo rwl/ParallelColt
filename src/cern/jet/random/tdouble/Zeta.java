@@ -14,20 +14,20 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * Zeta distribution.
  * <p>
  * Valid parameter ranges: <tt>ro &gt; 0</tt> and <tt>pk &gt;= 0</tt>.
- * <dt> If either <tt>ro &gt; 100</tt> or <tt>k &gt; 10000</tt> numerical
+ * <dt>If either <tt>ro &gt; 100</tt> or <tt>k &gt; 10000</tt> numerical
  * problems in computing the theoretical moments arise, therefore
  * <tt>ro &lt;= 100</tt> and <tt>k &lt;= 10000</tt> are recommended.
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b>
  * <dt>Method: Acceptance/Rejection. High performance implementation.
  * <dt>This is a port and adaption of <tt>Zeta.c</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library. C-RAND's implementation, in turn, is based upon
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * J. Dagpunar (1988): Principles of Random Variate Generation, Clarendon Press,
  * Oxford.

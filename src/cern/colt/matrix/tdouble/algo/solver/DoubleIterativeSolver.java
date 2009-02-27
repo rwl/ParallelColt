@@ -24,10 +24,9 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoublePreconditioner;
 
-
 /**
- * Iterative linear solver. Solves <code>Ax=b</code> for <code>x</code>,
- * and it supports preconditioning and convergence monitoring.
+ * Iterative linear solver. Solves <code>Ax=b</code> for <code>x</code>, and it
+ * supports preconditioning and convergence monitoring.
  */
 public interface DoubleIterativeSolver {
 
@@ -42,8 +41,7 @@ public interface DoubleIterativeSolver {
      *            Solution is stored here. Also used as initial guess
      * @return The solution vector x
      */
-    DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
-            throws IterativeSolverDoubleNotConvergedException;
+    DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException;
 
     /**
      * Sets preconditioner

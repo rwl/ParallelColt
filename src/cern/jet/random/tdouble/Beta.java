@@ -12,9 +12,9 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 import cern.jet.stat.tdouble.Probability;
 
 /**
- * Beta distribution; <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node15.html#SECTION000150000000000000000">
- * math definition</A> and <A
+ * Beta distribution; <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node15.html#SECTION000150000000000000000"
+ * > math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosb.html#Beta Distribution">
  * animated definition</A>.
  * <p>
@@ -26,15 +26,15 @@ import cern.jet.stat.tdouble.Probability;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b>
  * <dt>Method: Stratified Rejection/Patchwork Rejection. High performance
  * implementation.
  * <dt>This is a port of <tt>bsprc.c</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library. C-RAND's implementation, in turn, is based upon
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * H. Sakasegawa (1983): Stratified rejection and squeeze method for generating
  * beta random numbers, Ann. Inst. Statist. Math. 35 B, 291-302.
@@ -378,9 +378,9 @@ public class Beta extends AbstractContinousDoubleDistribution {
          * variates via patchwork rejection, * Computing 50, 1-18. * *
          * SUBPROGRAMS: - drand(seed) ... (0,1)-Uniform generator with *
          * unsigned long integer *seed. * - b00(seed,a,b) ... Beta generator for
-         * a<1, b<1 * - b01(seed,a,b) ... Beta generator for a<1<b or * b<1<a * -
-         * b1prs(seed,a,b) ... Beta generator for a>1, b>1 * with unsigned long
-         * integer *seed, double a, b. * *
+         * a<1, b<1 * - b01(seed,a,b) ... Beta generator for a<1<b or * b<1<a *
+         * - b1prs(seed,a,b) ... Beta generator for a>1, b>1 * with unsigned
+         * long integer *seed, double a, b. * *
          **********************************************************************/
         double a = alpha;
         double b = beta;

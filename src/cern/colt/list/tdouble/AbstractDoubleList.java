@@ -13,10 +13,10 @@ import cern.colt.function.tdouble.DoubleProcedure;
 import cern.colt.list.AbstractList;
 
 /**
- * Abstract base class for resizable lists holding <code>double</code>
- * elements; abstract. First see the <a href="package-summary.html">package
- * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get
- * the broad picture.
+ * Abstract base class for resizable lists holding <code>double</code> elements;
+ * abstract. First see the <a href="package-summary.html">package summary</a>
+ * and javadoc <a href="package-tree.html">tree view</a> to get the broad
+ * picture.
  */
 public abstract class AbstractDoubleList extends AbstractList implements cern.colt.buffer.tdouble.DoubleBufferConsumer {
     /**
@@ -67,7 +67,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param to
      *            the index of the last element to be appended (inclusive).
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>other.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=other.size())</tt>).
+     *                index is out of range (
+     *                <tt>other.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=other.size())</tt>
+     *                ).
      */
     public void addAllOfFromTo(AbstractDoubleList other, int from, int to) {
         beforeInsertAllOfFromTo(size, other, from, to);
@@ -84,7 +86,8 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param element
      *            element to be inserted.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>).
+     *                index is out of range (
+     *                <tt>index &lt; 0 || index &gt; size()</tt>).
      */
     public void beforeInsert(int index, double element) {
         beforeInsertDummies(index, 1);
@@ -107,9 +110,12 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param to
      *            the index of the last element to be inserted (inclusive).
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>other.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=other.size())</tt>).
+     *                index is out of range (
+     *                <tt>other.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=other.size())</tt>
+     *                ).
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>index &lt; 0 || index &gt; size()</tt>).
+     *                index is out of range (
+     *                <tt>index &lt; 0 || index &gt; size()</tt>).
      */
     public void beforeInsertAllOfFromTo(int index, AbstractDoubleList other, int from, int to) {
         int length = to - from + 1;
@@ -118,9 +124,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
     }
 
     /**
-     * Inserts <tt>length</tt> dummy elements before the specified position
-     * into the receiver. Shifts the element currently at that position (if any)
-     * and any subsequent elements to the right. <b>This method must set the new
+     * Inserts <tt>length</tt> dummy elements before the specified position into
+     * the receiver. Shifts the element currently at that position (if any) and
+     * any subsequent elements to the right. <b>This method must set the new
      * size to be <tt>size()+length</tt>.
      * 
      * @param index
@@ -155,10 +161,10 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      *         otherwise, <tt>(-(<i>insertion point</i>) - 1)</tt>. The
      *         <i>insertion point</i> is defined as the the point at which the
      *         value would be inserted into the receiver: the index of the first
-     *         element greater than the key, or <tt>receiver.size()</tt>, if
-     *         all elements in the receiver are less than the specified key.
-     *         Note that this guarantees that the return value will be &gt;= 0
-     *         if and only if the key is found.
+     *         element greater than the key, or <tt>receiver.size()</tt>, if all
+     *         elements in the receiver are less than the specified key. Note
+     *         that this guarantees that the return value will be &gt;= 0 if and
+     *         only if the key is found.
      * @see java.util.Arrays
      */
     public int binarySearch(double key) {
@@ -183,10 +189,10 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      *         otherwise, <tt>(-(<i>insertion point</i>) - 1)</tt>. The
      *         <i>insertion point</i> is defined as the the point at which the
      *         value would be inserted into the receiver: the index of the first
-     *         element greater than the key, or <tt>receiver.size()</tt>, if
-     *         all elements in the receiver are less than the specified key.
-     *         Note that this guarantees that the return value will be &gt;= 0
-     *         if and only if the key is found.
+     *         element greater than the key, or <tt>receiver.size()</tt>, if all
+     *         elements in the receiver are less than the specified key. Note
+     *         that this guarantees that the return value will be &gt;= 0 if and
+     *         only if the key is found.
      * @see java.util.Arrays
      */
     public int binarySearchFromTo(double key, int from, int to) {
@@ -243,10 +249,10 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * Returns the elements currently stored, possibly including invalid
      * elements between size and capacity.
      * 
-     * <b>WARNING:</b> For efficiency reasons and to keep memory usage low,
-     * this method may decide <b>not to copy the array</b>. So if subsequently
-     * you modify the returned array directly via the [] operator, be sure you
-     * know what you're doing.
+     * <b>WARNING:</b> For efficiency reasons and to keep memory usage low, this
+     * method may decide <b>not to copy the array</b>. So if subsequently you
+     * modify the returned array directly via the [] operator, be sure you know
+     * what you're doing.
      * 
      * @return the elements currently stored.
      */
@@ -341,8 +347,8 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
      *            returns <tt>false</tt>, otherwise continues.
-     * @return <tt>false</tt> if the procedure stopped before all elements
-     *         where iterated over, <tt>true</tt> otherwise.
+     * @return <tt>false</tt> if the procedure stopped before all elements where
+     *         iterated over, <tt>true</tt> otherwise.
      */
     public boolean forEach(DoubleProcedure procedure) {
         for (int i = 0; i < size;)
@@ -412,7 +418,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @return the index of the first occurrence of the element in the receiver;
      *         returns <code>-1</code> if the element is not found.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public int indexOfFromTo(double element, int from, int to) {
         checkRangeFromTo(from, to, size);
@@ -440,8 +448,8 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
     /**
      * Returns the index of the last occurrence of the specified element.
      * Returns <code>-1</code> if the receiver does not contain this element.
-     * Searches beginning at <code>to</code>, inclusive until
-     * <code>from</code>, inclusive. Tests for identity.
+     * Searches beginning at <code>to</code>, inclusive until <code>from</code>,
+     * inclusive. Tests for identity.
      * 
      * @param element
      *            element to search for.
@@ -452,7 +460,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @return the index of the last occurrence of the element in the receiver;
      *         returns <code>-1</code> if the element is not found.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public int lastIndexOfFromTo(double element, int from, int to) {
         checkRangeFromTo(from, to, size());
@@ -484,7 +494,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param to
      *            the index of the last element (inclusive) to be sorted.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void mergeSortFromTo(int from, int to) {
         int mySize = size();
@@ -499,9 +511,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
     /**
      * Sorts the receiver according to the order induced by the specified
      * comparator. All elements in the range must be <i>mutually comparable</i>
-     * by the specified comparator (that is, <tt>c.compare(e1, e2)</tt> must
-     * not throw a <tt>ClassCastException</tt> for any elements <tt>e1</tt>
-     * and <tt>e2</tt> in the range).
+     * by the specified comparator (that is, <tt>c.compare(e1, e2)</tt> must not
+     * throw a <tt>ClassCastException</tt> for any elements <tt>e1</tt> and
+     * <tt>e2</tt> in the range).
      * <p>
      * 
      * This sort is guaranteed to be <i>stable</i>: equal elements will not be
@@ -528,7 +540,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      *             if <tt>fromIndex &lt; 0</tt> or
      *             <tt>toIndex &gt; a.length</tt>
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void mergeSortFromTo(int from, int to, DoubleComparator c) {
         int mySize = size();
@@ -550,7 +564,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      *            the index of the last element (inclusive).
      * @return a new list
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public AbstractDoubleList partFromTo(int from, int to) {
         checkRangeFromTo(from, to, size);
@@ -581,7 +597,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param to
      *            the index of the last element (inclusive) to be sorted.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void quickSortFromTo(int from, int to) {
         int mySize = size();
@@ -599,9 +617,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
     /**
      * Sorts the receiver according to the order induced by the specified
      * comparator. All elements in the range must be <i>mutually comparable</i>
-     * by the specified comparator (that is, <tt>c.compare(e1, e2)</tt> must
-     * not throw a <tt>ClassCastException</tt> for any elements <tt>e1</tt>
-     * and <tt>e2</tt> in the range).
+     * by the specified comparator (that is, <tt>c.compare(e1, e2)</tt> must not
+     * throw a <tt>ClassCastException</tt> for any elements <tt>e1</tt> and
+     * <tt>e2</tt> in the range).
      * <p>
      * 
      * The sorting algorithm is a tuned quicksort, adapted from Jon L. Bentley
@@ -625,7 +643,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      *             if <tt>fromIndex &lt; 0</tt> or
      *             <tt>toIndex &gt; a.length</tt>
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void quickSortFromTo(int from, int to, DoubleComparator c) {
         int mySize = size();
@@ -664,16 +684,18 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
 
     /**
      * Removes from the receiver all elements whose index is between
-     * <code>from</code>, inclusive and <code>to</code>, inclusive. Shifts
-     * any succeeding elements to the left (reduces their index). This call
-     * shortens the list by <tt>(to - from + 1)</tt> elements.
+     * <code>from</code>, inclusive and <code>to</code>, inclusive. Shifts any
+     * succeeding elements to the left (reduces their index). This call shortens
+     * the list by <tt>(to - from + 1)</tt> elements.
      * 
      * @param from
      *            index of first element to be removed.
      * @param to
      *            index of last element to be removed.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void removeFromTo(int from, int to) {
         checkRangeFromTo(from, to, size);
@@ -727,11 +749,11 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
     /**
      * Replaces the part between <code>from</code> (inclusive) and
      * <code>to</code> (inclusive) with the other list's part between
-     * <code>otherFrom</code> and <code>otherTo</code>. Powerful (and
-     * tricky) method! Both parts need not be of the same size (part A can both
-     * be smaller or larger than part B). Parts may overlap. Receiver and other
-     * list may (but most not) be identical. If <code>from &gt; to</code>,
-     * then inserts other part before <code>from</code>.
+     * <code>otherFrom</code> and <code>otherTo</code>. Powerful (and tricky)
+     * method! Both parts need not be of the same size (part A can both be
+     * smaller or larger than part B). Parts may overlap. Receiver and other
+     * list may (but most not) be identical. If <code>from &gt; to</code>, then
+     * inserts other part before <code>from</code>.
      * 
      * @param from
      *            the first element of the receiver (inclusive)
@@ -744,10 +766,10 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param otherTo
      *            the last element of the other list (inclusive)
      * 
-     * <p>
-     * <b>Examples:</b>
+     *            <p>
+     *            <b>Examples:</b>
      * 
-     * <pre>
+     *            <pre>
      * a=[0, 1, 2, 3, 4, 5, 6, 7]
      * b=[50, 60, 70, 80, 90]
      * a.R(...)=a.replaceFromToWithFromTo(...)
@@ -899,11 +921,11 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
 
     /**
      * Replaces the element at the specified position in the receiver with the
-     * specified element; <b>WARNING:</b> Does not check preconditions.
-     * Provided with invalid parameters this method may access invalid indexes
-     * without throwing any exception! <b>You should only use this method when
-     * you are absolutely sure that the index is within bounds.</b>
-     * Precondition (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
+     * specified element; <b>WARNING:</b> Does not check preconditions. Provided
+     * with invalid parameters this method may access invalid indexes without
+     * throwing any exception! <b>You should only use this method when you are
+     * absolutely sure that the index is within bounds.</b> Precondition
+     * (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
      * 
      * This method is normally only used internally in large loops where bounds
      * are explicitly checked before the loop and need no be rechecked within
@@ -942,7 +964,9 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
      * @param to
      *            the index of the last element (inclusive) to be permuted.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void shuffleFromTo(int from, int to) {
         checkRangeFromTo(from, to, size());
@@ -983,8 +1007,8 @@ public abstract class AbstractDoubleList extends AbstractList implements cern.co
     }
 
     /**
-     * Returns a <code>java.util.ArrayList</code> containing all the elements
-     * in the receiver.
+     * Returns a <code>java.util.ArrayList</code> containing all the elements in
+     * the receiver.
      */
     public java.util.ArrayList toList() {
         int mySize = size();

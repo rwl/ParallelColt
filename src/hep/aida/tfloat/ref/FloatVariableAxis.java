@@ -96,8 +96,8 @@ public class FloatVariableAxis implements FloatIAxis {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */

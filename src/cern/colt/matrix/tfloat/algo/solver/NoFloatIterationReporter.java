@@ -22,7 +22,6 @@ package cern.colt.matrix.tfloat.algo.solver;
 
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 
-
 /**
  * An iteration reporter which does nothing.
  */

@@ -1,6 +1,5 @@
 package cern.colt.matrix.tfloat.impl;
 
-
 public class SparseFloatMatrix1DViewTest extends SparseFloatMatrix1DTest {
 
     public SparseFloatMatrix1DViewTest(String arg0) {

@@ -13,18 +13,18 @@ import java.util.Date;
 /**
  * Quick medium quality uniform pseudo-random number generator.
  * 
- * Produces uniformly distributed <tt>int</tt>'s and <tt>long</tt>'s in
- * the closed intervals <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> and
+ * Produces uniformly distributed <tt>int</tt>'s and <tt>long</tt>'s in the
+ * closed intervals <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> and
  * <tt>[Long.MIN_VALUE,Long.MAX_VALUE]</tt>, respectively, as well as
  * <tt>float</tt>'s and <tt>float</tt>'s in the open unit intervals
  * <tt>(0.0f,1.0f)</tt> and <tt>(0.0,1.0)</tt>, respectively.
  * <p>
  * The seed can be any integer satisfying
- * <tt>0 &lt; 4*seed+1 &lt; 2<sup>32</sup></tt>. In other words, there must
- * hold <tt>seed &gt;= 0 && seed &lt; 1073741823</tt>.
+ * <tt>0 &lt; 4*seed+1 &lt; 2<sup>32</sup></tt>. In other words, there must hold
+ * <tt>seed &gt;= 0 && seed &lt; 1073741823</tt>.
  * <p>
- * <b>Quality:</b> This generator follows the multiplicative congruential
- * method of the form
+ * <b>Quality:</b> This generator follows the multiplicative congruential method
+ * of the form
  * <dt> <tt>z(i+1) = a * z(i) (mod m)</tt> with
  * <tt>a=663608941 (=0X278DDE6DL), m=2<sup>32</sup></tt>.
  * <dt> <tt>z(i)</tt> assumes all different values
@@ -60,8 +60,8 @@ public class FRand extends FloatRandomEngine {
      * Constructs and returns a random number generator with the given seed.
      * 
      * @param seed
-     *            should not be 0, in such a case <tt>DRand.DEFAULT_SEED</tt>
-     *            is substituted.
+     *            should not be 0, in such a case <tt>DRand.DEFAULT_SEED</tt> is
+     *            substituted.
      */
     public FRand(int seed) {
         setSeed(seed);

@@ -6,7 +6,7 @@ public enum Norm {
      * Maximum absolute row sum
      */
     One,
-    
+
     /**
      * Euclidean norm
      */

@@ -1,5 +1,5 @@
 /*
-Copyright � 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -177,7 +177,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             b[1] = Float.NaN;
             return b;
         }
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         float[] a = null;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -235,8 +235,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             b[1] = Float.NaN;
             return b;
         }
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)other.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
         final int rowStrideOther = other.rowStride();
         final int colStrideOther = other.columnStride();
         final float[] elemsOther = (float[]) other.elements();
@@ -292,7 +292,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
     }
 
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             if (function instanceof cern.jet.math.tfcomplex.FComplexMult) {
@@ -317,14 +317,29 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         float[] tmp = new float[2];
-                        for (int r = startrow; r < stoprow; r++) {
-                            for (int i = idx, c = 0; c < columns; c++) {
-                                tmp = function.apply(elements[i], elements[i+1]);
-                                elements[i] = tmp[0];
-                                elements[i + 1] = tmp[1];
-                                i += columnStride;
+                        if (function instanceof cern.jet.math.tfcomplex.FComplexMult) {
+                            float[] multiplicator = ((cern.jet.math.tfcomplex.FComplexMult) function).multiplicator;
+                            // x[i] = mult*x[i]
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp[0] = elements[i];
+                                    tmp[1] = elements[i + 1];
+                                    elements[i] = tmp[0] * multiplicator[0] - tmp[1] * multiplicator[1];
+                                    elements[i + 1] = tmp[1] * multiplicator[0] + tmp[0] * multiplicator[1];
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
                             }
-                            idx += rowStride;
+                        } else {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp = function.apply(elements[i], elements[i + 1]);
+                                    elements[i] = tmp[0];
+                                    elements[i + 1] = tmp[1];
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
+                            }
                         }
                     }
                 });
@@ -333,21 +348,36 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         } else {
             int idx = zero;
             float[] tmp = new float[2];
-            for (int r = 0; r < rows; r++) {
-                for (int i = idx, c = 0; c < columns; c++) {
-                    tmp = function.apply(elements[i], elements[i+1]);
-                    elements[i] = tmp[0];
-                    elements[i + 1] = tmp[1];
-                    i += columnStride;
+            if (function instanceof cern.jet.math.tfcomplex.FComplexMult) {
+                float[] multiplicator = ((cern.jet.math.tfcomplex.FComplexMult) function).multiplicator;
+                // x[i] = mult*x[i]
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp[0] = elements[i];
+                        tmp[1] = elements[i + 1];
+                        elements[i] = tmp[0] * multiplicator[0] - tmp[1] * multiplicator[1];
+                        elements[i + 1] = tmp[1] * multiplicator[0] + tmp[0] * multiplicator[1];
+                        i += columnStride;
+                    }
+                    idx += rowStride;
                 }
-                idx += rowStride;
+            } else {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp = function.apply(elements[i], elements[i + 1]);
+                        elements[i] = tmp[0];
+                        elements[i + 1] = tmp[1];
+                        i += columnStride;
+                    }
+                    idx += rowStride;
+                }
             }
         }
         return this;
     }
 
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -403,7 +433,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
     }
 
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -456,7 +486,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
     }
 
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexRealFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -474,16 +504,39 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         float[] tmp = new float[2];
-                        for (int r = startrow; r < stoprow; r++) {
-                            for (int i = idx, c = 0; c < columns; c++) {
-                                tmp[0] = elements[i];
-                                tmp[1] = elements[i + 1];
-                                tmp[0] = function.apply(tmp);
-                                elements[i] = tmp[0];
-                                elements[i + 1] = 0;
-                                i += columnStride;
+                        if (function == cern.jet.math.tfcomplex.FComplexFunctions.abs) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp[0] = elements[i];
+                                    tmp[1] = elements[i + 1];
+                                    float absX = Math.abs(tmp[0]);
+                                    float absY = Math.abs(tmp[1]);
+                                    if (absX == 0 && absY == 0) {
+                                        elements[i] = 0;
+                                    } else if (absX >= absY) {
+                                        float d = tmp[1] / tmp[0];
+                                        elements[i] = (float) (absX * Math.sqrt(1 + d * d));
+                                    } else {
+                                        float d = tmp[0] / tmp[1];
+                                        elements[i] = (float) (absY * Math.sqrt(1 + d * d));
+                                    }
+                                    elements[i + 1] = 0;
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
                             }
-                            idx += rowStride;
+                        } else {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp[0] = elements[i];
+                                    tmp[1] = elements[i + 1];
+                                    tmp[0] = function.apply(tmp);
+                                    elements[i] = tmp[0];
+                                    elements[i + 1] = 0;
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
+                            }
                         }
                     }
                 });
@@ -492,16 +545,39 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         } else {
             int idx = zero;
             float[] tmp = new float[2];
-            for (int r = 0; r < rows; r++) {
-                for (int i = idx, c = 0; c < columns; c++) {
-                    tmp[0] = elements[i];
-                    tmp[1] = elements[i + 1];
-                    tmp[0] = function.apply(tmp);
-                    elements[i] = tmp[0];
-                    elements[i + 1] = 0;
-                    i += columnStride;
+            if (function == cern.jet.math.tfcomplex.FComplexFunctions.abs) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp[0] = elements[i];
+                        tmp[1] = elements[i + 1];
+                        float absX = Math.abs(tmp[0]);
+                        float absY = Math.abs(tmp[1]);
+                        if (absX == 0 && absY == 0) {
+                            elements[i] = 0;
+                        } else if (absX >= absY) {
+                            float d = tmp[1] / tmp[0];
+                            elements[i] = (float) (absX * Math.sqrt(1 + d * d));
+                        } else {
+                            float d = tmp[0] / tmp[1];
+                            elements[i] = (float) (absY * Math.sqrt(1 + d * d));
+                        }
+                        elements[i + 1] = 0;
+                        i += columnStride;
+                    }
+                    idx += rowStride;
                 }
-                idx += rowStride;
+            } else {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp[0] = elements[i];
+                        tmp[1] = elements[i + 1];
+                        tmp[0] = function.apply(tmp);
+                        elements[i] = tmp[0];
+                        elements[i + 1] = 0;
+                        i += columnStride;
+                    }
+                    idx += rowStride;
+                }
             }
         }
         return this;
@@ -538,8 +614,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             throw new InternalError();
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = rows / np;
@@ -598,8 +674,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             throw new InternalError();
         final int columnStrideOther = y.columnStride();
         final int rowStrideOther = y.rowStride();
-        final int zeroOther = (int)y.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) y.index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -618,20 +694,68 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
                         int idxOther = zeroOther + startrow * rowStrideOther;
                         float[] tmp1 = new float[2];
                         float[] tmp2 = new float[2];
-                        for (int r = startrow; r < stoprow; r++) {
-                            for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-                                tmp1[0] = elements[i];
-                                tmp1[1] = elements[i + 1];
-                                tmp2[0] = elemsOther[j];
-                                tmp2[1] = elemsOther[j + 1];
-                                tmp1 = function.apply(tmp1, tmp2);
-                                elements[i] = tmp1[0];
-                                elements[i + 1] = tmp1[1];
-                                i += columnStride;
-                                j += columnStrideOther;
+                        if (function == cern.jet.math.tfcomplex.FComplexFunctions.mult) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    elements[i] = tmp1[0] * tmp2[0] - tmp1[1] * tmp2[1];
+                                    elements[i + 1] = tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
                             }
-                            idx += rowStride;
-                            idxOther += rowStrideOther;
+                        } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjFirst) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                                    elements[i + 1] = -tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
+                            }
+
+                        } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjSecond) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                                    elements[i + 1] = tmp1[1] * tmp2[0] - tmp1[0] * tmp2[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
+                            }
+                        } else {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    tmp1 = function.apply(tmp1, tmp2);
+                                    elements[i] = tmp1[0];
+                                    elements[i + 1] = tmp1[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
+                            }
                         }
                     }
                 });
@@ -642,27 +766,75 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             float[] tmp2 = new float[2];
             int idx = zero;
             int idxOther = zeroOther;
-            for (int r = 0; r < rows; r++) {
-                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-                    tmp1[0] = elements[i];
-                    tmp1[1] = elements[i + 1];
-                    tmp2[0] = elemsOther[j];
-                    tmp2[1] = elemsOther[j + 1];
-                    tmp1 = function.apply(tmp1, tmp2);
-                    elements[i] = tmp1[0];
-                    elements[i + 1] = tmp1[1];
-                    i += columnStride;
-                    j += columnStrideOther;
+            if (function == cern.jet.math.tfcomplex.FComplexFunctions.mult) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        elements[i] = tmp1[0] * tmp2[0] - tmp1[1] * tmp2[1];
+                        elements[i + 1] = tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
                 }
-                idx += rowStride;
-                idxOther += rowStrideOther;
+            } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjFirst) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                        elements[i + 1] = -tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
+                }
+
+            } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjSecond) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                        elements[i + 1] = tmp1[1] * tmp2[0] - tmp1[0] * tmp2[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
+                }
+            } else {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        tmp1 = function.apply(tmp1, tmp2);
+                        elements[i] = tmp1[0];
+                        elements[i + 1] = tmp1[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
+                }
             }
         }
         return this;
     }
 
     public FComplexMatrix2D assign(final float re, final float im) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -711,7 +883,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         if (this.isNoView) {
             System.arraycopy(values, 0, this.elements, 0, values.length);
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = rows / np;
@@ -799,7 +971,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
                 }
             }
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = rows / np;
@@ -851,8 +1023,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
         final int rowStrideOther = other.rowStride();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final float[] elemsOther = ((DenseFloatMatrix2D) other).elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -875,7 +1047,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                                 elements[i + 1] = elemsOther[j];
-//                                elements[i] = 0;
+                                //                                elements[i] = 0;
                                 i += columnStride;
                                 j += columnStrideOther;
                             }
@@ -892,7 +1064,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             for (int r = 0; r < rows; r++) {
                 for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                     elements[i + 1] = elemsOther[j];
-//                    elements[i] = 0;
+                    //                    elements[i] = 0;
                     i += columnStride;
                     j += columnStrideOther;
                 }
@@ -907,8 +1079,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
         final int rowStrideOther = other.rowStride();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final float[] elemsOther = ((DenseFloatMatrix2D) other).elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -931,7 +1103,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                                 elements[i] = elemsOther[j];
-//                                elements[i + 1] = 0;
+                                //                                elements[i + 1] = 0;
                                 i += columnStride;
                                 j += columnStrideOther;
                             }
@@ -948,7 +1120,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             for (int r = 0; r < rows; r++) {
                 for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                     elements[i] = elemsOther[j];
-//                    elements[i + 1] = 0;
+                    //                    elements[i + 1] = 0;
                     i += columnStride;
                     j += columnStrideOther;
                 }
@@ -962,7 +1134,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
     public int cardinality() {
         int cardinality = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
@@ -1048,7 +1220,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         int oldNp = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int c = 0; c < columns; c++) {
-            ((DenseFComplexMatrix1D)viewColumn(c)).fft();
+            ((DenseFComplexMatrix1D) viewColumn(c)).fft();
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
@@ -1062,13 +1234,13 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         int oldNp = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int r = 0; r < rows; r++) {
-            ((DenseFComplexMatrix1D)viewRow(r)).fft();
+            ((DenseFComplexMatrix1D) viewRow(r)).fft();
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     public FComplexMatrix2D forEachNonZero(final cern.colt.function.tfcomplex.IntIntFComplexFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1125,7 +1297,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
     public FComplexMatrix2D getConjugateTranspose() {
         FComplexMatrix2D transpose = this.viewDice().copy();
         final float[] elemsOther = ((DenseFComplexMatrix2D) transpose).elements;
-        final int zeroOther = (int)transpose.index(0, 0);
+        final int zeroOther = (int) transpose.index(0, 0);
         final int columnStrideOther = transpose.columnStride();
         final int rowStrideOther = transpose.rowStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1177,8 +1349,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         final float[] elemsOther = (float[]) Im.elements();
         final int columnStrideOther = Im.columnStride();
         final int rowStrideOther = Im.rowStride();
-        final int zeroOther = (int)Im.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) Im.index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1228,7 +1400,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 float[] value = new float[2];
@@ -1258,8 +1430,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         final float[] elemsOther = (float[]) R.elements();
         final int columnStrideOther = R.columnStride();
         final int rowStrideOther = R.rowStride();
-        final int zeroOther = (int)R.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) R.index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1342,7 +1514,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         int oldNp = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int c = 0; c < columns; c++) {
-            ((DenseFComplexMatrix1D)viewColumn(c)).ifft(scale);
+            ((DenseFComplexMatrix1D) viewColumn(c)).ifft(scale);
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
@@ -1359,7 +1531,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         int oldNp = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int r = 0; r < rows; r++) {
-            ((DenseFComplexMatrix1D)viewRow(r)).ifft(scale);
+            ((DenseFComplexMatrix1D) viewRow(r)).ifft(scale);
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
@@ -1387,7 +1559,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
     public float[][] toArray() {
         final float[][] values = new float[rows][2 * columns];
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = rows / np;
@@ -1430,8 +1602,8 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public FComplexMatrix1D vectorize() {
         final FComplexMatrix1D v = new DenseFComplexMatrix1D(size());
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)v.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) v.index(0);
         final int strideOther = v.stride();
         final float[] elemsOther = (float[]) v.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1498,9 +1670,9 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             throw new InternalError();
         final int strideY = y.stride();
         final int strideZ = zLoc.stride();
-        final int zero = (int)index(0, 0);
-        final int zeroY = (int)y.index(0);
-        final int zeroZ = (int)zLoc.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroY = (int) y.index(0);
+        final int zeroZ = (int) zLoc.index(0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1721,8 +1893,9 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             JCublas.cublasFree("d_A");
             JCublas.cublasFree("d_B");
             JCublas.cublasFree("d_C");
-            if (JCublas.cublasGetError() != JCublas.CUBLAS_STATUS_SUCCESS) {
-                throw new InternalError("Error occured while using CUBLAS library");
+            int error = JCublas.cublasGetError();
+            if (error != JCublas.CUBLAS_STATUS_SUCCESS) {
+                throw new InternalError("Error occured while using CUBLAS library: " + error);
             }
             if ((np > 1) && (rowsA * colsA >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
@@ -1775,9 +1948,9 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             noOfTasks = Math.min(width, noOfTasks);
 
             if (noOfTasks < 2) { /*
-                                                                                     * parallelization doesn't pay off (too much start
-                                                                                     * up overhead)
-                                                                                     */
+                                                                                                                                                       * parallelization doesn't pay off (too much start
+                                                                                                                                                       * up overhead)
+                                                                                                                                                       */
                 return this.zMultSeq(B, C, alpha, beta, transposeA, transposeB);
             }
 
@@ -1813,7 +1986,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         }
         return C;
     }
-
 
     protected FComplexMatrix2D zMultSeq(FComplexMatrix2D B, FComplexMatrix2D C, float[] alpha, float[] beta, boolean transposeA, boolean transposeB) {
         if (transposeA)
@@ -1872,9 +2044,9 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         float reC;
         float imC;
         for (; --blocks >= 0;) {
-            int jB = (int)BB.index(0, 0);
-            int indexA = (int)index(rr, 0);
-            int jC = (int)CC.index(rr, 0);
+            int jB = (int) BB.index(0, 0);
+            int indexA = (int) index(rr, 0);
+            int jC = (int) CC.index(rr, 0);
             rr += m_optimal;
             if (blocks == 0)
                 m_optimal += m - rr;
@@ -1950,7 +2122,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     public float[] zSum() {
         float[] sum = new float[2];
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];

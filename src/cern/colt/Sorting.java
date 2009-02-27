@@ -23,10 +23,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * Quicksorts, mergesorts and binary searches; complements
  * <tt>java.util.Arrays</tt>. Contains, for example, the quicksort on
  * Comparators and Comparables, which are still missing in
- * <tt>java.util.Arrays</tt> of JDK 1.2. Also provides mergesorts for types
- * not supported in <tt>java.util.Arrays</tt>, as well as a couple of other
- * methods for primitive arrays. The quicksorts and mergesorts are the JDK 1.2
- * V1.26 algorithms, modified as necessary.
+ * <tt>java.util.Arrays</tt> of JDK 1.2. Also provides mergesorts for types not
+ * supported in <tt>java.util.Arrays</tt>, as well as a couple of other methods
+ * for primitive arrays. The quicksorts and mergesorts are the JDK 1.2 V1.26
+ * algorithms, modified as necessary.
  * 
  * @see cern.colt.GenericSorting
  * @see cern.colt.matrix.tdouble.algo.DoubleSorting
@@ -2245,8 +2245,8 @@ public class Sorting extends Object {
     /**
      * Sorts the specified range of the receiver into ascending order, according
      * to the <i>natural ordering</i> of its elements. All elements in this
-     * range must implement the <tt>Comparable</tt> interface. Furthermore,
-     * all elements in this range must be <i>mutually comparable</i> (that is,
+     * range must implement the <tt>Comparable</tt> interface. Furthermore, all
+     * elements in this range must be <i>mutually comparable</i> (that is,
      * <tt>e1.compareTo(e2)</tt> must not throw a <tt>ClassCastException</tt>
      * for any elements <tt>e1</tt> and <tt>e2</tt> in the array).
      * <p>
@@ -2267,8 +2267,8 @@ public class Sorting extends Object {
     /**
      * Sorts the specified range of the receiver into ascending order, according
      * to the <i>natural ordering</i> of its elements. All elements in this
-     * range must implement the <tt>Comparable</tt> interface. Furthermore,
-     * all elements in this range must be <i>mutually comparable</i> (that is,
+     * range must implement the <tt>Comparable</tt> interface. Furthermore, all
+     * elements in this range must be <i>mutually comparable</i> (that is,
      * <tt>e1.compareTo(e2)</tt> must not throw a <tt>ClassCastException</tt>
      * for any elements <tt>e1</tt> and <tt>e2</tt> in the array).
      * <p>
@@ -2330,9 +2330,9 @@ public class Sorting extends Object {
     /**
      * Sorts the specified array according to the order induced by the specified
      * comparator. All elements in the range must be <i>mutually comparable</i>
-     * by the specified comparator (that is, <tt>c.compare(e1, e2)</tt> must
-     * not throw a <tt>ClassCastException</tt> for any elements <tt>e1</tt>
-     * and <tt>e2</tt> in the range).
+     * by the specified comparator (that is, <tt>c.compare(e1, e2)</tt> must not
+     * throw a <tt>ClassCastException</tt> for any elements <tt>e1</tt> and
+     * <tt>e2</tt> in the range).
      * <p>
      * 
      * The sorting algorithm is a tuned quicksort, adapted from Jon L. Bentley

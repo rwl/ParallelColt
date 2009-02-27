@@ -96,7 +96,7 @@ public class DefaultFloatIterationMonitor extends AbstractFloatIterationMonitor 
     public void setMaxIterations(int maxIter) {
         this.maxIter = maxIter;
     }
-    
+
     /**
      * Returns maximum number of iterations to permit
      */

@@ -26,7 +26,8 @@ package cern.jet.stat.tdouble.quantile;
  * <li>Let <tt>p=(0, 1/s-1), 2/s-1,..., s-1/s-1=1.0)</tt> be a list of the
  * <tt>s</tt> percentages.</li>
  * <li>Then for each
- * <tt>i=0..s-1: l[i] = e : v.contains(e) && v[0],..., v[p[i]*v.length] &lt;= e</tt>.</li>
+ * <tt>i=0..s-1: l[i] = e : v.contains(e) && v[0],..., v[p[i]*v.length] &lt;= e</tt>
+ * .</li>
  * <li>(In particular: <tt>l[0]=min(v)=v[0]</tt> and
  * <tt>l[s-1]=max(v)=v[s-1]</tt>.)</li>
  * 

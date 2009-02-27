@@ -4,7 +4,7 @@ import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatAMG;
 
 /**
  * Test of FloatBiCG wit AMG
- *
+ * 
  */
 public class FloatBiCGAMGTest extends FloatBiCGTest {
 

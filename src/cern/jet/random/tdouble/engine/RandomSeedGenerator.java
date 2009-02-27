@@ -42,12 +42,12 @@ public class RandomSeedGenerator extends cern.colt.PersistentObject {
      * Constructs and returns a new seed generator; you normally won't need to
      * use this method.
      * <p>
-     * The position <tt>[row,column]</tt> indicates the iteration starting
-     * point within a (virtual) seed matrix. The seed matrix is a n*m matrix
-     * with <tt>1 + Integer.MAX_VALUE</tt> (virtual) rows and
+     * The position <tt>[row,column]</tt> indicates the iteration starting point
+     * within a (virtual) seed matrix. The seed matrix is a n*m matrix with
+     * <tt>1 + Integer.MAX_VALUE</tt> (virtual) rows and
      * <tt>RandomSeedTable.COLUMNS</tt> columns. Successive calls to method
-     * <tt>nextSeed()</tt> will cycle over the given column, in ascending
-     * order: <tt>nextSeed()</tt> returns the seed
+     * <tt>nextSeed()</tt> will cycle over the given column, in ascending order:
+     * <tt>nextSeed()</tt> returns the seed
      * <tt>s[row,column], s[row+1,column], ... s[Integer.MAX_VALUE,column], s[0,column], s[1,column], ...</tt>
      * 
      * @param row

@@ -131,19 +131,19 @@ public abstract class DoubleIterativeSolverTest extends TestCase {
         // Create solver and preconditioner
         createSolver();
         DoubleIterationMonitor im = new DefaultDoubleIterationMonitor(1000000, rtol, 1e-50, 1e+5);
-//        im.setIterationReporter(new NoDoubleIterationReporter() {
-//
-//            @Override
-//            public void monitor(double r, DoubleMatrix1D x, int i) {
-//                System.out.println("Norm of residual = " + r);
-//            }
-//
-//            @Override
-//            public void monitor(double r, int i) {
-//                System.out.println("Residual = " + r);
-//            }
-//
-//        });
+        //        im.setIterationReporter(new NoDoubleIterationReporter() {
+        //
+        //            @Override
+        //            public void monitor(double r, DoubleMatrix1D x, int i) {
+        //                System.out.println("Norm of residual = " + r);
+        //            }
+        //
+        //            @Override
+        //            public void monitor(double r, int i) {
+        //                System.out.println("Residual = " + r);
+        //            }
+        //
+        //        });
         if (!(solver instanceof DoubleHyBR)) {
             solver.setIterationMonitor(im);
         }

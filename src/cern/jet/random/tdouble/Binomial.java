@@ -13,9 +13,9 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 import cern.jet.stat.tdouble.Probability;
 
 /**
- * Binomial distribution; See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node19.html#SECTION000190000000000000000">
- * math definition</A> and <A
+ * Binomial distribution; See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node19.html#SECTION000190000000000000000"
+ * > math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosb.html#Binomial Distribution">
  * animated definition</A>.
  * <p>
@@ -23,14 +23,14 @@ import cern.jet.stat.tdouble.Probability;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b> High performance implementation. Acceptance
- * Rejection/Inversion method. This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandBinomial.html">RandBinomial</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++). CLHEP's implementation is, in turn, based on
+ * Rejection/Inversion method. This is a port of <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandBinomial.html"
+ * >RandBinomial</A> used in <A
+ * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A> (C++). CLHEP's
+ * implementation is, in turn, based on
  * <p>
  * V. Kachitvichyanukul, B.W. Schmeiser (1988): Binomial random variate
  * generation, Communications of the ACM 31, 216-222.
@@ -103,9 +103,9 @@ public class Binomial extends AbstractDiscreteDistribution {
      * Binomial random numbers with parameters * n (number of trials) and p
      * (probability of success). * For min(n*p,n*(1-p)) < 10 the Inversion
      * method is applied: * The random numbers are generated via sequential
-     * search, * starting at the lowest index k=0. The cumulative probabilities *
-     * are avoided by using the technique of chop-down. * For min(n*p,n*(1-p)) >=
-     * 10 Acceptance Rejection is used: * The algorithm is based on a
+     * search, * starting at the lowest index k=0. The cumulative probabilities
+     * * are avoided by using the technique of chop-down. * For min(n*p,n*(1-p))
+     * >= 10 Acceptance Rejection is used: * The algorithm is based on a
      * hat-function which is uniform in * the centre region and exponential in
      * the tails. * A triangular immediate acceptance region in the centre
      * speeds * up the generation of binomial variates. * If candidate k is near
@@ -113,8 +113,9 @@ public class Binomial extends AbstractDiscreteDistribution {
      * acceptance test by Stirling's formula is modified * according to W.
      * Hoermann (1992): The generation of binomial * random variates, to appear
      * in J. Statist. Comput. Simul. * If p < .5 the algorithm is applied to
-     * parameters n, p. * Otherwise p is replaced by 1-p, and k is replaced by n -
-     * k. * * ***************************************************************** *
+     * parameters n, p. * Otherwise p is replaced by 1-p, and k is replaced by n
+     * - k. * *
+     * ***************************************************************** *
      * FUNCTION: - samples a random number from the binomial * distribution with
      * parameters n and p and is * valid for n*min(p,1-p) > 0. * REFERENCE: - V.
      * Kachitvichyanukul, B.W. Schmeiser (1988): * Binomial random variate

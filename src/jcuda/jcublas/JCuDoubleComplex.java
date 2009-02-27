@@ -16,11 +16,9 @@
 package jcuda.jcublas;
 
 /**
- * Java port of the CUBLAS complex number structure for double 
- * precision numbers
+ * Java port of the CUBLAS complex number structure for double precision numbers
  */
-public class JCuDoubleComplex
-{
+public class JCuDoubleComplex {
     /** The real part of the complex number */
     public double x;
 
@@ -28,42 +26,42 @@ public class JCuDoubleComplex
     public double y;
 
     /* Private constructor */
-    private JCuDoubleComplex()
-    {
+    private JCuDoubleComplex() {
     }
-    
+
     /**
      * Returns the real part of the given complex number
      * 
-     * @param x The complex number whose real part should be returned
+     * @param x
+     *            The complex number whose real part should be returned
      * @return The real part of the given complex number
      */
-    public static double cuCreal (JCuDoubleComplex x)
-    {
+    public static double cuCreal(JCuDoubleComplex x) {
         return x.x;
     }
 
     /**
      * Returns the imaginary part of the given complex number
      * 
-     * @param x The complex number whose imaginary part should be returned
+     * @param x
+     *            The complex number whose imaginary part should be returned
      * @return The imaginary part of the given complex number
      */
-    public static double cuCimag (JCuDoubleComplex x)
-    {
+    public static double cuCimag(JCuDoubleComplex x) {
         return x.y;
     }
 
     /**
-     * Creates a new complex number consisting of the given real and
-     * imaginary part
+     * Creates a new complex number consisting of the given real and imaginary
+     * part
      * 
-     * @param r The real part of the complex number
-     * @param i The imaginary part of the complex number
+     * @param r
+     *            The real part of the complex number
+     * @param i
+     *            The imaginary part of the complex number
      * @return A complex number with the given real and imaginary part
      */
-    public static JCuDoubleComplex cuCmplx (double r, double i)
-    {
+    public static JCuDoubleComplex cuCmplx(double r, double i) {
         JCuDoubleComplex res = new JCuDoubleComplex();
         res.x = r;
         res.y = i;
@@ -73,25 +71,25 @@ public class JCuDoubleComplex
     /**
      * Returns the complex conjugate of the given complex number
      * 
-     * @param x The complex number whose complex conjugate should be returned
+     * @param x
+     *            The complex number whose complex conjugate should be returned
      * @return The complex conjugate of the given complex number
      */
-    public static  JCuDoubleComplex cuConj (JCuDoubleComplex x)
-    {
-        return cuCmplx (cuCreal(x), -cuCimag(x));
+    public static JCuDoubleComplex cuConj(JCuDoubleComplex x) {
+        return cuCmplx(cuCreal(x), -cuCimag(x));
     }
 
     /**
-     * Returns a new complex number that is the sum of the given
-     * complex numbers
+     * Returns a new complex number that is the sum of the given complex numbers
      * 
-     * @param x The first addend
-     * @param y The second addend
-     * @return The sum of the given addends 
+     * @param x
+     *            The first addend
+     * @param y
+     *            The second addend
+     * @return The sum of the given addends
      */
-    public static  JCuDoubleComplex cuCadd (JCuDoubleComplex x, JCuDoubleComplex y)
-    {
-        return cuCmplx (cuCreal(x) + cuCreal(y), cuCimag(x) + cuCimag(y));
+    public static JCuDoubleComplex cuCadd(JCuDoubleComplex x, JCuDoubleComplex y) {
+        return cuCmplx(cuCreal(x) + cuCreal(y), cuCimag(x) + cuCimag(y));
     }
 
     /**
@@ -104,15 +102,15 @@ public class JCuDoubleComplex
      * not guard against this (presumably to avoid losing performance), so we
      * don't do it either to stay competitive.
      * 
-     * @param x The first factor
-     * @param y The second factor
-     * @return The product of the given factors 
+     * @param x
+     *            The first factor
+     * @param y
+     *            The second factor
+     * @return The product of the given factors
      */
-    public static JCuDoubleComplex cuCmul (JCuDoubleComplex x, JCuDoubleComplex y)
-    {
+    public static JCuDoubleComplex cuCmul(JCuDoubleComplex x, JCuDoubleComplex y) {
         JCuDoubleComplex prod;
-        prod = cuCmplx ((cuCreal(x) * cuCreal(y)) - (cuCimag(x) * cuCimag(y)),
-                        (cuCreal(x) * cuCimag(y)) + (cuCimag(x) * cuCreal(y)));
+        prod = cuCmplx((cuCreal(x) * cuCreal(y)) - (cuCimag(x) * cuCimag(y)), (cuCreal(x) * cuCimag(y)) + (cuCimag(x) * cuCreal(y)));
         return prod;
     }
 
@@ -121,17 +119,18 @@ public class JCuDoubleComplex
      * <br />
      * Original comment:<br />
      * <br />
-     * This implementation guards against intermediate underflow and overflow
-     * by scaling. Such guarded implementations are usually the default for
-     * complex library implementations, with some also offering an unguarded,
-     * faster version.
+     * This implementation guards against intermediate underflow and overflow by
+     * scaling. Such guarded implementations are usually the default for complex
+     * library implementations, with some also offering an unguarded, faster
+     * version.
      * 
-     * @param x The dividend
-     * @param y The divisor
-     * @return The quotient of the given complex numbers 
+     * @param x
+     *            The dividend
+     * @param y
+     *            The divisor
+     * @return The quotient of the given complex numbers
      */
-    public static  JCuDoubleComplex cuCdiv (JCuDoubleComplex x, JCuDoubleComplex y)
-    {
+    public static JCuDoubleComplex cuCdiv(JCuDoubleComplex x, JCuDoubleComplex y) {
         JCuDoubleComplex quot;
         double s = Math.abs(cuCreal(y)) + Math.abs(cuCimag(y));
         double oos = 1.0 / s;
@@ -141,8 +140,7 @@ public class JCuDoubleComplex
         double bis = cuCimag(y) * oos;
         s = (brs * brs) + (bis * bis);
         oos = 1.0 / s;
-        quot = cuCmplx (((ars * brs) + (ais * bis)) * oos,
-                        ((ais * brs) - (ars * bis)) * oos);
+        quot = cuCmplx(((ars * brs) + (ais * bis)) * oos, ((ais * brs) - (ars * bis)) * oos);
         return quot;
     }
 
@@ -151,27 +149,33 @@ public class JCuDoubleComplex
      * <br />
      * Original comment:<br />
      * <br />
-     * This implementation guards against intermediate underflow and overflow
-     * by scaling. Otherwise the we'd lose half the exponent range. There are
-     * various ways of doing guarded computation. For now chose the simplest
-     * and fastest solution, however this may suffer from inaccuracies if sqrt
-     * and division are not IEEE compliant.
+     * This implementation guards against intermediate underflow and overflow by
+     * scaling. Otherwise the we'd lose half the exponent range. There are
+     * various ways of doing guarded computation. For now chose the simplest and
+     * fastest solution, however this may suffer from inaccuracies if sqrt and
+     * division are not IEEE compliant.
      * 
-     * @param x The complex number whose absolute value should be returned
+     * @param x
+     *            The complex number whose absolute value should be returned
      * @return The absolute value of the given complex number
      */
-    public static double cuCabs (JCuDoubleComplex x)
-    {
+    public static double cuCabs(JCuDoubleComplex x) {
         double p = cuCreal(x);
         double q = cuCimag(x);
         double r;
-        if (p == 0) return q;
-        if (q == 0) return p;
+        if (p == 0)
+            return q;
+        if (q == 0)
+            return p;
         p = Math.sqrt(p);
         q = Math.sqrt(q);
-        if (p < q) {r = p; p = q; q = r;}
+        if (p < q) {
+            r = p;
+            p = q;
+            q = r;
+        }
         r = q / p;
-        return p * Math.sqrt (1.0f + r * r);
+        return p * Math.sqrt(1.0f + r * r);
     }
 
     /**
@@ -179,9 +183,7 @@ public class JCuDoubleComplex
      * 
      * @return A String representation of this complex number
      */
-    public String toString()
-    {
-        return "("+x+","+y+")";
+    public String toString() {
+        return "(" + x + "," + y + ")";
     }
 }
-

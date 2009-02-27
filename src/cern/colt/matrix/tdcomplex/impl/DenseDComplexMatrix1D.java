@@ -61,10 +61,10 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
-     * copied. So subsequent changes in <tt>values</tt> are not reflected in
-     * the matrix, and vice-versa. Due to the fact that complex data is
-     * represented by 2 double values in sequence: the real and imaginary parts,
-     * the size of new matrix will be equal to values.length / 2.
+     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+     * matrix, and vice-versa. Due to the fact that complex data is represented
+     * by 2 double values in sequence: the real and imaginary parts, the size of
+     * new matrix will be equal to values.length / 2.
      * 
      * @param values
      *            The values to be filled into the new matrix.
@@ -181,7 +181,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             b[1] = Double.NaN;
             return b;
         }
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final double[] elemsOther = (double[]) other.elements();
         double[] a = null;
@@ -442,7 +442,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         final int strideOther = other.stride;
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
 
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -489,7 +489,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         }
         checkSize(y);
         final double[] elemsOther = (double[]) y.elements();
-        final int zeroOther = (int)y.index(0);
+        final int zeroOther = (int) y.index(0);
         final int strideOther = y.stride();
 
         if (elements == null || elemsOther == null)
@@ -599,7 +599,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             return super.assignImaginary(other);
         }
         checkSize(other);
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final double[] elemsOther = (double[]) other.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -619,7 +619,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
                         for (int i = startidx; i < stopidx; i++) {
-//                            elements[idx] = 0;
+                            //                            elements[idx] = 0;
                             elements[idx + 1] = elemsOther[idxOther];
                             idx += stride;
                             idxOther += strideOther;
@@ -632,7 +632,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             int idx = zero;
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
-//                elements[idx] = 0;
+                //                elements[idx] = 0;
                 elements[idx + 1] = elemsOther[idxOther];
                 idx += stride;
                 idxOther += strideOther;
@@ -646,7 +646,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             return super.assignReal(other);
         }
         checkSize(other);
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final double[] elemsOther = (double[]) other.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -667,7 +667,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
                         int idxOther = zeroOther + startidx * strideOther;
                         for (int i = startidx; i < stopidx; i++) {
                             elements[idx] = elemsOther[idxOther];
-//                            elements[idx + 1] = 0;
+                            //                            elements[idx + 1] = 0;
                             idx += stride;
                             idxOther += strideOther;
                         }
@@ -680,7 +680,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
                 elements[idx] = elemsOther[idxOther];
-//                elements[idx + 1] = 0;
+                //                elements[idx + 1] = 0;
                 idx += stride;
                 idxOther += strideOther;
             }
@@ -694,12 +694,12 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
      * number.
      */
     public void fft() {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
-        
+
         if (isNoView) {
             fft.complexForward(elements);
         } else {
@@ -707,7 +707,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
             fft.complexForward((double[]) copy.elements());
             this.assign((double[]) copy.elements());
         }
-    	ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     public double[] elements() {
@@ -717,7 +717,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     public DoubleMatrix1D getImaginaryPart() {
         final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(size);
         final double[] elemsOther = (double[]) Im.elements();
-        final int zeroOther = (int)Im.index(0);
+        final int zeroOther = (int) Im.index(0);
         final int strideOther = Im.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -784,7 +784,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
     public DoubleMatrix1D getRealPart() {
         final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(size);
         final double[] elemsOther = (double[]) R.elements();
-        final int zeroOther = (int)R.index(0);
+        final int zeroOther = (int) R.index(0);
         final int strideOther = R.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -832,8 +832,8 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
      *            if true, then scaling is performed.
      */
     public void ifft(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
@@ -861,7 +861,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         }
         DComplexMatrix2D M = new DenseDComplexMatrix2D(rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0);
+        final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -916,7 +916,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         }
         DComplexMatrix3D M = new DenseDComplexMatrix3D(slices, rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0, 0);
+        final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
@@ -995,7 +995,7 @@ public class DenseDComplexMatrix1D extends DComplexMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         final int strideOther = y.stride;
-        final int zeroOther = (int)y.index(0);
+        final int zeroOther = (int) y.index(0);
 
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {

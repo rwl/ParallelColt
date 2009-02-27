@@ -135,7 +135,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
      *            the number of elements between two columns, i.e.
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @param isView
-     *             if true then a matrix view is constructed
+     *            if true then a matrix view is constructed
      * @throws IllegalArgumentException
      *             if
      *             <tt>rows<0 || columns<0 || (int)columns*rows > Integer.MAX_VALUE</tt>
@@ -150,7 +150,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     public int aggregate(final cern.colt.function.tint.IntIntFunction aggr, final cern.colt.function.tint.IntFunction f) {
         if (size() == 0)
             throw new IllegalArgumentException("size == 0");
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int a = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -197,7 +197,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     public int aggregate(final cern.colt.function.tint.IntIntFunction aggr, final cern.colt.function.tint.IntFunction f, final cern.colt.function.tint.IntProcedure cond) {
         if (size() == 0)
             throw new IllegalArgumentException("size == 0");
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int a = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -257,7 +257,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     public int aggregate(final cern.colt.function.tint.IntIntFunction aggr, final cern.colt.function.tint.IntFunction f, final IntArrayList rowList, final IntArrayList columnList) {
         if (size() == 0)
             throw new IllegalArgumentException("size == 0");
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         final int size = rowList.size();
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
@@ -307,8 +307,8 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         checkShape(other);
         if (size() == 0)
             throw new IllegalArgumentException("size == 0");
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)other.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
         final int rowStrideOther = other.rowStride();
         final int colStrideOther = other.columnStride();
         final int[] elemsOther = (int[]) other.elements();
@@ -359,7 +359,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         final int[] elems = this.elements;
         if (elems == null)
             throw new InternalError();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             if (function instanceof cern.jet.math.tint.IntMult) { // x[i] =
@@ -442,7 +442,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     }
 
     public IntMatrix2D assign(final cern.colt.function.tint.IntProcedure cond, final cern.colt.function.tint.IntFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -492,7 +492,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     }
 
     public IntMatrix2D assign(final cern.colt.function.tint.IntProcedure cond, final int value) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -543,7 +543,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
 
     public IntMatrix2D assign(final int value) {
         final int[] elems = this.elements;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -610,7 +610,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
                 System.arraycopy(values, 0, this.elements, 0, values.length);
             }
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = rows / np;
@@ -696,7 +696,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
                 }
             }
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = rows / np;
@@ -792,8 +792,8 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         final int[] elemsOther = other.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -851,8 +851,8 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         final int[] elemsOther = other.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1062,8 +1062,8 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
         final int[] elemsOther = (int[]) y.elements();
-        final int zeroOther = (int)y.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) y.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = y.columnStride();
         final int rowStrideOther = y.rowStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1108,7 +1108,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     public int cardinality() {
         int cardinality = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
@@ -1169,7 +1169,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     }
 
     public IntMatrix2D forEachNonZero(final cern.colt.function.tint.IntIntIntFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1219,7 +1219,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 int value = elements[i];
@@ -1238,7 +1238,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 int value = elements[i];
@@ -1257,7 +1257,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 int value = elements[i];
@@ -1291,7 +1291,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     public int[] getMaxLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int maxValue = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1369,7 +1369,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     public int[] getMinLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int minValue = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1451,7 +1451,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
     public int[][] toArray() {
         final int[][] values = new int[rows][columns];
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = rows / np;
@@ -1494,8 +1494,8 @@ public class DenseIntMatrix2D extends IntMatrix2D {
 
     public IntMatrix1D vectorize() {
         final DenseIntMatrix1D v = new DenseIntMatrix1D(size());
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)v.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) v.index(0);
         final int strideOther = v.stride();
         final int[] elemsOther = (int[]) v.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1558,9 +1558,9 @@ public class DenseIntMatrix2D extends IntMatrix2D {
 
         final int[] elemsY = (int[]) y.elements();
         final int[] elemsZ = (int[]) z_loc.elements();
-        final int zero = (int)index(0, 0);
-        final int zeroY = (int)y.index(0);
-        final int zeroZ = (int)z_loc.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroY = (int) y.index(0);
+        final int zeroZ = (int) z_loc.index(0);
         final int strideY = y.stride();
         final int strideZ = z_loc.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1621,9 +1621,9 @@ public class DenseIntMatrix2D extends IntMatrix2D {
 
         final int[] elemsY = (int[]) y.elements();
         final int[] elemsZ = (int[]) z_loc.elements();
-        final int zero = (int)index(0, 0);
-        final int zeroY = (int)y.index(0);
-        final int zeroZ = (int)z_loc.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroY = (int) y.index(0);
+        final int zeroZ = (int) z_loc.index(0);
         final int strideY = y.stride();
         final int strideZ = z_loc.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1701,9 +1701,9 @@ public class DenseIntMatrix2D extends IntMatrix2D {
             throw new InternalError();
         final int strideY = y.stride();
         final int strideZ = z_loc.stride();
-        final int zero = (int)index(0, 0);
-        final int zeroY = (int)y.index(0);
-        final int zeroZ = (int)z_loc.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroY = (int) y.index(0);
+        final int zeroZ = (int) z_loc.index(0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1757,7 +1757,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         z = z_loc;
         return z;
     }
-    
+
     public IntMatrix2D zMult(final IntMatrix2D B, IntMatrix2D C) {
         final int m = rows;
         final int n = columns;
@@ -1788,12 +1788,12 @@ public class DenseIntMatrix2D extends IntMatrix2D {
 
         long flops = 2L * m * n * p;
         int noOfTasks = (int) Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each thread should process at least 30000 flops
-        
-//        int np = ConcurrencyUtils.getNumberOfProcessors();
-//        int noOfTasks = 1;
-//        if ((np > 1) && (B.size() >= ConcurrencyUtils.getThreadsBeginN_2D())){
-//            noOfTasks = np;
-//        }
+
+        //        int np = ConcurrencyUtils.getNumberOfProcessors();
+        //        int noOfTasks = 1;
+        //        if ((np > 1) && (B.size() >= ConcurrencyUtils.getThreadsBeginN_2D())){
+        //            noOfTasks = np;
+        //        }
         boolean splitB = (p >= noOfTasks);
         int width = splitB ? p : m;
         noOfTasks = Math.min(width, noOfTasks);
@@ -1940,7 +1940,7 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         int sum = 0;
         if (elements == null)
             throw new InternalError();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -2053,9 +2053,9 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         if (m % m_optimal != 0)
             blocks++;
         for (; --blocks >= 0;) {
-            int jB = (int)BB.index(0, 0);
-            int indexA = (int)index(rr, 0);
-            int jC = (int)CC.index(rr, 0);
+            int jB = (int) BB.index(0, 0);
+            int indexA = (int) index(rr, 0);
+            int jC = (int) CC.index(rr, 0);
             rr += m_optimal;
             if (blocks == 0)
                 m_optimal += m - rr;
@@ -2090,7 +2090,6 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         return C;
     }
 
-    
     private IntMatrix2D zMultSeq(IntMatrix2D B, IntMatrix2D C, int alpha, int beta, boolean transposeA, boolean transposeB) {
         if (transposeA)
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);
@@ -2151,9 +2150,9 @@ public class DenseIntMatrix2D extends IntMatrix2D {
         if (m % m_optimal != 0)
             blocks++;
         for (; --blocks >= 0;) {
-            int jB = (int)BB.index(0, 0);
-            int indexA = (int)index(rr, 0);
-            int jC = (int)CC.index(rr, 0);
+            int jB = (int) BB.index(0, 0);
+            int indexA = (int) index(rr, 0);
+            int jC = (int) CC.index(rr, 0);
             rr += m_optimal;
             if (blocks == 0)
                 m_optimal += m - rr;

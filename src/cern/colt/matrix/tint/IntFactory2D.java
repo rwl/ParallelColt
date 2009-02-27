@@ -15,53 +15,48 @@ import cern.colt.matrix.tint.impl.SparseIntMatrix2D;
 /**
  * Factory for convenient construction of 2-d matrices holding <tt>int</tt>
  * cells. Also provides convenient methods to compose (concatenate) and
- * decompose (split) matrices from/to constituent blocks.
- * </p>
+ * decompose (split) matrices from/to constituent blocks. </p>
  * <p>
  * &nbsp;
  * </p>
  * <table border="0" cellspacing="0">
  * <tr align="left" valign="top">
  * <td><i>Construction</i></td>
- * <td>Use idioms like <tt>IntFactory2D.dense.make(4,4)</tt> to construct
- * dense matrices, <tt>IntFactory2D.sparse.make(4,4)</tt> to construct
- * sparse matrices.</td>
+ * <td>Use idioms like <tt>IntFactory2D.dense.make(4,4)</tt> to construct dense
+ * matrices, <tt>IntFactory2D.sparse.make(4,4)</tt> to construct sparse
+ * matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Construction with initial values </i></td>
- * <td>Use other <tt>make</tt> methods to construct matrices with given
- * initial values. </td>
+ * <td>Use other <tt>make</tt> methods to construct matrices with given initial
+ * values.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Appending rows and columns </i></td>
- * <td>Use methods
- * {@link #appendColumns(IntMatrix2D,IntMatrix2D) appendColumns},
- * {@link #appendColumns(IntMatrix2D,IntMatrix2D) appendRows} and {@link 
- * #repeat(IntMatrix2D,int,int) repeat} to append rows and columns. </td>
+ * <td>Use methods {@link #appendColumns(IntMatrix2D,IntMatrix2D) appendColumns}, {@link #appendColumns(IntMatrix2D,IntMatrix2D) appendRows} and
+ * {@link #repeat(IntMatrix2D,int,int) repeat} to append rows and columns.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> General block matrices </i></td>
  * <td>Use methods {@link #compose(IntMatrix2D[][]) compose} and
- * {@link #decompose(IntMatrix2D[][],IntMatrix2D)  decompose} to work with
- * general block matrices. </td>
+ * {@link #decompose(IntMatrix2D[][],IntMatrix2D) decompose} to work with
+ * general block matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Diagonal matrices </i></td>
- * <td>Use methods {@link #diagonal(IntMatrix1D) diagonal(vector)}, {@link 
- * #diagonal(IntMatrix2D) diagonal(matrix)} and
- * {@link #identity(int) identity} to work with diagonal matrices. </td>
+ * <td>Use methods {@link #diagonal(IntMatrix1D) diagonal(vector)},
+ * {@link #diagonal(IntMatrix2D) diagonal(matrix)} and {@link #identity(int)
+ * identity} to work with diagonal matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Diagonal block matrices </i></td>
- * <td>Use method
- * {@link #composeDiagonal(IntMatrix2D,IntMatrix2D,IntMatrix2D) 
- * composeDiagonal} to work with diagonal block matrices. </td>
+ * <td>Use method {@link #composeDiagonal(IntMatrix2D,IntMatrix2D,IntMatrix2D)
+ * composeDiagonal} to work with diagonal block matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i>Random</i></td>
  * <td>Use methods {@link #random(int,int) random} and
- * {@link #sample(int,int,int,int)  sample} to construct random matrices.
- * </td>
+ * {@link #sample(int,int,int,int) sample} to construct random matrices.</td>
  * </tr>
  * </table>
  * <p>
@@ -129,7 +124,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *   --&gt;
      *   0 1 2 6 7 
      *   3 4 5 8 9
-     *  
+     * 
      * </pre>
      */
     public IntMatrix2D appendColumns(IntMatrix2D A, IntMatrix2D B) {
@@ -183,7 +178,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *   4 5
      *   6 7
      *   8 9
-     *  
+     * 
      * </pre>
      */
     public IntMatrix2D appendRows(IntMatrix2D A, IntMatrix2D B) {
@@ -227,7 +222,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * <pre>
      *   0 1 2 
      *   3 4 5
-     *  
+     * 
      * </pre>
      */
     public IntMatrix2D ascending(int rows, int columns) {
@@ -294,11 +289,12 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * method {@link #decompose(IntMatrix2D[][], IntMatrix2D)}.
      * <p>
      * All matrices of a given column within <tt>parts</tt> must have the same
-     * number of columns. All matrices of a given row within <tt>parts</tt>
-     * must have the same number of rows. Otherwise an
+     * number of columns. All matrices of a given row within <tt>parts</tt> must
+     * have the same number of rows. Otherwise an
      * <tt>IllegalArgumentException</tt> is thrown. Note that <tt>null</tt>s
      * within <tt>parts[row,col]</tt> are an exception to this rule: they are
-     * ignored. Cells are copied. Example: <table border="1" cellspacing="0">
+     * ignored. Cells are copied. Example:
+     * <table border="1" cellspacing="0">
      * <tr align="left" valign="top">
      * <td><tt>Code</tt></td>
      * <td><tt>Result</tt></td>
@@ -456,7 +452,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * <pre>
      *   A 0
      *   0 B
-     *  
+     * 
      * </pre>
      * 
      * (The direct sum has <tt>A.rows()+B.rows()</tt> rows and
@@ -483,7 +479,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *   A 0 0
      *   0 B 0
      *   0 0 C
-     *  
+     * 
      * </pre>
      * 
      * from the given parts. Cells are copied.
@@ -513,11 +509,12 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * {@link #compose(IntMatrix2D[][])}.
      * <p>
      * All matrices of a given column within <tt>parts</tt> must have the same
-     * number of columns. All matrices of a given row within <tt>parts</tt>
-     * must have the same number of rows. Otherwise an
+     * number of columns. All matrices of a given row within <tt>parts</tt> must
+     * have the same number of rows. Otherwise an
      * <tt>IllegalArgumentException</tt> is thrown. Note that <tt>null</tt>s
      * within <tt>parts[row,col]</tt> are an exception to this rule: they are
-     * ignored. Cells are copied. Example: <table border="1" cellspacing="0">
+     * ignored. Cells are copied. Example:
+     * <table border="1" cellspacing="0">
      * <tr align="left" valign="top">
      * <td><tt>Code</tt></td>
      * <td><tt>matrix</tt></td>
@@ -543,7 +540,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *   System.out.println(&quot;\nB = &quot;+B);
      *   System.out.println(&quot;\nC = &quot;+C);
      *   System.out.println(&quot;\nD = &quot;+D);
-     *  
+     * 
      * </pre>
      * 
      * </td>
@@ -740,7 +737,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * <pre>
      *   5 4 3 
      *   2 1 0
-     *  
+     * 
      * </pre>
      */
     public IntMatrix2D descending(int rows, int columns) {
@@ -764,7 +761,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *   5 0 0
      *   0 4 0
      *   0 0 3
-     *  
+     * 
      * </pre>
      * 
      * @return a new matrix.
@@ -788,7 +785,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *   5 0 0
      *   0 4 0
      *   0 0 3
-     *  
+     * 
      * </pre>
      * 
      * @return a new matrix.
@@ -803,15 +800,15 @@ public class IntFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a new vector consisting of the diagonal elements of <tt>A</tt>.
-     * Cells values are copied. The new vector is not a view. Example:
+     * Constructs a new vector consisting of the diagonal elements of <tt>A</tt>
+     * . Cells values are copied. The new vector is not a view. Example:
      * 
      * <pre>
      *   5 0 0 9
      *   0 4 0 9
      *   0 0 3 9
      *   --&gt; 5 4 3
-     *  
+     * 
      * </pre>
      * 
      * @param A
@@ -851,7 +848,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
      */
     public IntMatrix2D make(int[][] values) {
         if (this == sparse)
@@ -863,8 +861,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
     /**
      * Construct a matrix from a one-dimensional column-major packed array, ala
      * Fortran. Has the form
-     * <tt>matrix.get(row,column) == values[row + column*rows]</tt>. The
-     * values are copied.
+     * <tt>matrix.get(row,column) == values[row + column*rows]</tt>. The values
+     * are copied.
      * 
      * @param values
      *            One-dimensional array of doubles, packed by columns (ala
@@ -872,8 +870,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * @param rows
      *            the number of rows.
      * @exception IllegalArgumentException
-     *                <tt>values.length</tt> must be a multiple of
-     *                <tt>rows</tt>.
+     *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
+     *                .
      */
     public IntMatrix2D make(int values[], int rows) {
         int columns = (rows != 0 ? values.length / rows : 0);
@@ -941,7 +939,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      *   2 3 2 3 2 3
      *   0 1 0 1 0 1
      *   2 3 2 3 2 3
-     *  
+     * 
      * </pre>
      */
     public IntMatrix2D repeat(IntMatrix2D A, int rowRepeat, int columnRepeat) {
@@ -959,10 +957,10 @@ public class IntFactory2D extends cern.colt.PersistentObject {
     /**
      * Constructs a randomly sampled matrix with the given shape. Randomly picks
      * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
-     * initializes them to <tt>value</tt>, all the rest will be initialized
-     * to zero. Note that this is not the same as setting each cell with
-     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The
-     * random seed is a constant.
+     * initializes them to <tt>value</tt>, all the rest will be initialized to
+     * zero. Note that this is not the same as setting each cell with
+     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
+     * seed is a constant.
      * 
      * @throws IllegalArgumentException
      *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
@@ -977,10 +975,10 @@ public class IntFactory2D extends cern.colt.PersistentObject {
     /**
      * Modifies the given matrix to be a randomly sampled matrix. Randomly picks
      * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
-     * initializes them to <tt>value</tt>, all the rest will be initialized
-     * to zero. Note that this is not the same as setting each cell with
-     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The
-     * random seed is a constant.
+     * initializes them to <tt>value</tt>, all the rest will be initialized to
+     * zero. Note that this is not the same as setting each cell with
+     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
+     * seed is a constant.
      * 
      * @throws IllegalArgumentException
      *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.

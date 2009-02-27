@@ -10,9 +10,9 @@ package cern.colt.matrix;
 
 /**
  * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding objects or
- * primitive data types such as <code>int</code>, <code>double</code>,
- * etc. First see the <a href="package-summary.html">package summary</a> and
- * javadoc <a href="package-tree.html">tree view</a> to get the broad picture.
+ * primitive data types such as <code>int</code>, <code>double</code>, etc.
+ * First see the <a href="package-summary.html">package summary</a> and javadoc
+ * <a href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Note that this implementation is not synchronized.</b>
  * 
@@ -208,9 +208,9 @@ public abstract class AbstractMatrix1D extends AbstractMatrix {
     }
 
     /**
-     * Self modifying version of viewFlip(). What used to be index <tt>0</tt>
-     * is now index <tt>size()-1</tt>, ..., what used to be index
-     * <tt>size()-1</tt> is now index <tt>0</tt>.
+     * Self modifying version of viewFlip(). What used to be index <tt>0</tt> is
+     * now index <tt>size()-1</tt>, ..., what used to be index <tt>size()-1</tt>
+     * is now index <tt>0</tt>.
      */
     protected AbstractMatrix1D vFlip() {
         if (size > 0) {

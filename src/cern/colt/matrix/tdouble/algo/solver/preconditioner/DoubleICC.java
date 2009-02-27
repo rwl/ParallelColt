@@ -64,7 +64,7 @@ public class DoubleICC implements DoublePreconditioner {
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
         // R'y = b, y = R'\b
         upperTransSolve(b, y);
-        
+
         // Rx = R'\b = y
         return upperSolve(y, x);
     }

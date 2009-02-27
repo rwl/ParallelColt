@@ -35,10 +35,8 @@ import cern.colt.matrix.tobject.ObjectMatrix3D;
  * manually be reclaimed by calling {@link #trimToSize()}.
  * </ul>
  * <p>
- * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>.
- * <br>
- * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>.
- * <br>
+ * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>. <br>
+ * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>. <br>
  * Where <tt>nonZeros = cardinality()</tt> is the number of non-zero cells.
  * Thus, a 100 x 100 x 100 matrix with minLoadFactor=0.25 and maxLoadFactor=0.5
  * and 1000000 non-zero cells consumes between 25 MB and 50 MB. The same 100 x
@@ -48,11 +46,11 @@ import cern.colt.matrix.tobject.ObjectMatrix3D;
  * <p>
  * This class offers <i>expected</i> time complexity <tt>O(1)</tt> (i.e.
  * constant time) for the basic operations <tt>get</tt>, <tt>getQuick</tt>,
- * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash
- * function disperses the elements properly among the buckets. Otherwise,
- * pathological cases, although highly improbable, can occur, degrading
- * performance to <tt>O(N)</tt> in the worst case. As such this sparse class
- * is expected to have no worse time complexity than its dense counterpart
+ * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash function
+ * disperses the elements properly among the buckets. Otherwise, pathological
+ * cases, although highly improbable, can occur, degrading performance to
+ * <tt>O(N)</tt> in the worst case. As such this sparse class is expected to
+ * have no worse time complexity than its dense counterpart
  * {@link DenseObjectMatrix2D}. However, constant factors are considerably
  * larger.
  * <p>
@@ -108,10 +106,12 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>.
+     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>
+     *             .
      */
     public SparseObjectMatrix3D(Object[][][] values) {
         this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
@@ -139,8 +139,8 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
 
     /**
      * Constructs a matrix with a given number of slices, rows and columns using
-     * memory as specified. All entries are initially <tt>null</tt>. For
-     * details related to memory usage see
+     * memory as specified. All entries are initially <tt>null</tt>. For details
+     * related to memory usage see
      * {@link cern.colt.map.tobject.OpenIntObjectHashMap}.
      * 
      * @param slices
@@ -158,7 +158,9 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
      *            the maximum load factor of the hash map.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if <tt>(double)slices*columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException
@@ -215,7 +217,7 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
         else
             return super.cardinality();
     }
-    
+
     /**
      * Returns the elements of this matrix.
      * 
@@ -224,7 +226,6 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
     public AbstractIntObjectMap elements() {
         return elements;
     }
-
 
     /**
      * Ensures that the receiver can hold at least the specified number of
@@ -273,8 +274,7 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(ObjectMatrix3D other) {
         if (other instanceof SelectedSparseObjectMatrix3D) {
@@ -330,10 +330,10 @@ public class SparseObjectMatrix3D extends ObjectMatrix3D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseObjectMatrix3D</tt> the new matrix must also
-     * be of type <tt>DenseObjectMatrix2D</tt>, if the receiver is an
-     * instance of type <tt>SparseObjectMatrix3D</tt> the new matrix must also
-     * be of type <tt>SparseObjectMatrix2D</tt>, etc.
+     * instance of type <tt>DenseObjectMatrix3D</tt> the new matrix must also be
+     * of type <tt>DenseObjectMatrix2D</tt>, if the receiver is an instance of
+     * type <tt>SparseObjectMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseObjectMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.

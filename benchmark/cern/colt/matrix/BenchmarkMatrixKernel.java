@@ -249,6 +249,7 @@ public class BenchmarkMatrixKernel {
 
     /**
      * Displays properties.
+     * 
      * @param size
      */
     public static void displayProperties(int[] size) {

@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
+import java.security.CodeSource;
 
 /**
  * JCublas - Java bindings for CUBLAS, the NVIDIA CUDA BLAS library<br />
@@ -144,7 +145,7 @@ public class JCublas {
      * @throws URISyntaxException
      * @throws UnsatisfiedLinkError
      */
-    public static int cublasInit() throws UnsatisfiedLinkError, URISyntaxException, IOException {
+    public static int cublasInit() throws Throwable {
         return cublasInit(defaultEmulation);
     }
 
@@ -164,16 +165,27 @@ public class JCublas {
      * @param emulation
      *            Indicates whether emulation mode should be used
      * @return The status result of cublasInit
-     * @throws URISyntaxException
-     * @throws IOException
+     * @throws Throwable
      */
-    public static int cublasInit(boolean emulation) throws URISyntaxException, IOException, UnsatisfiedLinkError {
-        File jarFile = null;
-        jarFile = new File(jcuda.jcublas.JCublas.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        if (emulation) {
-            System.load(jarFile.getParentFile().getCanonicalPath().toString() + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + getNativeLibraryName("JCublasEmu"));
-        } else {
-            System.load(jarFile.getParentFile().getCanonicalPath().toString() + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + getNativeLibraryName("JCublas"));
+    public static int cublasInit(boolean emulation) throws Throwable {
+        try {
+            if (emulation) {
+                System.loadLibrary("JCublasEmu");
+            } else {
+                System.loadLibrary("JCublas");
+            }
+        } catch (Throwable e) {
+            CodeSource sc = jcuda.jcublas.JCublas.class.getProtectionDomain().getCodeSource();
+            if (sc == null) {
+                throw new NullPointerException("sc == null");
+            } else {
+                File jarFile = new File(sc.getLocation().toURI());
+                if (emulation) {
+                    System.load(jarFile.getParentFile().getCanonicalPath().toString() + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + getNativeLibraryName("JCublasEmu"));
+                } else {
+                    System.load(jarFile.getParentFile().getCanonicalPath().toString() + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + getNativeLibraryName("JCublas"));
+                }
+            }
         }
         return cublasInitNative();
     }

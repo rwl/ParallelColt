@@ -15,17 +15,17 @@ import cern.colt.matrix.tobject.ObjectMatrix3D;
 
 /**
  * Matrix quicksorts and mergesorts. Use idioms like
- * <tt>Sorting.quickSort.sort(...)</tt> and
- * <tt>Sorting.mergeSort.sort(...)</tt>.
+ * <tt>Sorting.quickSort.sort(...)</tt> and <tt>Sorting.mergeSort.sort(...)</tt>
+ * .
  * <p>
  * This is another case demonstrating one primary goal of this library:
  * Delivering easy to use, yet very efficient APIs. The sorts return convenient
- * <i>sort views</i>. This enables the usage of algorithms which scale well
- * with the problem size: For example, sorting a 1000000 x 10000 or a 1000000 x
- * 100 x 100 matrix performs just as fast as sorting a 1000000 x 1 matrix. This
- * is so, because internally the algorithms only move around integer indexes,
- * they do not physically move around entire rows or slices. The original matrix
- * is left unaffected.
+ * <i>sort views</i>. This enables the usage of algorithms which scale well with
+ * the problem size: For example, sorting a 1000000 x 10000 or a 1000000 x 100 x
+ * 100 matrix performs just as fast as sorting a 1000000 x 1 matrix. This is so,
+ * because internally the algorithms only move around integer indexes, they do
+ * not physically move around entire rows or slices. The original matrix is left
+ * unaffected.
  * <p>
  * The quicksort is a derivative of the JDK 1.2 V1.26 algorithms (which are, in
  * turn, based on Bentley's and McIlroy's fine work). The mergesort is a
@@ -87,7 +87,8 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      * the returned view are reflected in this matrix, and vice-versa. To sort
      * ranges use sub-ranging views. To sort descending, use flip views ...
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt> 7, 1, 3, 1<br>
      </tt></td>
@@ -180,7 +181,8 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      * sort columns by rows, use dice views. To sort descending, use flip views
      * ...
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>4 x 2 matrix: <br>
      7, 6<br>
@@ -331,7 +333,8 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      *         that the original matrix is left unaffected.</b>
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>row < 0 || row >= matrix.rows() || column < 0 || column >= matrix.columns()</tt>.
+     *             <tt>row < 0 || row >= matrix.rows() || column < 0 || column >= matrix.columns()</tt>
+     *             .
      */
     public ObjectMatrix3D sort(ObjectMatrix3D matrix, int row, int column) {
         if (row < 0 || row >= matrix.rows())

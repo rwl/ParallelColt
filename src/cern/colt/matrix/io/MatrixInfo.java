@@ -117,17 +117,13 @@ public class MatrixInfo {
      */
     private void validate() {
         if (isDense() && isPattern())
-            throw new IllegalArgumentException(
-                    "Matrix cannot be dense with pattern storage");
+            throw new IllegalArgumentException("Matrix cannot be dense with pattern storage");
         if (isReal() && isHermitian())
-            throw new IllegalArgumentException(
-                    "Data cannot be real with hermitian symmetry");
+            throw new IllegalArgumentException("Data cannot be real with hermitian symmetry");
         if (!isComplex() && isHermitian())
-            throw new IllegalArgumentException(
-                    "Data must be complex with hermitian symmetry");
+            throw new IllegalArgumentException("Data must be complex with hermitian symmetry");
         if (isPattern() && isSkewSymmetric())
-            throw new IllegalArgumentException(
-                    "Storage cannot be pattern and skew symmetrical");
+            throw new IllegalArgumentException("Storage cannot be pattern and skew symmetrical");
     }
 
     /**
@@ -187,8 +183,8 @@ public class MatrixInfo {
     }
 
     /**
-     * Returns <code>true</code> if the matrix does not store any numbers,
-     * else <code>false</code>
+     * Returns <code>true</code> if the matrix does not store any numbers, else
+     * <code>false</code>
      */
     public boolean isPattern() {
         return field == MatrixField.Pattern;

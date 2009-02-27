@@ -14,15 +14,14 @@ import cern.jet.stat.tdouble.Probability;
 /**
  * Gamma distribution; <A
  * HREF="http://wwwinfo.cern.ch/asdoc/shortwrupsdir/g106/top.html"> math
- * definition</A>, <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node96.html#SECTION000960000000000000000">
- * definition of gamma function</A> and <A
+ * definition</A>, <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node96.html#SECTION000960000000000000000"
+ * > definition of gamma function</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosf.html#Gamma Distribution">
  * animated definition</A>.
  * <p>
  * <tt>p(x) = k * x^(alpha-1) * e^(-x/beta)</tt> with
- * <tt>k = 1/(g(alpha) * b^a))</tt> and <tt>g(a)</tt> being the gamma
- * function.
+ * <tt>k = 1/(g(alpha) * b^a))</tt> and <tt>g(a)</tt> being the gamma function.
  * <p>
  * Valid parameter ranges: <tt>alpha &gt; 0</tt>.
  * <p>
@@ -37,17 +36,17 @@ import cern.jet.stat.tdouble.Probability;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b>
- * <dt> Method: Acceptance Rejection combined with Acceptance Complement.
- * <dt> High performance implementation. This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandGamma.html">RandGamma</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++). CLHEP's implementation, in turn, is based on <tt>gds.c</tt> from the
- * <A HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
- * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
+ * <dt>Method: Acceptance Rejection combined with Acceptance Complement.
+ * <dt>High performance implementation. This is a port of <A HREF=
+ * "http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandGamma.html"
+ * >RandGamma</A> used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP
+ * 1.4.0</A> (C++). CLHEP's implementation, in turn, is based on <tt>gds.c</tt>
+ * from the <A HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND
+ * / WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * J.H. Ahrens, U. Dieter (1974): Computer methods for sampling from gamma,
  * beta, Poisson and binomial distributions, Computing 12, 223-246.
@@ -106,10 +105,10 @@ public class Gamma extends AbstractContinousDoubleDistribution {
          * distribution with parameter a > 0. * Acceptance Rejection gs for a <
          * 1 , * Acceptance Complement gd for a >= 1 . * REFERENCES: - J.H.
          * Ahrens, U. Dieter (1974): Computer methods * for sampling from gamma,
-         * beta, Poisson and * binomial distributions, Computing 12, 223-246. * -
-         * J.H. Ahrens, U. Dieter (1982): Generating gamma * variates by a
-         * modified rejection technique, * Communications of the ACM 25, 47-54. *
-         * SUBPROGRAMS: - drand(seed) ... (0,1)-Uniform generator with *
+         * beta, Poisson and * binomial distributions, Computing 12, 223-246. *
+         * - J.H. Ahrens, U. Dieter (1982): Generating gamma * variates by a
+         * modified rejection technique, * Communications of the ACM 25, 47-54.
+         * * SUBPROGRAMS: - drand(seed) ... (0,1)-Uniform generator with *
          * unsigned long integer *seed * - NORMAL(seed) ... Normal generator
          * N(0,1). * *
          **********************************************************************/

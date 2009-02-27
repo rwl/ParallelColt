@@ -15,7 +15,7 @@ public class DoubleQMRILUTTest extends DoubleQMRTest {
     @Override
     protected void createSolver() throws Exception {
         super.createSolver();
-        M = new DoubleILUT((RCMDoubleMatrix2D)(new RCMDoubleMatrix2D(A.rows(), A.columns()).assign(A)));
+        M = new DoubleILUT((RCMDoubleMatrix2D) (new RCMDoubleMatrix2D(A.rows(), A.columns()).assign(A)));
     }
 
 }

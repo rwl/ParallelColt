@@ -172,7 +172,8 @@ public abstract class AbstractMatrix2D extends AbstractMatrix {
      * 
      * @throws IllegalArgumentException
      *             if
-     *             <tt>columns() != B.columns() || rows() != B.rows() || columns() != C.columns() || rows() != C.rows()</tt>.
+     *             <tt>columns() != B.columns() || rows() != B.rows() || columns() != C.columns() || rows() != C.rows()</tt>
+     *             .
      */
     public void checkShape(AbstractMatrix2D B, AbstractMatrix2D C) {
         if (columns != B.columns || rows != B.rows || columns != C.columns || rows != C.rows)
@@ -229,7 +230,8 @@ public abstract class AbstractMatrix2D extends AbstractMatrix {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>.
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+     *             .
      */
     protected void setUp(int rows, int columns) {
         setUp(rows, columns, 0, 0, columns, 1);

@@ -16,8 +16,8 @@ public class DenseDComplexMatrix3DTest extends DComplexMatrix3DTest {
 
     public void testFft3() {
         DComplexMatrix3D Acopy = A.copy();
-        ((DenseDComplexMatrix3D)A).fft3();
-        ((DenseDComplexMatrix3D)A).ifft3(true);
+        ((DenseDComplexMatrix3D) A).fft3();
+        ((DenseDComplexMatrix3D) A).ifft3(true);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
@@ -26,11 +26,11 @@ public class DenseDComplexMatrix3DTest extends DComplexMatrix3DTest {
             }
         }
     }
-    
+
     public void testFft2Slices() {
         DComplexMatrix3D Acopy = A.copy();
-        ((DenseDComplexMatrix3D)A).fft2Slices();
-        ((DenseDComplexMatrix3D)A).ifft2Slices(true);
+        ((DenseDComplexMatrix3D) A).fft2Slices();
+        ((DenseDComplexMatrix3D) A).ifft2Slices(true);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {

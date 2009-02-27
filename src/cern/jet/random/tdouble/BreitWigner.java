@@ -11,19 +11,18 @@ package cern.jet.random.tdouble;
 import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 
 /**
- * BreitWigner (aka Lorentz) distribution; See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node23.html#SECTION000230000000000000000">
- * math definition</A>. A more general form of the Cauchy distribution.
+ * BreitWigner (aka Lorentz) distribution; See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node23.html#SECTION000230000000000000000"
+ * > math definition</A>. A more general form of the Cauchy distribution.
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
- * <b>Implementation:</b> This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandBreitWigner.html">RandBreitWigner</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++).
+ * <b>Implementation:</b> This is a port of <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandBreitWigner.html"
+ * >RandBreitWigner</A> used in <A
+ * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A> (C++).
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
@@ -42,8 +41,7 @@ public class BreitWigner extends AbstractContinousDoubleDistribution {
      * Constructs a BreitWigner distribution.
      * 
      * @param cut
-     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't
-     *            cut".
+     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
     public BreitWigner(double mean, double gamma, double cut, DoubleRandomEngine randomGenerator) {
         setRandomGenerator(randomGenerator);
@@ -62,8 +60,7 @@ public class BreitWigner extends AbstractContinousDoubleDistribution {
      * state.
      * 
      * @param cut
-     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't
-     *            cut".
+     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
     public double nextDouble(double mean, double gamma, double cut) {
         double val, rval, displ;
@@ -87,8 +84,7 @@ public class BreitWigner extends AbstractContinousDoubleDistribution {
      * Sets the mean, gamma and cut parameters.
      * 
      * @param cut
-     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't
-     *            cut".
+     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
     public void setState(double mean, double gamma, double cut) {
         this.mean = mean;
@@ -100,8 +96,7 @@ public class BreitWigner extends AbstractContinousDoubleDistribution {
      * Returns a random number from the distribution.
      * 
      * @param cut
-     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't
-     *            cut".
+     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
     public static double staticNextDouble(double mean, double gamma, double cut) {
         synchronized (shared) {

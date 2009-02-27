@@ -11,8 +11,8 @@ package cern.colt.matrix.tbit;
 /**
  * Fixed sized (non resizable) bitvector. Upon instance construction a bitvector
  * is told to hold a fixed number of bits - it's size. The size can be any
- * number (need not be a power of 2 or so). The bits of a <tt>BitVector</tt>
- * are indexed by nonnegative integers. Any attempt to access a bit at an
+ * number (need not be a power of 2 or so). The bits of a <tt>BitVector</tt> are
+ * indexed by nonnegative integers. Any attempt to access a bit at an
  * <tt>index&lt;0 || index&gt;=size()</tt> will throw an
  * <tt>IndexOutOfBoundsException</tt>.
  * <p>
@@ -44,16 +44,15 @@ package cern.colt.matrix.tbit;
  * results are obtained.
  * <ul>
  * <li><tt>A.and(B)</tt> i.e. A = A & B --> runs at about 35 MB/sec
- * <li><tt>A.cardinality()</tt>, i.e. determining the selectivity, the
- * number of bits in state "true" --> runs at about 80 MB/sec
+ * <li><tt>A.cardinality()</tt>, i.e. determining the selectivity, the number of
+ * bits in state "true" --> runs at about 80 MB/sec
  * <li>Similar performance for
- * <tt>or, xor, andNot, not, copy, replace, partFromTo, indexOf, clear</tt>
- * etc.
+ * <tt>or, xor, andNot, not, copy, replace, partFromTo, indexOf, clear</tt> etc.
  * </ul>
  * If you need extremely quick access to individual bits: Although getting and
- * setting individual bits with methods <tt>get(...)</tt>, <tt>set(...)</tt>
- * and <tt>put(...)</tt>is quick, it is even quicker (<b>but not safe</b>)
- * to use <tt>getQuick(...)</tt> and <tt>putQuick(...)</tt> or even
+ * setting individual bits with methods <tt>get(...)</tt>, <tt>set(...)</tt> and
+ * <tt>put(...)</tt>is quick, it is even quicker (<b>but not safe</b>) to use
+ * <tt>getQuick(...)</tt> and <tt>putQuick(...)</tt> or even
  * <tt>QuickBitVector</tt>.
  * <p>
  * <b>Note</b> that this implementation is not synchronized.
@@ -101,8 +100,8 @@ public class BitVector extends cern.colt.PersistentObject {
      * you're doing.
      * 
      * <p>
-     * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt>
-     * holds bits of a bitvector. Each long value holds 64 bits. The i-th bit is
+     * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt> holds
+     * bits of a bitvector. Each long value holds 64 bits. The i-th bit is
      * stored in bits[i/64] at bit position i % 64 (where bit position 0 refers
      * to the least significant bit and 63 refers to the most significant bit).
      * 
@@ -127,8 +126,8 @@ public class BitVector extends cern.colt.PersistentObject {
     }
 
     /**
-     * Performs a logical <b>AND</b> of the receiver with another bit vector (A =
-     * A & B). The receiver is modified so that a bit in it has the value
+     * Performs a logical <b>AND</b> of the receiver with another bit vector (A
+     * = A & B). The receiver is modified so that a bit in it has the value
      * <code>true</code> if and only if it already had the value
      * <code>true</code> and the corresponding bit in the other bit vector
      * argument has the value <code>true</code>.
@@ -228,8 +227,8 @@ public class BitVector extends cern.colt.PersistentObject {
     }
 
     /**
-     * Changes the bit with index <tt>bitIndex</tt> to the "clear" (<tt>false</tt>)
-     * state.
+     * Changes the bit with index <tt>bitIndex</tt> to the "clear" (
+     * <tt>false</tt>) state.
      * 
      * @param bitIndex
      *            the index of the bit to be cleared.
@@ -243,11 +242,10 @@ public class BitVector extends cern.colt.PersistentObject {
     }
 
     /**
-     * Cloning this <code>BitVector</code> produces a new
-     * <code>BitVector</code> that is equal to it. The clone of the bit vector
-     * is another bit vector that has exactly the same bits set to
-     * <code>true</code> as this bit vector and the same current size, but
-     * independent state.
+     * Cloning this <code>BitVector</code> produces a new <code>BitVector</code>
+     * that is equal to it. The clone of the bit vector is another bit vector
+     * that has exactly the same bits set to <code>true</code> as this bit
+     * vector and the same current size, but independent state.
      * 
      * @return a deep copy of this bit vector.
      */
@@ -259,8 +257,8 @@ public class BitVector extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns a deep copy of the receiver; calls <code>clone()</code> and
-     * casts the result.
+     * Returns a deep copy of the receiver; calls <code>clone()</code> and casts
+     * the result.
      * 
      * @return a deep copy of the receiver.
      */
@@ -277,8 +275,8 @@ public class BitVector extends cern.colt.PersistentObject {
      * doing.
      * 
      * <p>
-     * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt>
-     * holds bits of a bitvector. Each long value holds 64 bits. The i-th bit is
+     * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt> holds
+     * bits of a bitvector. Each long value holds 64 bits. The i-th bit is
      * stored in bits[i/64] at bit position i % 64 (where bit position 0 refers
      * to the least significant bit and 63 refers to the most significant bit).
      */
@@ -295,8 +293,8 @@ public class BitVector extends cern.colt.PersistentObject {
      * you're doing.
      * 
      * <p>
-     * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt>
-     * holds bits of a bitvector. Each long value holds 64 bits. The i-th bit is
+     * A bitvector is modelled as a long array, i.e. <tt>long[] bits</tt> holds
+     * bits of a bitvector. Each long value holds 64 bits. The i-th bit is
      * stored in bits[i/64] at bit position i % 64 (where bit position 0 refers
      * to the least significant bit and 63 refers to the most significant bit).
      * 
@@ -318,8 +316,8 @@ public class BitVector extends cern.colt.PersistentObject {
      * Compares this object against the specified object. The result is
      * <code>true</code> if and only if the argument is not <code>null</code>
      * and is a <code>BitVector</code> object that has the same size as the
-     * receiver and the same bits set to <code>true</code> as the receiver.
-     * That is, for every nonnegative <code>int</code> index <code>k</code>,
+     * receiver and the same bits set to <code>true</code> as the receiver. That
+     * is, for every nonnegative <code>int</code> index <code>k</code>,
      * 
      * <pre>
      * ((BitVector) obj).get(k) == this.get(k)
@@ -329,8 +327,8 @@ public class BitVector extends cern.colt.PersistentObject {
      * 
      * @param obj
      *            the object to compare with.
-     * @return <code>true</code> if the objects are the same;
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the objects are the same; <code>false</code>
+     *         otherwise.
      */
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof BitVector))
@@ -362,16 +360,16 @@ public class BitVector extends cern.colt.PersistentObject {
     /**
      * Applies a procedure to each bit index within the specified range that
      * holds a bit in the given state. Starts at index <tt>from</tt>, moves
-     * rightwards to <tt>to</tt>. Useful, for example, if you want to copy
-     * bits into an image or somewhere else.
+     * rightwards to <tt>to</tt>. Useful, for example, if you want to copy bits
+     * into an image or somewhere else.
      * <p>
      * Optimized for speed. Particularly quick if one of the following
      * conditions holds
      * <ul>
-     * <li><tt>state==true</tt> and the receiver is sparse (<tt>cardinality()</tt>
-     * is small compared to <tt>size()</tt>).
-     * <li><tt>state==false</tt> and the receiver is dense (<tt>cardinality()</tt>
-     * is large compared to <tt>size()</tt>).
+     * <li><tt>state==true</tt> and the receiver is sparse (
+     * <tt>cardinality()</tt> is small compared to <tt>size()</tt>).
+     * <li><tt>state==false</tt> and the receiver is dense (
+     * <tt>cardinality()</tt> is large compared to <tt>size()</tt>).
      * </ul>
      * 
      * @param from
@@ -384,10 +382,12 @@ public class BitVector extends cern.colt.PersistentObject {
      *            a procedure object taking as argument the current bit index.
      *            Stops iteration if the procedure returns <tt>false</tt>,
      *            otherwise continues.
-     * @return <tt>false</tt> if the procedure stopped before all elements
-     *         where iterated over, <tt>true</tt> otherwise.
+     * @return <tt>false</tt> if the procedure stopped before all elements where
+     *         iterated over, <tt>true</tt> otherwise.
      * @throws IndexOutOfBoundsException
-     *             if (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *             if (
+     *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *             ).
      */
     public boolean forEachIndexFromToInState(int from, int to, boolean state, cern.colt.function.tint.IntProcedure procedure) {
         /*
@@ -507,8 +507,8 @@ public class BitVector extends cern.colt.PersistentObject {
 
     /**
      * Returns from the bitvector the value of the bit with the specified index.
-     * The value is <tt>true</tt> if the bit with the index <tt>bitIndex</tt>
-     * is currently set; otherwise, returns <tt>false</tt>.
+     * The value is <tt>true</tt> if the bit with the index <tt>bitIndex</tt> is
+     * currently set; otherwise, returns <tt>false</tt>.
      * 
      * @param bitIndex
      *            the bit index.
@@ -524,11 +524,11 @@ public class BitVector extends cern.colt.PersistentObject {
 
     /**
      * Returns a long value representing bits of the receiver from index
-     * <tt>from</tt> to index <tt>to</tt>. Bits are returned as a long
-     * value with the return value having bit 0 set to bit <code>from</code>,
-     * ..., bit <code>to-from</code> set to bit <code>to</code>. All other
-     * bits of the return value are set to 0. If <tt>to-from+1==0</tt> then
-     * returns zero (<tt>0L</tt>).
+     * <tt>from</tt> to index <tt>to</tt>. Bits are returned as a long value
+     * with the return value having bit 0 set to bit <code>from</code>, ..., bit
+     * <code>to-from</code> set to bit <code>to</code>. All other bits of the
+     * return value are set to 0. If <tt>to-from+1==0</tt> then returns zero (
+     * <tt>0L</tt>).
      * 
      * @param from
      *            index of start bit (inclusive).
@@ -551,15 +551,14 @@ public class BitVector extends cern.colt.PersistentObject {
     /**
      * Returns from the bitvector the value of the bit with the specified index;
      * <b>WARNING:</b> Does not check preconditions. The value is <tt>true</tt>
-     * if the bit with the index <tt>bitIndex</tt> is currently set;
-     * otherwise, returns <tt>false</tt>.
+     * if the bit with the index <tt>bitIndex</tt> is currently set; otherwise,
+     * returns <tt>false</tt>.
      * 
      * <p>
      * Provided with invalid parameters this method may return invalid values
      * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the index is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>bitIndex &gt;= 0 && bitIndex &lt; size()</tt>.
+     * you are absolutely sure that the index is within bounds.</b> Precondition
+     * (unchecked): <tt>bitIndex &gt;= 0 && bitIndex &lt; size()</tt>.
      * 
      * @param bitIndex
      *            the bit index.
@@ -611,8 +610,7 @@ public class BitVector extends cern.colt.PersistentObject {
     /**
      * Returns the index of the first occurrence of the specified state. Returns
      * <code>-1</code> if the receiver does not contain this state. Searches
-     * between <code>from</code>, inclusive and <code>to</code>,
-     * inclusive.
+     * between <code>from</code>, inclusive and <code>to</code>, inclusive.
      * <p>
      * Optimized for speed. Preliminary performance (200Mhz Pentium Pro, JDK
      * 1.2, NT): size=10^6, from=0, to=size-1, receiver contains matching state
@@ -627,7 +625,9 @@ public class BitVector extends cern.colt.PersistentObject {
      * @return the index of the first occurrence of the element in the receiver;
      *         returns <code>-1</code> if the element is not found.
      * @exception IndexOutOfBoundsException
-     *                if (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                if (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public int indexOfFromTo(int from, int to, boolean state) {
         IndexProcedure indexProcedure = new IndexProcedure();
@@ -691,7 +691,8 @@ public class BitVector extends cern.colt.PersistentObject {
      *            the end index within the receiver, inclusive.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size()))</tt>.
+     *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size()))</tt>
+     *             .
      */
     public BitVector partFromTo(int from, int to) {
         if (nbits == 0 || to == from - 1)
@@ -726,11 +727,10 @@ public class BitVector extends cern.colt.PersistentObject {
 
     /**
      * Sets bits of the receiver from index <code>from</code> to index
-     * <code>to</code> to the bits of <code>value</code>. Bit
-     * <code>from</code> is set to bit 0 of <code>value</code>, ..., bit
-     * <code>to</code> is set to bit <code>to-from</code> of
-     * <code>value</code>. All other bits stay unaffected. If
-     * <tt>to-from+1==0</tt> then does nothing.
+     * <code>to</code> to the bits of <code>value</code>. Bit <code>from</code>
+     * is set to bit 0 of <code>value</code>, ..., bit <code>to</code> is set to
+     * bit <code>to-from</code> of <code>value</code>. All other bits stay
+     * unaffected. If <tt>to-from+1==0</tt> then does nothing.
      * 
      * @param value
      *            the value to be copied into the receiver.
@@ -740,7 +740,8 @@ public class BitVector extends cern.colt.PersistentObject {
      *            index of end bit (inclusive).
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>from&lt;0 || from&gt;=size() || to&lt;0 || to&gt;=size() || to-from+1<0 || to-from+1>64</tt>.
+     *             <tt>from&lt;0 || from&gt;=size() || to&lt;0 || to&gt;=size() || to-from+1<0 || to-from+1>64</tt>
+     *             .
      */
     public void putLongFromTo(long value, int from, int to) {
         int width = to - from + 1;
@@ -758,9 +759,8 @@ public class BitVector extends cern.colt.PersistentObject {
      * <p>
      * Provided with invalid parameters this method may set invalid values
      * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the index is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>bitIndex &gt;= 0 && bitIndex &lt; size()</tt>.
+     * you are absolutely sure that the index is within bounds.</b> Precondition
+     * (unchecked): <tt>bitIndex &gt;= 0 && bitIndex &lt; size()</tt>.
      * 
      * @param bitIndex
      *            the index of the bit to be changed.
@@ -778,9 +778,9 @@ public class BitVector extends cern.colt.PersistentObject {
      * Replaces the bits of the receiver in the given range with the bits of
      * another bit vector. Replaces the range <tt>[from,to]</tt> with the
      * contents of the range <tt>[sourceFrom,sourceFrom+to-from]</tt>, all
-     * inclusive. If <tt>source==this</tt> and the source and destination
-     * range intersect in an ambiguous way, then replaces as if using an
-     * intermediate auxiliary copy of the receiver.
+     * inclusive. If <tt>source==this</tt> and the source and destination range
+     * intersect in an ambiguous way, then replaces as if using an intermediate
+     * auxiliary copy of the receiver.
      * <p>
      * Optimized for speed. Preliminary performance (200Mhz Pentium Pro, JDK
      * 1.2, NT): replace 10^6 ill aligned bits --> 0.02 seconds elapsed time.
@@ -795,7 +795,9 @@ public class BitVector extends cern.colt.PersistentObject {
      *            the start index within <tt>source</tt>, inclusive.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size() || sourceFrom<0 || sourceFrom+to-from+1>source.size()))</tt>.
+     * 
+     *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size() || sourceFrom<0 || sourceFrom+to-from+1>source.size()))</tt>
+     *             .
      */
     public void replaceFromToWith(int from, int to, BitVector source, int sourceFrom) {
         if (nbits == 0 || to == from - 1)
@@ -843,7 +845,8 @@ public class BitVector extends cern.colt.PersistentObject {
     }
 
     /**
-     * Sets the bits in the given range to the state specified by <tt>value</tt>.
+     * Sets the bits in the given range to the state specified by <tt>value</tt>
+     * .
      * <p>
      * Optimized for speed. Preliminary performance (200Mhz Pentium Pro, JDK
      * 1.2, NT): replace 10^6 ill aligned bits --> 0.002 seconds elapsed time.
@@ -856,7 +859,8 @@ public class BitVector extends cern.colt.PersistentObject {
      *            the value to be stored in the bits of the range.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>.
+     *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *             .
      */
     public void replaceFromToWith(int from, int to, boolean value) {
         if (nbits == 0 || to == from - 1)
@@ -930,9 +934,9 @@ public class BitVector extends cern.colt.PersistentObject {
 
     /**
      * Shrinks or expands the receiver so that it holds <tt>newSize</tt> bits.
-     * If the receiver is expanded, additional <tt>false</tt> bits are added
-     * to the end. If the receiver is shrinked, all bits between the old size
-     * and the new size are lost; their memory is subject to garbage collection.
+     * If the receiver is expanded, additional <tt>false</tt> bits are added to
+     * the end. If the receiver is shrinked, all bits between the old size and
+     * the new size are lost; their memory is subject to garbage collection.
      * (This method introduces a new backing array of elements. WARNING: if you
      * have more than one BitVector or BitMatrix sharing identical backing
      * elements, be sure you know what you are doing.)
@@ -959,8 +963,8 @@ public class BitVector extends cern.colt.PersistentObject {
 
     /**
      * Returns a string representation of the receiver. For every index for
-     * which the receiver contains a bit in the "set" (<tt>true</tt>) state,
-     * the decimal representation of that index is included in the result. Such
+     * which the receiver contains a bit in the "set" (<tt>true</tt>) state, the
+     * decimal representation of that index is included in the result. Such
      * indeces are listed in order from lowest to highest, separated by
      * ",&nbsp;" (a comma and a space) and surrounded by braces.
      * 
@@ -984,8 +988,8 @@ public class BitVector extends cern.colt.PersistentObject {
     }
 
     /**
-     * Performs a logical <b>XOR</b> of the receiver with another bit vector (A =
-     * A ^ B). The receiver is modified so that a bit in it has the value
+     * Performs a logical <b>XOR</b> of the receiver with another bit vector (A
+     * = A ^ B). The receiver is modified so that a bit in it has the value
      * <code>true</code> if and only if one of the following statements holds:
      * <ul>
      * <li>The bit initially has the value <code>true</code>, and the

@@ -17,16 +17,15 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * an array of positive real numbers. The pdf does not need to be provided in
  * the form of relative probabilities, absolute probabilities are also accepted.
  * <p>
- * If <tt>interpolationType == LINEAR_INTERPOLATION</tt> a linear
- * interpolation within the bin is computed, resulting in a constant density
- * within each bin.
- * <dt> If <tt>interpolationType == NO_INTERPOLATION</tt> no interpolation is
+ * If <tt>interpolationType == LINEAR_INTERPOLATION</tt> a linear interpolation
+ * within the bin is computed, resulting in a constant density within each bin.
+ * <dt>If <tt>interpolationType == NO_INTERPOLATION</tt> no interpolation is
  * performed and the result is a discrete distribution.
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b> A uniform random number is generated using a user
  * supplied generator. The uniform number is then transformed to the user's
@@ -34,10 +33,10 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * the pdf. The cumulative distribution is inverted using a binary search for
  * the nearest bin boundary.
  * <p>
- * This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandGeneral.html">RandGeneral</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++).
+ * This is a port of <A HREF=
+ * "http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandGeneral.html"
+ * >RandGeneral</A> used in <A
+ * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A> (C++).
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99

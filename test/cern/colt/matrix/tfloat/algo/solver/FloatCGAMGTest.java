@@ -2,7 +2,6 @@ package cern.colt.matrix.tfloat.algo.solver;
 
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatAMG;
 
-
 /**
  * Test of FloatCG with AMG
  */

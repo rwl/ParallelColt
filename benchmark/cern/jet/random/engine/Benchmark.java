@@ -17,18 +17,19 @@ import cern.jet.random.tdouble.engine.MersenneTwister64;
  * Benchmarks the performance of the currently provided uniform pseudo-random
  * number generation engines.
  * <p>
- * All distributions are obtained by using a <b>uniform</b> pseudo-random
- * number generation engine. followed by a transformation to the desired
- * distribution. Therefore, the performance of the uniform engines is crucial.
+ * All distributions are obtained by using a <b>uniform</b> pseudo-random number
+ * generation engine. followed by a transformation to the desired distribution.
+ * Therefore, the performance of the uniform engines is crucial.
  * <p>
- * <h2 align=center>Comparison of uniform generation engines</h2>
- * <center> <table border>
+ * <h2 align=center>Comparison of uniform generation engines</h2> <center>
+ * <table border>
  * <tr>
  * <td align="center" width="40%">Name</td>
  * <td align="center" width="20%">Period</td>
  * <td align="center" width="40%">
  * <p>
- * Speed<br> [# million uniform random numbers generated/sec]<br>
+ * Speed<br>
+ * [# million uniform random numbers generated/sec]<br>
  * Pentium Pro 200 Mhz, JDK 1.2, NT
  * </p>
  * </td>
@@ -39,8 +40,7 @@ import cern.jet.random.tdouble.engine.MersenneTwister64;
  * <td align="center" width="40">2.5</td>
  * </tr>
  * <tr>
- * <td align="center" width="40%"> <tt>Ranlux</tt> (default luxury level 3)
- * </td>
+ * <td align="center" width="40%"> <tt>Ranlux</tt> (default luxury level 3)</td>
  * <td align="center" width="20%">10<sup>171</sup></td>
  * <td align="center" width="40">0.4</td>
  * </tr>
@@ -50,7 +50,7 @@ import cern.jet.random.tdouble.engine.MersenneTwister64;
  * <td align="center" width="40%">1.6</td>
  * </tr>
  * <tr>
- * <td align="center" width="40%"> <tt>Ranecu</tt> </td>
+ * <td align="center" width="40%"> <tt>Ranecu</tt></td>
  * <td align="center" width="20">10<sup>18</sup></td>
  * <td align="center" width="40%">1.5</td>
  * </tr>
@@ -60,7 +60,8 @@ import cern.jet.random.tdouble.engine.MersenneTwister64;
  * <td align="center"><font size=+3>?</font></td>
  * <td align="center">2.4</td>
  * </tr>
- * </table> </center>
+ * </table>
+ * </center>
  * <p>
  * <b>Note:</b> Methods working on the default uniform random generator are
  * <b>synchronized</b> and therefore in current VM's <b>slow</b> (as of June

@@ -355,8 +355,7 @@ public class IOUtils {
     }
 
     /**
-     * Displays elements of <code>x</code>, assuming that it is 1D real
-     * array.
+     * Displays elements of <code>x</code>, assuming that it is 1D real array.
      * 
      * @param x
      * @param title
@@ -371,8 +370,7 @@ public class IOUtils {
     }
 
     /**
-     * Displays elements of <code>x</code>, assuming that it is 2D real
-     * array.
+     * Displays elements of <code>x</code>, assuming that it is 2D real array.
      * 
      * @param n1
      * @param n2
@@ -396,8 +394,7 @@ public class IOUtils {
     }
 
     /**
-     * Displays elements of <code>x</code>, assuming that it is 3D real
-     * array.
+     * Displays elements of <code>x</code>, assuming that it is 3D real array.
      * 
      * @param n1
      * @param n2
@@ -523,8 +520,8 @@ public class IOUtils {
     }
 
     /**
-     * Saves elements of <code>x</code> in a file <code>filename</code>.
-     * Complex data is represented by 2 double values in sequence: the real and
+     * Saves elements of <code>x</code> in a file <code>filename</code>. Complex
+     * data is represented by 2 double values in sequence: the real and
      * imaginary parts.
      * 
      * @param n1
@@ -626,8 +623,8 @@ public class IOUtils {
     }
 
     /**
-     * Saves elements of <code>x</code> in a file <code>filename</code>.
-     * Complex data is represented by 2 double values in sequence: the real and
+     * Saves elements of <code>x</code> in a file <code>filename</code>. Complex
+     * data is represented by 2 double values in sequence: the real and
      * imaginary parts.
      * 
      * @param n1
@@ -689,8 +686,6 @@ public class IOUtils {
             e.printStackTrace();
         }
     }
-
-
 
     /**
      * Saves elements of <code>x</code> in a file <code>filename</code>,
@@ -765,7 +760,6 @@ public class IOUtils {
         }
     }
 
-    
     /**
      * Saves elements of <code>x</code> in a file <code>filename</code>,
      * assuming that it is 3D real array.

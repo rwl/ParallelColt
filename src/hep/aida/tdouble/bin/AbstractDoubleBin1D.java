@@ -11,9 +11,9 @@ import cern.jet.stat.tdouble.DoubleDescriptive;
  * <p>
  * This class is fully thread safe (all public methods are synchronized). Thus,
  * you can have one or more threads adding to the bin as well as one or more
- * threads reading and viewing the statistics of the bin <i>while it is filled</i>.
- * For high performance, add data in large chunks (buffers) via method
- * <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
+ * threads reading and viewing the statistics of the bin <i>while it is
+ * filled</i>. For high performance, add data in large chunks (buffers) via
+ * method <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 0.9, 03-Jul-99
@@ -46,8 +46,8 @@ public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements c
 
     /**
      * Adds the part of the specified list between indexes <tt>from</tt>
-     * (inclusive) and <tt>to</tt> (inclusive) to the receiver. You may want
-     * to override this method for performance reasons.
+     * (inclusive) and <tt>to</tt> (inclusive) to the receiver. You may want to
+     * override this method for performance reasons.
      * 
      * @param list
      *            the list of which elements shall be added.
@@ -57,7 +57,8 @@ public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements c
      *            the index of the last element to be added (inclusive).
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>.
+     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
+     *             .
      */
     public synchronized void addAllOfFromTo(DoubleArrayList list, int from, int to) {
         for (int i = from; i <= to; i++)
@@ -67,8 +68,8 @@ public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements c
     /**
      * Constructs and returns a streaming buffer connected to the receiver.
      * Whenever the buffer is full it's contents are automatically flushed to
-     * <tt>this</tt>. (Addding elements via a buffer to a bin is
-     * significantly faster than adding them directly.)
+     * <tt>this</tt>. (Addding elements via a buffer to a bin is significantly
+     * faster than adding them directly.)
      * 
      * @param capacity
      *            the number of elements the buffer shall be capable of holding

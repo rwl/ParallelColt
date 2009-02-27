@@ -132,7 +132,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                         int idx = zero + (firstIdx - 1) * stride;
                         double a = f.apply(elements[idx]);
                         for (int i = firstIdx - 1; --i >= lastIdx;) {
-                            a = aggr.apply(a, f.apply(elements[idx-=stride]));
+                            a = aggr.apply(a, f.apply(elements[idx -= stride]));
                         }
                         return a;
                     }
@@ -143,7 +143,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             int idx = zero + (size - 1) * stride;
             a = f.apply(elements[idx]);
             for (int i = size - 1; --i >= 0;) {
-                a = aggr.apply(a, f.apply(elements[idx-=stride]));
+                a = aggr.apply(a, f.apply(elements[idx -= stride]));
             }
         }
         return a;
@@ -156,7 +156,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         checkSize(other);
         if (size == 0)
             return Double.NaN;
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final double[] elemsOther = (double[]) other.elements();
         double a = 0;
@@ -246,18 +246,18 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
-        } else {            
+        } else {
             int idx = zero - stride;
             // specialization for speed
             if (function instanceof cern.jet.math.tdouble.DoubleMult) {
                 // x[i] = mult*x[i]
-                for (int k = size; --k>=0;) {
-                    elements[idx+= stride] *= multiplicator;
-                }                
+                for (int k = size; --k >= 0;) {
+                    elements[idx += stride] *= multiplicator;
+                }
             } else {
                 // the general case x[i] = f(x[i])
-                for (int k = size; --k>=0;) {
-                    elements[idx+= stride] = function.apply(elements[idx]);
+                for (int k = size; --k >= 0;) {
+                    elements[idx += stride] = function.apply(elements[idx]);
                 }
             }
         }
@@ -466,7 +466,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         final double[] elemsOther = other.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -512,7 +512,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             return this;
         }
         checkSize(y);
-        final int zeroOther = (int)y.index(0);
+        final int zeroOther = (int) y.index(0);
         final int strideOther = y.stride();
         final double[] elemsOther = (double[]) y.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1239,7 +1239,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
         DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0);
+        final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1292,7 +1292,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
         DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, cols);
         final double[] elemsOther = (double[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0, 0);
+        final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
@@ -1360,7 +1360,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         final double[] elemsOther = y.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -1425,8 +1425,8 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         if (y.size() < tail)
             tail = y.size();
         final double[] elemsOther = yy.elements;
-        int zeroThis = (int)index(from);
-        int zeroOther = (int)yy.index(from);
+        int zeroThis = (int) index(from);
+        int zeroOther = (int) yy.index(from);
         int strideOther = yy.stride;
         if (elements == null || elemsOther == null)
             throw new InternalError();

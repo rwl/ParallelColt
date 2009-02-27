@@ -1,6 +1,5 @@
 package cern.colt.matrix.tfloat.algo.solver;
 
-
 /**
  * Test of FloatIR
  */

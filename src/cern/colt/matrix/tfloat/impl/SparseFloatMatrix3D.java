@@ -36,10 +36,8 @@ import cern.colt.matrix.tfloat.FloatMatrix3D;
  * manually be reclaimed by calling {@link #trimToSize()}.
  * </ul>
  * <p>
- * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>.
- * <br>
- * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>.
- * <br>
+ * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>. <br>
+ * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>. <br>
  * Where <tt>nonZeros = cardinality()</tt> is the number of non-zero cells.
  * Thus, a 100 x 100 x 100 matrix with minLoadFactor=0.25 and maxLoadFactor=0.5
  * and 1000000 non-zero cells consumes between 25 MB and 50 MB. The same 100 x
@@ -49,11 +47,11 @@ import cern.colt.matrix.tfloat.FloatMatrix3D;
  * <p>
  * This class offers <i>expected</i> time complexity <tt>O(1)</tt> (i.e.
  * constant time) for the basic operations <tt>get</tt>, <tt>getQuick</tt>,
- * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash
- * function disperses the elements properly among the buckets. Otherwise,
- * pathological cases, although highly improbable, can occur, degrading
- * performance to <tt>O(N)</tt> in the worst case. As such this sparse class
- * is expected to have no worse time complexity than its dense counterpart
+ * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash function
+ * disperses the elements properly among the buckets. Otherwise, pathological
+ * cases, although highly improbable, can occur, degrading performance to
+ * <tt>O(N)</tt> in the worst case. As such this sparse class is expected to
+ * have no worse time complexity than its dense counterpart
  * {@link DenseFloatMatrix2D}. However, constant factors are considerably
  * larger.
  * <p>
@@ -111,10 +109,12 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>.
+     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>
+     *             .
      */
     public SparseFloatMatrix3D(float[][][] values) {
         this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
@@ -143,7 +143,8 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
     /**
      * Constructs a matrix with a given number of slices, rows and columns using
      * memory as specified. All entries are initially <tt>0</tt>. For details
-     * related to memory usage see {@link cern.colt.map.tfloat.OpenIntFloatHashMap}.
+     * related to memory usage see
+     * {@link cern.colt.map.tfloat.OpenIntFloatHashMap}.
      * 
      * @param slices
      *            the number of slices the matrix shall have.
@@ -160,7 +161,9 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
      *            the maximum load factor of the hash map.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if <tt>(float)columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException

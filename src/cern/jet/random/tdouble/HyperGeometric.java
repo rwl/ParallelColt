@@ -15,10 +15,10 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * HyperGeometric distribution; See the <A
  * HREF="http://library.advanced.org/10030/6atpdvah.htm"> math definition</A>
  * 
- * The hypergeometric distribution with parameters <tt>N</tt>, <tt>n</tt>
- * and <tt>s</tt> is the probability distribution of the random variable X,
- * whose value is the number of successes in a sample of <tt>n</tt> items from
- * a population of size <tt>N</tt> that has <tt>s</tt> 'success' items and
+ * The hypergeometric distribution with parameters <tt>N</tt>, <tt>n</tt> and
+ * <tt>s</tt> is the probability distribution of the random variable X, whose
+ * value is the number of successes in a sample of <tt>n</tt> items from a
+ * population of size <tt>N</tt> that has <tt>s</tt> 'success' items and
  * <tt>N - s</tt> 'failure' items.
  * <p>
  * <tt>p(k) = C(s,k) * C(N-s,n-k) / C(N,n)</tt> where
@@ -28,14 +28,14 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b> High performance implementation. Patchwork
  * Rejection/Inversion method.
  * <dt>This is a port of <tt>hprsc.c</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library. C-RAND's implementation, in turn, is based upon
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * H. Zechner (1994): Efficient sampling from continuous and discrete unimodal
  * distributions, Doctoral Dissertation, 156 pp., Technical University Graz,
@@ -331,8 +331,8 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
          * numbers are generated via modal down-up search, * starting at the
          * mode m. The cumulative probabilities * are avoided by using the
          * technique of chop-down. * For l >= 10 the Patchwork Rejection method
-         * hprs is employed: * The area below the histogram function f(x) in its *
-         * body is rearranged by certain point reflections. Within a * large
+         * hprs is employed: * The area below the histogram function f(x) in its
+         * * body is rearranged by certain point reflections. Within a * large
          * center interval variates are sampled efficiently by * rejection from
          * uniform hats. Rectangular immediate acceptance * regions speed up the
          * generation. The remaining tails are * covered by exponential
@@ -341,13 +341,13 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
          * FUNCTION : - hprsc samples a random number from the * Hypergeometric
          * distribution with parameters * N (number of red and black balls), M
          * (number * of red balls) and n (number of trials) * valid for N >= 2,
-         * M,n <= N. * REFERENCE : - H. Zechner (1994): Efficient sampling from *
-         * continuous and discrete unimodal distributions, * Doctoral
+         * M,n <= N. * REFERENCE : - H. Zechner (1994): Efficient sampling from
+         * * continuous and discrete unimodal distributions, * Doctoral
          * Dissertation, 156 pp., Technical * University Graz, Austria. *
          * SUBPROGRAMS: - flogfak(k) ... log(k!) with long integer k * -
          * drand(seed) ... (0,1)-Uniform generator with * unsigned long integer
-         * *seed. * - hmdu(seed,N,M,n) ... Hypergeometric generator * for l<10 * -
-         * hprs(seed,N,M,n) ... Hypergeometric generator * for l>=10 with
+         * *seed. * - hmdu(seed,N,M,n) ... Hypergeometric generator * for l<10 *
+         * - hprs(seed,N,M,n) ... Hypergeometric generator * for l>=10 with
          * unsigned long integer *seed, * long integer N , M , n. * *
          **********************************************************************/
         int Nhalf, n_le_Nhalf, M_le_Nhalf, K;

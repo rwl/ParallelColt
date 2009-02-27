@@ -109,8 +109,7 @@ public class MatrixVectorWriter extends PrintWriter {
      * Prints the matrix size. Assumes coordinate format
      */
     public void printMatrixSize(MatrixSize size) {
-        format("%10d %10d %19d\n", size.numRows(), size.numColumns(), size
-                .numEntries());
+        format("%10d %10d %19d\n", size.numRows(), size.numColumns(), size.numEntries());
     }
 
     /**
@@ -153,8 +152,7 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printArray(float[] dataR, float[] dataI) {
         int size = dataR.length;
         if (size != dataI.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
             format("% .12e % .12e\n", dataR[i], dataI[i]);
     }
@@ -166,8 +164,7 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printArray(double[] dataR, double[] dataI) {
         int size = dataR.length;
         if (size != dataI.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
             format("% .12e % .12e\n", dataR[i], dataI[i]);
     }
@@ -196,8 +193,7 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printCoordinate(int[] index, float[] data, int offset) {
         int size = index.length;
         if (size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
             format("%10d % .12e\n", index[i] + offset, data[i]);
     }
@@ -210,8 +206,7 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printCoordinate(int[] index, double[] data, int offset) {
         int size = index.length;
         if (size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
             format("%10d % .12e\n", index[i] + offset, data[i]);
     }
@@ -224,8 +219,7 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printCoordinate(int[] index, int[] data, int offset) {
         int size = index.length;
         if (size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
             format("%10d %10d\n", index[i] + offset, data[i]);
     }
@@ -238,8 +232,7 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printCoordinate(int[] index, long[] data, int offset) {
         int size = index.length;
         if (size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
             format("%10d %10d\n", index[i] + offset, data[i]);
     }
@@ -249,15 +242,12 @@ public class MatrixVectorWriter extends PrintWriter {
      * entry on each line. The offset is added to each index, typically, this
      * can transform from a 0-based indicing to a 1-based.
      */
-    public void printCoordinate(int[] row, int[] column, float[] data,
-            int offset) {
+    public void printCoordinate(int[] row, int[] column, float[] data, int offset) {
         int size = row.length;
         if (size != column.length || size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d %10d % .12e\n", row[i] + offset, column[i] + offset,
-                    data[i]);
+            format("%10d %10d % .12e\n", row[i] + offset, column[i] + offset, data[i]);
     }
 
     /**
@@ -265,15 +255,12 @@ public class MatrixVectorWriter extends PrintWriter {
      * entry on each line. The offset is added to each index, typically, this
      * can transform from a 0-based indicing to a 1-based.
      */
-    public void printCoordinate(int[] row, int[] column, double[] data,
-            int offset) {
+    public void printCoordinate(int[] row, int[] column, double[] data, int offset) {
         int size = row.length;
         if (size != column.length || size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d %10d % .12e\n", row[i] + offset, column[i] + offset,
-                    data[i]);
+            format("%10d %10d % .12e\n", row[i] + offset, column[i] + offset, data[i]);
     }
 
     /**
@@ -282,15 +269,12 @@ public class MatrixVectorWriter extends PrintWriter {
      * can transform from a 0-based indicing to a 1-based. The first float array
      * specifies the real entries, and the second is the imaginary entries
      */
-    public void printCoordinate(int[] index, float[] dataR, float[] dataI,
-            int offset) {
+    public void printCoordinate(int[] index, float[] dataR, float[] dataI, int offset) {
         int size = index.length;
         if (size != dataR.length || size != dataI.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d % .12e % .12e\n", index[i] + offset, dataR[i],
-                    dataI[i]);
+            format("%10d % .12e % .12e\n", index[i] + offset, dataR[i], dataI[i]);
     }
 
     /**
@@ -299,15 +283,12 @@ public class MatrixVectorWriter extends PrintWriter {
      * can transform from a 0-based indicing to a 1-based. The first double
      * array specifies the real entries, and the second is the imaginary entries
      */
-    public void printCoordinate(int[] index, double[] dataR, double[] dataI,
-            int offset) {
+    public void printCoordinate(int[] index, double[] dataR, double[] dataI, int offset) {
         int size = index.length;
         if (size != dataR.length || size != dataI.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d % .12e % .12e\n", index[i] + offset, dataR[i],
-                    dataI[i]);
+            format("%10d % .12e % .12e\n", index[i] + offset, dataR[i], dataI[i]);
     }
 
     /**
@@ -316,16 +297,12 @@ public class MatrixVectorWriter extends PrintWriter {
      * can transform from a 0-based indicing to a 1-based. The first float array
      * specifies the real entries, and the second is the imaginary entries
      */
-    public void printCoordinate(int[] row, int[] column, float[] dataR,
-            float[] dataI, int offset) {
+    public void printCoordinate(int[] row, int[] column, float[] dataR, float[] dataI, int offset) {
         int size = row.length;
-        if (size != column.length || size != dataR.length
-                || size != dataI.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+        if (size != column.length || size != dataR.length || size != dataI.length)
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d %10d % .12e % .12e\n", row[i] + offset, column[i]
-                    + offset, dataR[i], dataI[i]);
+            format("%10d %10d % .12e % .12e\n", row[i] + offset, column[i] + offset, dataR[i], dataI[i]);
     }
 
     /**
@@ -334,16 +311,12 @@ public class MatrixVectorWriter extends PrintWriter {
      * can transform from a 0-based indicing to a 1-based. The first double
      * array specifies the real entries, and the second is the imaginary entries
      */
-    public void printCoordinate(int[] row, int[] column, double[] dataR,
-            double[] dataI, int offset) {
+    public void printCoordinate(int[] row, int[] column, double[] dataR, double[] dataI, int offset) {
         int size = row.length;
-        if (size != column.length || size != dataR.length
-                || size != dataI.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+        if (size != column.length || size != dataR.length || size != dataI.length)
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d %10d % .12e % .12e\n", row[i] + offset, column[i]
-                    + offset, dataR[i], dataI[i]);
+            format("%10d %10d % .12e % .12e\n", row[i] + offset, column[i] + offset, dataR[i], dataI[i]);
     }
 
     /**
@@ -354,11 +327,9 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printCoordinate(int[] row, int[] column, int[] data, int offset) {
         int size = row.length;
         if (size != column.length || size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d %10d %19d\n", row[i] + offset, column[i] + offset,
-                    data[i]);
+            format("%10d %10d %19d\n", row[i] + offset, column[i] + offset, data[i]);
     }
 
     /**
@@ -369,11 +340,9 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printCoordinate(int[] row, int[] column, long[] data, int offset) {
         int size = row.length;
         if (size != column.length || size != data.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
-            format("%10d %10d %19d\n", row[i] + offset, column[i] + offset,
-                    data[i]);
+            format("%10d %10d %19d\n", row[i] + offset, column[i] + offset, data[i]);
     }
 
     /**
@@ -384,8 +353,7 @@ public class MatrixVectorWriter extends PrintWriter {
     public void printPattern(int[] row, int[] column, int offset) {
         int size = row.length;
         if (size != column.length)
-            throw new IllegalArgumentException(
-                    "All arrays must be of the same size");
+            throw new IllegalArgumentException("All arrays must be of the same size");
         for (int i = 0; i < size; ++i)
             format("%10d %10d\n", row[i] + offset, column[i] + offset);
     }
@@ -422,8 +390,7 @@ public class MatrixVectorWriter extends PrintWriter {
      * entry on each line. The first double array specifies the real entries,
      * and the second is the imaginary entries
      */
-    public void printCoordinate(int[] row, int[] column, float[] dataR,
-            float[] dataI) {
+    public void printCoordinate(int[] row, int[] column, float[] dataR, float[] dataI) {
         printCoordinate(row, column, dataR, dataI, 0);
     }
 
@@ -432,8 +399,7 @@ public class MatrixVectorWriter extends PrintWriter {
      * entry on each line. The first double array specifies the real entries,
      * and the second is the imaginary entries
      */
-    public void printCoordinate(int[] row, int[] column, double[] dataR,
-            double[] dataI) {
+    public void printCoordinate(int[] row, int[] column, double[] dataR, double[] dataI) {
         printCoordinate(row, column, dataR, dataI, 0);
     }
 

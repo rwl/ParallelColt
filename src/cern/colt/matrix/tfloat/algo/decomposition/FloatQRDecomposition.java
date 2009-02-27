@@ -16,8 +16,7 @@ import cern.colt.matrix.tfloat.algo.FloatProperty;
 /**
  * For an <tt>m x n</tt> matrix <tt>A</tt> with <tt>m >= n</tt>, the QR
  * decomposition is an <tt>m x n</tt> orthogonal matrix <tt>Q</tt> and an
- * <tt>n x n</tt> upper triangular matrix <tt>R</tt> so that
- * <tt>A = Q*R</tt>.
+ * <tt>n x n</tt> upper triangular matrix <tt>R</tt> so that <tt>A = Q*R</tt>.
  * <P>
  * The QR decompostion always exists, even if the matrix does not have full
  * rank, so the constructor will never fail. The primary use of the QR
@@ -258,7 +257,7 @@ public class FloatQRDecomposition implements java.io.Serializable {
      * <pre>
      *   rank          : 3
      *   trace         : 0
-     *  
+     * 
      * </pre>
      */
     public String toString() {

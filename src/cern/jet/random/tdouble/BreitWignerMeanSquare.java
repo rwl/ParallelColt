@@ -11,19 +11,18 @@ package cern.jet.random.tdouble;
 import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 
 /**
- * Mean-square BreitWigner distribution; See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node23.html#SECTION000230000000000000000">
- * math definition</A>.
+ * Mean-square BreitWigner distribution; See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node23.html#SECTION000230000000000000000"
+ * > math definition</A>.
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
- * <b>Implementation:</b> This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandBreitWigner.html">RandBreitWigner</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++).
+ * <b>Implementation:</b> This is a port of <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandBreitWigner.html"
+ * >RandBreitWigner</A> used in <A
+ * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A> (C++).
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
@@ -38,8 +37,7 @@ public class BreitWignerMeanSquare extends BreitWigner {
      * Constructs a mean-squared BreitWigner distribution.
      * 
      * @param cut
-     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't
-     *            cut".
+     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
     public BreitWignerMeanSquare(double mean, double gamma, double cut, DoubleRandomEngine randomGenerator) {
         super(mean, gamma, cut, randomGenerator);
@@ -65,8 +63,7 @@ public class BreitWignerMeanSquare extends BreitWigner {
      * internal state.
      * 
      * @param cut
-     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't
-     *            cut".
+     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
     public double nextDouble(double mean, double gamma, double cut) {
         if (gamma == 0.0)
@@ -91,8 +88,7 @@ public class BreitWignerMeanSquare extends BreitWigner {
      * Returns a random number from the distribution.
      * 
      * @param cut
-     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't
-     *            cut".
+     *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
     public static double staticNextDouble(double mean, double gamma, double cut) {
         synchronized (shared) {

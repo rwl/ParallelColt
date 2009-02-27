@@ -17,8 +17,8 @@ package cern.jet.math.tdouble;
  * <li><tt>a/constant + b</tt>
  * <li><tt>a/constant - b</tt>
  * </ul>
- * <tt>a</tt> and <tt>b</tt> are variables, <tt>constant</tt> is fixed,
- * but for performance reasons publicly accessible. Intended to be passed to
+ * <tt>a</tt> and <tt>b</tt> are variables, <tt>constant</tt> is fixed, but for
+ * performance reasons publicly accessible. Intended to be passed to
  * <tt>matrix.assign(otherMatrix,function)</tt> methods.
  */
 public final class DoublePlusMultFirst implements cern.colt.function.tdouble.DoubleDoubleFunction {

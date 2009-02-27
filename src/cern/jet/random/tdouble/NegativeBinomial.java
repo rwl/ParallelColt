@@ -17,13 +17,13 @@ import cern.jet.stat.tdouble.Probability;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b> High performance implementation. Compound method.
- * <dt> This is a port of <tt>nbp.c</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library. C-RAND's implementation, in turn, is based upon
+ * <dt>This is a port of <tt>nbp.c</tt> from the <A
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * J.H. Ahrens, U. Dieter (1974): Computer methods for sampling from gamma,
  * beta, Poisson and binomial distributions, Computing 12, 223--246.

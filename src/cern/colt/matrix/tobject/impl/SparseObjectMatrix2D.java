@@ -35,10 +35,8 @@ import cern.colt.matrix.tobject.ObjectMatrix2D;
  * manually be reclaimed by calling {@link #trimToSize()}.
  * </ul>
  * <p>
- * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>.
- * <br>
- * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>.
- * <br>
+ * worst case: <tt>memory [bytes] = (1/minLoadFactor) * nonZeros * 13</tt>. <br>
+ * best case: <tt>memory [bytes] = (1/maxLoadFactor) * nonZeros * 13</tt>. <br>
  * Where <tt>nonZeros = cardinality()</tt> is the number of non-zero cells.
  * Thus, a 1000 x 1000 matrix with minLoadFactor=0.25 and maxLoadFactor=0.5 and
  * 1000000 non-zero cells consumes between 25 MB and 50 MB. The same 1000 x 1000
@@ -48,11 +46,11 @@ import cern.colt.matrix.tobject.ObjectMatrix2D;
  * <p>
  * This class offers <i>expected</i> time complexity <tt>O(1)</tt> (i.e.
  * constant time) for the basic operations <tt>get</tt>, <tt>getQuick</tt>,
- * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash
- * function disperses the elements properly among the buckets. Otherwise,
- * pathological cases, although highly improbable, can occur, degrading
- * performance to <tt>O(N)</tt> in the worst case. As such this sparse class
- * is expected to have no worse time complexity than its dense counterpart
+ * <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt> assuming the hash function
+ * disperses the elements properly among the buckets. Otherwise, pathological
+ * cases, although highly improbable, can occur, degrading performance to
+ * <tt>O(N)</tt> in the worst case. As such this sparse class is expected to
+ * have no worse time complexity than its dense counterpart
  * {@link DenseObjectMatrix2D}. However, constant factors are considerably
  * larger.
  * <p>
@@ -101,7 +99,8 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
      */
     public SparseObjectMatrix2D(Object[][] values) {
         this(values.length, values.length == 0 ? 0 : values[0].length);
@@ -118,7 +117,8 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>.
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+     *             .
      */
     public SparseObjectMatrix2D(int rows, int columns) {
         this(rows, columns, rows * (columns / 1000), 0.2, 0.5);
@@ -127,7 +127,8 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
     /**
      * Constructs a matrix with a given number of rows and columns using memory
      * as specified. All entries are initially <tt>null</tt>. For details
-     * related to memory usage see {@link cern.colt.map.tobject.OpenIntObjectHashMap}.
+     * related to memory usage see
+     * {@link cern.colt.map.tobject.OpenIntObjectHashMap}.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -142,10 +143,13 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
      *            the maximum load factor of the hash map.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>.
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+     *             .
      */
     public SparseObjectMatrix2D(int rows, int columns, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         setUp(rows, columns);
@@ -191,7 +195,7 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
         else
             return super.cardinality();
     }
-    
+
     /**
      * Returns the elements of this matrix.
      * 
@@ -200,7 +204,6 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
     public AbstractIntObjectMap elements() {
         return elements;
     }
-
 
     /**
      * Ensures that the receiver can hold at least the specified number of
@@ -245,9 +248,8 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if at least one of the following
-     * conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if at least one of the following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
@@ -304,9 +306,9 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseObjectMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseObjectMatrix1D</tt>, if the receiver
-     * is an instance of type <tt>SparseObjectMatrix2D</tt> the new matrix
-     * must be of type <tt>SparseObjectMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseObjectMatrix1D</tt>, if the receiver is
+     * an instance of type <tt>SparseObjectMatrix2D</tt> the new matrix must be
+     * of type <tt>SparseObjectMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -320,8 +322,8 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
      * instance of type <tt>DenseObjectMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseObjectMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseObjectMatrix2D</tt> the new matrix must be of type
+     * type <tt>DenseObjectMatrix1D</tt>, if the receiver is an instance of type
+     * <tt>SparseObjectMatrix2D</tt> the new matrix must be of type
      * <tt>SparseObjectMatrix1D</tt>, etc.
      * 
      * @param size
@@ -338,8 +340,8 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -382,12 +384,12 @@ public class SparseObjectMatrix2D extends ObjectMatrix2D {
      * <li>switch back from non-zero to zero state also do use memory. However,
      * their memory can be reclaimed by calling <tt>trimToSize()</tt>.
      * </ul>
-     * A sequence like <tt>set(r,c,5); set(r,c,0);</tt> sets a cell to
-     * non-zero state and later back to zero state. Such as sequence generates
-     * obsolete memory that is automatically reclaimed from time to time or can
-     * manually be reclaimed by calling <tt>trimToSize()</tt>. Putting zeros
-     * into cells already containing zeros does not generate obsolete memory
-     * since no memory was allocated to them in the first place.
+     * A sequence like <tt>set(r,c,5); set(r,c,0);</tt> sets a cell to non-zero
+     * state and later back to zero state. Such as sequence generates obsolete
+     * memory that is automatically reclaimed from time to time or can manually
+     * be reclaimed by calling <tt>trimToSize()</tt>. Putting zeros into cells
+     * already containing zeros does not generate obsolete memory since no
+     * memory was allocated to them in the first place.
      */
     public void trimToSize() {
         this.elements.trimToSize();

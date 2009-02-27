@@ -2,7 +2,6 @@ package cern.colt.matrix.tdouble.algo.solver;
 
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoubleDiagonal;
 
-
 /**
  * Test of DoubleBiCG with diagonal preconditioner
  */

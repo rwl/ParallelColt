@@ -148,7 +148,7 @@ public class FloatGMRES extends AbstractFloatIterativeSolver {
                     w.assign(v[k], FloatFunctions.plusMultSecond(-H.getQuick(k, i)));
                 }
                 H.setQuick(i + 1, i, FloatAlgebra.DEFAULT.norm(w, Norm.Two));
-                v[i + 1].assign(w, FloatFunctions.multSecond((float)(1.0 / H.getQuick(i + 1, i))));
+                v[i + 1].assign(w, FloatFunctions.multSecond((float) (1.0 / H.getQuick(i + 1, i))));
 
                 // QR factorization of H using Givens rotations
                 for (int k = 0; k < i; ++k)

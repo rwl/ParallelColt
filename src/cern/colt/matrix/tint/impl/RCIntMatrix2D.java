@@ -16,8 +16,8 @@ import cern.colt.matrix.tint.IntMatrix2D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
- * Sparse row-compressed 2-d matrix holding <tt>int</tt> elements. First see
- * the <a href="package-summary.html">package summary</a> and javadoc <a
+ * Sparse row-compressed 2-d matrix holding <tt>int</tt> elements. First see the
+ * <a href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
@@ -131,8 +131,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  * </td>
  * </table>
- * Method
- * {@link #assign(IntMatrix2D,cern.colt.function.tint.IntIntFunction)}
+ * Method {@link #assign(IntMatrix2D,cern.colt.function.tint.IntIntFunction)}
  * does just that if you supply
  * {@link cern.jet.math.tint.IntFunctions#plusMultSecond} as argument.
  * 
@@ -149,7 +148,6 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     protected IntArrayList values;
 
     protected int[] rowPointers;
-
 
     /**
      * Constructs a matrix with a copy of the given values. <tt>values</tt> is
@@ -555,7 +553,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     public IntArrayList getValues() {
         return values;
     }
-   
+
     /**
      * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
      * 
@@ -590,12 +588,11 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseIntMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseIntMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseIntMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseIntMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * example, if the receiver is an instance of type <tt>DenseIntMatrix2D</tt>
+     * the new matrix must also be of type <tt>DenseIntMatrix2D</tt>, if the
+     * receiver is an instance of type <tt>SparseIntMatrix2D</tt> the new matrix
+     * must also be of type <tt>SparseIntMatrix2D</tt>, etc. In general, the new
+     * matrix should have internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -610,10 +607,10 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirely independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseIntMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseIntMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseIntMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseIntMatrix1D</tt>, etc.
+     * receiver is an instance of type <tt>DenseIntMatrix2D</tt> the new matrix
+     * must be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance
+     * of type <tt>SparseIntMatrix2D</tt> the new matrix must be of type
+     * <tt>SparseIntMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -701,12 +698,12 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
         DenseIntMatrix1D zz = (DenseIntMatrix1D) z;
         final int[] zElements = zz.elements;
         final int zStride = zz.stride();
-        final int zi = (int)z.index(0);
+        final int zi = (int) z.index(0);
 
         DenseIntMatrix1D yy = (DenseIntMatrix1D) y;
         final int[] yElements = yy.elements;
         final int yStride = yy.stride();
-        final int yi = (int)y.index(0);
+        final int yi = (int) y.index(0);
 
         final int[] columnindexesElements = columnindexes.elements();
         final int[] valuesElements = values.elements();
@@ -780,12 +777,12 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
         DenseIntMatrix1D zz = (DenseIntMatrix1D) z;
         final int[] zElements = zz.elements;
         final int zStride = zz.stride();
-        final int zi = (int)z.index(0);
+        final int zi = (int) z.index(0);
 
         DenseIntMatrix1D yy = (DenseIntMatrix1D) y;
         final int[] yElements = yy.elements;
         final int yStride = yy.stride();
-        final int yi = (int)y.index(0);
+        final int yi = (int) y.index(0);
 
         if (transposeA) {
             if ((!ignore) && (beta != 1.0))

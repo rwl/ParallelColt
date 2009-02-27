@@ -644,8 +644,8 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -661,9 +661,9 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseFloatMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.

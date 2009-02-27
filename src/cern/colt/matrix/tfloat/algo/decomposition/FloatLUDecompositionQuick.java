@@ -17,12 +17,12 @@ import cern.colt.matrix.tfloat.algo.FloatProperty;
  * A low level version of {@link FloatLUDecomposition}, avoiding unnecessary
  * memory allocation and copying. The input to <tt>decompose</tt> methods is
  * overriden with the result (LU). The input to <tt>solve</tt> methods is
- * overriden with the result (X). In addition to <tt>LUDecomposition</tt>,
- * this class also includes a faster variant of the decomposition, specialized
- * for tridiagonal (and hence also diagonal) matrices, as well as a solver tuned
- * for vectors. Its disadvantage is that it is a bit more difficult to use than
- * <tt>LUDecomposition</tt>. Thus, you may want to disregard this class and
- * come back later, if a need for speed arises.
+ * overriden with the result (X). In addition to <tt>LUDecomposition</tt>, this
+ * class also includes a faster variant of the decomposition, specialized for
+ * tridiagonal (and hence also diagonal) matrices, as well as a solver tuned for
+ * vectors. Its disadvantage is that it is a bit more difficult to use than
+ * <tt>LUDecomposition</tt>. Thus, you may want to disregard this class and come
+ * back later, if a need for speed arises.
  * <p>
  * An instance of this class remembers the result of its last decomposition.
  * Usage pattern is as follows: Create an instance of this class, call a
@@ -30,9 +30,9 @@ import cern.colt.matrix.tfloat.algo.FloatProperty;
  * as many equation problems as needed. Once another matrix needs to be
  * LU-decomposed, you need not create a new instance of this class. Start again
  * by calling a decompose method, then retrieve the decomposition and/or solve
- * your equations, and so on. In case a <tt>LU</tt> matrix is already
- * available, call method <tt>setLU</tt> instead of <tt>decompose</tt> and
- * proceed with solving et al.
+ * your equations, and so on. In case a <tt>LU</tt> matrix is already available,
+ * call method <tt>setLU</tt> instead of <tt>decompose</tt> and proceed with
+ * solving et al.
  * <p>
  * If a matrix shall not be overriden, use <tt>matrix.copy()</tt> and hand the
  * the copy to methods.
@@ -40,9 +40,9 @@ import cern.colt.matrix.tfloat.algo.FloatProperty;
  * For an <tt>m x n</tt> matrix <tt>A</tt> with <tt>m >= n</tt>, the LU
  * decomposition is an <tt>m x n</tt> unit lower triangular matrix <tt>L</tt>,
  * an <tt>n x n</tt> upper triangular matrix <tt>U</tt>, and a permutation
- * vector <tt>piv</tt> of length <tt>m</tt> so that <tt>A(piv,:) = L*U</tt>;
- * If <tt>m < n</tt>, then <tt>L</tt> is <tt>m x m</tt> and <tt>U</tt>
- * is <tt>m x n</tt>.
+ * vector <tt>piv</tt> of length <tt>m</tt> so that <tt>A(piv,:) = L*U</tt>; If
+ * <tt>m < n</tt>, then <tt>L</tt> is <tt>m x m</tt> and <tt>U</tt> is
+ * <tt>m x n</tt>.
  * <P>
  * The LU decomposition with pivoting always exists, even if the matrix is
  * singular, so the decompose methods will never fail. The primary use of the LU
@@ -102,10 +102,10 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
     }
 
     /**
-     * Decomposes matrix <tt>A</tt> into <tt>L</tt> and <tt>U</tt>
-     * (in-place). Upon return <tt>A</tt> is overridden with the result
-     * <tt>LU</tt>, such that <tt>L*U = A</tt>. Uses a "left-looking",
-     * dot-product, Crout/Doolittle algorithm.
+     * Decomposes matrix <tt>A</tt> into <tt>L</tt> and <tt>U</tt> (in-place).
+     * Upon return <tt>A</tt> is overridden with the result <tt>LU</tt>, such
+     * that <tt>L*U = A</tt>. Uses a "left-looking", dot-product,
+     * Crout/Doolittle algorithm.
      * 
      * @param A
      *            any matrix.
@@ -208,14 +208,14 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
     }
 
     /**
-     * Decomposes the banded and square matrix <tt>A</tt> into <tt>L</tt>
-     * and <tt>U</tt> (in-place). Upon return <tt>A</tt> is overridden with
-     * the result <tt>LU</tt>, such that <tt>L*U = A</tt>. Currently
-     * supports diagonal and tridiagonal matrices, all other cases fall through
-     * to {@link #decompose(FloatMatrix2D)}.
+     * Decomposes the banded and square matrix <tt>A</tt> into <tt>L</tt> and
+     * <tt>U</tt> (in-place). Upon return <tt>A</tt> is overridden with the
+     * result <tt>LU</tt>, such that <tt>L*U = A</tt>. Currently supports
+     * diagonal and tridiagonal matrices, all other cases fall through to
+     * {@link #decompose(FloatMatrix2D)}.
      * 
-     * @param semiBandwidth ==
-     *            1 --> A is diagonal, == 2 --> A is tridiagonal.
+     * @param semiBandwidth
+     *            == 1 --> A is diagonal, == 2 --> A is tridiagonal.
      * @param A
      *            any matrix.
      */
@@ -334,8 +334,8 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
     /**
      * Returns whether the matrix is nonsingular (has an inverse).
      * 
-     * @return true if <tt>U</tt>, and hence <tt>A</tt>, is nonsingular;
-     *         false otherwise.
+     * @return true if <tt>U</tt>, and hence <tt>A</tt>, is nonsingular; false
+     *         otherwise.
      */
     public boolean isNonsingular() {
         return isNonSingular;
@@ -363,12 +363,13 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
     /**
      * Modifies the matrix to be a lower triangular matrix.
      * <p>
-     * <b>Examples:</b> <table border="0">
+     * <b>Examples:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">3 x 5 matrix:<br>
      * 9, 9, 9, 9, 9<br>
      * 9, 9, 9, 9, 9<br>
-     * 9, 9, 9, 9, 9 </td>
+     * 9, 9, 9, 9, 9</td>
      * <td align="center">triang.Upper<br>
      * ==></td>
      * <td valign="top">3 x 5 matrix:<br>
@@ -382,7 +383,7 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
      * 9, 9, 9<br>
      * 9, 9, 9<br>
      * 9, 9, 9<br>
-     * 9, 9, 9 </td>
+     * 9, 9, 9</td>
      * <td align="center">triang.Upper<br>
      * ==></td>
      * <td valign="top">5 x 3 matrix:<br>
@@ -396,7 +397,7 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
      * <td valign="top">3 x 5 matrix:<br>
      * 9, 9, 9, 9, 9<br>
      * 9, 9, 9, 9, 9<br>
-     * 9, 9, 9, 9, 9 </td>
+     * 9, 9, 9, 9, 9</td>
      * <td align="center">triang.Lower<br>
      * ==></td>
      * <td valign="top">3 x 5 matrix:<br>
@@ -410,7 +411,7 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
      * 9, 9, 9<br>
      * 9, 9, 9<br>
      * 9, 9, 9<br>
-     * 9, 9, 9 </td>
+     * 9, 9, 9</td>
      * <td align="center">triang.Lower<br>
      * ==></td>
      * <td valign="top">5 x 3 matrix:<br>
@@ -658,7 +659,8 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
      * @exception IllegalArgumentException
      *                if </tt>B.rows() != A.rows()</tt>.
      * @exception IllegalArgumentException
-     *                if A is singular, that is, if <tt>!this.isNonsingular()</tt>.
+     *                if A is singular, that is, if
+     *                <tt>!this.isNonsingular()</tt>.
      * @exception IllegalArgumentException
      *                if <tt>A.rows() < A.columns()</tt>.
      */
@@ -720,7 +722,7 @@ public class FloatLUDecompositionQuick implements java.io.Serializable {
      * <pre>
      * 	 rank          : 3
      * 	 trace         : 0
-     * 	
+     * 
      * </pre>
      */
     public String toString() {

@@ -16,7 +16,7 @@ public class DoubleChebyshevTest extends DoubleIterativeSolverTest {
     protected void createSolver() throws Exception {
         // Get the extremal eigenvalues
         DoubleEigenvalueDecomposition evd = DoubleAlgebra.DEFAULT.eig(A);
-        double[] eigs = (double[])evd.getRealEigenvalues().elements();
+        double[] eigs = (double[]) evd.getRealEigenvalues().elements();
 
         double eigmin = 1, eigmax = 1;
         if (eigs.length > 0) {

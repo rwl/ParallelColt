@@ -15,17 +15,17 @@ import cern.jet.random.tfloat.sampling.WeightedFloatRandomSampler;
 import cern.jet.stat.Utils;
 
 /**
- * Approximate quantile finding algorithm for unknown <tt>N</tt> requiring
- * only one pass and little main memory; computes quantiles over a sequence of
- * <tt>float</tt> elements. This algorithm requires at most two times the
- * memory of a corresponding approx. quantile finder knowing <tt>N</tt>.
+ * Approximate quantile finding algorithm for unknown <tt>N</tt> requiring only
+ * one pass and little main memory; computes quantiles over a sequence of
+ * <tt>float</tt> elements. This algorithm requires at most two times the memory
+ * of a corresponding approx. quantile finder knowing <tt>N</tt>.
  * 
  * <p>
  * Needs as input the following parameters:
  * <p>
  * <dt>1. <tt>quantiles</tt> - the number of quantiles to be computed.
- * <dt>2. <tt>epsilon</tt> - the allowed approximation error on quantiles.
- * The approximation guarantee of this algorithm is explicit.
+ * <dt>2. <tt>epsilon</tt> - the allowed approximation error on quantiles. The
+ * approximation guarantee of this algorithm is explicit.
  * 
  * <p>
  * It is also possible to couple the approximation algorithm with random
@@ -33,9 +33,9 @@ import cern.jet.stat.Utils;
  * approximation guarantees are explicit but probabilistic, i.e. they apply with
  * respect to a (user controlled) confidence parameter "delta".
  * 
- * <dt>3. <tt>delta</tt> - the probability allowed that the approximation
- * error fails to be smaller than epsilon. Set <tt>delta</tt> to zero for
- * explicit non probabilistic guarantees.
+ * <dt>3. <tt>delta</tt> - the probability allowed that the approximation error
+ * fails to be smaller than epsilon. Set <tt>delta</tt> to zero for explicit non
+ * probabilistic guarantees.
  * 
  * You usually don't instantiate quantile finders by using the constructor.
  * Instead use the factory <tt>QuantileFinderFactor</tt> to do so. It will set

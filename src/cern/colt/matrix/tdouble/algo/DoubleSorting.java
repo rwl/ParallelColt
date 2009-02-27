@@ -129,7 +129,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
 
         if (vector instanceof DenseDoubleMatrix1D) {
             final double[] velems = (double[]) vector.elements();
-            final int zero = (int)vector.index(0);
+            final int zero = (int) vector.index(0);
             final int stride = vector.stride();
             IntComparator comp = new IntComparator() {
                 public int compare(int a, int b) {
@@ -173,7 +173,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final double[] velems = (double[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -246,7 +246,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final double[] velems = (double[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -275,7 +275,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final double[] velems = (double[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {

@@ -2,6 +2,13 @@ package cern.colt.matrix.tdouble.impl;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
+/**
+ * Sparse row-compressed-modified 2-d matrix holding <tt>double</tt> elements.
+ * Each row is stored as SparseDoubleMatrix1D.
+ * 
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ * 
+ */
 public class RCMDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
     private SparseDoubleMatrix1D[] elements;
@@ -31,13 +38,11 @@ public class RCMDoubleMatrix2D extends WrapperDoubleMatrix2D {
         for (int i = 0; i < rows; ++i)
             elements[i] = new SparseDoubleMatrix1D(columns);
     }
-    
-    
 
     public SparseDoubleMatrix1D[] elements() {
         return elements;
     }
-    
+
     public double getQuick(int row, int column) {
         return elements[row].getQuick(column);
     }
@@ -51,15 +56,15 @@ public class RCMDoubleMatrix2D extends WrapperDoubleMatrix2D {
             elements[r].trimToSize();
         }
     }
-    
+
     public SparseDoubleMatrix1D viewRow(int row) {
         return elements[row];
     }
-    
+
     protected DoubleMatrix2D getContent() {
         return this;
     }
-    
+
     public DoubleMatrix2D like(int rows, int columns) {
         return new RCMDoubleMatrix2D(rows, columns);
     }

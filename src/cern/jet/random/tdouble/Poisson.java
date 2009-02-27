@@ -13,9 +13,9 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 import cern.jet.stat.tdouble.Probability;
 
 /**
- * Poisson distribution (quick); See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node208.html#SECTION0002080000000000000000">
- * math definition</A> and <A
+ * Poisson distribution (quick); See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node208.html#SECTION0002080000000000000000"
+ * > math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosp.html#Poisson Distribution">
  * animated definition</A>.
  * <p>
@@ -26,14 +26,14 @@ import cern.jet.stat.tdouble.Probability;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b> High performance implementation. Patchwork
  * Rejection/Inversion method.
  * <dt>This is a port of <tt>pprsc.c</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library. C-RAND's implementation, in turn, is based upon
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * H. Zechner (1994): Efficient sampling from continuous and discrete unimodal
  * distributions, Doctoral Dissertation, 156 pp., Technical University Graz,

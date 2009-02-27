@@ -11,9 +11,9 @@ package cern.jet.random.tdouble;
 import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 
 /**
- * Poisson distribution; See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node208.html#SECTION0002080000000000000000">
- * math definition</A> and <A
+ * Poisson distribution; See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node208.html#SECTION0002080000000000000000"
+ * > math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosp.html#Poisson Distribution">
  * animated definition</A>.
  * <p>
@@ -24,14 +24,15 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
- * <b>Implementation:</b> This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandPoisson.html">RandPoisson</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++). CLHEP's implementation, in turn, is based upon "W.H.Press et al.,
- * Numerical Recipes in C, Second Edition".
+ * <b>Implementation:</b> This is a port of <A HREF=
+ * "http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandPoisson.html"
+ * >RandPoisson</A> used in <A
+ * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A> (C++). CLHEP's
+ * implementation, in turn, is based upon "W.H.Press et al., Numerical Recipes
+ * in C, Second Edition".
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99

@@ -15,9 +15,9 @@ import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix3D;
 
 /**
- * Selection view on sparse 3-d matrices holding <tt>int</tt> elements.
- * First see the <a href="package-summary.html">package summary</a> and javadoc
- * <a href="package-tree.html">tree view</a> to get the broad picture.
+ * Selection view on sparse 3-d matrices holding <tt>int</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
@@ -41,8 +41,8 @@ import cern.colt.matrix.tint.IntMatrix3D;
  * <p>
  * <b>Memory requirements:</b>
  * <p>
- * <tt>memory [bytes] = 4*(sliceIndexes.length+rowIndexes.length+columnIndexes.length)</tt>.
- * Thus, an index view with 100 x 100 x 100 indexes additionally uses 8 KB.
+ * <tt>memory [bytes] = 4*(sliceIndexes.length+rowIndexes.length+columnIndexes.length)</tt>
+ * . Thus, an index view with 100 x 100 x 100 indexes additionally uses 8 KB.
  * <p>
  * <b>Time complexity:</b>
  * <p>
@@ -158,8 +158,8 @@ class SelectedSparseIntMatrix3D extends IntMatrix3D {
      * <tt>DenseIntMatrix3D</tt> the new matrix must also be of type
      * <tt>DenseIntMatrix3D</tt>, if the receiver is an instance of type
      * <tt>SparseIntMatrix3D</tt> the new matrix must also be of type
-     * <tt>SparseIntMatrix3D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseIntMatrix3D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param slices
      *            the number of slices the matrix shall have.
@@ -218,17 +218,17 @@ class SelectedSparseIntMatrix3D extends IntMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and rows of the given column. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and rows of the given column. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param column
      *            the index of the column to fix.
@@ -258,17 +258,17 @@ class SelectedSparseIntMatrix3D extends IntMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and columns of the given row. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and columns of the given row. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param row
      *            the index of the row to fix.
@@ -298,17 +298,17 @@ class SelectedSparseIntMatrix3D extends IntMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the rows and columns of the given slice. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the rows and columns of the given slice. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param slice
      *            the index of the slice to fix.
@@ -377,9 +377,9 @@ class SelectedSparseIntMatrix3D extends IntMatrix3D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if <tt>other != null</tt> and at
-     * least one of the following conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+     * following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
@@ -400,10 +400,10 @@ class SelectedSparseIntMatrix3D extends IntMatrix3D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseIntMatrix3D</tt> the new matrix must also
-     * be of type <tt>DenseIntMatrix2D</tt>, if the receiver is an
-     * instance of type <tt>SparseIntMatrix3D</tt> the new matrix must also
-     * be of type <tt>SparseIntMatrix2D</tt>, etc.
+     * instance of type <tt>DenseIntMatrix3D</tt> the new matrix must also be of
+     * type <tt>DenseIntMatrix2D</tt>, if the receiver is an instance of type
+     * <tt>SparseIntMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseIntMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.

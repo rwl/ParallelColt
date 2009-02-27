@@ -167,7 +167,9 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     /**
      * Constructs a matrix from MatrixVectorReader.
-     * @param r matrix reader
+     * 
+     * @param r
+     *            matrix reader
      * @throws IOException
      */
     public DenseDoubleMatrix2D(MatrixVectorReader r) throws IOException {
@@ -2940,7 +2942,7 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         if (C == null) {
             C = new DenseDoubleMatrix2D(rowsC, colsC);
         }
-        
+
         if (ConcurrencyUtils.getUseJCublas()) {
             //CUBLAS matrices are column-ordered
             double[] elemsA = (double[]) this.viewDice().copy().elements();
@@ -3126,7 +3128,6 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDoubleMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }
-
 
     private DoubleMatrix2D zMultSeq(DoubleMatrix2D B, DoubleMatrix2D C, double alpha, double beta, boolean transposeA, boolean transposeB) {
         if (transposeA)

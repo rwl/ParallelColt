@@ -21,13 +21,13 @@ import cern.jet.stat.tfloat.FloatDescriptive;
  * <p>
  * This class is fully thread safe (all public methods are synchronized). Thus,
  * you can have one or more threads adding to the bin as well as one or more
- * threads reading and viewing the statistics of the bin <i>while it is filled</i>.
- * For high performance, add data in large chunks (buffers) via method
- * <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
+ * threads reading and viewing the statistics of the bin <i>while it is
+ * filled</i>. For high performance, add data in large chunks (buffers) via
+ * method <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
  * <p>
  * If your favourite statistics measure is not directly provided by this class,
- * check out {@link cern.jet.stat.tfloat.FloatDescriptive} in combination with methods
- * {@link #elements()} and {@link #sortedElements()}.
+ * check out {@link cern.jet.stat.tfloat.FloatDescriptive} in combination with
+ * methods {@link #elements()} and {@link #sortedElements()}.
  * <p>
  * <b>Implementation</b>: Lazy evaluation, caching, incremental maintainance.
  * 
@@ -112,7 +112,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      *            the index of the last element to be added (inclusive).
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>.
+     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
+     *             .
      */
     public synchronized void addAllOfFromTo(FloatArrayList list, int from, int to) {
         this.elements.addAllOfFromTo(list, from, to);
@@ -134,7 +135,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * 	 // Sum( x[i]*x[i] ) 
      * 	 bin.aggregate(F.plus,F.square);
      * 	 --&gt; 14
-     * 	
+     * 
      * </pre>
      * 
      * For further examples, see the <a
@@ -206,9 +207,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * (for a perfect negative relationship) to +1 (for a perfect positive
      * relationship). See the <A
      * HREF="http://www.cquest.utoronto.ca/geog/ggr270y/notes/not05efg.html">
-     * math definition</A> and <A
-     * HREF="http://www.stat.berkeley.edu/users/stark/SticiGui/Text/gloss.htm#correlation_coef">
-     * another def</A>.
+     * math definition</A> and <A HREF="http://www.stat.berkeley.edu/users/stark/SticiGui/Text/gloss.htm#correlation_coef"
+     * > another def</A>.
      * 
      * @param other
      *            the bin to compare with.
@@ -336,17 +336,17 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Computes the frequency (number of occurances, count) of each distinct
      * element. After this call returns both <tt>distinctElements</tt> and
-     * <tt>frequencies</tt> have a new size (which is equal for both), which
-     * is the number of distinct elements currently contained.
+     * <tt>frequencies</tt> have a new size (which is equal for both), which is
+     * the number of distinct elements currently contained.
      * <p>
-     * Distinct elements are filled into <tt>distinctElements</tt>, starting
-     * at index 0. The frequency of each distinct element is filled into
+     * Distinct elements are filled into <tt>distinctElements</tt>, starting at
+     * index 0. The frequency of each distinct element is filled into
      * <tt>frequencies</tt>, starting at index 0. Further, both
-     * <tt>distinctElements</tt> and <tt>frequencies</tt> are sorted
-     * ascending by "element" (in sync, of course). As a result, the smallest
-     * distinct element (and its frequency) can be found at index 0, the second
-     * smallest distinct element (and its frequency) at index 1, ..., the
-     * largest distinct element (and its frequency) at index
+     * <tt>distinctElements</tt> and <tt>frequencies</tt> are sorted ascending
+     * by "element" (in sync, of course). As a result, the smallest distinct
+     * element (and its frequency) can be found at index 0, the second smallest
+     * distinct element (and its frequency) at index 1, ..., the largest
+     * distinct element (and its frequency) at index
      * <tt>distinctElements.size()-1</tt>.
      * <p>
      * <b>Example:</b> <br>
@@ -431,11 +431,10 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     }
 
     /**
-     * Returns <tt>true</tt>. Returns whether a client can obtain all
-     * elements added to the receiver. In other words, tells whether the
-     * receiver internally preserves all added elements. If the receiver is
-     * rebinnable, the elements can be obtained via <tt>elements()</tt>
-     * methods.
+     * Returns <tt>true</tt>. Returns whether a client can obtain all elements
+     * added to the receiver. In other words, tells whether the receiver
+     * internally preserves all added elements. If the receiver is rebinnable,
+     * the elements can be obtained via <tt>elements()</tt> methods.
      * 
      */
     public synchronized boolean isRebinnable() {
@@ -461,8 +460,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     }
 
     /**
-     * Returns the moment of <tt>k</tt>-th order with value <tt>c</tt>,
-     * which is <tt>Sum( (x[i]-c)<sup>k</sup> ) / size()</tt>.
+     * Returns the moment of <tt>k</tt>-th order with value <tt>c</tt>, which is
+     * <tt>Sum( (x[i]-c)<sup>k</sup> ) / size()</tt>.
      * 
      * @param k
      *            the order; any number - can be less than zero, zero or greater
@@ -476,9 +475,9 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     }
 
     /**
-     * Returns the exact <tt>phi-</tt>quantile; that is, the smallest
-     * contained element <tt>elem</tt> for which holds that <tt>phi</tt>
-     * percent of elements are less than <tt>elem</tt>.
+     * Returns the exact <tt>phi-</tt>quantile; that is, the smallest contained
+     * element <tt>elem</tt> for which holds that <tt>phi</tt> percent of
+     * elements are less than <tt>elem</tt>.
      * 
      * @param phi
      *            must satisfy <tt>0 &lt; phi &lt; 1</tt>.
@@ -538,9 +537,9 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     }
 
     /**
-     * Uniformly samples (chooses) <tt>n</tt> random elements <i>with or
-     * without replacement</i> from the contained elements and adds them to the
-     * given buffer. If the buffer is connected to a bin, the effect is that the
+     * Uniformly samples (chooses) <tt>n</tt> random elements <i>with or without
+     * replacement</i> from the contained elements and adds them to the given
+     * buffer. If the buffer is connected to a bin, the effect is that the
      * chosen elements are added to the bin connected to the buffer. Also see
      * {@link #buffered(int) buffered}.
      * 
@@ -584,18 +583,18 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
 
     /**
      * Generic bootstrap resampling. Quite optimized - Don't be afraid to try
-     * it. Executes <tt>resamples</tt> resampling steps. In each resampling
-     * step does the following:
+     * it. Executes <tt>resamples</tt> resampling steps. In each resampling step
+     * does the following:
      * <ul>
-     * <li>Uniformly samples (chooses) <tt>size()</tt> random elements
-     * <i>with replacement</i> from <tt>this</tt> and fills them into an
-     * auxiliary bin <tt>b1</tt>.
+     * <li>Uniformly samples (chooses) <tt>size()</tt> random elements <i>with
+     * replacement</i> from <tt>this</tt> and fills them into an auxiliary bin
+     * <tt>b1</tt>.
      * <li>Uniformly samples (chooses) <tt>other.size()</tt> random elements
-     * <i>with replacement</i> from <tt>other</tt> and fills them into
-     * another auxiliary bin <tt>b2</tt>.
-     * <li>Executes the comparison function <tt>function</tt> on both
-     * auxiliary bins (<tt>function.apply(b1,b2)</tt>) and adds the result
-     * of the function to an auxiliary bootstrap bin <tt>b3</tt>.
+     * <i>with replacement</i> from <tt>other</tt> and fills them into another
+     * auxiliary bin <tt>b2</tt>.
+     * <li>Executes the comparison function <tt>function</tt> on both auxiliary
+     * bins (<tt>function.apply(b1,b2)</tt>) and adds the result of the function
+     * to an auxiliary bootstrap bin <tt>b3</tt>.
      * </ul>
      * <p>
      * Finally returns the auxiliary bootstrap bin <tt>b3</tt> from which the
@@ -609,43 +608,41 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * HREF="http://garnet.acns.fsu.edu/~pkelly/bootstrap.html"> in-depth
      * discussion</A> on bootstrapping and related randomization methods. The
      * classical statistical test for comparing the means of two samples is the
-     * <i>t-test</i>. Unfortunately, this test assumes that the two samples
-     * each come from a normal distribution and that these distributions have
-     * the same standard deviation. Quite often, however, data has a
-     * distribution that is non-normal in many ways. In particular,
-     * distributions are often unsymmetric. For such data, the t-test may
-     * produce misleading results and should thus not be used. Sometimes
-     * asymmetric data can be transformed into normally distributed data by
-     * taking e.g. the logarithm and the t-test will then produce valid results,
-     * but this still requires postulation of a certain distribution underlying
-     * the data, which is often not warranted, because too little is known about
-     * the data composition.
+     * <i>t-test</i>. Unfortunately, this test assumes that the two samples each
+     * come from a normal distribution and that these distributions have the
+     * same standard deviation. Quite often, however, data has a distribution
+     * that is non-normal in many ways. In particular, distributions are often
+     * unsymmetric. For such data, the t-test may produce misleading results and
+     * should thus not be used. Sometimes asymmetric data can be transformed
+     * into normally distributed data by taking e.g. the logarithm and the
+     * t-test will then produce valid results, but this still requires
+     * postulation of a certain distribution underlying the data, which is often
+     * not warranted, because too little is known about the data composition.
      * </p>
      * <p>
      * <i>Bootstrap resampling of means differences</i> (and other differences)
      * is a robust replacement for the t-test and does not require assumptions
      * about the actual distribution of the data. The idea of bootstrapping is
      * quite simple: simulation. The only assumption required is that the two
-     * samples <tt>a</tt> and <tt>b</tt> are representative for the
-     * underlying distribution with respect to the statistic that is being
-     * tested - this assumption is of course implicit in all statistical tests.
-     * We can now generate lots of further samples that correspond to the two
-     * given ones, by sampling <i>with replacement</i>. This process is called
+     * samples <tt>a</tt> and <tt>b</tt> are representative for the underlying
+     * distribution with respect to the statistic that is being tested - this
+     * assumption is of course implicit in all statistical tests. We can now
+     * generate lots of further samples that correspond to the two given ones,
+     * by sampling <i>with replacement</i>. This process is called
      * <i>resampling</i>. A resample can (and usually will) have a different
      * mean than the original one and by drawing hundreds or thousands of such
      * resamples <tt>a<sub>r</sub></tt> from <tt>a</tt> and
      * <tt>b<sub>r</sub></tt> from <tt>b</tt> we can compute the so-called
      * bootstrap distribution of all the differences &quot;mean of
-     * <tt>a<sub>r</sub></tt> minus mean of <tt>b<sub>r</sub></tt>&quot;.
-     * That is, a bootstrap bin filled with the differences. Now we can compute,
-     * what fraction of these differences is, say, greater than zero. Let's
-     * assume we have computed 1000 resamples of both <tt>a</tt> and
-     * <tt>b</tt> and found that only <tt>8</tt> of the differences were
-     * greater than zero. Then <tt>8/1000</tt> or <tt>0.008</tt> is the
-     * p-value (probability) for the hypothesis that the mean of the
-     * distribution underlying <tt>a</tt> is actually larger than the mean of
-     * the distribution underlying <tt>b</tt>. From this bootstrap test, we
-     * can clearly reject the hypothesis.
+     * <tt>a<sub>r</sub></tt> minus mean of <tt>b<sub>r</sub></tt>&quot;. That
+     * is, a bootstrap bin filled with the differences. Now we can compute, what
+     * fraction of these differences is, say, greater than zero. Let's assume we
+     * have computed 1000 resamples of both <tt>a</tt> and <tt>b</tt> and found
+     * that only <tt>8</tt> of the differences were greater than zero. Then
+     * <tt>8/1000</tt> or <tt>0.008</tt> is the p-value (probability) for the
+     * hypothesis that the mean of the distribution underlying <tt>a</tt> is
+     * actually larger than the mean of the distribution underlying <tt>b</tt>.
+     * From this bootstrap test, we can clearly reject the hypothesis.
      * </p>
      * <p>
      * Instead of using means differences, we can also use other differences,
@@ -653,11 +650,11 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * </p>
      * <p>
      * Instead of p-values we can also read arbitrary confidence intervals from
-     * the bootstrap bin. For example, <tt>90%</tt> of all bootstrap
-     * differences are left of the value <tt>-3.5</tt>, hence a left
-     * <tt>90%</tt> confidence interval for the difference would be
-     * <tt>(3.5,infinity)</tt>; in other words: the difference is
-     * <tt>3.5</tt> or larger with probability <tt>0.9</tt>.
+     * the bootstrap bin. For example, <tt>90%</tt> of all bootstrap differences
+     * are left of the value <tt>-3.5</tt>, hence a left <tt>90%</tt> confidence
+     * interval for the difference would be <tt>(3.5,infinity)</tt>; in other
+     * words: the difference is <tt>3.5</tt> or larger with probability
+     * <tt>0.9</tt>.
      * </p>
      * <p>
      * Sometimes we would like to compare not only means and medians, but also
@@ -672,7 +669,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * inequality or variability.
      * </p>
      * <p>
-     * <b>Example:</b> <table>
+     * <b>Example:</b>
+     * <table>
      * <td class="PRE">
      * 
      * <pre>
@@ -718,7 +716,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * 	 // bootstrap resampling of differences of inter-quartile ranges:
      * 	 p-value=0.5699
      * 	 left 90% confidence interval = (5.0,infinity)
-     * 	
+     * 
      * </pre>
      * 
      * </td>
@@ -736,8 +734,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      *            a difference function comparing two samples; takes as first
      *            argument a sample of <tt>this</tt> and as second argument a
      *            sample of <tt>other</tt>.
-     * @return a bootstrap bin holding the results of <tt>function</tt> of
-     *         each resampling step.
+     * @return a bootstrap bin holding the results of <tt>function</tt> of each
+     *         resampling step.
      * @see cern.colt.GenericPermuting#permutation(long,int)
      */
     public synchronized DynamicFloatBin1D sampleBootstrap(DynamicFloatBin1D other, int resamples, cern.jet.random.tfloat.engine.FloatRandomEngine randomGenerator, FloatBinBinFunction1D function) {
@@ -779,18 +777,18 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * reordered or not.
      * <ul>
      * <li><tt>fixedOrder==false</tt> allows the order in which elements are
-     * returned by method <tt>elements()</tt> to be different from the order
-     * in which elements are added.
-     * <li><tt>fixedOrder==true</tt> guarantees that under all circumstances
-     * the order in which elements are returned by method <tt>elements()</tt>
-     * is identical to the order in which elements are added. However, the
-     * latter consumes twice as much memory if operations involving sorting are
+     * returned by method <tt>elements()</tt> to be different from the order in
+     * which elements are added.
+     * <li><tt>fixedOrder==true</tt> guarantees that under all circumstances the
+     * order in which elements are returned by method <tt>elements()</tt> is
+     * identical to the order in which elements are added. However, the latter
+     * consumes twice as much memory if operations involving sorting are
      * requested. This option is usually only required if a 2-dimensional bin,
      * formed by two 1-dimensional bins, needs to be rebinnable.
      * </ul>
      * <p>
-     * Naturally, if <tt>fixedOrder</tt> is set to <tt>true</tt> you should
-     * not already have added elements to the receiver; it should be empty.
+     * Naturally, if <tt>fixedOrder</tt> is set to <tt>true</tt> you should not
+     * already have added elements to the receiver; it should be empty.
      */
     public void setFixedOrder(boolean fixedOrder) {
         // if (size() > 0) throw new RuntimeException("must be called before
@@ -856,8 +854,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * only corrupt the receiver's internal state, but also break thread safety!
      * Only provided for performance and memory sensitive applications. Do not
      * modify the returned elements unless you know exactly what you're doing.
-     * This method can be used in a thread safe, clean <i>and</i> performant
-     * way by explicitly synchronizing on the bin, as follows:
+     * This method can be used in a thread safe, clean <i>and</i> performant way
+     * by explicitly synchronizing on the bin, as follows:
      * 
      * <pre>
      * ...
@@ -965,12 +963,12 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     }
 
     /**
-     * Removes the <tt>s</tt> smallest and <tt>l</tt> largest elements from
-     * the receiver. The receivers size will be reduced by <tt>s + l</tt>
-     * elements.
+     * Removes the <tt>s</tt> smallest and <tt>l</tt> largest elements from the
+     * receiver. The receivers size will be reduced by <tt>s + l</tt> elements.
      * 
      * @param s
-     *            the number of smallest elements to trim away (<tt>s >= 0</tt>).
+     *            the number of smallest elements to trim away (<tt>s >= 0</tt>
+     *            ).
      * @param l
      *            the number of largest elements to trim away (<tt>l >= 0</tt>).
      */
@@ -986,7 +984,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * removed from the receiver (they are not removed).
      * 
      * @param s
-     *            the number of smallest elements to trim away (<tt>s >= 0</tt>).
+     *            the number of smallest elements to trim away (<tt>s >= 0</tt>
+     *            ).
      * @param l
      *            the number of largest elements to trim away (<tt>l >= 0</tt>).
      * @return the trimmed mean.

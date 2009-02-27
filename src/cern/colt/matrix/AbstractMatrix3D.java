@@ -135,6 +135,7 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      * 
      * @throws IndexOutOfBoundsException
      *             if
+     * 
      *             <tt>row<0 || height<0 || row+height>rows || slice<0 || depth<0 || slice+depth>slices  || column<0 || width<0 || column+width>columns</tt>
      */
     protected void checkBox(int slice, int row, int column, int depth, int height, int width) {
@@ -200,7 +201,8 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      * 
      * @throws IllegalArgumentException
      *             if
-     *             <tt>slices() != B.slices() || rows() != B.rows() || columns() != B.columns()</tt>.
+     *             <tt>slices() != B.slices() || rows() != B.rows() || columns() != B.columns()</tt>
+     *             .
      */
     public void checkShape(AbstractMatrix3D B) {
         if (slices != B.slices || rows != B.rows || columns != B.columns)
@@ -213,7 +215,9 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      * 
      * @throws IllegalArgumentException
      *             if
-     *             <tt>slices() != B.slices() || rows() != B.rows() || columns() != B.columns() || slices() != C.slices() || rows() != C.rows() || columns() != C.columns()</tt>.
+     * 
+     *             <tt>slices() != B.slices() || rows() != B.rows() || columns() != B.columns() || slices() != C.slices() || rows() != C.rows() || columns() != C.columns()</tt>
+     *             .
      */
     public void checkShape(AbstractMatrix3D B, AbstractMatrix3D C) {
         if (slices != B.slices || rows != B.rows || columns != B.columns || slices != C.slices || rows != C.rows || columns != C.columns)
@@ -444,6 +448,7 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      * 
      * @throws IndexOutOfBoundsException
      *             if
+     * 
      *             <tt>slice<0 || depth<0 || slice+depth>slices() || row<0 || height<0 || row+height>rows() || column<0 || width<0 || column+width>columns()</tt>
      */
     protected AbstractMatrix3D vPart(int slice, int row, int column, int depth, int height, int width) {
@@ -489,7 +494,8 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      * Self modifying version of viewStrides().
      * 
      * @throws IndexOutOfBoundsException
-     *             if <tt>sliceStride<=0 || rowStride<=0 || columnStride<=0</tt>.
+     *             if <tt>sliceStride<=0 || rowStride<=0 || columnStride<=0</tt>
+     *             .
      */
     protected AbstractMatrix3D vStrides(int sliceStride, int rowStride, int columnStride) {
         if (sliceStride <= 0 || rowStride <= 0 || columnStride <= 0)

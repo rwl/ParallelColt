@@ -131,19 +131,19 @@ public abstract class FloatIterativeSolverTest extends TestCase {
         // Create solver and preconditioner
         createSolver();
         FloatIterationMonitor im = new DefaultFloatIterationMonitor(1000000, rtol, 1e-25f, 1e+5f);
-//        im.setIterationReporter(new NoFloatIterationReporter() {
-//
-//            @Override
-//            public void monitor(float r, FloatMatrix1D x, int i) {
-//                System.out.println("Norm of residual = " + r);
-//            }
-//
-//            @Override
-//            public void monitor(float r, int i) {
-//                System.out.println("Residual = " + r);
-//            }
-//
-//        });
+        //        im.setIterationReporter(new NoFloatIterationReporter() {
+        //
+        //            @Override
+        //            public void monitor(float r, FloatMatrix1D x, int i) {
+        //                System.out.println("Norm of residual = " + r);
+        //            }
+        //
+        //            @Override
+        //            public void monitor(float r, int i) {
+        //                System.out.println("Residual = " + r);
+        //            }
+        //
+        //        });
         if (!(solver instanceof FloatHyBR)) {
             solver.setIterationMonitor(im);
         }

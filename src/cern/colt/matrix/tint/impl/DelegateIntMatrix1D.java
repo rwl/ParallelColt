@@ -12,8 +12,8 @@ import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
 
 /**
- * 1-d matrix holding <tt>int</tt> elements; either a view wrapping another
- * 2-d matrix and therefore delegating calls to it.
+ * 1-d matrix holding <tt>int</tt> elements; either a view wrapping another 2-d
+ * matrix and therefore delegating calls to it.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
@@ -58,11 +58,11 @@ class DelegateIntMatrix1D extends WrapperIntMatrix1D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix must
-     * also be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseIntMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseIntMatrix1D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix must also
+     * be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of
+     * type <tt>SparseIntMatrix1D</tt> the new matrix must also be of type
+     * <tt>SparseIntMatrix1D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -75,10 +75,10 @@ class DelegateIntMatrix1D extends WrapperIntMatrix1D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseIntMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseIntMatrix2D</tt>, if the receiver
-     * is an instance of type <tt>SparseIntMatrix1D</tt> the new matrix
-     * must be of type <tt>SparseIntMatrix2D</tt>, etc.
+     * receiver is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix
+     * must be of type <tt>DenseIntMatrix2D</tt>, if the receiver is an instance
+     * of type <tt>SparseIntMatrix1D</tt> the new matrix must be of type
+     * <tt>SparseIntMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -91,8 +91,7 @@ class DelegateIntMatrix1D extends WrapperIntMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes

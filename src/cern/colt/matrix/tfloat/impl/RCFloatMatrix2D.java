@@ -195,9 +195,11 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         this(values.length, values.length == 0 ? 0 : values[0].length);
         assign(values);
     }
-    
+
     /**
-     * Constructs a matrix with indexes and values given in compressed-row format.
+     * Constructs a matrix with indexes and values given in compressed-row
+     * format.
+     * 
      * @param rows
      * @param columns
      * @param rowPointers
@@ -216,9 +218,50 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         this.columnindexes = columnIndexes;
         this.values = values;
     }
-    
+
+    /**
+     * Constructs a matrix with indexes given in coordinate format and a single
+     * value.
+     * 
+     * @param rows
+     * @param columns
+     * @param rowIndexes
+     * @param columnIndexes
+     * @param value
+     */
+    public RCFloatMatrix2D(int rows, int columns, IntArrayList rowIndexes, IntArrayList columnIndexes, float value) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        int nnz = rowIndexes.size();
+        int[] rowIndexesElements = rowIndexes.elements();
+        int[] columnIndexesElements = columnIndexes.elements();
+
+        int[] idxs = new int[nnz];
+        float[] vals = new float[nnz];
+        int[] starts = new int[rows + 1];
+        int[] w = new int[rows];
+        int r;
+        for (int k = 0; k < nnz; k++) {
+            w[rowIndexesElements[k]]++;
+        }
+        cumsum(starts, w, rows);
+        for (int k = 0; k < nnz; k++) {
+            idxs[r = w[rowIndexesElements[k]]++] = columnIndexesElements[k];
+            vals[r] = value;
+        }
+        this.rowPointers = starts;
+        this.columnindexes = new IntArrayList(idxs);
+        this.values = new FloatArrayList(vals);
+    }
+
     /**
      * Constructs a matrix with indexes and values given in coordinate format.
+     * 
      * @param rows
      * @param columns
      * @param rowIndexes
@@ -235,7 +278,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         }
         int nnz = rowIndexes.size();
         int[] rowIndexesElements = rowIndexes.elements();
-        int[] columnIndexesElements = columnIndexes.elements();        
+        int[] columnIndexesElements = columnIndexes.elements();
         float[] valuesElements = values.elements();
 
         int[] idxs = new int[nnz];
@@ -255,7 +298,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         this.columnindexes = new IntArrayList(idxs);
         this.values = new FloatArrayList(vals);
     }
-    
+
     private float cumsum(int[] p, int[] c, int n) {
         int nz = 0;
         float nz2 = 0;
@@ -268,7 +311,6 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         p[n] = nz;
         return (nz2);
     }
-
 
     /**
      * Constructs a matrix with a given number of rows and columns. All entries
@@ -676,8 +718,8 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the value at the specified coordinate.
      */
     public float getQuick(int row, int column) {
-                int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
-//        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        //        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
         float v = 0;
         if (k >= 0)
             v = values.getQuick(k);
@@ -698,8 +740,8 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -715,9 +757,9 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirely independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseFloatMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -757,8 +799,8 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      *            the value to be filled into the specified cell.
      */
     public synchronized void setQuick(int row, int column, float value) {
-                int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
-//        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        //        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
         if (k >= 0) { // found
             if (value == 0)
                 remove(row, k);
@@ -972,15 +1014,15 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         return C;
     }
 
-//    private static int searchFromTo(int[] list, int key, int from, int to) {
-//        while (from <= to) {
-//            if (list[from] == key) {
-//                return from;
-//            } else {
-//                from++;
-//                continue;
-//            }
-//        }
-//        return -(from + 1); // key not found.
-//    }
+    //    private static int searchFromTo(int[] list, int key, int from, int to) {
+    //        while (from <= to) {
+    //            if (list[from] == key) {
+    //                return from;
+    //            } else {
+    //                from++;
+    //                continue;
+    //            }
+    //        }
+    //        return -(from + 1); // key not found.
+    //    }
 }

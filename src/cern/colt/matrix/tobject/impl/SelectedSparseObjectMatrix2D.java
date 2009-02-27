@@ -14,9 +14,9 @@ import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 
 /**
- * Selection view on sparse 2-d matrices holding <tt>Object</tt> elements.
- * First see the <a href="package-summary.html">package summary</a> and javadoc
- * <a href="package-tree.html">tree view</a> to get the broad picture.
+ * Selection view on sparse 2-d matrices holding <tt>Object</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
@@ -40,8 +40,8 @@ import cern.colt.matrix.tobject.ObjectMatrix2D;
  * <p>
  * <b>Memory requirements:</b>
  * <p>
- * <tt>memory [bytes] = 4*(rowIndexes.length+columnIndexes.length)</tt>.
- * Thus, an index view with 1000 x 1000 indexes additionally uses 8 KB.
+ * <tt>memory [bytes] = 4*(rowIndexes.length+columnIndexes.length)</tt>. Thus,
+ * an index view with 1000 x 1000 indexes additionally uses 8 KB.
  * <p>
  * <b>Time complexity:</b>
  * <p>
@@ -147,7 +147,6 @@ class SelectedSparseObjectMatrix2D extends ObjectMatrix2D {
         return rowOffsets[absRank];
     }
 
-    
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -177,9 +176,9 @@ class SelectedSparseObjectMatrix2D extends ObjectMatrix2D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if <tt>other != null</tt> and at
-     * least one of the following conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+     * following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
@@ -236,9 +235,9 @@ class SelectedSparseObjectMatrix2D extends ObjectMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseObjectMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseObjectMatrix1D</tt>, if the receiver
-     * is an instance of type <tt>SparseObjectMatrix2D</tt> the new matrix
-     * must be of type <tt>SparseObjectMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseObjectMatrix1D</tt>, if the receiver is
+     * an instance of type <tt>SparseObjectMatrix2D</tt> the new matrix must be
+     * of type <tt>SparseObjectMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -252,8 +251,8 @@ class SelectedSparseObjectMatrix2D extends ObjectMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
      * instance of type <tt>DenseObjectMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseObjectMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseObjectMatrix2D</tt> the new matrix must be of type
+     * type <tt>DenseObjectMatrix1D</tt>, if the receiver is an instance of type
+     * <tt>SparseObjectMatrix2D</tt> the new matrix must be of type
      * <tt>SparseObjectMatrix1D</tt>, etc.
      * 
      * @param size
@@ -272,8 +271,8 @@ class SelectedSparseObjectMatrix2D extends ObjectMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -339,14 +338,15 @@ class SelectedSparseObjectMatrix2D extends ObjectMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the rows of
      * the given column. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>viewColumn(0) ==></td>
      * <td valign="top">Matrix1D of size 2:<br>
      * 1, 4</td>
@@ -374,14 +374,15 @@ class SelectedSparseObjectMatrix2D extends ObjectMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the columns
      * of the given row. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>viewRow(0) ==></td>
      * <td valign="top">Matrix1D of size 3:<br>
      * 1, 2, 3</td>

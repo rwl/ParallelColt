@@ -21,8 +21,8 @@ import cern.colt.matrix.tint.impl.DenseIntMatrix2D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
- * Abstract base class for 2-d matrices holding <tt>int</tt> elements. First
- * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * Abstract base class for 2-d matrices holding <tt>int</tt> elements. First see
+ * the <a href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * A matrix has a number of rows and columns, which are assigned upon instance
@@ -948,7 +948,6 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
         return like().assign(this);
     }
 
-
     /**
      * Returns the elements of this matrix.
      * 
@@ -1221,16 +1220,14 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
         return false;
     }
 
-
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of rows and columns. For example,
-     * if the receiver is an instance of type <tt>DenseIntMatrix2D</tt> the
-     * new matrix must also be of type <tt>DenseIntMatrix2D</tt>, if the
-     * receiver is an instance of type <tt>SparseIntMatrix2D</tt> the new
-     * matrix must also be of type <tt>SparseIntMatrix2D</tt>, etc. In
-     * general, the new matrix should have internal parametrization as similar
-     * as possible.
+     * if the receiver is an instance of type <tt>DenseIntMatrix2D</tt> the new
+     * matrix must also be of type <tt>DenseIntMatrix2D</tt>, if the receiver is
+     * an instance of type <tt>SparseIntMatrix2D</tt> the new matrix must also
+     * be of type <tt>SparseIntMatrix2D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1241,12 +1238,11 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseIntMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseIntMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseIntMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseIntMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * example, if the receiver is an instance of type <tt>DenseIntMatrix2D</tt>
+     * the new matrix must also be of type <tt>DenseIntMatrix2D</tt>, if the
+     * receiver is an instance of type <tt>SparseIntMatrix2D</tt> the new matrix
+     * must also be of type <tt>SparseIntMatrix2D</tt>, etc. In general, the new
+     * matrix should have internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -1259,10 +1255,10 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseIntMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseIntMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseIntMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseIntMatrix1D</tt>, etc.
+     * receiver is an instance of type <tt>DenseIntMatrix2D</tt> the new matrix
+     * must be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance
+     * of type <tt>SparseIntMatrix2D</tt> the new matrix must be of type
+     * <tt>SparseIntMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -1273,8 +1269,8 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseIntMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of type
+     * instance of type <tt>DenseIntMatrix2D</tt> the new matrix must be of type
+     * <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of type
      * <tt>SparseIntMatrix2D</tt> the new matrix must be of type
      * <tt>SparseIntMatrix1D</tt>, etc.
      * 
@@ -1453,7 +1449,6 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
         return new int[] { minValue, rowLocation, columnLocation };
     }
 
-
     /**
      * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
      * value.
@@ -1473,7 +1468,6 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
             throw new IndexOutOfBoundsException("row:" + row + ", column:" + column);
         setQuick(row, column, value);
     }
-    
 
     /**
      * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
@@ -1606,7 +1600,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
     public IntMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
-        int viewZero = (int)index(0, column);
+        int viewZero = (int) index(0, column);
         int viewStride = this.rowStride;
         return like1D(viewSize, viewZero, viewStride);
     }
@@ -1747,7 +1741,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
     public IntMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
-        int viewZero = (int)index(row, 0);
+        int viewZero = (int) index(row, 0);
         int viewStride = this.columnStride;
         return like1D(viewSize, viewZero, viewStride);
     }

@@ -2,7 +2,6 @@ package cern.colt.matrix.tfloat.algo.solver;
 
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatDiagonal;
 
-
 /**
  * Test of FloatBiCG with diagonal preconditioner
  */

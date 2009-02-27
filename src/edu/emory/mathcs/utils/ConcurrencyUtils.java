@@ -33,8 +33,6 @@
  * ***** END LICENSE BLOCK ***** */
 package edu.emory.mathcs.utils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -51,7 +49,7 @@ import cern.colt.function.tint.IntIntFunction;
 import cern.colt.function.tobject.ObjectObjectFunction;
 
 /**
- * Utility methods.
+ * Concurrency utilities.
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
@@ -113,7 +111,8 @@ public class ConcurrencyUtils {
      * representing the pending results of the task.
      * 
      * @param <T>
-     * @param task task for execution
+     * @param task
+     *            task for execution
      * @return a handle to the task submitted for execution
      */
     public static <T> Future<T> submit(Callable<T> task) {
@@ -124,7 +123,8 @@ public class ConcurrencyUtils {
      * Submits a Runnable task for execution and returns a Future representing
      * that task.
      * 
-     * @param task task for execution
+     * @param task
+     *            task for execution
      * @return a handle to the task submitted for execution
      */
     public static Future<?> submit(Runnable task) {
@@ -149,11 +149,7 @@ public class ConcurrencyUtils {
         int result;
         try {
             result = JCublas.cublasInit(false);
-        } catch (URISyntaxException e) {
-            return false;
-        } catch (IOException e) {
-            return false;
-        } catch (UnsatisfiedLinkError e) {
+        } catch (Throwable e) {
             return false;
         }
         if (result == JCublas.CUBLAS_STATUS_SUCCESS) {

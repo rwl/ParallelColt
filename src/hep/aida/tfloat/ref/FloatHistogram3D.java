@@ -50,7 +50,8 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
      *            ascending and must not contain multiple identical elements.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>xEdges.length < 1 || yEdges.length < 1|| zEdges.length < 1</tt>.
+     *             <tt>xEdges.length < 1 || yEdges.length < 1|| zEdges.length < 1</tt>
+     *             .
      */
     public FloatHistogram3D(String title, float[] xEdges, float[] yEdges, float[] zEdges) {
         this(title, new FloatVariableAxis(xEdges), new FloatVariableAxis(yEdges), new FloatVariableAxis(zEdges));

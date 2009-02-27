@@ -10,6 +10,7 @@ package cern.colt.matrix.tdouble.impl;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.DoubleMatrix3D;
 
 /**
  * 1-d matrix holding <tt>double</tt> elements; either a view wrapping another
@@ -18,7 +19,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  */
-class DelegateDoubleMatrix1D extends WrapperDoubleMatrix1D {
+class DelegateDoubleMatrix1D extends DoubleMatrix1D {
     /*
      * The elements of the matrix.
      */
@@ -30,7 +31,6 @@ class DelegateDoubleMatrix1D extends WrapperDoubleMatrix1D {
     protected int row;
 
     public DelegateDoubleMatrix1D(DoubleMatrix2D newContent, int row) {
-        super(null);
         if (row < 0 || row >= newContent.rows())
             throw new IllegalArgumentException();
         setUp(newContent.columns());
@@ -61,8 +61,8 @@ class DelegateDoubleMatrix1D extends WrapperDoubleMatrix1D {
      * is an instance of type <tt>DenseDoubleMatrix1D</tt> the new matrix must
      * also be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver is an
      * instance of type <tt>SparseDoubleMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseDoubleMatrix1D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * be of type <tt>SparseDoubleMatrix1D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -76,9 +76,9 @@ class DelegateDoubleMatrix1D extends WrapperDoubleMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseDoubleMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseDoubleMatrix2D</tt>, if the receiver
-     * is an instance of type <tt>SparseDoubleMatrix1D</tt> the new matrix
-     * must be of type <tt>SparseDoubleMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseDoubleMatrix2D</tt>, if the receiver is
+     * an instance of type <tt>SparseDoubleMatrix1D</tt> the new matrix must be
+     * of type <tt>SparseDoubleMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -91,8 +91,7 @@ class DelegateDoubleMatrix1D extends WrapperDoubleMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -108,4 +107,28 @@ class DelegateDoubleMatrix1D extends WrapperDoubleMatrix1D {
     public void setQuick(int index, double value) {
         content.setQuick(row, index, value);
     }
+
+    public Object elements() {
+        return content.elements();
+    }
+
+    public DoubleMatrix2D reshape(int rows, int cols) {
+        throw new IllegalArgumentException("This method is not supported.");
+    }
+
+    public DoubleMatrix3D reshape(int slices, int rows, int cols) {
+        throw new IllegalArgumentException("This method is not supported.");
+    }
+
+    /**
+     * Construct and returns a new selection view.
+     * 
+     * @param offsets
+     *            the offsets of the visible elements.
+     * @return a new view.
+     */
+    protected DoubleMatrix1D viewSelectionLike(int[] offsets) {
+        throw new InternalError(); // should never get called
+    }
+
 }

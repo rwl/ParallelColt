@@ -55,7 +55,8 @@ public class FloatPartitioning extends Object {
      * <p>
      * Note that arguments are not checked for validity.
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>8 x 3 matrix:<br>
      23, 22, 21<br>
@@ -81,7 +82,7 @@ public class FloatPartitioning extends Object {
      rowIndexes == {7, 6, 5, 4, 0, 1, 2, 3}</tt>
      * </p>
      * </td>
-     * <td valign="top"> The matrix IS NOT REORDERED.<br>
+     * <td valign="top">The matrix IS NOT REORDERED.<br>
      * Here is how it would look<br>
      * like, if it would be reordered<br>
      * accoring to <tt>rowIndexes</tt>.<br>
@@ -199,7 +200,8 @@ public class FloatPartitioning extends Object {
      * <p>
      * Note that arguments are not checked for validity.
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>8 x 3 matrix:<br>
      23, 22, 21<br>
@@ -216,8 +218,7 @@ public class FloatPartitioning extends Object {
      ==><br>
      splitIndexes == {0, 2, 3}</tt>
      * </p>
-     * </td>
-     * <td valign="top"> The matrix IS NOT REORDERED.<br>
+     * </td> <td valign="top">The matrix IS NOT REORDERED.<br>
      * The new VIEW IS REORDERED:<br>
      * <tt>8 x 3 matrix:<br>
      2,  1,  0<br>
@@ -227,9 +228,7 @@ public class FloatPartitioning extends Object {
      23, 22, 21<br>
      20, 19, 18<br>
      17, 16, 15<br>
-     14, 13, 12 </tt></td>
-     * </tr>
-     * </table>
+     14, 13, 12 </tt></td> </tr> </table>
      * 
      * @param matrix
      *            the matrix to be partitioned.
@@ -293,7 +292,8 @@ public class FloatPartitioning extends Object {
      * <p>
      * Note that arguments are not checked for validity.
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>8 x 3 matrix:<br>
      23, 22, 21<br>

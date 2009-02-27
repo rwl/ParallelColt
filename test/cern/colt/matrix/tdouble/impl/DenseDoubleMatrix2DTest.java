@@ -138,8 +138,8 @@ public class DenseDoubleMatrix2DTest extends DoubleMatrix2DTest {
     }
 
     public void testFft2() {
-    	int nrows = 64;
-    	int ncolumns = 128; 
+        int nrows = 64;
+        int ncolumns = 128;
         DoubleMatrix2D A = new DenseDoubleMatrix2D(nrows, ncolumns);
         DoubleMatrix2D Acopy = A.copy();
         ((DenseDoubleMatrix2D) A).fft2();

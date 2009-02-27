@@ -150,7 +150,6 @@ public abstract class DoubleMatrix2DTest extends TestCase {
         }
     }
 
-
     public void testAssignDoubleArrayArray() {
         double[][] expected = new double[NROWS][NCOLUMNS];
         for (int r = 0; r < NROWS; r++) {
@@ -257,7 +256,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
                 }
             }
         }
-    }   
+    }
 
     public void testCardinality() {
         int card = A.cardinality();
@@ -399,7 +398,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             assertEquals(A.getQuick(r, NCOLUMNS / 2), col.getQuick(r), TOL);
         }
     }
-    
+
     public void testViewColumnFlip() {
         DoubleMatrix2D B = A.viewColumnFlip();
         assertEquals(A.size(), B.size());
@@ -409,7 +408,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewDice() {
         DoubleMatrix2D B = A.viewDice();
         assertEquals(NROWS, B.columns());
@@ -420,7 +419,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewPart() {
         DoubleMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
         assertEquals(NROWS / 3, B.rows());
@@ -431,7 +430,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewRow() {
         DoubleMatrix1D B = A.viewRow(NROWS / 2);
         assertEquals(NCOLUMNS, B.size());
@@ -440,7 +439,6 @@ public abstract class DoubleMatrix2DTest extends TestCase {
         }
     }
 
-    
     public void testViewRowFlip() {
         DoubleMatrix2D B = A.viewRowFlip();
         assertEquals(A.size(), B.size());
@@ -450,7 +448,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewSelectionDoubleMatrix1DProcedure() {
         final double value = 2;
         A.assign(0);
@@ -470,10 +468,10 @@ public abstract class DoubleMatrix2DTest extends TestCase {
         assertEquals(A.getQuick(NROWS / 4, 0), B.getQuick(0, 0), TOL);
         assertEquals(A.getQuick(NROWS / 2, 0), B.getQuick(1, 0), TOL);
     }
-    
+
     public void testViewSelectionIntArrayIntArray() {
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1};
+        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1 };
         DoubleMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
         assertEquals(rowIndexes.length, B.rows());
         assertEquals(colIndexes.length, B.columns());
@@ -483,14 +481,14 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewSorted() {
         DoubleMatrix2D B = A.viewSorted(1);
         for (int r = 0; r < NROWS - 1; r++) {
-            assertTrue(B.getQuick(r+1, 1) >= B.getQuick(r, 1));
+            assertTrue(B.getQuick(r + 1, 1) >= B.getQuick(r, 1));
         }
     }
-    
+
     public void testViewStrides() {
         int rowStride = 3;
         int colStride = 5;
@@ -501,7 +499,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testZMultDoubleMatrix1DDoubleMatrix1DDoubleDoubleBoolean() {
         DoubleMatrix1D y = new DenseDoubleMatrix1D(NCOLUMNS);
         for (int i = 0; i < y.size(); i++) {
@@ -519,7 +517,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             }
             expected[r] = s * alpha + expected[r] * beta;
         }
-                
+
         for (int r = 0; r < NROWS; r++) {
             assertEquals(expected[r], z.getQuick(r), TOL);
         }
@@ -537,7 +535,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
         for (int r = 0; r < NROWS; r++) {
             assertEquals(expected[r], z.getQuick(r), TOL);
         }
-        
+
         //transpose
         y = new DenseDoubleMatrix1D(NROWS);
         for (int i = 0; i < y.size(); i++) {
@@ -571,7 +569,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
             assertEquals(expected[r], z.getQuick(r), TOL);
         }
     }
-    
+
     public void testZMultDoubleMatrix2DDoubleMatrix2DDoubleDoubleBooleanBoolean() {
         double alpha = 3;
         double beta = 5;
@@ -592,7 +590,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
                 assertEquals(expected[r][c], C.getQuick(r, c), TOL);
             }
         }
-        
+
         //---
         C = null;
         C = A.zMult(Bt, C, alpha, beta, false, false);
@@ -611,7 +609,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
                 assertEquals(expected[r][c], C.getQuick(r, c), TOL);
             }
         }
-        
+
         //transposeA
         C = DoubleFactory2D.dense.random(NCOLUMNS, NCOLUMNS);
         expected = C.toArray();
@@ -648,7 +646,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
                 assertEquals(expected[r][c], C.getQuick(r, c), TOL);
             }
         }
-        
+
         //transposeB
         C = DoubleFactory2D.dense.random(NROWS, NROWS);
         expected = C.toArray();
@@ -723,8 +721,7 @@ public abstract class DoubleMatrix2DTest extends TestCase {
         }
 
     }
-    
-    
+
     public void testZSum() {
         double sum = A.zSum();
         double expected = 0;
@@ -735,5 +732,5 @@ public abstract class DoubleMatrix2DTest extends TestCase {
         }
         assertEquals(expected, sum, TOL);
     }
-    
+
 }

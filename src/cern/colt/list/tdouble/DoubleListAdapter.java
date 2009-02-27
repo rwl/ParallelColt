@@ -8,10 +8,9 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.list.tdouble;
 
-
 /**
- * Adapter that permits an {@link cern.colt.list.tdouble.AbstractDoubleList} to be
- * viewed and treated as a JDK 1.2 {@link java.util.AbstractList}. Makes the
+ * Adapter that permits an {@link cern.colt.list.tdouble.AbstractDoubleList} to
+ * be viewed and treated as a JDK 1.2 {@link java.util.AbstractList}. Makes the
  * contained list compatible with the JDK 1.2 Collections Framework.
  * <p>
  * Any attempt to pass elements other than <tt>java.lang.Number</tt> to setter
@@ -50,7 +49,7 @@ public class DoubleListAdapter extends java.util.AbstractList implements java.ut
      *             being added to this list.
      * @throws IndexOutOfBoundsException
      *             index is out of range (<tt>index &lt;
-     *		  0 || index &gt; size()</tt>).
+     * 		  0 || index &gt; size()</tt>).
      */
     public void add(int index, Object element) {
         content.beforeInsert(index, value(element));
@@ -65,7 +64,8 @@ public class DoubleListAdapter extends java.util.AbstractList implements java.ut
      * 
      * @return the element at the specified position in this list.
      * @throws IndexOutOfBoundsException
-     *             if the given index is out of range (<tt>index &lt; 0 || index &gt;= size()</tt>).
+     *             if the given index is out of range (
+     *             <tt>index &lt; 0 || index &gt;= size()</tt>).
      */
     public Object get(int index) {
         return object(content.get(index));
@@ -89,7 +89,8 @@ public class DoubleListAdapter extends java.util.AbstractList implements java.ut
      * @return the element previously at the specified position.
      * 
      * @throws IndexOutOfBoundsException
-     *             if the specified index is out of range (<tt>index &lt; 0 || index &gt;= size()</tt>).
+     *             if the specified index is out of range (
+     *             <tt>index &lt; 0 || index &gt;= size()</tt>).
      */
     public Object remove(int index) {
         Object old = get(index);
@@ -117,7 +118,8 @@ public class DoubleListAdapter extends java.util.AbstractList implements java.ut
      *             being added to this list.
      * 
      * @throws IndexOutOfBoundsException
-     *             if the specified index is out of range (<tt>index &lt; 0 || index &gt;= size()</tt>).
+     *             if the specified index is out of range (
+     *             <tt>index &lt; 0 || index &gt;= size()</tt>).
      */
 
     public Object set(int index, Object element) {

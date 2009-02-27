@@ -58,6 +58,7 @@ public class DoubleArithmetic extends DoubleConstants {
      * <li>k==1<tt>: <tt>n</tt>.
      * <li>else: <tt>(n * n-1 * ... * n-k+1 ) / ( 1 * 2 * ... * k )</tt>.
      * </ul>
+     * 
      * @return the binomial coefficient.
      */
     public static double binomial(double n, long k) {
@@ -87,6 +88,7 @@ public class DoubleArithmetic extends DoubleConstants {
      * <li>k==1 || k==n-1<tt>: <tt>n</tt>.
      * <li>else: <tt>(n * n-1 * ... * n-k+1 ) / ( 1 * 2 * ... * k )</tt>.
      * </ul>
+     * 
      * @return the binomial coefficient.
      */
     public static double binomial(long n, long k) {
@@ -126,10 +128,9 @@ public class DoubleArithmetic extends DoubleConstants {
     }
 
     /**
-     * Returns the smallest <code>long &gt;= value</code>.
-     * <dt>Examples: <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method
-     * is safer than using (long) Math.ceil(value), because of possible rounding
-     * error.
+     * Returns the smallest <code>long &gt;= value</code>. <dt>Examples:
+     * <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method is safer than
+     * using (long) Math.ceil(value), because of possible rounding error.
      */
     public static long ceil(double value) {
         return Math.round(Math.ceil(value));
@@ -250,12 +251,10 @@ public class DoubleArithmetic extends DoubleConstants {
     }
 
     /**
-     * Returns the largest <code>long &lt;= value</code>.
-     * <dt>Examples: <code>
+     * Returns the largest <code>long &lt;= value</code>. <dt>Examples: <code>
      * 1.0 -> 1, 1.2 -> 1, 1.9 -> 1 <dt>
-     * 2.0 -> 2, 2.2 -> 2, 2.9 -> 2 </code>
-     * <dt> This method is safer than using (long) Math.floor(value), because of
-     * possible rounding error.
+     * 2.0 -> 2, 2.2 -> 2, 2.9 -> 2 </code> <dt>This method is safer than using
+     * (long) Math.floor(value), because of possible rounding error.
      */
     public static long floor(double value) {
         return Math.round(Math.floor(value));

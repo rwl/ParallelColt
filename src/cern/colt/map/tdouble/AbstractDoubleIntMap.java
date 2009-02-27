@@ -15,9 +15,9 @@ import cern.colt.list.tint.IntArrayList;
 
 /**
  * Abstract base class for hash maps holding (key,value) associations of type
- * <tt>(double-->int)</tt>. First see the <a
- * href="package-summary.html">package summary</a> and javadoc <a
- * href="package-tree.html">tree view</a> to get the broad picture.
+ * <tt>(double-->int)</tt>. First see the <a href="package-summary.html">package
+ * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get the
+ * broad picture.
  * <p>
  * <b>Implementation</b>:
  * <p>
@@ -65,8 +65,8 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
     }
 
     /**
-     * Returns a deep copy of the receiver; uses <code>clone()</code> and
-     * casts the result.
+     * Returns a deep copy of the receiver; uses <code>clone()</code> and casts
+     * the result.
      * 
      * @return a deep copy of the receiver.
      */
@@ -99,8 +99,8 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      * </pre>
      * 
      * This implementation first checks if the specified object is this map; if
-     * so it returns <tt>true</tt>. Then, it checks if the specified object
-     * is a map whose size is identical to the size of this set; if not, it it
+     * so it returns <tt>true</tt>. Then, it checks if the specified object is a
+     * map whose size is identical to the size of this set; if not, it it
      * returns <tt>false</tt>. If so, it applies the iteration as described
      * above.
      * 
@@ -133,11 +133,11 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      * Applies a procedure to each key of the receiver, if any. Note: Iterates
      * over the keys in no particular order. Subclasses can define a particular
      * order, for example, "sorted by key". All methods which <i>can</i> be
-     * expressed in terms of this method (most methods can) <i>must guarantee</i>
-     * to use the <i>same</i> order defined by this method, even if it is no
-     * particular order. This is necessary so that, for example, methods
-     * <tt>keys</tt> and <tt>values</tt> will yield association pairs, not
-     * two uncorrelated lists.
+     * expressed in terms of this method (most methods can) <i>must
+     * guarantee</i> to use the <i>same</i> order defined by this method, even
+     * if it is no particular order. This is necessary so that, for example,
+     * methods <tt>keys</tt> and <tt>values</tt> will yield association pairs,
+     * not two uncorrelated lists.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -149,8 +149,8 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
 
     /**
      * Applies a procedure to each (key,value) pair of the receiver, if any.
-     * Iteration order is guaranteed to be <i>identical</i> to the order used
-     * by method {@link #forEachKey(DoubleProcedure)}.
+     * Iteration order is guaranteed to be <i>identical</i> to the order used by
+     * method {@link #forEachKey(DoubleProcedure)}.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -188,8 +188,8 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      * 
      * @param value
      *            the value to search for.
-     * @return the first key for which holds <tt>get(key) == value</tt>;
-     *         returns <tt>Double.NaN</tt> if no such key exists.
+     * @return the first key for which holds <tt>get(key) == value</tt>; returns
+     *         <tt>Double.NaN</tt> if no such key exists.
      */
     public double keyOf(final int value) {
         final double[] foundKey = new double[1];
@@ -208,8 +208,8 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
 
     /**
      * Returns a list filled with all keys contained in the receiver. The
-     * returned list has a size that equals <tt>this.size()</tt>. Note: Keys
-     * are filled into the list in no particular order. However, the order is
+     * returned list has a size that equals <tt>this.size()</tt>. Note: Keys are
+     * filled into the list in no particular order. However, the order is
      * <i>identical</i> to the order used by method
      * {@link #forEachKey(DoubleProcedure)}.
      * <p>
@@ -246,11 +246,11 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
     }
 
     /**
-     * Fills all keys <i>sorted ascending by their associated value</i> into
-     * the specified list. Fills into the list, starting at index 0. After this
-     * call returns the specified list has a new size that equals
-     * <tt>this.size()</tt>. Primary sort criterium is "value", secondary
-     * sort criterium is "key". This means that if any two values are equal, the
+     * Fills all keys <i>sorted ascending by their associated value</i> into the
+     * specified list. Fills into the list, starting at index 0. After this call
+     * returns the specified list has a new size that equals
+     * <tt>this.size()</tt>. Primary sort criterium is "value", secondary sort
+     * criterium is "key". This means that if any two values are equal, the
      * smaller key comes first.
      * <p>
      * <b>Example:</b> <br>
@@ -277,8 +277,8 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      * 	 public boolean apply(double key, int value) { return value%2==0; }
      * 	 }
      * 	 keys = (8,7,6), values = (1,2,2) --&gt; keyList = (6,8), valueList = (2,1)
-     * </tt>
-     </pre>
+     * &lt;/tt&gt;
+     * </pre>
      * 
      * @param condition
      *            the condition to be matched. Takes the current key as first
@@ -350,8 +350,8 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      * Fills all keys and values <i>sorted ascending by value</i> into the
      * specified lists. Fills into the lists, starting at index 0. After this
      * call returns the specified lists both have a new size that equals
-     * <tt>this.size()</tt>. Primary sort criterium is "value", secondary
-     * sort criterium is "key". This means that if any two values are equal, the
+     * <tt>this.size()</tt>. Primary sort criterium is "value", secondary sort
+     * criterium is "key". This means that if any two values are equal, the
      * smaller key comes first.
      * <p>
      * <b>Example:</b> <br>
@@ -400,10 +400,9 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      *            the key the value shall be associated with.
      * @param value
      *            the value to be associated.
-     * @return <tt>true</tt> if the receiver did not already contain such a
-     *         key; <tt>false</tt> if the receiver did already contain such a
-     *         key - the new value has now replaced the formerly associated
-     *         value.
+     * @return <tt>true</tt> if the receiver did not already contain such a key;
+     *         <tt>false</tt> if the receiver did already contain such a key -
+     *         the new value has now replaced the formerly associated value.
      */
     public abstract boolean put(double key, int value);
 

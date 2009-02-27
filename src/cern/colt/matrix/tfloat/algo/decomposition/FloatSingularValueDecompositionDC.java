@@ -15,10 +15,10 @@ import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
 
 /**
  * 
- * For an <tt>m x n</tt> matrix <tt>A</tt>, the singular value
- * decomposition is an <tt>m x m</tt> orthogonal matrix <tt>U</tt>, an
- * <tt>m x n</tt> diagonal matrix <tt>S</tt>, and an <tt>n x n</tt>
- * orthogonal matrix <tt>V</tt> so that <tt>A = U*S*V'</tt>.
+ * For an <tt>m x n</tt> matrix <tt>A</tt>, the singular value decomposition is
+ * an <tt>m x m</tt> orthogonal matrix <tt>U</tt>, an <tt>m x n</tt> diagonal
+ * matrix <tt>S</tt>, and an <tt>n x n</tt> orthogonal matrix <tt>V</tt> so that
+ * <tt>A = U*S*V'</tt>.
  * <P>
  * The singular values, <tt>sigma[k] = S[k][k]</tt>, are ordered so that
  * <tt>sigma[0] >= sigma[1] >= ... >= sigma[min(m-1,n-1)]</tt>.
@@ -59,11 +59,11 @@ public class FloatSingularValueDecompositionDC {
      *            rectangular matrix
      * 
      * @param wantUV
-     *            <br>
+     * <br>
      *            true: all matrices (U, S, V') are computed<br>
      *            false: only S is computed
      * @param wantWholeUV
-     *            <br>
+     * <br>
      *            true: all m columns of U and all n rows of V' are computed<br>
      *            false: the first min(m,n) columns of U and the first min(m,n)
      *            rows of V' are computed
@@ -128,8 +128,8 @@ public class FloatSingularValueDecompositionDC {
     }
 
     /**
-     * Returns the diagonal of <tt>S</tt>, which is a one-dimensional array
-     * of singular values
+     * Returns the diagonal of <tt>S</tt>, which is a one-dimensional array of
+     * singular values
      * 
      * @return diagonal of <tt>S</tt>.
      */
@@ -210,8 +210,9 @@ public class FloatSingularValueDecompositionDC {
     /**
      * Returns the output flag
      * 
-     * @return 0: successful exit<br> < 0: if INFO = -i, the i-th argument had
-     *         an illegal value<br> > 0: process did not converge.
+     * @return 0: successful exit<br>
+     *         < 0: if INFO = -i, the i-th argument had an illegal value<br>
+     *         > 0: process did not converge.
      */
     public org.netlib.util.intW getInfo() {
         return info;
@@ -247,7 +248,7 @@ public class FloatSingularValueDecompositionDC {
      * <pre>
      * 	 rank          : 3
      * 	 trace         : 0
-     * 	
+     * 
      * </pre>
      */
     public String toString() {

@@ -14,10 +14,10 @@ import cern.colt.matrix.tdouble.algo.DoubleProperty;
 
 /**
  * For a symmetric, positive definite matrix <tt>A</tt>, the Cholesky
- * decomposition is a lower triangular matrix <tt>L</tt> so that
- * <tt>A = L*L'</tt>; If the matrix is not symmetric or positive definite,
- * the constructor returns a partial decomposition and sets an internal flag
- * that may be queried by the <tt>isSymmetricPositiveDefinite()</tt> method.
+ * decomposition is a lower triangular matrix <tt>L</tt> so that <tt>A = L*L'</tt>; If
+ * the matrix is not symmetric or positive definite, the constructor returns a
+ * partial decomposition and sets an internal flag that may be queried by the
+ * <tt>isSymmetricPositiveDefinite()</tt> method.
  */
 public class DoubleCholeskyDecomposition implements java.io.Serializable {
     static final long serialVersionUID = 1020;
@@ -115,8 +115,7 @@ public class DoubleCholeskyDecomposition implements java.io.Serializable {
     }
 
     /**
-     * Returns whether the matrix <tt>A</tt> is symmetric and positive
-     * definite.
+     * Returns whether the matrix <tt>A</tt> is symmetric and positive definite.
      * 
      * @return true if <tt>A</tt> is symmetric and positive definite; false
      *         otherwise
@@ -249,7 +248,7 @@ public class DoubleCholeskyDecomposition implements java.io.Serializable {
      * <pre>
      * 	 rank          : 3
      * 	 trace         : 0
-     * 	
+     * 
      * </pre>
      */
     public String toString() {

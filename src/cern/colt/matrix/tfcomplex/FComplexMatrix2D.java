@@ -25,10 +25,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * Abstract base class for 2-d matrices holding <tt>complex</tt> elements.
  * 
  * A matrix has a number of rows and columns, which are assigned upon instance
- * construction - The matrix's size is then <tt>rows()*columns()</tt>.
- * Elements are accessed via <tt>[row,column]</tt> coordinates. Legal
- * coordinates range from <tt>[0,0]</tt> to <tt>[rows()-1,columns()-1]</tt>.
- * Any attempt to access an element at a coordinate
+ * construction - The matrix's size is then <tt>rows()*columns()</tt>. Elements
+ * are accessed via <tt>[row,column]</tt> coordinates. Legal coordinates range
+ * from <tt>[0,0]</tt> to <tt>[rows()-1,columns()-1]</tt>. Any attempt to access
+ * an element at a coordinate
  * <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
  * will throw an <tt>IndexOutOfBoundsException</tt>.
  * <p>
@@ -524,8 +524,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     }
 
     /**
-     * Sets all cells to the state specified by <tt>values</tt>.
-     * <tt>values</tt> is required to have the form
+     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
+     * is required to have the form
      * <tt>re = values[row*rowStride+column*columnStride]; im = values[row*rowStride+column*columnStride+1]</tt>
      * and have exactly the same number of rows and columns as the receiver.
      * <p>
@@ -583,8 +583,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     }
 
     /**
-     * Sets all cells to the state specified by <tt>values</tt>.
-     * <tt>values</tt> is required to have the form
+     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
+     * is required to have the form
      * <tt>re = values[row][2*column]; im = values[row][2*column+1]</tt> and
      * have exactly the same number of rows and columns as the receiver.
      * <p>
@@ -596,7 +596,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      * @throws IllegalArgumentException
      *             if
-     *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != 2*columns()</tt>.
+     *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != 2*columns()</tt>
+     *             .
      */
     public FComplexMatrix2D assign(final float[][] values) {
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -640,7 +641,6 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
         return this;
     }
 
-   
     /**
      * Replaces imaginary part of the receiver with the values of another real
      * matrix. The real part of the receiver remains unchanged. Both matrices
@@ -838,8 +838,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * 
      * @param obj
      *            the object to compare with.
-     * @return <code>true</code> if the objects are the same;
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the objects are the same; <code>false</code>
+     *         otherwise.
      */
     public boolean equals(Object obj) {
         if (this == obj)
@@ -852,9 +852,6 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
         return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, (FComplexMatrix2D) obj);
     }
 
-    
-    
-   
     /**
      * Assigns the result of a function to each <i>non-zero</i> cell. Use this
      * method for fast special-purpose iteration. If you want to modify another
@@ -1053,14 +1050,11 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      */
     public abstract FloatMatrix2D getRealPart();
 
-    
-    
-    
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of rows and columns. For example,
-     * if the receiver is an instance of type <tt>DenseComplexMatrix2D</tt>
-     * the new matrix must also be of type <tt>DenseComplexMatrix2D</tt>. In
+     * if the receiver is an instance of type <tt>DenseComplexMatrix2D</tt> the
+     * new matrix must also be of type <tt>DenseComplexMatrix2D</tt>. In
      * general, the new matrix should have internal parametrization as similar
      * as possible.
      * 
@@ -1099,8 +1093,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     public abstract FComplexMatrix1D like1D(int size);
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * @param row
      *            the index of the row-coordinate.
@@ -1119,8 +1113,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -1144,8 +1138,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     public abstract void setQuick(int row, int column, float re, float im);
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -1166,8 +1160,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     /**
      * Constructs and returns a 2-dimensional array containing the cell values.
      * The returned array <tt>values</tt> has the form
-     * <tt>re = values[row][2*column]; im = values[row][2*column+1]</tt> and
-     * has the same number of rows and columns as the receiver.
+     * <tt>re = values[row][2*column]; im = values[row][2*column+1]</tt> and has
+     * the same number of rows and columns as the receiver.
      * <p>
      * The values are copied. So subsequent changes in <tt>values</tt> are not
      * reflected in the matrix, and vice-versa.
@@ -1268,8 +1262,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the rows of
      * the given column. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * 
      * @param column
      *            the column to fix.
@@ -1281,17 +1275,17 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     public FComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
-        int viewZero = (int)index(0, column);
+        int viewZero = (int) index(0, column);
         int viewStride = this.rowStride;
         return like1D(viewSize, viewZero, viewStride);
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the column axis.
-     * What used to be column <tt>0</tt> is now column <tt>columns()-1</tt>,
-     * ..., what used to be column <tt>columns()-1</tt> is now column
-     * <tt>0</tt>. The returned view is backed by this matrix, so changes in
-     * the returned view are reflected in this matrix, and vice-versa.
+     * Constructs and returns a new <i>flip view</i> along the column axis. What
+     * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
+     * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
+     * returned view is backed by this matrix, so changes in the returned view
+     * are reflected in this matrix, and vice-versa.
      * 
      * @return a new flip view.
      * @see #viewRowFlip()
@@ -1330,11 +1324,11 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * <p>
      * The view contains the cells from <tt>[row,column]</tt> to
      * <tt>[row+height-1,column+width-1]</tt>, all inclusive. and has
-     * <tt>view.rows() == height; view.columns() == width;</tt>. A view's
-     * legal coordinates are again zero based, as usual. In other words, legal
+     * <tt>view.rows() == height; view.columns() == width;</tt>. A view's legal
+     * coordinates are again zero based, as usual. In other words, legal
      * coordinates of the view range from <tt>[0,0]</tt> to
-     * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As
-     * usual, any attempt to access a cell at a coordinate
+     * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As usual,
+     * any attempt to access a cell at a coordinate
      * <tt>column&lt;0 || column&gt;=view.columns() || row&lt;0 || row&gt;=view.rows()</tt>
      * will throw an <tt>IndexOutOfBoundsException</tt>.
      * 
@@ -1360,8 +1354,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the columns
      * of the given row. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * 
      * @param row
      *            the row to fix.
@@ -1373,17 +1367,17 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     public FComplexMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
-        int viewZero = (int)index(row, 0);
+        int viewZero = (int) index(row, 0);
         int viewStride = this.columnStride;
         return like1D(viewSize, viewZero, viewStride);
     }
 
     /**
      * Constructs and returns a new <i>flip view</i> along the row axis. What
-     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what
-     * used to be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned
-     * view is backed by this matrix, so changes in the returned view are
-     * reflected in this matrix, and vice-versa.
+     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
+     * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
+     * backed by this matrix, so changes in the returned view are reflected in
+     * this matrix, and vice-versa.
      * 
      * @return a new flip view.
      * @see #viewColumnFlip()
@@ -1500,8 +1494,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      *            the source vector.
      * @param z
      *            the vector where results are to be stored. Set this parameter
-     *            to <tt>null</tt> to indicate that a new result vector shall
-     *            be constructed.
+     *            to <tt>null</tt> to indicate that a new result vector shall be
+     *            constructed.
      * @return z (for convenience only).
      */
     public FComplexMatrix1D zMult(FComplexMatrix1D y, FComplexMatrix1D z) {
@@ -1518,8 +1512,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      *            the source vector.
      * @param z
      *            the vector where results are to be stored. Set this parameter
-     *            to <tt>null</tt> to indicate that a new result vector shall
-     *            be constructed.
+     *            to <tt>null</tt> to indicate that a new result vector shall be
+     *            constructed.
      * @return z (for convenience only).
      * 
      * @throws IllegalArgumentException
@@ -1587,8 +1581,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      *            the second source matrix.
      * @param C
      *            the matrix where results are to be stored. Set this parameter
-     *            to <tt>null</tt> to indicate that a new result matrix shall
-     *            be constructed.
+     *            to <tt>null</tt> to indicate that a new result matrix shall be
+     *            constructed.
      * @return C (for convenience only).
      */
     public FComplexMatrix2D zMult(FComplexMatrix2D B, FComplexMatrix2D C) {
@@ -1606,8 +1600,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      *            the second source matrix.
      * @param C
      *            the matrix where results are to be stored. Set this parameter
-     *            to <tt>null</tt> to indicate that a new result matrix shall
-     *            be constructed.
+     *            to <tt>null</tt> to indicate that a new result matrix shall be
+     *            constructed.
      * @return C (for convenience only).
      * 
      * @throws IllegalArgumentException
@@ -1707,13 +1701,11 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      * 
      * @param other
      *            matrix
-     * @return <tt>true</tt> if both matrices share at least one identical
-     *         cell.
+     * @return <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCells(FComplexMatrix2D other) {
         if (other == null)
@@ -1737,8 +1729,8 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be
-     * of type <tt>DenseComplexMatrix1D</tt>.
+     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be of
+     * type <tt>DenseComplexMatrix1D</tt>.
      * 
      * @param size
      *            the number of cells the matrix shall have.

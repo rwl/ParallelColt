@@ -25,7 +25,6 @@ public abstract class DoubleMatrix1DTest extends TestCase {
 
     protected double TOL = 1e-10;
 
- 
     /**
      * Constructor for DoubleMatrix1DTest
      */
@@ -256,7 +255,7 @@ public abstract class DoubleMatrix1DTest extends TestCase {
             assertEquals(array[i], A.getQuick(i), TOL);
         }
     }
-    
+
     public void testToArrayDoubleArray() {
         double[] array = new double[SIZE];
         A.toArray(array);
@@ -342,7 +341,7 @@ public abstract class DoubleMatrix1DTest extends TestCase {
     public void testViewSorted() {
         DoubleMatrix1D b = A.viewSorted();
         for (int i = 0; i < SIZE - 1; i++) {
-            assertTrue(b.getQuick(i+1) >= b.getQuick(i));
+            assertTrue(b.getQuick(i + 1) >= b.getQuick(i));
         }
     }
 
@@ -363,7 +362,6 @@ public abstract class DoubleMatrix1DTest extends TestCase {
         assertEquals(expected, product, TOL);
     }
 
-    
     public void testZDotProductDoubleMatrix1DIntInt() {
         double product = A.zDotProduct(B, 5, B.size() - 10);
         double expected = 0;
@@ -385,7 +383,7 @@ public abstract class DoubleMatrix1DTest extends TestCase {
         }
         assertEquals(expected, product, TOL);
     }
-    
+
     public void testZSum() {
         double sum = A.zSum();
         double expected = 0;

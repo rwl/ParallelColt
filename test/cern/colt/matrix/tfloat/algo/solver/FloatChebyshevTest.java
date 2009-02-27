@@ -16,7 +16,7 @@ public class FloatChebyshevTest extends FloatIterativeSolverTest {
     protected void createSolver() throws Exception {
         // Get the extremal eigenvalues
         FloatEigenvalueDecomposition evd = FloatAlgebra.DEFAULT.eig(A);
-        float[] eigs = (float[])evd.getRealEigenvalues().elements();
+        float[] eigs = (float[]) evd.getRealEigenvalues().elements();
 
         float eigmin = 1, eigmax = 1;
         if (eigs.length > 0) {

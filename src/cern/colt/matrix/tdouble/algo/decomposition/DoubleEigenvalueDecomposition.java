@@ -18,17 +18,17 @@ import cern.colt.matrix.tdouble.algo.DoubleProperty;
 /**
  * Eigenvalues and eigenvectors of a real matrix <tt>A</tt>.
  * <P>
- * If <tt>A</tt> is symmetric, then <tt>A = V*D*V'</tt> where the eigenvalue
- * matrix <tt>D</tt> is diagonal and the eigenvector matrix <tt>V</tt> is
- * orthogonal. I.e. <tt>A = V.mult(D.mult(transpose(V)))</tt> and
+ * If <tt>A</tt> is symmetric, then <tt>A = V*D*V'</tt> where the eigenvalue matrix
+ * <tt>D</tt> is diagonal and the eigenvector matrix <tt>V</tt> is orthogonal.
+ * I.e. <tt>A = V.mult(D.mult(transpose(V)))</tt> and
  * <tt>V.mult(transpose(V))</tt> equals the identity matrix.
  * 
  * <P>
  * If <tt>A</tt> is not symmetric, then the eigenvalue matrix <tt>D</tt> is
  * block diagonal with the real eigenvalues in 1-by-1 blocks and any complex
  * eigenvalues, <tt>lambda + i*mu</tt>, in 2-by-2 blocks,
- * <tt>[lambda, mu; -mu, lambda]</tt>. The columns of <tt>V</tt> represent
- * the eigenvectors in the sense that <tt>A*V = V*D</tt>, i.e.
+ * <tt>[lambda, mu; -mu, lambda]</tt>. The columns of <tt>V</tt> represent the
+ * eigenvectors in the sense that <tt>A*V = V*D</tt>, i.e.
  * <tt>A.mult(V) equals V.mult(D)</tt>. The matrix <tt>V</tt> may be badly
  * conditioned, or even singular, so the validity of the equation
  * <tt>A = V*D*inverse(V)</tt> depends upon <tt>Algebra.cond(V)</tt>.
@@ -736,7 +736,7 @@ public class DoubleEigenvalueDecomposition implements java.io.Serializable {
      * <pre>
      * 	 rank          : 3
      * 	 trace         : 0
-     * 	
+     * 
      * </pre>
      */
     public String toString() {

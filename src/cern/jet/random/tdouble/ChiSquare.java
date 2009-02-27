@@ -12,12 +12,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 import cern.jet.stat.tdouble.Probability;
 
 /**
- * ChiSquare distribution; See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node31.html#SECTION000310000000000000000">
- * math definition</A> and <A
+ * ChiSquare distribution; See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node31.html#SECTION000310000000000000000"
+ * > math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosc.html#Chi-square Distribution">
- * animated definition</A>.
- * <dt>A special case of the Gamma distribution.
+ * animated definition</A>. <dt>A special case of the Gamma distribution.
  * <p>
  * <tt>p(x) = (1/g(f/2)) * (x/2)^(f/2-1) * exp(-x/2)</tt> with <tt>g(a)</tt>
  * being the gamma function and <tt>f</tt> being the degrees of freedom.
@@ -26,16 +25,16 @@ import cern.jet.stat.tdouble.Probability;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b>
- * <dt> Method: Ratio of Uniforms with shift.
- * <dt> High performance implementation. This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandChiSquare.html">RandChiSquare</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++). CLHEP's implementation, in turn, is based on <tt>chru.c</tt> from
- * the <A HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * <dt>Method: Ratio of Uniforms with shift.
+ * <dt>High performance implementation. This is a port of <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandChiSquare.html"
+ * >RandChiSquare</A> used in <A
+ * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A> (C++). CLHEP's
+ * implementation, in turn, is based on <tt>chru.c</tt> from the <A
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
  * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * J.F. Monahan (1987): An algorithm for generating chi random variables, ACM

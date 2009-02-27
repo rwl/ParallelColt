@@ -17,8 +17,8 @@ package cern.jet.math.tint;
  * <li><tt>a + b/constant</tt>
  * <li><tt>a - b/constant</tt>
  * </ul>
- * <tt>a</tt> and <tt>b</tt> are variables, <tt>constant</tt> is fixed,
- * but for performance reasons publicly accessible. Intended to be passed to
+ * <tt>a</tt> and <tt>b</tt> are variables, <tt>constant</tt> is fixed, but for
+ * performance reasons publicly accessible. Intended to be passed to
  * <tt>matrix.assign(otherMatrix,function)</tt> methods.
  */
 public final class IntPlusMultSecond implements cern.colt.function.tint.IntIntFunction {

@@ -14,7 +14,6 @@ import cern.colt.matrix.tfcomplex.impl.SparseFComplexMatrix2DTest;
 import cern.colt.matrix.tfcomplex.impl.SparseFComplexMatrix2DViewTest;
 import cern.colt.matrix.tfcomplex.impl.SparseFComplexMatrix3DTest;
 import cern.colt.matrix.tfcomplex.impl.SparseFComplexMatrix3DViewTest;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class AllFComplexMatrixTests {
     public static Test suite() {
@@ -23,17 +22,17 @@ public class AllFComplexMatrixTests {
         suite.addTestSuite(DenseFComplexMatrix1DViewTest.class);
         suite.addTestSuite(SparseFComplexMatrix1DTest.class);
         suite.addTestSuite(SparseFComplexMatrix1DViewTest.class);
-        
+
         suite.addTestSuite(DenseFComplexMatrix2DTest.class);
         suite.addTestSuite(DenseFComplexMatrix2DViewTest.class);
         suite.addTestSuite(SparseFComplexMatrix2DTest.class);
         suite.addTestSuite(SparseFComplexMatrix2DViewTest.class);
-        
+
         suite.addTestSuite(DenseFComplexMatrix3DTest.class);
         suite.addTestSuite(DenseFComplexMatrix3DViewTest.class);
         suite.addTestSuite(SparseFComplexMatrix3DTest.class);
         suite.addTestSuite(SparseFComplexMatrix3DViewTest.class);
-        
+
         return suite;
     }
 

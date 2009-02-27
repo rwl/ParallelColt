@@ -89,10 +89,12 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>.
+     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>
+     *             .
      */
     public DenseObjectMatrix3D(Object[][][] values) {
         this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
@@ -157,10 +159,9 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
     }
 
     /**
-     * Sets all cells to the state specified by <tt>values</tt>.
-     * <tt>values</tt> is required to have the form
-     * <tt>values[slice][row][column]</tt> and have exactly the same number of
-     * slices, rows and columns as the receiver.
+     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
+     * is required to have the form <tt>values[slice][row][column]</tt> and have
+     * exactly the same number of slices, rows and columns as the receiver.
      * <p>
      * The values are copied. So subsequent changes in <tt>values</tt> are not
      * reflected in the matrix, and vice-versa.
@@ -170,134 +171,136 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @return <tt>this</tt> (for convenience only).
      * @throws IllegalArgumentException
      *             if
-     *             <tt>values.length != slices() || for any 0 &lt;= slice &lt; slices(): values[slice].length != rows()</tt>.
+     *             <tt>values.length != slices() || for any 0 &lt;= slice &lt; slices(): values[slice].length != rows()</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != columns()</tt>.
+     *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != columns()</tt>
+     *             .
      */
     public ObjectMatrix3D assign(final Object[][][] values) {
-    	if (values.length != slices)
-			throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
-		int np = ConcurrencyUtils.getNumberOfThreads();
-		if (this.isNoView) {
-			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future<?>[] futures = new Future[np];
-				int k = slices / np;
-				for (int j = 0; j < np; j++) {
-					final int startslice = j * k;
-					final int stopslice;
-					if (j == np - 1) {
-						stopslice = slices;
-					} else {
-						stopslice = startslice + k;
-					}
-					futures[j] = ConcurrencyUtils.submit(new Runnable() {
-						public void run() {
-							int i = startslice * sliceStride;
-							for (int s = startslice; s < stopslice; s++) {
-								Object[][] currentSlice = values[s];
-								if (currentSlice.length != rows)
-									throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
-								for (int r = 0; r < rows; r++) {
-									Object[] currentRow = currentSlice[r];
-									if (currentRow.length != columns)
-										throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
-									System.arraycopy(currentRow, 0, elements, i, columns);
-									i += columns;
-								}
-							}
-						}
-					});
-				}
-				try {
-					for (int j = 0; j < np; j++) {
-						futures[j].get();
-					}
-				} catch (ExecutionException ex) {
-					ex.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} else {
-				int i = 0;
-				for (int s = 0; s < slices; s++) {
-					Object[][] currentSlice = values[s];
-					if (currentSlice.length != rows)
-						throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
-					for (int r = 0; r < rows; r++) {
-						Object[] currentRow = currentSlice[r];
-						if (currentRow.length != columns)
-							throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
-						System.arraycopy(currentRow, 0, this.elements, i, columns);
-						i += columns;
-					}
-				}
-			}
-		} else {
-			final int zero = (int)index(0, 0, 0);
-			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future<?>[] futures = new Future[np];
-				int k = slices / np;
-				for (int j = 0; j < np; j++) {
-					final int startslice = j * k;
-					final int stopslice;
-					if (j == np - 1) {
-						stopslice = slices;
-					} else {
-						stopslice = startslice + k;
-					}
-					futures[j] = ConcurrencyUtils.submit(new Runnable() {
+        if (values.length != slices)
+            throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        if (this.isNoView) {
+            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                Future<?>[] futures = new Future[np];
+                int k = slices / np;
+                for (int j = 0; j < np; j++) {
+                    final int startslice = j * k;
+                    final int stopslice;
+                    if (j == np - 1) {
+                        stopslice = slices;
+                    } else {
+                        stopslice = startslice + k;
+                    }
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                        public void run() {
+                            int i = startslice * sliceStride;
+                            for (int s = startslice; s < stopslice; s++) {
+                                Object[][] currentSlice = values[s];
+                                if (currentSlice.length != rows)
+                                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                                for (int r = 0; r < rows; r++) {
+                                    Object[] currentRow = currentSlice[r];
+                                    if (currentRow.length != columns)
+                                        throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                                    System.arraycopy(currentRow, 0, elements, i, columns);
+                                    i += columns;
+                                }
+                            }
+                        }
+                    });
+                }
+                try {
+                    for (int j = 0; j < np; j++) {
+                        futures[j].get();
+                    }
+                } catch (ExecutionException ex) {
+                    ex.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                int i = 0;
+                for (int s = 0; s < slices; s++) {
+                    Object[][] currentSlice = values[s];
+                    if (currentSlice.length != rows)
+                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                    for (int r = 0; r < rows; r++) {
+                        Object[] currentRow = currentSlice[r];
+                        if (currentRow.length != columns)
+                            throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                        System.arraycopy(currentRow, 0, this.elements, i, columns);
+                        i += columns;
+                    }
+                }
+            }
+        } else {
+            final int zero = (int) index(0, 0, 0);
+            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                Future<?>[] futures = new Future[np];
+                int k = slices / np;
+                for (int j = 0; j < np; j++) {
+                    final int startslice = j * k;
+                    final int stopslice;
+                    if (j == np - 1) {
+                        stopslice = slices;
+                    } else {
+                        stopslice = startslice + k;
+                    }
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
-						public void run() {
-							int idx;
-							for (int s = startslice; s < stopslice; s++) {
-								Object[][] currentSlice = values[s];
-								if (currentSlice.length != rows)
-									throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
-								for (int r = 0; r < rows; r++) {
-									idx = zero + s * sliceStride + r * rowStride;
-									Object[] currentRow = currentSlice[r];
-									if (currentRow.length != columns)
-										throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
-									for (int c = 0; c < columns; c++) {
-										elements[idx] = currentRow[c];
-										idx += columnStride;
-									}
-								}
-							}
-						}
-					});
-				}
-				try {
-					for (int j = 0; j < np; j++) {
-						futures[j].get();
-					}
-				} catch (ExecutionException ex) {
-					ex.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+                        public void run() {
+                            int idx;
+                            for (int s = startslice; s < stopslice; s++) {
+                                Object[][] currentSlice = values[s];
+                                if (currentSlice.length != rows)
+                                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                                for (int r = 0; r < rows; r++) {
+                                    idx = zero + s * sliceStride + r * rowStride;
+                                    Object[] currentRow = currentSlice[r];
+                                    if (currentRow.length != columns)
+                                        throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                                    for (int c = 0; c < columns; c++) {
+                                        elements[idx] = currentRow[c];
+                                        idx += columnStride;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                try {
+                    for (int j = 0; j < np; j++) {
+                        futures[j].get();
+                    }
+                } catch (ExecutionException ex) {
+                    ex.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-			} else {
-				int idx;
-				for (int s = 0; s < slices; s++) {
-					Object[][] currentSlice = values[s];
-					if (currentSlice.length != rows)
-						throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
-					for (int r = 0; r < rows; r++) {
-						idx = zero + s * sliceStride + r * rowStride;
-						Object[] currentRow = currentSlice[r];
-						if (currentRow.length != columns)
-							throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
-						for (int c = 0; c < columns; c++) {
-							elements[idx] = currentRow[c];
-							idx += columnStride;
-						}
-					}
-				}
-			}
-		}
-		return this;
+            } else {
+                int idx;
+                for (int s = 0; s < slices; s++) {
+                    Object[][] currentSlice = values[s];
+                    if (currentSlice.length != rows)
+                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                    for (int r = 0; r < rows; r++) {
+                        idx = zero + s * sliceStride + r * rowStride;
+                        Object[] currentRow = currentSlice[r];
+                        if (currentRow.length != columns)
+                            throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                        for (int c = 0; c < columns; c++) {
+                            elements[idx] = currentRow[c];
+                            idx += columnStride;
+                        }
+                    }
+                }
+            }
+        }
+        return this;
     }
 
     /**
@@ -305,8 +308,8 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * matrix. Both matrices must have the same number of slices, rows and
      * columns. If both matrices share the same cells (as is the case if they
      * are views derived from the same matrix) and intersect in an ambiguous
-     * way, then replaces <i>as if</i> using an intermediate auxiliary deep
-     * copy of <tt>other</tt>.
+     * way, then replaces <i>as if</i> using an intermediate auxiliary deep copy
+     * of <tt>other</tt>.
      * 
      * @param source
      *            the source matrix to copy from (may be identical to the
@@ -322,119 +325,119 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
             return super.assign(source);
         }
         DenseObjectMatrix3D other = (DenseObjectMatrix3D) source;
-		if (other == this)
-			return this;
-		checkShape(other);
-		if (haveSharedCells(other)) {
-			ObjectMatrix3D c = other.copy();
-			if (!(c instanceof DenseObjectMatrix3D)) { // should not happen
-				super.assign(source);
-				return this;
-			}
-			other = (DenseObjectMatrix3D) c;
-		}
+        if (other == this)
+            return this;
+        checkShape(other);
+        if (haveSharedCells(other)) {
+            ObjectMatrix3D c = other.copy();
+            if (!(c instanceof DenseObjectMatrix3D)) { // should not happen
+                super.assign(source);
+                return this;
+            }
+            other = (DenseObjectMatrix3D) c;
+        }
 
-		final DenseObjectMatrix3D other_final = (DenseObjectMatrix3D) other;
-		int np = ConcurrencyUtils.getNumberOfThreads();
-		if (this.isNoView && other.isNoView) { // quickest
-			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future<?>[] futures = new Future[np];
-				int k = size() / np;
-				for (int j = 0; j < np; j++) {
-					final int startidx = j * k;
-					final int length;
-					if (j == np - 1) {
-						length = size() - startidx;
-					} else {
-						length = k;
-					}
-					futures[j] = ConcurrencyUtils.submit(new Runnable() {
-						public void run() {
-							System.arraycopy(other_final.elements, startidx, elements, startidx, length);
-						}
-					});
-				}
-				try {
-					for (int j = 0; j < np; j++) {
-						futures[j].get();
-					}
-				} catch (ExecutionException ex) {
-					ex.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.arraycopy(other_final.elements, 0, this.elements, 0, this.elements.length);
-			}
-			return this;
-		} else {
-			final int zero = (int)index(0, 0, 0);
-			final int zeroOther = (int)other_final.index(0, 0, 0);
-			final int sliceStrideOther = other_final.sliceStride;
-			final int rowStrideOther = other_final.rowStride;
-			final int columnStrideOther = other_final.columnStride;
-			final Object[] elemsOther = other_final.elements;
-			if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-				Future<?>[] futures = new Future[np];
-				int k = slices / np;
-				for (int j = 0; j < np; j++) {
-					final int startslice = j * k;
-					final int stopslice;
-					if (j == np - 1) {
-						stopslice = slices;
-					} else {
-						stopslice = startslice + k;
-					}
-					futures[j] = ConcurrencyUtils.submit(new Runnable() {
+        final DenseObjectMatrix3D other_final = (DenseObjectMatrix3D) other;
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        if (this.isNoView && other.isNoView) { // quickest
+            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                Future<?>[] futures = new Future[np];
+                int k = size() / np;
+                for (int j = 0; j < np; j++) {
+                    final int startidx = j * k;
+                    final int length;
+                    if (j == np - 1) {
+                        length = size() - startidx;
+                    } else {
+                        length = k;
+                    }
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                        public void run() {
+                            System.arraycopy(other_final.elements, startidx, elements, startidx, length);
+                        }
+                    });
+                }
+                try {
+                    for (int j = 0; j < np; j++) {
+                        futures[j].get();
+                    }
+                } catch (ExecutionException ex) {
+                    ex.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.arraycopy(other_final.elements, 0, this.elements, 0, this.elements.length);
+            }
+            return this;
+        } else {
+            final int zero = (int) index(0, 0, 0);
+            final int zeroOther = (int) other_final.index(0, 0, 0);
+            final int sliceStrideOther = other_final.sliceStride;
+            final int rowStrideOther = other_final.rowStride;
+            final int columnStrideOther = other_final.columnStride;
+            final Object[] elemsOther = other_final.elements;
+            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                Future<?>[] futures = new Future[np];
+                int k = slices / np;
+                for (int j = 0; j < np; j++) {
+                    final int startslice = j * k;
+                    final int stopslice;
+                    if (j == np - 1) {
+                        stopslice = slices;
+                    } else {
+                        stopslice = startslice + k;
+                    }
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
-						public void run() {
-							int idx;
-							int idxOther;
-							for (int s = startslice; s < stopslice; s++) {
-								for (int r = 0; r < rows; r++) {
-									idx = zero + s * sliceStride + r * rowStride;
-									idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
-									for (int c = 0; c < columns; c++) {
-										elements[idx] = elemsOther[idxOther];
-										idx += columnStride;
-										idxOther += columnStrideOther;
-									}
-								}
-							}
-						}
-					});
-				}
-				try {
-					for (int j = 0; j < np; j++) {
-						futures[j].get();
-					}
-				} catch (ExecutionException ex) {
-					ex.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} else {
-				int idx;
-				int idxOther;
-				for (int s = 0; s < slices; s++) {
-					for (int r = 0; r < rows; r++) {
-						idx = zero + s * sliceStride + r * rowStride;
-						idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
-						for (int c = 0; c < columns; c++) {
-							elements[idx] = elemsOther[idxOther];
-							idx += columnStride;
-							idxOther += columnStrideOther;
-						}
-					}
-				}
-			}
-			return this;
-		}
+                        public void run() {
+                            int idx;
+                            int idxOther;
+                            for (int s = startslice; s < stopslice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx = zero + s * sliceStride + r * rowStride;
+                                    idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
+                                    for (int c = 0; c < columns; c++) {
+                                        elements[idx] = elemsOther[idxOther];
+                                        idx += columnStride;
+                                        idxOther += columnStrideOther;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                try {
+                    for (int j = 0; j < np; j++) {
+                        futures[j].get();
+                    }
+                } catch (ExecutionException ex) {
+                    ex.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                int idx;
+                int idxOther;
+                for (int s = 0; s < slices; s++) {
+                    for (int r = 0; r < rows; r++) {
+                        idx = zero + s * sliceStride + r * rowStride;
+                        idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
+                        for (int c = 0; c < columns; c++) {
+                            elements[idx] = elemsOther[idxOther];
+                            idx += columnStride;
+                            idxOther += columnStrideOther;
+                        }
+                    }
+                }
+            }
+            return this;
+        }
     }
-    
+
     public Object[] elements() {
-		return elements;
-	}
+        return elements;
+    }
 
     /**
      * Returns the matrix cell value at coordinate <tt>[slice,row,column]</tt>.
@@ -465,9 +468,9 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if <tt>other != null</tt> and at
-     * least one of the following conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+     * following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
@@ -528,10 +531,10 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseObjectMatrix3D</tt> the new matrix must also
-     * be of type <tt>DenseObjectMatrix2D</tt>, if the receiver is an
-     * instance of type <tt>SparseObjectMatrix3D</tt> the new matrix must also
-     * be of type <tt>SparseObjectMatrix2D</tt>, etc.
+     * instance of type <tt>DenseObjectMatrix3D</tt> the new matrix must also be
+     * of type <tt>DenseObjectMatrix2D</tt>, if the receiver is an instance of
+     * type <tt>SparseObjectMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseObjectMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.

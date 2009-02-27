@@ -20,8 +20,8 @@ import cern.colt.map.PrimeFinder;
  * Hash map holding (key,value) associations of type <tt>(int-->float)</tt>;
  * Automatically grows and shrinks as needed; Implemented using open addressing
  * with float hashing. First see the <a href="package-summary.html">package
- * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get
- * the broad picture.
+ * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get the
+ * broad picture.
  * 
  * Overrides many methods for performance reasons only.
  * 
@@ -97,7 +97,9 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      *            the maximum load factor.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      */
     public OpenIntFloatHashMap(int initialCapacity, float minLoadFactor, float maxLoadFactor) {
         setUp(initialCapacity, minLoadFactor, maxLoadFactor);
@@ -134,8 +136,8 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
     }
 
     /**
-     * Clears the receiver, then adds all (key,value) pairs of <tt>other</tt>values
-     * to it.
+     * Clears the receiver, then adds all (key,value) pairs of <tt>other</tt>
+     * values to it.
      * 
      * @param other
      *            the other map to be copied into the receiver.
@@ -233,11 +235,11 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * Applies a procedure to each key of the receiver, if any. Note: Iterates
      * over the keys in no particular order. Subclasses can define a particular
      * order, for example, "sorted by key". All methods which <i>can</i> be
-     * expressed in terms of this method (most methods can) <i>must guarantee</i>
-     * to use the <i>same</i> order defined by this method, even if it is no
-     * particular order. This is necessary so that, for example, methods
-     * <tt>keys</tt> and <tt>values</tt> will yield association pairs, not
-     * two uncorrelated lists.
+     * expressed in terms of this method (most methods can) <i>must
+     * guarantee</i> to use the <i>same</i> order defined by this method, even
+     * if it is no particular order. This is necessary so that, for example,
+     * methods <tt>keys</tt> and <tt>values</tt> will yield association pairs,
+     * not two uncorrelated lists.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -256,8 +258,8 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
 
     /**
      * Applies a procedure to each (key,value) pair of the receiver, if any.
-     * Iteration order is guaranteed to be <i>identical</i> to the order used
-     * by method {@link #forEachKey(IntProcedure)}.
+     * Iteration order is guaranteed to be <i>identical</i> to the order used by
+     * method {@link #forEachKey(IntProcedure)}.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -410,8 +412,8 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * 
      * @param value
      *            the value to search for.
-     * @return the first key for which holds <tt>get(key) == value</tt>;
-     *         returns <tt>Integer.MIN_VALUE</tt> if no such key exists.
+     * @return the first key for which holds <tt>get(key) == value</tt>; returns
+     *         <tt>Integer.MIN_VALUE</tt> if no such key exists.
      */
     public int keyOf(float value) {
         // returns the first key found; there may be more matching keys,
@@ -462,8 +464,8 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * 	 public boolean apply(int key, float value) { return key%2==0; }
      * 	 }
      * 	 keys = (8,7,6), values = (1,2,2) --&gt; keyList = (6,8), valueList = (2,1)
-     * </tt>
-     </pre>
+     * &lt;/tt&gt;
+     * </pre>
      * 
      * @param condition
      *            the condition to be matched. Takes the current key as first
@@ -493,10 +495,9 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      *            the key the value shall be associated with.
      * @param value
      *            the value to be associated.
-     * @return <tt>true</tt> if the receiver did not already contain such a
-     *         key; <tt>false</tt> if the receiver did already contain such a
-     *         key - the new value has now replaced the formerly associated
-     *         value.
+     * @return <tt>true</tt> if the receiver did not already contain such a key;
+     *         <tt>false</tt> if the receiver did already contain such a key -
+     *         the new value has now replaced the formerly associated value.
      */
     public boolean put(int key, float value) {
         int i = indexOfInsertion(key);
@@ -625,7 +626,9 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      *            the maxLoadFactor of the receiver.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      */
     protected void setUp(int initialCapacity, float minLoadFactor, float maxLoadFactor) {
         int capacity = initialCapacity;

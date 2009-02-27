@@ -29,8 +29,8 @@ import cern.jet.math.tfloat.FloatFunctions;
 
 /**
  * BiCG stablized solver. BiCGstab solves the unsymmetric linear system
- * <code>Ax = b</code> using the Preconditioned BiConjugate Gradient
- * Stabilized method
+ * <code>Ax = b</code> using the Preconditioned BiConjugate Gradient Stabilized
+ * method
  * 
  * @author Templates
  */
@@ -62,8 +62,7 @@ public class FloatBiCGstab extends AbstractFloatIterativeSolver {
         rtilde = template.copy();
     }
 
-    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
-            throws IterativeSolverFloatNotConvergedException {
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         checkSizes(A, b, x);
 
         float rho_1 = 1, rho_2 = 1, alpha = 1, beta = 1, omega = 1;
@@ -75,12 +74,10 @@ public class FloatBiCGstab extends AbstractFloatIterativeSolver {
             rho_1 = rtilde.zDotProduct(r);
 
             if (rho_1 == 0)
-                throw new IterativeSolverFloatNotConvergedException(
-                        FloatNotConvergedException.Reason.Breakdown, "rho", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "rho", iter);
 
             if (omega == 0)
-                throw new IterativeSolverFloatNotConvergedException(
-                        FloatNotConvergedException.Reason.Breakdown, "omega", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "omega", iter);
 
             if (iter.isFirst())
                 p.assign(r);
@@ -99,7 +96,8 @@ public class FloatBiCGstab extends AbstractFloatIterativeSolver {
             s.assign(r).assign(v, FloatFunctions.plusMultSecond(-alpha));
 
             if (iter.converged(s, x))
-                return x.assign(phat, FloatFunctions.plusMultSecond(alpha));;
+                return x.assign(phat, FloatFunctions.plusMultSecond(alpha));
+            ;
 
             M.apply(s, shat);
             A.zMult(shat, t);

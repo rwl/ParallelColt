@@ -332,8 +332,8 @@ public class IntFunctions extends Object {
 
     /**
      * Constructs a unary function from a binary function with the first operand
-     * (argument) fixed to the given constant <tt>c</tt>. The second operand
-     * is variable (free).
+     * (argument) fixed to the given constant <tt>c</tt>. The second operand is
+     * variable (free).
      * 
      * @param function
      *            a binary function taking operands in the form
@@ -455,8 +455,8 @@ public class IntFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>a == b ? 1 : 0</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>a == b ? 1 : 0</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static IntFunction equals(final int b) {
         return new IntFunction() {
@@ -467,8 +467,8 @@ public class IntFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>from<=a && a<=to</tt>.
-     * <tt>a</tt> is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
+     * Constructs a function that returns <tt>from<=a && a<=to</tt>. <tt>a</tt>
+     * is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
      */
     public static IntProcedure isBetween(final int from, final int to) {
         return new IntProcedure() {
@@ -515,8 +515,8 @@ public class IntFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static IntFunction max(final int b) {
         return new IntFunction() {
@@ -527,8 +527,8 @@ public class IntFunctions extends Object {
     }
 
     /**
-     * Constructs a function that returns <tt>Math.min(a,b)</tt>. <tt>a</tt>
-     * is a variable, <tt>b</tt> is fixed.
+     * Constructs a function that returns <tt>Math.min(a,b)</tt>. <tt>a</tt> is
+     * a variable, <tt>b</tt> is fixed.
      */
     public static IntFunction min(final int b) {
         return new IntFunction() {
@@ -609,7 +609,7 @@ public class IntFunctions extends Object {
             }
         };
     }
-    
+
     /**
      * Constructs a function that returns <tt>a + b*constant</tt>. <tt>a</tt>
      * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
@@ -630,18 +630,17 @@ public class IntFunctions extends Object {
      * Constructs a function that returns a 32 bit uniformly distributed random
      * number in the closed interval
      * <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> (including
-     * <tt>Integer.MIN_VALUE</tt> and <tt>Integer.MAX_VALUE</tt>).
-     * Currently the engine is
-     * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} and is seeded with
-     * the current time.
+     * <tt>Integer.MIN_VALUE</tt> and <tt>Integer.MAX_VALUE</tt>). Currently the
+     * engine is {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister}
+     * and is seeded with the current time.
      * <p>
      * Note that any random engine derived from
      * {@link cern.jet.random.tdouble.engine.DoubleRandomEngine} and any random
      * distribution derived from
-     * {@link cern.jet.random.tdouble.AbstractDoubleDistribution} are function objects,
-     * because they implement the proper interfaces. Thus, if you are not happy
-     * with the default, just pass your favourite random generator to function
-     * evaluating methods.
+     * {@link cern.jet.random.tdouble.AbstractDoubleDistribution} are function
+     * objects, because they implement the proper interfaces. Thus, if you are
+     * not happy with the default, just pass your favourite random generator to
+     * function evaluating methods.
      */
     public static IntFunction random() {
         return new cern.jet.random.tdouble.engine.DoubleMersenneTwister(new java.util.Date());

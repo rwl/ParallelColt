@@ -19,8 +19,8 @@ import cern.colt.matrix.tobject.ObjectMatrix3D;
 /**
  * Flexible, well human readable matrix print formatting. Each cell is converted
  * using {@link Object#toString()}. For examples see
- * {@link cern.colt.matrix.tdouble.algo.DoubleFormatter doublealgo.Formatter} which is
- * just the same except that it operates on doubles.
+ * {@link cern.colt.matrix.tdouble.algo.DoubleFormatter doublealgo.Formatter}
+ * which is just the same except that it operates on doubles.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.1, 11/22/99
@@ -78,8 +78,8 @@ public class ObjectFormatter extends AbstractFormatter {
     }
 
     /**
-     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a
-     * legal Java statement.
+     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a legal
+     * Java statement.
      * 
      * @param matrix
      *            the matrix to format.
@@ -94,8 +94,8 @@ public class ObjectFormatter extends AbstractFormatter {
     }
 
     /**
-     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a
-     * legal Java statement.
+     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a legal
+     * Java statement.
      * 
      * @param matrix
      *            the matrix to format.
@@ -112,8 +112,8 @@ public class ObjectFormatter extends AbstractFormatter {
     }
 
     /**
-     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a
-     * legal Java statement.
+     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a legal
+     * Java statement.
      * 
      * @param matrix
      *            the matrix to format.
@@ -186,8 +186,8 @@ public class ObjectFormatter extends AbstractFormatter {
 
     /**
      * Returns a string representation of the given matrix with axis as well as
-     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters
-     * to indicate that the corresponding decoration element shall not appear in
+     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters to
+     * indicate that the corresponding decoration element shall not appear in
      * the string converted matrix.
      * 
      * @param matrix
@@ -288,8 +288,8 @@ public class ObjectFormatter extends AbstractFormatter {
 
     /**
      * Returns a string representation of the given matrix with axis as well as
-     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters
-     * to indicate that the corresponding decoration element shall not appear in
+     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters to
+     * indicate that the corresponding decoration element shall not appear in
      * the string converted matrix.
      * 
      * @param matrix

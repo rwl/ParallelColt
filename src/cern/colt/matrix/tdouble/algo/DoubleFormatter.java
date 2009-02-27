@@ -28,16 +28,17 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  * <p>
  * Can't exactly remember the syntax of printf format strings? See
  * {@link corejava.Format} or <a
- * href="http://www.braju.com/docs/index.html">Henrik Nordberg's documentation</a>,
- * or the <a
- * href="http://www.dinkumware.com/htm_cl/lib_prin.html#Print%20Functions">Dinkumware's
- * C Library Reference</a>.
+ * href="http://www.braju.com/docs/index.html">Henrik Nordberg's
+ * documentation</a>, or the <a
+ * href="http://www.dinkumware.com/htm_cl/lib_prin.html#Print%20Functions"
+ * >Dinkumware's C Library Reference</a>.
  * 
  * <p>
  * <b>Examples:</b>
  * <p>
  * Examples demonstrate usage on 2-d matrices. 1-d and 3-d matrices formatting
- * works very similar. <table border="1" cellspacing="0">
+ * works very similar.
+ * <table border="1" cellspacing="0">
  * <tr align="center">
  * <td>Original matrix</td>
  * </tr>
@@ -108,15 +109,14 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  &nbsp;&nbsp;&nbsp;5.100000&nbsp;0.000000&nbsp;&nbsp;3.012346&nbsp;&nbsp;0.000000<br>
  &nbsp;&nbsp;16.370000&nbsp;0.000000&nbsp;&nbsp;2.500000&nbsp;&nbsp;0.000000<br>
  &nbsp;-16.300000&nbsp;0.000000&nbsp;-0.000301&nbsp;-1.000000<br>
- 1236.345679&nbsp;0.000000&nbsp;&nbsp;7.000000&nbsp;-1.200000 </tt> </td>
+ 1236.345679&nbsp;0.000000&nbsp;&nbsp;7.000000&nbsp;-1.200000 </tt></td>
  * <td align="left" valign="top"><tt> {<br>
  &nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;3.000000,&nbsp;0.000000,&nbsp;-3.400000,&nbsp;&nbsp;0.000000},<br>
  &nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;5.100000,&nbsp;0.000000,&nbsp;&nbsp;3.012346,&nbsp;&nbsp;0.000000},<br>
  &nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;16.370000,&nbsp;0.000000,&nbsp;&nbsp;2.500000,&nbsp;&nbsp;0.000000},<br>
  &nbsp;&nbsp;&nbsp;{&nbsp;-16.300000,&nbsp;0.000000,&nbsp;-0.000301,&nbsp;-1.000000},<br>
  &nbsp;&nbsp;&nbsp;{1236.345679,&nbsp;0.000000,&nbsp;&nbsp;7.000000,&nbsp;-1.200000}<br>
- }; </tt>
- * </td>
+ }; </tt></td>
  * </tr>
  * <tr>
  * <td><tt>%1.2f</tt></td>
@@ -165,8 +165,7 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  &nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;16.37&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;0.0,&nbsp;&nbsp;2.5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;&nbsp;0.0},<br>
  &nbsp;&nbsp;&nbsp;{&nbsp;-16.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;0.0,&nbsp;-3.012345678E-4,&nbsp;-1.0},<br>
  &nbsp;&nbsp;&nbsp;{1236.3456789,&nbsp;0.0,&nbsp;&nbsp;7.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;-1.2}<br>
- }; </tt>
- * </td>
+ }; </tt></td>
  * </tr>
  * </table>
  * 
@@ -217,12 +216,11 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  &nbsp;&nbsp;StdDev&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;3.86&nbsp;&nbsp;4.27&nbsp;&nbsp;8.38&nbsp;15.81&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
  &nbsp;&nbsp;Min&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
  &nbsp;&nbsp;Max&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;12&nbsp;&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;&nbsp;&nbsp;20&nbsp;&nbsp;&nbsp;&nbsp;19&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
- </tt>
- * </td>
+ </tt></td>
  * </tr>
  * <tr>
  * <td nowrap><tt> same as above, but now without aggregations<br>
- aggr=null; </tt> </td>
+ aggr=null; </tt></td>
  * </tr>
  * <tr>
  * <td><tt> CPU&nbsp;performance&nbsp;over&nbsp;time&nbsp;[nops/sec]<br>
@@ -233,8 +231,7 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  P&nbsp;Benzol&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;8&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;<br>
  U&nbsp;Mercedes&nbsp;&nbsp;|&nbsp;12&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;&nbsp;20&nbsp;&nbsp;&nbsp;19&nbsp;&nbsp;<br>
  &nbsp;&nbsp;Sparcling&nbsp;|&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp; 
- </tt>
- * </td>
+ </tt></td>
  * </tr>
  * <tr>
  * <td nowrap>
@@ -256,20 +253,19 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  &nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;8&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;<br>
  12&nbsp;&nbsp;&nbsp;10&nbsp;&nbsp;&nbsp;20&nbsp;&nbsp;&nbsp;19&nbsp;&nbsp;<br>
  &nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;
- </tt>
- * </td>
+ </tt></td>
  * </tr>
  * </table>
  * 
  * <p>
  * A column can be broader than specified by the parameter
  * <tt>minColumnWidth</tt> (because a cell may not fit into that width) but a
- * column is never smaller than <tt>minColumnWidth</tt>. Normally one does
- * not need to specify <tt>minColumnWidth</tt> (default is <tt>1</tt>).
- * This parameter is only interesting when wanting to print two distinct
- * matrices such that both matrices have the same column width, for example, to
- * make it easier to see which column of matrix A corresponds to which column of
- * matrix B.
+ * column is never smaller than <tt>minColumnWidth</tt>. Normally one does not
+ * need to specify <tt>minColumnWidth</tt> (default is <tt>1</tt>). This
+ * parameter is only interesting when wanting to print two distinct matrices
+ * such that both matrices have the same column width, for example, to make it
+ * easier to see which column of matrix A corresponds to which column of matrix
+ * B.
  * </p>
  * 
  * <p>
@@ -283,8 +279,8 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  * </p>
  * <p>
  * Analyzes the entire matrix before producing output. Each cell is converted to
- * a String as indicated by the given C-like format string. If <tt>null</tt>
- * is passed as format string, {@link java.lang.Double#toString(double)} is used
+ * a String as indicated by the given C-like format string. If <tt>null</tt> is
+ * passed as format string, {@link java.lang.Double#toString(double)} is used
  * instead, yielding full precision.
  * </p>
  * <p>
@@ -602,8 +598,8 @@ public class DoubleFormatter extends AbstractFormatter {
     }
 
     /**
-     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a
-     * legal Java statement.
+     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a legal
+     * Java statement.
      * 
      * @param matrix
      *            the matrix to format.
@@ -618,8 +614,8 @@ public class DoubleFormatter extends AbstractFormatter {
     }
 
     /**
-     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a
-     * legal Java statement.
+     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a legal
+     * Java statement.
      * 
      * @param matrix
      *            the matrix to format.
@@ -636,8 +632,8 @@ public class DoubleFormatter extends AbstractFormatter {
     }
 
     /**
-     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a
-     * legal Java statement.
+     * Returns a string <tt>s</tt> such that <tt>Object[] m = s</tt> is a legal
+     * Java statement.
      * 
      * @param matrix
      *            the matrix to format.
@@ -676,7 +672,7 @@ public class DoubleFormatter extends AbstractFormatter {
     public String toString(DoubleMatrix2D matrix) {
         return super.toString(matrix);
     }
-    
+
     /**
      * Returns a string representation of the given matrix.
      * 
@@ -710,8 +706,8 @@ public class DoubleFormatter extends AbstractFormatter {
 
     /**
      * Returns a string representation of the given matrix with axis as well as
-     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters
-     * to indicate that the corresponding decoration element shall not appear in
+     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters to
+     * indicate that the corresponding decoration element shall not appear in
      * the string converted matrix.
      * 
      * @param matrix
@@ -859,8 +855,8 @@ public class DoubleFormatter extends AbstractFormatter {
 
     /**
      * Returns a string representation of the given matrix with axis as well as
-     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters
-     * to indicate that the corresponding decoration element shall not appear in
+     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters to
+     * indicate that the corresponding decoration element shall not appear in
      * the string converted matrix.
      * 
      * @param matrix
@@ -899,8 +895,8 @@ public class DoubleFormatter extends AbstractFormatter {
 
     /**
      * Returns a string representation of the given matrix with axis as well as
-     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters
-     * to indicate that the corresponding decoration element shall not appear in
+     * rows and columns labeled. Pass <tt>null</tt> to one or more parameters to
+     * indicate that the corresponding decoration element shall not appear in
      * the string converted matrix.
      * 
      * @param matrix

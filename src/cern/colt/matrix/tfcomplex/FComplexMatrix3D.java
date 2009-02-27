@@ -25,8 +25,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * instance construction - The matrix's size is then
  * <tt>slices()*rows()*columns()</tt>. Elements are accessed via
  * <tt>[slice,row,column]</tt> coordinates. Legal coordinates range from
- * <tt>[0,0,0]</tt> to <tt>[slices()-1,rows()-1,columns()-1]</tt>. Any
- * attempt to access an element at a coordinate
+ * <tt>[0,0,0]</tt> to <tt>[slices()-1,rows()-1,columns()-1]</tt>. Any attempt
+ * to access an element at a coordinate
  * <tt>slice&lt;0 || slice&gt;=slices() || row&lt;0 || row&gt;=rows() || column&lt;0 || column&gt;=column()</tt>
  * will throw an <tt>IndexOutOfBoundsException</tt>.
  * <p>
@@ -401,8 +401,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * matrix. Both matrices must have the same number of slices, rows and
      * columns. If both matrices share the same cells (as is the case if they
      * are views derived from the same matrix) and intersect in an ambiguous
-     * way, then replaces <i>as if</i> using an intermediate auxiliary deep
-     * copy of <tt>other</tt>.
+     * way, then replaces <i>as if</i> using an intermediate auxiliary deep copy
+     * of <tt>other</tt>.
      * 
      * @param other
      *            the source matrix to copy from (may be identical to the
@@ -565,12 +565,11 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Sets all cells to the state specified by <tt>values</tt>.
-     * <tt>values</tt> is required to have the form
+     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
+     * is required to have the form
      * <tt>re = values[slice*silceStride+row*rowStride+2*column], 
-     * im = values[slice*silceStride+row*rowStride+2*column+1]</tt>
-     * and have exactly the same number of slices, rows and columns as the
-     * receiver.
+     * im = values[slice*silceStride+row*rowStride+2*column+1]</tt> and have
+     * exactly the same number of slices, rows and columns as the receiver.
      * <p>
      * The values are copied. So subsequent changes in <tt>values</tt> are not
      * reflected in the matrix, and vice-versa.
@@ -628,8 +627,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Sets all cells to the state specified by <tt>values</tt>.
-     * <tt>values</tt> is required to have the form
+     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
+     * is required to have the form
      * <tt>re = values[slice][row][2*column], im = values[slice][row][2*column+1]</tt>
      * and have exactly the same number of slices, rows and columns as the
      * receiver.
@@ -642,10 +641,12 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * @return <tt>this</tt> (for convenience only).
      * @throws IllegalArgumentException
      *             if
-     *             <tt>values.length != slices() || for any 0 &lt;= slice &lt; slices(): values[slice].length != rows()</tt>.
+     *             <tt>values.length != slices() || for any 0 &lt;= slice &lt; slices(): values[slice].length != rows()</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != 2*columns()</tt>.
+     *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != 2*columns()</tt>
+     *             .
      */
     public FComplexMatrix3D assign(final float[][][] values) {
         if (values.length != slices)
@@ -907,8 +908,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * 
      * @param obj
      *            the object to compare with.
-     * @return <code>true</code> if the objects are the same;
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the objects are the same; <code>false</code>
+     *         otherwise.
      */
     public boolean equals(Object obj) {
         if (this == obj)
@@ -921,8 +922,6 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
         return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, (FComplexMatrix3D) obj);
     }
 
-    
-    
     /**
      * Returns the matrix cell value at coordinate <tt>[slice,row,column]</tt>.
      * 
@@ -935,7 +934,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * @return the value of the specified cell.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>slice&lt;0 || slice&gt;=slices() || row&lt;0 || row&gt;=rows() || column&lt;0 || column&gt;=column()</tt>.
+     *             <tt>slice&lt;0 || slice&gt;=slices() || row&lt;0 || row&gt;=rows() || column&lt;0 || column&gt;=column()</tt>
+     *             .
      */
     public float[] get(int slice, int row, int column) {
         if (slice < 0 || slice >= slices || row < 0 || row >= rows || column < 0 || column >= columns)
@@ -965,8 +965,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * <p>
      * In general, fill order is <i>unspecified</i>. This implementation fill
      * like:
-     * <tt>for (slice = 0..slices-1) for (row = 0..rows-1) for (column = 0..colums-1) do ... </tt>.
-     * However, subclasses are free to us any other order, even an order that
+     * <tt>for (slice = 0..slices-1) for (row = 0..rows-1) for (column = 0..colums-1) do ... </tt>
+     * . However, subclasses are free to us any other order, even an order that
      * may change over time as cell values are changed. (Of course, result lists
      * indexes are guaranteed to correspond to the same cell).
      * 
@@ -1028,8 +1028,6 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      */
     public abstract FloatMatrix3D getRealPart();
 
-
-
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of slices, rows and columns. For
@@ -1076,7 +1074,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      *            the value to be filled into the specified cell.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>row&lt;0 || row&gt;=rows() || slice&lt;0 || slice&gt;=slices() || column&lt;0 || column&gt;=column()</tt>.
+     *             <tt>row&lt;0 || row&gt;=rows() || slice&lt;0 || slice&gt;=slices() || column&lt;0 || column&gt;=column()</tt>
+     *             .
      */
     public void set(int slice, int row, int column, float[] value) {
         if (slice < 0 || slice >= slices || row < 0 || row >= rows || column < 0 || column >= columns)
@@ -1247,17 +1246,17 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     public abstract FComplexMatrix1D vectorize();
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and rows of the given column. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and rows of the given column. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param column
      *            the index of the column to fix.
@@ -1281,11 +1280,11 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the column axis.
-     * What used to be column <tt>0</tt> is now column <tt>columns()-1</tt>,
-     * ..., what used to be column <tt>columns()-1</tt> is now column
-     * <tt>0</tt>. The returned view is backed by this matrix, so changes in
-     * the returned view are reflected in this matrix, and vice-versa.
+     * Constructs and returns a new <i>flip view</i> along the column axis. What
+     * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
+     * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
+     * returned view is backed by this matrix, so changes in the returned view
+     * are reflected in this matrix, and vice-versa.
      * 
      * @return a new flip view.
      * @see #viewSliceFlip()
@@ -1320,10 +1319,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * Constructs and returns a new <i>sub-range view</i> that is a
      * <tt>depth x height x width</tt> sub matrix starting at
      * <tt>[slice,row,column]</tt>; Equivalent to
-     * <tt>view().part(slice,row,column,depth,height,width)</tt>; Provided
-     * for convenience only. The returned view is backed by this matrix, so
-     * changes in the returned view are reflected in this matrix, and
-     * vice-versa.
+     * <tt>view().part(slice,row,column,depth,height,width)</tt>; Provided for
+     * convenience only. The returned view is backed by this matrix, so changes
+     * in the returned view are reflected in this matrix, and vice-versa.
      * 
      * @param slice
      *            The index of the slice-coordinate.
@@ -1339,6 +1337,7 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      *            The width of the box.
      * @throws IndexOutOfBoundsException
      *             if
+     * 
      *             <tt>slice<0 || depth<0 || slice+depth>slices() || row<0 || height<0 || row+height>rows() || column<0 || width<0 || column+width>columns()</tt>
      * @return the new view.
      * 
@@ -1348,17 +1347,17 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and columns of the given row. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and columns of the given row. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param row
      *            the index of the row to fix.
@@ -1383,10 +1382,10 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
 
     /**
      * Constructs and returns a new <i>flip view</i> along the row axis. What
-     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what
-     * used to be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned
-     * view is backed by this matrix, so changes in the returned view are
-     * reflected in this matrix, and vice-versa.
+     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
+     * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
+     * backed by this matrix, so changes in the returned view are reflected in
+     * this matrix, and vice-versa.
      * 
      * @return a new flip view.
      * @see #viewSliceFlip()
@@ -1400,10 +1399,10 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * Constructs and returns a new <i>selection view</i> that is a matrix
      * holding all <b>slices</b> matching the given condition. Applies the
      * condition to each slice and takes only those where
-     * <tt>condition.apply(viewSlice(i))</tt> yields <tt>true</tt>. To
-     * match rows or columns, use a dice view. The returned view is backed by
-     * this matrix, so changes in the returned view are reflected in this
-     * matrix, and vice-versa.
+     * <tt>condition.apply(viewSlice(i))</tt> yields <tt>true</tt>. To match
+     * rows or columns, use a dice view. The returned view is backed by this
+     * matrix, so changes in the returned view are reflected in this matrix, and
+     * vice-versa.
      * 
      * @param condition
      *            The condition to be matched.
@@ -1424,10 +1423,11 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     /**
      * Constructs and returns a new <i>selection view</i> that is a matrix
      * holding the indicated cells. There holds
+     * 
      * <tt>view.slices() == sliceIndexes.length, view.rows() == rowIndexes.length, view.columns() == columnIndexes.length</tt>
      * and
-     * <tt>view.get(k,i,j) == this.get(sliceIndexes[k],rowIndexes[i],columnIndexes[j])</tt>.
-     * Indexes can occur multiple times and can be in arbitrary order.
+     * <tt>view.get(k,i,j) == this.get(sliceIndexes[k],rowIndexes[i],columnIndexes[j])</tt>
+     * . Indexes can occur multiple times and can be in arbitrary order.
      * <p>
      * Note that modifying the index arguments after this call has returned has
      * no effect on the view. The returned view is backed by this matrix, so
@@ -1496,17 +1496,17 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the rows and columns of the given slice. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the rows and columns of the given slice. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param slice
      *            the index of the slice to fix.
@@ -1531,10 +1531,10 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
 
     /**
      * Constructs and returns a new <i>flip view</i> along the slice axis. What
-     * used to be slice <tt>0</tt> is now slice <tt>slices()-1</tt>, ...,
-     * what used to be slice <tt>slices()-1</tt> is now slice <tt>0</tt>.
-     * The returned view is backed by this matrix, so changes in the returned
-     * view are reflected in this matrix, and vice-versa.
+     * used to be slice <tt>0</tt> is now slice <tt>slices()-1</tt>, ..., what
+     * used to be slice <tt>slices()-1</tt> is now slice <tt>0</tt>. The
+     * returned view is backed by this matrix, so changes in the returned view
+     * are reflected in this matrix, and vice-versa.
      * 
      * @return a new flip view.
      * @see #viewRowFlip()
@@ -1551,8 +1551,9 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      * <tt>this.rows()/rowStride</tt> rows and
      * <tt>this.columns()/columnStride</tt> columns holding cells
      * <tt>this.get(k*sliceStride,i*rowStride,j*columnStride)</tt> for all
-     * <tt>k = 0..slices()/sliceStride - 1, i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1</tt>.
-     * The returned view is backed by this matrix, so changes in the returned
+     * 
+     * <tt>k = 0..slices()/sliceStride - 1, i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1</tt>
+     * . The returned view is backed by this matrix, so changes in the returned
      * view are reflected in this matrix, and vice-versa.
      * 
      * @param sliceStride
@@ -1563,7 +1564,8 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
      *            the column step factor.
      * @return a new view.
      * @throws IndexOutOfBoundsException
-     *             if <tt>sliceStride<=0 || rowStride<=0 || columnStride<=0</tt>.
+     *             if <tt>sliceStride<=0 || rowStride<=0 || columnStride<=0</tt>
+     *             .
      */
     public FComplexMatrix3D viewStrides(int sliceStride, int rowStride, int columnStride) {
         return (FComplexMatrix3D) (view().vStrides(sliceStride, rowStride, columnStride));
@@ -1591,13 +1593,11 @@ public abstract class FComplexMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      * 
      * @param other
      *            matrix
-     * @return <tt>true</tt> if both matrices share at least one identical
-     *         cell.
+     * @return <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCells(FComplexMatrix3D other) {
         if (other == null)

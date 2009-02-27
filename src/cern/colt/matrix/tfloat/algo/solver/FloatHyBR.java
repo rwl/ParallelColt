@@ -232,13 +232,13 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
         //        hybrOutput.setRnorm(alg.norm2(work));
         if (M instanceof FloatIdentity) {
             beta = alg.norm2(b);
-            U.viewRow(0).assign(b, FloatFunctions.multSecond((float)(1.0 / beta)));
+            U.viewRow(0).assign(b, FloatFunctions.multSecond((float) (1.0 / beta)));
             lbd = new FloatSimpleLBD(A, U, reorth);
         } else {
             work = new DenseFloatMatrix1D(b.size());
             work = M.apply(b, work);
             beta = alg.norm2(work);
-            U.viewRow(0).assign(work, FloatFunctions.multSecond((float)(1.0 / beta)));
+            U.viewRow(0).assign(work, FloatFunctions.multSecond((float) (1.0 / beta)));
             lbd = new FloatPLBD(M, A, U, reorth);
         }
         for (int i = 0; i <= maxIts; i++) {
@@ -445,7 +445,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
         FloatMatrix1D t2 = t1.copy();
         t2.assign(u.viewPart(0, k), FloatFunctions.mult);
         t2.assign(FloatFunctions.mult(alpha2));
-        float num = (float)(beta2 * (t2.aggregate(FloatFunctions.plus, FloatFunctions.square) + Math.pow(Math.abs(u.getQuick(k)), 2)) / (float) n);
+        float num = (float) (beta2 * (t2.aggregate(FloatFunctions.plus, FloatFunctions.square) + Math.pow(Math.abs(u.getQuick(k)), 2)) / (float) n);
         float den = (n - t1.aggregate(s2, FloatFunctions.plus, FloatFunctions.mult)) / (float) n;
         den = den * den;
         return num / den;

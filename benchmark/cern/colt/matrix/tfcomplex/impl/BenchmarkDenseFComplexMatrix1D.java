@@ -59,13 +59,12 @@ public class BenchmarkDenseFComplexMatrix1D {
         ConcurrencyUtils.resetThreadsBeginN();
         System.gc();
     }
-    
+
     @Before
     public void setUpBefore() {
         noViewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
         viewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
     }
-    
 
     @Test
     public void testAggregateFComplexFComplexFComplexFunctionFComplexFComplexFunction() {
@@ -146,7 +145,7 @@ public class BenchmarkDenseFComplexMatrix1D {
     public void testAssignFloatFloat() {
         /* No view */
         FComplexMatrix1D A = new DenseFComplexMatrix1D(BenchmarkMatrixKernel.MATRIX_SIZE_1D);
-        float value = (float)Math.random();
+        float value = (float) Math.random();
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
@@ -352,7 +351,7 @@ public class BenchmarkDenseFComplexMatrix1D {
     public void testAssignFComplexProcedureFloatArray() {
         /* No view */
         FComplexMatrix1D A = new DenseFComplexMatrix1D(a);
-        float[] value = new float[] {-1, -2};
+        float[] value = new float[] { -1, -2 };
         FComplexProcedure procedure = new FComplexProcedure() {
             public boolean apply(float[] element) {
                 if (FComplex.abs(element) > 0.1) {
@@ -483,7 +482,7 @@ public class BenchmarkDenseFComplexMatrix1D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testGetImaginaryPart() {
         /* No view */
@@ -568,7 +567,6 @@ public class BenchmarkDenseFComplexMatrix1D {
 
     }
 
-    
     @Test
     public void testFft() {
         /* No view */
@@ -621,11 +619,11 @@ public class BenchmarkDenseFComplexMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFComplexMatrix1D)Av).fft();
+            ((DenseFComplexMatrix1D) Av).fft();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a);
                 t.reset().start();
-                ((DenseFComplexMatrix1D)Av).fft();
+                ((DenseFComplexMatrix1D) Av).fft();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -689,11 +687,11 @@ public class BenchmarkDenseFComplexMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFComplexMatrix1D)Av).ifft(true);
+            ((DenseFComplexMatrix1D) Av).ifft(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Av.assign(a);
                 t.reset().start();
-                ((DenseFComplexMatrix1D)Av).ifft(true);
+                ((DenseFComplexMatrix1D) Av).ifft(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }

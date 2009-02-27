@@ -11,7 +11,6 @@ import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.jet.math.tfcomplex.FComplex;
 import cern.jet.math.tfcomplex.FComplexFunctions;
-import edu.emory.mathcs.utils.AssertUtils;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public abstract class FComplexMatrix2DTest extends TestCase {
@@ -55,19 +54,19 @@ public abstract class FComplexMatrix2DTest extends TestCase {
         ConcurrencyUtils.setThreadsBeginN_2D(1);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                A.setQuick(r, c, new float[] { (float)Math.random(), (float)Math.random() });
+                A.setQuick(r, c, new float[] { (float) Math.random(), (float) Math.random() });
             }
         }
 
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                B.setQuick(r, c, new float[] { (float)Math.random(), (float)Math.random() });
+                B.setQuick(r, c, new float[] { (float) Math.random(), (float) Math.random() });
             }
         }
 
         for (int r = 0; r < NCOLUMNS; r++) {
             for (int c = 0; c < NROWS; c++) {
-                Bt.setQuick(r, c, new float[] { (float)Math.random(), (float)Math.random() });
+                Bt.setQuick(r, c, new float[] { (float) Math.random(), (float) Math.random() });
             }
         }
     }
@@ -154,7 +153,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
 
     public void testAssignComplexProcedureFloatArray() {
         FComplexMatrix2D Acopy = A.copy();
-        float[] value = new float[] { (float)Math.random(), (float)Math.random() };
+        float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.assign(new FComplexProcedure() {
             public boolean apply(float[] element) {
                 if (FComplex.abs(element) > 3) {
@@ -191,7 +190,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
     public void testAssignFloatArray() {
         float[] expected = new float[2 * A.size()];
         for (int i = 0; i < 2 * A.size(); i++) {
-            expected[i] = (float)Math.random();
+            expected[i] = (float) Math.random();
         }
         A.assign(expected);
         int idx = 0;
@@ -209,7 +208,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
         float[][] expected = new float[NROWS][2 * NCOLUMNS];
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < 2 * NCOLUMNS; c++) {
-                expected[r][c] = (float)Math.random();
+                expected[r][c] = (float) Math.random();
             }
         }
         A.assign(expected);
@@ -223,7 +222,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
     }
 
     public void testAssignFloatFloat() {
-        float[] value = new float[] { (float)Math.random(), (float)Math.random() };
+        float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.assign(value[0], value[1]);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
@@ -263,7 +262,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
     }
 
     public void testEqualsFloatArray() {
-        float[] value = new float[] { (float)Math.random(), (float)Math.random() };
+        float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.assign(value[0], value[1]);
         boolean eq = A.equals(value);
         assertEquals(true, eq);
@@ -355,7 +354,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
         int idx = 0;
         for (int c = 0; c < NCOLUMNS; c++) {
             for (int r = 0; r < NROWS; r++) {
-                AssertUtils.assertArrayEquals(A.getQuick(r, c), B.getQuick(idx++), TOL);
+                assertEquals(A.getQuick(r, c), B.getQuick(idx++), TOL);
             }
         }
     }
@@ -393,7 +392,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
         FComplexMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
         for (int r = 0; r < NROWS / 3; r++) {
             for (int c = 0; c < NCOLUMNS / 3; c++) {
-                AssertUtils.assertArrayEquals(A.getQuick(NROWS / 2 + r, NCOLUMNS / 2 + c), B.getQuick(r, c), TOL);
+                assertEquals(A.getQuick(NROWS / 2 + r, NCOLUMNS / 2 + c), B.getQuick(r, c), TOL);
             }
         }
     }
@@ -417,7 +416,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
     }
 
     public void testViewSelectionComplexMatrix1DProcedure() {
-        final float[] value = new float[] { (float)Math.random(), (float)Math.random() };
+        final float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.setQuick(NROWS / 3, 0, value);
         A.setQuick(NROWS / 2, 0, value);
         FComplexMatrix2D B = A.viewSelection(new FComplexMatrix1DProcedure() {
@@ -458,7 +457,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
     public void testZMultFComplexMatrix1DFComplexMatrix1DFComplexFComplexBoolean() {
         FComplexMatrix1D y = new DenseFComplexMatrix1D(NCOLUMNS);
         for (int i = 0; i < y.size(); i++) {
-            y.setQuick(i, new float[] { (float)Math.random(), (float)Math.random() });
+            y.setQuick(i, new float[] { (float) Math.random(), (float) Math.random() });
         }
         float[] alpha = new float[] { 3, 2 };
         float[] beta = new float[] { 5, 4 };
@@ -486,7 +485,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
         //transpose
         y = new DenseFComplexMatrix1D(NROWS);
         for (int i = 0; i < y.size(); i++) {
-            y.setQuick(i, new float[] { (float)Math.random(), (float)Math.random() });
+            y.setQuick(i, new float[] { (float) Math.random(), (float) Math.random() });
         }
         z = null;
         z = A.zMult(y, z, alpha, beta, true);
@@ -508,7 +507,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
             assertEquals(expected[2 * r + 1], z.getQuick(r)[1], TOL);
         }
     }
-    
+
     public void testZMultFloatMatrix2DFloatMatrix2DFloatFloatBooleanBoolean() {
         float[] alpha = new float[] { 3, 2 };
         float[] beta = new float[] { 5, 4 };
@@ -536,7 +535,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
                 assertEquals(expected[r][2 * c + 1], C.getQuick(r, c)[1], TOL);
             }
         }
-        
+
         //transposeA
         C = null;
         C = A.zMult(B, C, alpha, beta, true, false);
@@ -611,7 +610,6 @@ public abstract class FComplexMatrix2DTest extends TestCase {
         }
 
     }
-    
 
     public void testZSum() {
         float[] actual = A.zSum();

@@ -23,7 +23,6 @@ package cern.colt.matrix.tdouble.algo.solver;
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
-
 /**
  * Monitors the iterative solution process for convergence and divergence. Can
  * also report the current progress.
@@ -64,8 +63,7 @@ public interface DoubleIterationMonitor {
      *            State-vector
      * @return True if converged
      */
-    boolean converged(DoubleMatrix1D r, DoubleMatrix1D x)
-            throws IterativeSolverDoubleNotConvergedException;
+    boolean converged(DoubleMatrix1D r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException;
 
     /**
      * Checks for convergence
@@ -76,8 +74,7 @@ public interface DoubleIterationMonitor {
      *            State-vector
      * @return True if converged
      */
-    boolean converged(double r, DoubleMatrix1D x)
-            throws IterativeSolverDoubleNotConvergedException;
+    boolean converged(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException;
 
     /**
      * Checks for convergence
@@ -124,7 +121,7 @@ public interface DoubleIterationMonitor {
      *            Maximum number of iterations
      */
     public void setMaxIterations(int maxIter);
-    
+
     /**
      * Returns the maximum number of iterations
      */

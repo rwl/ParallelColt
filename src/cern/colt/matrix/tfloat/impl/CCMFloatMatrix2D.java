@@ -2,6 +2,13 @@ package cern.colt.matrix.tfloat.impl;
 
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 
+/**
+ * Sparse column-compressed-modified 2-d matrix holding <tt>float</tt> elements.
+ * Each column is stored as SparseFloatMatrix1D.
+ * 
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ * 
+ */
 public class CCMFloatMatrix2D extends WrapperFloatMatrix2D {
 
     private SparseFloatMatrix1D[] elements;
@@ -36,12 +43,10 @@ public class CCMFloatMatrix2D extends WrapperFloatMatrix2D {
         return elements;
     }
 
-
     public float getQuick(int row, int column) {
         return elements[column].getQuick(row);
     }
 
-    
     public void setQuick(int row, int column, float value) {
         elements[column].setQuick(row, value);
     }
@@ -51,15 +56,15 @@ public class CCMFloatMatrix2D extends WrapperFloatMatrix2D {
             elements[c].trimToSize();
         }
     }
-    
+
     public SparseFloatMatrix1D viewColumn(int column) {
         return elements[column];
     }
-    
+
     protected FloatMatrix2D getContent() {
         return this;
     }
-    
+
     public FloatMatrix2D like(int rows, int columns) {
         return new CCMFloatMatrix2D(rows, columns);
     }

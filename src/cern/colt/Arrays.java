@@ -26,8 +26,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -55,8 +54,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -84,8 +82,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -114,8 +111,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -143,8 +139,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -172,8 +167,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -201,8 +195,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -230,8 +223,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -259,8 +251,7 @@ public class Arrays extends Object {
     }
 
     /**
-     * Ensures that a given array can hold up to <tt>minCapacity</tt>
-     * elements.
+     * Ensures that a given array can hold up to <tt>minCapacity</tt> elements.
      * 
      * Returns the identical array if it can hold at least the number of
      * elements specified. Otherwise, returns a new array with increased
@@ -290,8 +281,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -311,8 +302,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -332,8 +323,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -353,8 +344,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -374,8 +365,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -395,8 +386,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -416,8 +407,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -437,8 +428,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */
@@ -458,8 +449,8 @@ public class Arrays extends Object {
     /**
      * Returns a string representation of the specified array. The string
      * representation consists of a list of the arrays's elements, enclosed in
-     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by
-     * the characters <tt>", "</tt> (comma and space).
+     * square brackets (<tt>"[]"</tt>). Adjacent elements are separated by the
+     * characters <tt>", "</tt> (comma and space).
      * 
      * @return a string representation of the specified array.
      */

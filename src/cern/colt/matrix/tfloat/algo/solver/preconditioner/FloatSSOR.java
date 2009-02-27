@@ -148,7 +148,7 @@ public class FloatSSOR implements FloatPreconditioner {
         float[] data = F.getValues().elements();
 
         float[] bd = ((DenseFloatMatrix1D) b).elements();
-//        float[] xd = ((DenseFloatMatrix1D) x).elements();
+        //        float[] xd = ((DenseFloatMatrix1D) x).elements();
         float[] xd = new float[x.size()];
 
         int n = F.rows();

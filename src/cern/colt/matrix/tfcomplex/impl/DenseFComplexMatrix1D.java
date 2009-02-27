@@ -61,10 +61,10 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
-     * copied. So subsequent changes in <tt>values</tt> are not reflected in
-     * the matrix, and vice-versa. Due to the fact that complex data is
-     * represented by 2 float values in sequence: the real and imaginary parts,
-     * the size of new matrix will be equal to values.length / 2.
+     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+     * matrix, and vice-versa. Due to the fact that complex data is represented
+     * by 2 float values in sequence: the real and imaginary parts, the size of
+     * new matrix will be equal to values.length / 2.
      * 
      * @param values
      *            The values to be filled into the new matrix.
@@ -181,7 +181,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             b[1] = Float.NaN;
             return b;
         }
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final float[] elemsOther = (float[]) other.elements();
         float[] a = null;
@@ -442,7 +442,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         final int strideOther = other.stride;
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
 
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -489,7 +489,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         }
         checkSize(y);
         final float[] elemsOther = (float[]) y.elements();
-        final int zeroOther = (int)y.index(0);
+        final int zeroOther = (int) y.index(0);
         final int strideOther = y.stride();
 
         if (elements == null || elemsOther == null)
@@ -599,7 +599,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             return super.assignImaginary(other);
         }
         checkSize(other);
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final float[] elemsOther = (float[]) other.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -619,7 +619,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
                         int idx = zero + startidx * stride;
                         int idxOther = zeroOther + startidx * strideOther;
                         for (int i = startidx; i < stopidx; i++) {
-//                            elements[idx] = 0;
+                            //                            elements[idx] = 0;
                             elements[idx + 1] = elemsOther[idxOther];
                             idx += stride;
                             idxOther += strideOther;
@@ -632,7 +632,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             int idx = zero;
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
-//                elements[idx] = 0;
+                //                elements[idx] = 0;
                 elements[idx + 1] = elemsOther[idxOther];
                 idx += stride;
                 idxOther += strideOther;
@@ -646,7 +646,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             return super.assignReal(other);
         }
         checkSize(other);
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final float[] elemsOther = (float[]) other.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -667,7 +667,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
                         int idxOther = zeroOther + startidx * strideOther;
                         for (int i = startidx; i < stopidx; i++) {
                             elements[idx] = elemsOther[idxOther];
-//                            elements[idx + 1] = 0;
+                            //                            elements[idx + 1] = 0;
                             idx += stride;
                             idxOther += strideOther;
                         }
@@ -680,7 +680,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
                 elements[idx] = elemsOther[idxOther];
-//                elements[idx + 1] = 0;
+                //                elements[idx + 1] = 0;
                 idx += stride;
                 idxOther += strideOther;
             }
@@ -699,7 +699,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         if (fft == null) {
             fft = new FloatFFT_1D(size);
         }
-        
+
         if (isNoView) {
             fft.complexForward(elements);
         } else {
@@ -717,7 +717,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
     public FloatMatrix1D getImaginaryPart() {
         final DenseFloatMatrix1D Im = new DenseFloatMatrix1D(size);
         final float[] elemsOther = (float[]) Im.elements();
-        final int zeroOther = (int)Im.index(0);
+        final int zeroOther = (int) Im.index(0);
         final int strideOther = Im.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -784,7 +784,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
     public FloatMatrix1D getRealPart() {
         final DenseFloatMatrix1D R = new DenseFloatMatrix1D(size);
         final float[] elemsOther = (float[]) R.elements();
-        final int zeroOther = (int)R.index(0);
+        final int zeroOther = (int) R.index(0);
         final int strideOther = R.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -861,7 +861,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         }
         FComplexMatrix2D M = new DenseFComplexMatrix2D(rows, cols);
         final float[] elemsOther = (float[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0);
+        final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -916,7 +916,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         }
         FComplexMatrix3D M = new DenseFComplexMatrix3D(slices, rows, cols);
         final float[] elemsOther = (float[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0, 0);
+        final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
@@ -995,7 +995,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         final int strideOther = y.stride;
-        final int zeroOther = (int)y.index(0);
+        final int zeroOther = (int) y.index(0);
 
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {

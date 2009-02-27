@@ -1013,7 +1013,6 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
         return like().assign(this);
     }
 
-    
     /**
      * Returns the elements of this matrix.
      * 
@@ -1056,7 +1055,6 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
         return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, (FloatMatrix3D) obj);
     }
 
-    
     /**
      * Returns the matrix cell value at coordinate <tt>[slice,row,column]</tt>.
      * 
@@ -1086,10 +1084,6 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
         return this;
     }
 
-    
-    
-    
-    
     /**
      * Fills the coordinates and values of cells having negative values into the
      * specified lists. Fills into the lists, starting at index 0. After this
@@ -1247,13 +1241,6 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
         return false;
     }
 
-    
-    
-    
-    
-    
-    
-    
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of slices, rows and columns. For
@@ -1261,8 +1248,8 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
      * <tt>DenseFloatMatrix3D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix3D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix3D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix3D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix3D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1277,8 +1264,8 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
      * <tt>DenseFloatMatrix3D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix3D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix3D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix3D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix3D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param slices
      *            the number of slices the matrix shall have.
@@ -1502,8 +1489,8 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
 
     /**
      * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
-     * If the matrix contains negative elements then all the values are shifted to
-     * ensure non-negativity.
+     * If the matrix contains negative elements then all the values are shifted
+     * to ensure non-negativity.
      */
     public void normalize() {
         float min = getMinLocation()[0];
@@ -1511,10 +1498,10 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
             assign(FloatFunctions.minus(min));
         }
         if (getMaxLocation()[0] == 0) {
-            assign((float)(1.0 / size()));
+            assign((float) (1.0 / size()));
         } else {
             float sumScaleFactor = zSum();
-            sumScaleFactor = (float)(1.0 / sumScaleFactor);
+            sumScaleFactor = (float) (1.0 / sumScaleFactor);
             assign(FloatFunctions.mult(sumScaleFactor));
         }
     }
@@ -1817,9 +1804,9 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
      * <pre>
      * // extract and view all slices which have an aggregate sum &gt; 1000
      * matrix.viewSelection(new FloatMatrix2DProcedure() {
-     *  public final boolean apply(FloatMatrix2D m) {
-     *      return m.zSum &gt; 1000;
-     *  }
+     *     public final boolean apply(FloatMatrix2D m) {
+     *         return m.zSum &gt; 1000;
+     *     }
      * });
      * </pre>
      * 
@@ -1989,8 +1976,8 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
      * ordering</i> of the matrix values in the given <tt>[row,column]</tt>
      * position. This sort is guaranteed to be <i>stable</i>. For further
      * information, see
-     * {@link cern.colt.matrix.tfloat.algo.FloatSorting#sort(FloatMatrix3D,int,int)}.
-     * For more advanced sorting functionality, see
+     * {@link cern.colt.matrix.tfloat.algo.FloatSorting#sort(FloatMatrix3D,int,int)}
+     * . For more advanced sorting functionality, see
      * {@link cern.colt.matrix.tfloat.algo.FloatSorting}.
      * 
      * @return a new sorted vector (matrix) view.

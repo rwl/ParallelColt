@@ -14,8 +14,7 @@ import cern.colt.matrix.tdcomplex.impl.SparseDComplexMatrix2D;
 /**
  * Factory for convenient construction of 2-d matrices holding <tt>complex</tt>
  * cells. Also provides convenient methods to compose (concatenate) and
- * decompose (split) matrices from/to constituent blocks.
- * </p>
+ * decompose (split) matrices from/to constituent blocks. </p>
  * <p>
  * &nbsp;
  * </p>
@@ -28,40 +27,39 @@ import cern.colt.matrix.tdcomplex.impl.SparseDComplexMatrix2D;
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Construction with initial values </i></td>
- * <td>Use other <tt>make</tt> methods to construct matrices with given
- * initial values. </td>
+ * <td>Use other <tt>make</tt> methods to construct matrices with given initial
+ * values.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Appending rows and columns </i></td>
- * <td>Use methods
- * {@link #appendColumns(DComplexMatrix2D,DComplexMatrix2D) appendColumns},
- * {@link #appendColumns(DComplexMatrix2D,DComplexMatrix2D) appendRows} and
- * {@link  #repeat(DComplexMatrix2D,int,int) repeat} to append rows and columns.
- * </td>
+ * <td>Use methods {@link #appendColumns(DComplexMatrix2D,DComplexMatrix2D)
+ * appendColumns}, {@link #appendColumns(DComplexMatrix2D,DComplexMatrix2D)
+ * appendRows} and {@link #repeat(DComplexMatrix2D,int,int) repeat} to append
+ * rows and columns.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> General block matrices </i></td>
  * <td>Use methods {@link #compose(DComplexMatrix2D[][]) compose} and
- * {@link #decompose(DComplexMatrix2D[][],DComplexMatrix2D)  decompose} to work
- * with general block matrices. </td>
+ * {@link #decompose(DComplexMatrix2D[][],DComplexMatrix2D) decompose} to work
+ * with general block matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Diagonal matrices </i></td>
  * <td>Use methods {@link #diagonal(DComplexMatrix1D) diagonal(vector)},
- * {@link  #diagonal(DComplexMatrix2D) diagonal(matrix)} and
- * {@link #identity(int) identity} to work with diagonal matrices. </td>
+ * {@link #diagonal(DComplexMatrix2D) diagonal(matrix)} and
+ * {@link #identity(int) identity} to work with diagonal matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Diagonal block matrices </i></td>
  * <td>Use method
- * {@link #composeDiagonal(DComplexMatrix2D,DComplexMatrix2D,DComplexMatrix2D) 
- * composeDiagonal} to work with diagonal block matrices. </td>
+ * {@link #composeDiagonal(DComplexMatrix2D,DComplexMatrix2D,DComplexMatrix2D)
+ * composeDiagonal} to work with diagonal block matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i>Random</i></td>
  * <td>Use methods {@link #random(int,int) random} and
- * {@link #sample(int,int,double[],double)  sample} to construct random
- * matrices. </td>
+ * {@link #sample(int,int,double[],double) sample} to construct random matrices.
+ * </td>
  * </tr>
  * </table>
  * <p>
@@ -125,7 +123,7 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      * 	 --&gt;
      * 	 0 1 2 6 7 
      * 	 3 4 5 8 9
-     * 	
+     * 
      * </pre>
      */
     public DComplexMatrix2D appendColumns(DComplexMatrix2D A, DComplexMatrix2D B) {
@@ -260,8 +258,8 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      * method {@link #decompose(DComplexMatrix2D[][], DComplexMatrix2D)}.
      * <p>
      * All matrices of a given column within <tt>parts</tt> must have the same
-     * number of columns. All matrices of a given row within <tt>parts</tt>
-     * must have the same number of rows. Otherwise an
+     * number of columns. All matrices of a given row within <tt>parts</tt> must
+     * have the same number of rows. Otherwise an
      * <tt>IllegalArgumentException</tt> is thrown. Note that <tt>null</tt>s
      * within <tt>parts[row,col]</tt> are an exception to this rule: they are
      * ignored. Cells are copied.
@@ -346,7 +344,7 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      * <pre>
      * 	 A 0
      * 	 0 B
-     * 	
+     * 
      * </pre>
      * 
      * (The direct sum has <tt>A.rows()+B.rows()</tt> rows and
@@ -373,7 +371,7 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      * 	 A 0 0
      * 	 0 B 0
      * 	 0 0 C
-     * 	
+     * 
      * </pre>
      * 
      * from the given parts. Cells are copied.
@@ -408,8 +406,8 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      * {@link #compose(DComplexMatrix2D[][])}.
      * <p>
      * All matrices of a given column within <tt>parts</tt> must have the same
-     * number of columns. All matrices of a given row within <tt>parts</tt>
-     * must have the same number of rows. Otherwise an
+     * number of columns. All matrices of a given row within <tt>parts</tt> must
+     * have the same number of rows. Otherwise an
      * <tt>IllegalArgumentException</tt> is thrown. Note that <tt>null</tt>s
      * within <tt>parts[row,col]</tt> are an exception to this rule: they are
      * ignored. Cells are copied.
@@ -538,8 +536,8 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a new vector consisting of the diagonal elements of <tt>A</tt>.
-     * Cells values are copied. The new vector is not a view.
+     * Constructs a new vector consisting of the diagonal elements of <tt>A</tt>
+     * . Cells values are copied. The new vector is not a view.
      * 
      * @param A
      *            the matrix, need not be square.
@@ -579,7 +577,8 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
      */
     public DComplexMatrix2D make(double[][] values) {
         if (this == sparse) {
@@ -646,10 +645,10 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
     /**
      * Constructs a randomly sampled matrix with the given shape. Randomly picks
      * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
-     * initializes them to <tt>value</tt>, all the rest will be initialized
-     * to zero. Note that this is not the same as setting each cell with
-     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The
-     * random seed is a constant.
+     * initializes them to <tt>value</tt>, all the rest will be initialized to
+     * zero. Note that this is not the same as setting each cell with
+     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
+     * seed is a constant.
      * 
      * @throws IllegalArgumentException
      *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
@@ -664,10 +663,10 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
     /**
      * Modifies the given matrix to be a randomly sampled matrix. Randomly picks
      * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
-     * initializes them to <tt>value</tt>, all the rest will be initialized
-     * to zero. Note that this is not the same as setting each cell with
-     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The
-     * random seed is a constant.
+     * initializes them to <tt>value</tt>, all the rest will be initialized to
+     * zero. Note that this is not the same as setting each cell with
+     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
+     * seed is a constant.
      * 
      * @throws IllegalArgumentException
      *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.

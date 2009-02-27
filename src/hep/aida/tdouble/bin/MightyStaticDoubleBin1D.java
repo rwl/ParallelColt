@@ -58,9 +58,9 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
      *            least 4 if the kurtosis is required. In general, if moments
      *            are required set this parameter at least as large as the
      *            largest required moment. This method always substitutes
-     *            <tt>Math.max(2,maxOrderForSumOfPowers)</tt> for the
-     *            parameter passed in. Thus, <tt>sumOfPowers(0..2)</tt> always
-     *            returns meaningful results.
+     *            <tt>Math.max(2,maxOrderForSumOfPowers)</tt> for the parameter
+     *            passed in. Thus, <tt>sumOfPowers(0..2)</tt> always returns
+     *            meaningful results.
      * 
      * @see #hasSumOfPowers(int)
      * @see #moment(int,double)
@@ -84,7 +84,8 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
      *            the index of the last element to be added (inclusive).
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>.
+     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
+     *             .
      */
     public synchronized void addAllOfFromTo(DoubleArrayList list, int from, int to) {
         super.addAllOfFromTo(list, from, to);
@@ -219,8 +220,7 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
     }
 
     /**
-     * Returns whether <tt>sumOfInversions()</tt> can return meaningful
-     * results.
+     * Returns whether <tt>sumOfInversions()</tt> can return meaningful results.
      * 
      * @return <tt>false</tt> if the bin was constructed with insufficient
      *         parametrization, <tt>true</tt> otherwise. See the constructors
@@ -244,8 +244,8 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
     /**
      * Tells whether <tt>sumOfPowers(k)</tt> can return meaningful results.
      * Defined as
-     * <tt>hasSumOfPowers(k) <==> getMinOrderForSumOfPowers() <= k && k <= getMaxOrderForSumOfPowers()</tt>.
-     * A return value of <tt>true</tt> implies that
+     * <tt>hasSumOfPowers(k) <==> getMinOrderForSumOfPowers() <= k && k <= getMaxOrderForSumOfPowers()</tt>
+     * . A return value of <tt>true</tt> implies that
      * <tt>hasSumOfPowers(k-1) .. hasSumOfPowers(0)</tt> will also return
      * <tt>true</tt>. See the constructors for proper parametrization.
      * <p>
@@ -265,8 +265,7 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
      * Returns the kurtosis (aka excess), which is
      * <tt>-3 + moment(4,mean()) / standardDeviation()<sup>4</sup></tt>.
      * 
-     * @return the kurtosis; <tt>Double.NaN</tt> if
-     *         <tt>!hasSumOfPowers(4)</tt>.
+     * @return the kurtosis; <tt>Double.NaN</tt> if <tt>!hasSumOfPowers(4)</tt>.
      * @see #hasSumOfPowers(int)
      */
     public synchronized double kurtosis() {
@@ -274,8 +273,8 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
     }
 
     /**
-     * Returns the moment of <tt>k</tt>-th order with value <tt>c</tt>,
-     * which is <tt>Sum( (x[i]-c)<sup>k</sup> ) / size()</tt>.
+     * Returns the moment of <tt>k</tt>-th order with value <tt>c</tt>, which is
+     * <tt>Sum( (x[i]-c)<sup>k</sup> ) / size()</tt>.
      * 
      * @param k
      *            the order; must be greater than or equal to zero.
@@ -317,8 +316,8 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
 
     /**
      * Sets the range of orders in which sums of powers are to be computed. In
-     * other words, <tt>sumOfPower(k)</tt> will return <tt>Sum( x[i]^k )</tt>
-     * if <tt>min_k <= k <= max_k || 0 <= k <= 2</tt> and throw an exception
+     * other words, <tt>sumOfPower(k)</tt> will return <tt>Sum( x[i]^k )</tt> if
+     * <tt>min_k <= k <= max_k || 0 <= k <= 2</tt> and throw an exception
      * otherwise.
      * 
      * @see #isLegalOrder(int)
@@ -469,8 +468,8 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
     }
 
     /**
-     * Tells whether <tt>sumOfPowers(fromK) .. sumOfPowers(toK)</tt> can
-     * return meaningful results.
+     * Tells whether <tt>sumOfPowers(fromK) .. sumOfPowers(toK)</tt> can return
+     * meaningful results.
      * 
      * @return <tt>false</tt> if the bin was constructed with insufficient
      *         parametrization, <tt>true</tt> otherwise. See the constructors
@@ -486,7 +485,8 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
 
     /**
      * Returns
-     * <tt>getMinOrderForSumOfPowers() <= k && k <= getMaxOrderForSumOfPowers()</tt>.
+     * <tt>getMinOrderForSumOfPowers() <= k && k <= getMaxOrderForSumOfPowers()</tt>
+     * .
      */
     protected synchronized boolean xisLegalOrder(int k) {
         return getMinOrderForSumOfPowers() <= k && k <= getMaxOrderForSumOfPowers();

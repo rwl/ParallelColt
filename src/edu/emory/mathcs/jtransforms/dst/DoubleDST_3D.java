@@ -41,7 +41,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 /**
  * Computes 3D Discrete Sine Transform (DST) of double precision data. The sizes
  * of all three dimensions can be arbitrary numbers. This is a parallel
- * implementation optimized for SMP systems.
+ * implementation optimized for SMP systems.<br>
+ * <br>
+ * Part of code is derived from General Purpose FFT Package written by Takuya
+ * Ooura (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 

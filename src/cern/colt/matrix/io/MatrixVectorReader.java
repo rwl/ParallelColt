@@ -487,7 +487,6 @@ public class MatrixVectorReader extends BufferedReader {
         }
     }
 
-
     /**
      * Reads a coordinate matrix
      */

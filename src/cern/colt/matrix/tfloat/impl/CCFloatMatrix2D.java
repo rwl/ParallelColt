@@ -172,7 +172,9 @@ public class CCFloatMatrix2D extends WrapperFloatMatrix2D {
     }
 
     /**
-     * Constructs a matrix with indexes and values given in compressed-column format.
+     * Constructs a matrix with indexes and values given in compressed-column
+     * format.
+     * 
      * @param rows
      * @param columns
      * @param columnPointers
@@ -243,9 +245,10 @@ public class CCFloatMatrix2D extends WrapperFloatMatrix2D {
         values = new FloatArrayList(nzmax);
         columnPointers = new int[columns + 1];
     }
-    
+
     /**
      * Constructs a matrix with indexes and values given in coordinate format.
+     * 
      * @param rows
      * @param columns
      * @param rowIndexes
@@ -262,7 +265,7 @@ public class CCFloatMatrix2D extends WrapperFloatMatrix2D {
         }
         int nnz = rowIndexes.size();
         int[] rowIndexesElements = rowIndexes.elements();
-        int[] columnIndexesElements = columnIndexes.elements();        
+        int[] columnIndexesElements = columnIndexes.elements();
         float[] valuesElements = values.elements();
 
         int[] idxs = new int[nnz];
@@ -282,7 +285,47 @@ public class CCFloatMatrix2D extends WrapperFloatMatrix2D {
         this.rowIndexes = new IntArrayList(idxs);
         this.values = new FloatArrayList(vals);
     }
-    
+
+    /**
+     * Constructs a matrix with indexes given in coordinate format and single
+     * value.
+     * 
+     * @param rows
+     * @param columns
+     * @param rowIndexes
+     * @param columnIndexes
+     * @param value
+     */
+    public CCFloatMatrix2D(int rows, int columns, IntArrayList rowIndexes, IntArrayList columnIndexes, float value) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        int nnz = rowIndexes.size();
+        int[] rowIndexesElements = rowIndexes.elements();
+        int[] columnIndexesElements = columnIndexes.elements();
+
+        int[] idxs = new int[nnz];
+        float[] vals = new float[nnz];
+        int[] starts = new int[columns + 1];
+        int[] w = new int[columns];
+        int r;
+        for (int k = 0; k < nnz; k++) {
+            w[columnIndexesElements[k]]++;
+        }
+        cumsum(starts, w, columns);
+        for (int k = 0; k < nnz; k++) {
+            idxs[r = w[columnIndexesElements[k]]++] = rowIndexesElements[k];
+            vals[r] = value;
+        }
+        this.columnPointers = starts;
+        this.rowIndexes = new IntArrayList(idxs);
+        this.values = new FloatArrayList(vals);
+    }
+
     private float cumsum(int[] p, int[] c, int n) {
         int nz = 0;
         float nz2 = 0;
@@ -643,8 +686,8 @@ public class CCFloatMatrix2D extends WrapperFloatMatrix2D {
      * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -660,9 +703,9 @@ public class CCFloatMatrix2D extends WrapperFloatMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirely independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseFloatMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.

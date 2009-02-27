@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.jet.math.tdouble;
 
-
 /**
  * Bessel and Airy functions.
  */
@@ -266,8 +265,8 @@ public class Bessel extends DoubleConstants {
     }
 
     /**
-     * Returns the Bessel function of the first kind of order <tt>n</tt> of
-     * the argument.
+     * Returns the Bessel function of the first kind of order <tt>n</tt> of the
+     * argument.
      * 
      * @param n
      *            the order of the Bessel function.
@@ -634,8 +633,8 @@ public class Bessel extends DoubleConstants {
     }
 
     /**
-     * Returns the Bessel function of the second kind of order <tt>n</tt> of
-     * the argument.
+     * Returns the Bessel function of the second kind of order <tt>n</tt> of the
+     * argument.
      * 
      * @param n
      *            the order of the Bessel function.

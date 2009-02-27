@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.list.tlong;
 
-
 /**
  * Resizable compressed list holding numbers; based on the fact that a number
  * from a large list with few distinct values need not take more than
@@ -28,8 +27,8 @@ package cern.colt.list.tlong;
  * are known in advance. Robust in the presence of "outliers".
  * <p>
  * <b>Performance:</b> Operations <tt>get()</tt>, <tt>size()</tt> and
- * <tt>clear()</tt> are <tt>O(1)</tt>, i.e. run in constant time.
- * Operations like <tt>add()</tt> and <tt>set()</tt> are
+ * <tt>clear()</tt> are <tt>O(1)</tt>, i.e. run in constant time. Operations
+ * like <tt>add()</tt> and <tt>set()</tt> are
  * <tt>O(log(distinctValues.length))</tt>.
  * <p>
  * Upon instantiation a contract is signed that defines the distinct values
@@ -37,15 +36,14 @@ package cern.colt.list.tlong;
  * specified by the contract. Any attempt to violate the contract will throw an
  * <tt>IllegalArgumentException</tt>.
  * <p>
- * Although access methods are only defined on <tt>long</tt> values you can
- * also store all other primitive data types: <tt>boolean</tt>, <tt>byte</tt>,
- * <tt>short</tt>, <tt>int</tt>, <tt>long</tt>, <tt>float</tt>,
- * <tt>double</tt> and <tt>char</tt>. You can do this by explicitly
- * representing them as <tt>long</tt> values. Use casts for discrete data
- * types. Use the methods of <tt>java.lang.Float</tt> and
- * <tt>java.lang.Double</tt> for floating point data types: Recall that with
- * those methods you can convert any floating point value to a <tt>long</tt>
- * value and back <b>without losing any precision</b>:
+ * Although access methods are only defined on <tt>long</tt> values you can also
+ * store all other primitive data types: <tt>boolean</tt>, <tt>byte</tt>,
+ * <tt>short</tt>, <tt>int</tt>, <tt>long</tt>, <tt>float</tt>, <tt>double</tt>
+ * and <tt>char</tt>. You can do this by explicitly representing them as
+ * <tt>long</tt> values. Use casts for discrete data types. Use the methods of
+ * <tt>java.lang.Float</tt> and <tt>java.lang.Double</tt> for floating point
+ * data types: Recall that with those methods you can convert any floating point
+ * value to a <tt>long</tt> value and back <b>without losing any precision</b>:
  * <p>
  * <b>Example usage:</b>
  * 
@@ -141,16 +139,18 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
 
     /**
      * Removes from the receiver all elements whose index is between
-     * <code>from</code>, inclusive and <code>to</code>, inclusive. Shifts
-     * any succeeding elements to the left (reduces their index). This call
-     * shortens the list by <tt>(to - from + 1)</tt> elements.
+     * <code>from</code>, inclusive and <code>to</code>, inclusive. Shifts any
+     * succeeding elements to the left (reduces their index). This call shortens
+     * the list by <tt>(to - from + 1)</tt> elements.
      * 
      * @param from
      *            index of first element to be removed.
      * @param to
      *            index of last element to be removed.
      * @exception IndexOutOfBoundsException
-     *                index is out of range (<tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>).
+     *                index is out of range (
+     *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
+     *                ).
      */
     public void removeFromTo(int from, int to) {
         elements.removeFromTo(from, to);
@@ -159,11 +159,11 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
 
     /**
      * Replaces the element at the specified position in the receiver with the
-     * specified element; <b>WARNING:</b> Does not check preconditions.
-     * Provided with invalid parameters this method may access invalid indexes
-     * without throwing any exception! <b>You should only use this method when
-     * you are absolutely sure that the index is within bounds.</b>
-     * Precondition (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
+     * specified element; <b>WARNING:</b> Does not check preconditions. Provided
+     * with invalid parameters this method may access invalid indexes without
+     * throwing any exception! <b>You should only use this method when you are
+     * absolutely sure that the index is within bounds.</b> Precondition
+     * (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
      * 
      * @param index
      *            index of element to replace.

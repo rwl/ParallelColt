@@ -11,7 +11,6 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import edu.emory.mathcs.utils.AssertUtils;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public abstract class DComplexMatrix2DTest extends TestCase {
@@ -372,7 +371,7 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         int idx = 0;
         for (int c = 0; c < NCOLUMNS; c++) {
             for (int r = 0; r < NROWS; r++) {
-                AssertUtils.assertArrayEquals(A.getQuick(r, c), B.getQuick(idx++), TOL);
+                assertEquals(A.getQuick(r, c), B.getQuick(idx++), TOL);
             }
         }
     }
@@ -410,7 +409,7 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         DComplexMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
         for (int r = 0; r < NROWS / 3; r++) {
             for (int c = 0; c < NCOLUMNS / 3; c++) {
-                AssertUtils.assertArrayEquals(A.getQuick(NROWS / 2 + r, NCOLUMNS / 2 + c), B.getQuick(r, c), TOL);
+                assertEquals(A.getQuick(NROWS / 2 + r, NCOLUMNS / 2 + c), B.getQuick(r, c), TOL);
             }
         }
     }
@@ -525,7 +524,7 @@ public abstract class DComplexMatrix2DTest extends TestCase {
             assertEquals(expected[2 * r + 1], z.getQuick(r)[1], TOL);
         }
     }
-    
+
     public void testZMultDoubleMatrix2DDoubleMatrix2DDoubleDoubleBooleanBoolean() {
         double[] alpha = new double[] { 3, 2 };
         double[] beta = new double[] { 5, 4 };
@@ -553,7 +552,7 @@ public abstract class DComplexMatrix2DTest extends TestCase {
                 assertEquals(expected[r][2 * c + 1], C.getQuick(r, c)[1], TOL);
             }
         }
-        
+
         //transposeA
         C = null;
         C = A.zMult(B, C, alpha, beta, true, false);
@@ -628,7 +627,6 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         }
 
     }
-    
 
     public void testZSum() {
         double[] actual = A.zSum();

@@ -177,14 +177,14 @@ public class FloatQMR extends AbstractFloatIterativeSolver {
             rho = FloatAlgebra.DEFAULT.norm(y, Norm.Two);
 
             A.zMult(q, w_tld.assign(w, FloatFunctions.multSecond(-beta)), 1, 1, true);
-            
+
             M2.transApply(w_tld, z);
             xi = FloatAlgebra.DEFAULT.norm(z, Norm.Two);
 
             gamma_1 = gamma;
             theta_1 = theta;
             theta = rho / (gamma_1 * beta);
-            gamma = (float)(1 / Math.sqrt(1 + theta * theta));
+            gamma = (float) (1 / Math.sqrt(1 + theta * theta));
 
             if (gamma == 0)
                 throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "gamma", iter);
@@ -192,7 +192,7 @@ public class FloatQMR extends AbstractFloatIterativeSolver {
             eta = -eta * rho_1 * gamma * gamma / (beta * gamma_1 * gamma_1);
 
             if (iter.isFirst()) {
-                d.assign(p, FloatFunctions.multSecond(eta));                
+                d.assign(p, FloatFunctions.multSecond(eta));
                 s.assign(p_tld, FloatFunctions.multSecond(eta));
             } else {
                 float val = theta_1 * theta_1 * gamma * gamma;

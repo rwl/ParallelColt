@@ -17,14 +17,14 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b>
- * <dt> Method: Acceptance Rejection.
- * <dt> This is a port of <tt>mwc.c</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library. C-RAND's implementation, in turn, is based upon
+ * <dt>Method: Acceptance Rejection.
+ * <dt>This is a port of <tt>mwc.c</tt> from the <A
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * D.J. Best, N.I. Fisher (1979): Efficient simulation of the von Mises
  * distribution, Appl. Statist. 28, 152-157.
@@ -75,8 +75,8 @@ public class VonMises extends AbstractContinousDoubleDistribution {
          * FUNCTION : - mwc samples a random number from the von Mises *
          * distribution ( -Pi <= x <= Pi) with parameter * k > 0 via rejection
          * from the wrapped Cauchy * distibution. * REFERENCE: - D.J. Best, N.I.
-         * Fisher (1979): Efficient * simulation of the von Mises distribution, *
-         * Appl. Statist. 28, 152-157. * SUBPROGRAM: - drand(seed) ...
+         * Fisher (1979): Efficient * simulation of the von Mises distribution,
+         * * Appl. Statist. 28, 152-157. * SUBPROGRAM: - drand(seed) ...
          * (0,1)-Uniform generator with * unsigned long integer *seed. * *
          * Implemented by F. Niederl, August 1992 *
          **********************************************************************/

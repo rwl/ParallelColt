@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.list.tlong;
 
-
 /**
  * Resizable list holding <code>long</code> elements; implemented with arrays;
  * not efficient; just to demonstrate which methods you must override to
@@ -100,11 +99,11 @@ public class SimpleLongArrayList extends AbstractLongList {
 
     /**
      * Replaces the element at the specified position in the receiver with the
-     * specified element; <b>WARNING:</b> Does not check preconditions.
-     * Provided with invalid parameters this method may access invalid indexes
-     * without throwing any exception! <b>You should only use this method when
-     * you are absolutely sure that the index is within bounds.</b>
-     * Precondition (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
+     * specified element; <b>WARNING:</b> Does not check preconditions. Provided
+     * with invalid parameters this method may access invalid indexes without
+     * throwing any exception! <b>You should only use this method when you are
+     * absolutely sure that the index is within bounds.</b> Precondition
+     * (unchecked): <tt>index &gt;= 0 && index &lt; size()</tt>.
      * 
      * @param index
      *            index of element to replace.

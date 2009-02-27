@@ -664,11 +664,11 @@ public class DoubleFunctions extends Object {
      * Function that returns <tt>a + b</tt>.
      */
     public static final DoubleDoubleFunction plus = plusMultSecond(1);
-//        new DoubleDoubleFunction() {
-//            public final double apply(double a, double b) {
-//                return a + b;
-//            }
-//        };
+    //        new DoubleDoubleFunction() {
+    //            public final double apply(double a, double b) {
+    //                return a + b;
+    //            }
+    //        };
 
     /**
      * Function that returns <tt>Math.abs(a) + Math.abs(b)</tt>.

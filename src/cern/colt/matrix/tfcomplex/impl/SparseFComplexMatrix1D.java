@@ -119,10 +119,9 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
      */
     public float[] getQuick(int index) {
         float[] elem = elements.get(zero + index * stride);
-        if(elem != null) {
-            return new float[] {elem[0], elem[1]};
-        }
-        else {
+        if (elem != null) {
+            return new float[] { elem[0], elem[1] };
+        } else {
             return new float[2];
         }
     }

@@ -46,7 +46,7 @@ public abstract class FloatMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    A.setQuick(s, r, c, (float)Math.random());
+                    A.setQuick(s, r, c, (float) Math.random());
                 }
             }
         }
@@ -54,7 +54,7 @@ public abstract class FloatMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    B.setQuick(s, r, c, (float)Math.random());
+                    B.setQuick(s, r, c, (float) Math.random());
                 }
             }
         }
@@ -147,7 +147,7 @@ public abstract class FloatMatrix3DTest extends TestCase {
     }
 
     public void testAssignFloat() {
-        float value = (float)Math.random();
+        float value = (float) Math.random();
         A.assign(value);
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
@@ -160,7 +160,7 @@ public abstract class FloatMatrix3DTest extends TestCase {
     public void testAssignFloatArray() {
         float[] expected = new float[A.size()];
         for (int i = 0; i < A.size(); i++) {
-            expected[i] = (float)Math.random();
+            expected[i] = (float) Math.random();
         }
         A.assign(expected);
         int idx = 0;
@@ -178,7 +178,7 @@ public abstract class FloatMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    expected[s][r][c] = (float)Math.random();
+                    expected[s][r][c] = (float) Math.random();
                 }
             }
         }
@@ -200,7 +200,7 @@ public abstract class FloatMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    float expected = (float)Math.acos(Acopy.getQuick(s, r, c));
+                    float expected = (float) Math.acos(Acopy.getQuick(s, r, c));
                     assertEquals(expected, A.getQuick(s, r, c), TOL);
                 }
             }

@@ -295,7 +295,7 @@ public abstract class DComplexMatrix1DTest extends TestCase {
             assertEquals(elem[1], array[2 * i + 1], TOL);
         }
     }
-    
+
     public void testToArrayDoubleArray() {
         double[] array = new double[2 * SIZE];
         A.toArray(array);
@@ -305,21 +305,21 @@ public abstract class DComplexMatrix1DTest extends TestCase {
             assertEquals(elem[1], array[2 * i + 1], TOL);
         }
     }
-    
+
     public void testViewFlip() {
         DComplexMatrix1D B = A.viewFlip();
         for (int i = 0; i < SIZE; i++) {
             assertEquals(A.getQuick(SIZE - 1 - i), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testViewPart() {
         DComplexMatrix1D B = A.viewPart(SIZE / 2, SIZE / 3);
         for (int i = 0; i < SIZE / 3; i++) {
             assertEquals(A.getQuick(SIZE / 2 + i), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testViewSelectionComplexProcedure() {
         DComplexMatrix1D B = A.viewSelection(new DComplexProcedure() {
             public boolean apply(double[] element) {
@@ -337,15 +337,15 @@ public abstract class DComplexMatrix1DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewSelectionIntArray() {
-        int[] indexes = new int[] {SIZE / 6, SIZE / 5, SIZE / 4, SIZE / 3, SIZE / 2};
+        int[] indexes = new int[] { SIZE / 6, SIZE / 5, SIZE / 4, SIZE / 3, SIZE / 2 };
         DComplexMatrix1D B = A.viewSelection(indexes);
         for (int i = 0; i < indexes.length; i++) {
             assertEquals(A.getQuick(indexes[i]), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testViewStrides() {
         int stride = 3;
         DComplexMatrix1D B = A.viewStrides(stride);
@@ -353,7 +353,7 @@ public abstract class DComplexMatrix1DTest extends TestCase {
             assertEquals(A.getQuick(i * stride), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testZDotProductComplexMatrix1D() {
         double[] actual = A.zDotProduct(B);
         double[] expected = new double[2];
@@ -362,7 +362,7 @@ public abstract class DComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     public void testZDotProductComplexMatrix1DIntInt() {
         double[] actual = A.zDotProduct(B, 5, B.size() - 10);
         double[] expected = new double[2];
@@ -371,7 +371,7 @@ public abstract class DComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     public void testZDotProductComplexMatrix1DIntIntIntArrayList() {
         IntArrayList indexList = new IntArrayList();
         ArrayList<double[]> valueList = new ArrayList<double[]>();
@@ -383,7 +383,7 @@ public abstract class DComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     public void testZSum() {
         double[] actual = A.zSum();
         double[] expected = new double[2];
@@ -392,13 +392,11 @@ public abstract class DComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     protected void assertEquals(double[] expected, double[] actual, double tol) {
         for (int i = 0; i < actual.length; i++) {
             assertEquals(expected[i], actual[i], tol);
         }
     }
 
-
-    
 }

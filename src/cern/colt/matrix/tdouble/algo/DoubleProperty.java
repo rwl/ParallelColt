@@ -720,7 +720,6 @@ public class DoubleProperty extends cern.colt.PersistentObject {
         }
     }
 
-
     /**
      * Returns whether both given matrices <tt>A</tt> and <tt>B</tt> are equal.
      * The result is <tt>true</tt> if <tt>A==B</tt>. Otherwise, the result is

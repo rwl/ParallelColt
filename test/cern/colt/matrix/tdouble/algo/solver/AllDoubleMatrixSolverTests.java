@@ -2,7 +2,6 @@ package cern.colt.matrix.tdouble.algo.solver;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  * Test of all double precision iterative solvers

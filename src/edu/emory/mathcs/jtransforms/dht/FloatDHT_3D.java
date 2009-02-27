@@ -41,7 +41,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 /**
  * Computes 3D Discrete Hartley Transform (DHT) of real, single precision data.
  * The sizes of all three dimensions can be arbitrary numbers. This is a
- * parallel implementation optimized for SMP systems.
+ * parallel implementation optimized for SMP systems.<br>
+ * <br>
+ * Part of code is derived from General Purpose FFT Package written by Takuya
+ * Ooura (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 

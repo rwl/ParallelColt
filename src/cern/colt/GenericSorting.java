@@ -23,24 +23,24 @@ import cern.colt.function.tint.IntComparator;
  * <p>
  * Assume we have three arrays X, Y and Z. We want to sort all three arrays by X
  * (or some arbitrary comparison function). For example, we have<br>
- * <tt>X=[3, 2, 1], Y=[3.0, 2.0, 1.0], Z=[6.0, 7.0, 8.0]</tt>. The output
- * should be <tt><br>
+ * <tt>X=[3, 2, 1], Y=[3.0, 2.0, 1.0], Z=[6.0, 7.0, 8.0]</tt>. The output should
+ * be <tt><br>
  X=[1, 2, 3], Y=[1.0, 2.0, 3.0], Z=[8.0, 7.0, 6.0]</tt>.
  * </p>
  * <p>
  * How can we achive this? Here are several alternatives. We could ...
  * </p>
  * <ol>
- * <li> make a list of Point3D objects, sort the list as desired using a
+ * <li>make a list of Point3D objects, sort the list as desired using a
  * comparison function, then copy the results back into X, Y and Z. The classic
- * object-oriented way. </li>
+ * object-oriented way.</li>
  * <li>make an index list [0,1,2,...,N-1], sort the index list using a
  * comparison function, then reorder the elements of X,Y,Z as defined by the
  * index list. Reordering cannot be done in-place, so we need to copy X to some
  * temporary array, then copy in the right order back from the temporary into X.
- * Same for Y and Z. </li>
- * <li> use a generic quicksort or mergesort which, whenever two elements in X
- * are swapped, also swaps the corresponding elements in Y and Z. </li>
+ * Same for Y and Z.</li>
+ * <li>use a generic quicksort or mergesort which, whenever two elements in X
+ * are swapped, also swaps the corresponding elements in Y and Z.</li>
  * </ol>
  * Alternatives 1 and 2 involve quite a lot of copying and allocate significant
  * amounts of temporary memory. Alternative 3 involves more swapping, more
@@ -54,14 +54,15 @@ import cern.colt.function.tint.IntComparator;
  * <p>
  * Lets call the generic data <tt>g</tt> (it may be one array, three linked
  * lists or whatever). This class takes a user comparison function operating on
- * two indexes <tt>(a,b)</tt>, namely an {@link IntComparator}. The
- * comparison function determines whether <tt>g[a]</tt> is equal, less or
- * greater than <tt>g[b]</tt>. The sort, depending on its implementation, can
- * decide to swap the data at index <tt>a</tt> with the data at index
- * <tt>b</tt>. It calls a user provided {@link cern.colt.Swapper} object that
- * knows how to swap the data of these indexes.
+ * two indexes <tt>(a,b)</tt>, namely an {@link IntComparator}. The comparison
+ * function determines whether <tt>g[a]</tt> is equal, less or greater than
+ * <tt>g[b]</tt>. The sort, depending on its implementation, can decide to swap
+ * the data at index <tt>a</tt> with the data at index <tt>b</tt>. It calls a
+ * user provided {@link cern.colt.Swapper} object that knows how to swap the
+ * data of these indexes.
  * <p>
- * The following snippet shows how to solve the problem. <table>
+ * The following snippet shows how to solve the problem.
+ * <table>
  * <td class="PRE">
  * 
  * <pre>
@@ -90,7 +91,7 @@ import cern.colt.function.tint.IntComparator;
  *     }
  * };
  * // simple comparison: compare by X and ignore Y,Z
- * <br>
+ * &lt;br&gt;
  * IntComparator comp = new IntComparator() {
  *     public int compare(int a, int b) {
  *         return x[a] == x[b] ? 0 : (x[a] &lt; x[b] ? -1 : 1);
@@ -113,14 +114,14 @@ import cern.colt.function.tint.IntComparator;
  * 
  * </td>
  * </table>
- * <h4>Sorting by multiple sorting criterias (primary, secondary, tertiary,
- * ...)</h4>
+ * <h4>Sorting by multiple sorting criterias (primary, secondary, tertiary, ...)
+ * </h4>
  * <p>
  * Assume again we have three arrays X, Y and Z. Now we want to sort all three
  * arrays, primarily by Y, secondarily by Z (if Y elements are equal). For
  * example, we have<br>
- * <tt>X=[6, 7, 8, 9], Y=[3.0, 2.0, 1.0, 3.0], Z=[5.0, 4.0, 4.0, 1.0]</tt>.
- * The output should be <tt><br>
+ * <tt>X=[6, 7, 8, 9], Y=[3.0, 2.0, 1.0, 3.0], Z=[5.0, 4.0, 4.0, 1.0]</tt>. The
+ * output should be <tt><br>
  X=[8, 7, 9, 6], Y=[1.0, 2.0, 3.0, 3.0], Z=[4.0, 4.0, 1.0, 5.0]</tt>.
  * </p>
  * <p>
@@ -149,25 +150,26 @@ import cern.colt.function.tint.IntComparator;
  * </p>
  * <p>
  * Sorts involving floating point data and not involving comparators, like, for
- * example provided in the JDK {@link java.util.Arrays} and in the Colt {@link 
- * cern.colt.Sorting} handle floating point numbers in special ways to guarantee
- * that NaN's are swapped to the end and -0.0 comes before 0.0. Methods
- * delegating to comparators cannot do this. They rely on the comparator. Thus,
- * if such boundary cases are an issue for the application at hand, comparators
- * explicitly need to implement -0.0 and NaN aware comparisons. Remember:
- * <tt>-0.0 < 0.0 == false</tt>, <tt>(-0.0 == 0.0) == true</tt>, as well
- * as <tt>5.0 &lt; Double.NaN == false</tt>,
- * <tt>5.0 &gt; Double.NaN == false</tt>. Same for <tt>float</tt>.
- * <h4>Implementation </h4>
+ * example provided in the JDK {@link java.util.Arrays} and in the Colt
+ * {@link cern.colt.Sorting} handle floating point numbers in special ways to
+ * guarantee that NaN's are swapped to the end and -0.0 comes before 0.0.
+ * Methods delegating to comparators cannot do this. They rely on the
+ * comparator. Thus, if such boundary cases are an issue for the application at
+ * hand, comparators explicitly need to implement -0.0 and NaN aware
+ * comparisons. Remember: <tt>-0.0 < 0.0 == false</tt>,
+ * <tt>(-0.0 == 0.0) == true</tt>, as well as
+ * <tt>5.0 &lt; Double.NaN == false</tt>, <tt>5.0 &gt; Double.NaN == false</tt>.
+ * Same for <tt>float</tt>.
+ * <h4>Implementation</h4>
  * <p>
  * The quicksort is a derivative of the JDK 1.2 V1.26 algorithms (which are, in
  * turn, based on Bentley's and McIlroy's fine work). The mergesort is a
  * derivative of the JAL algorithms, with optimisations taken from the JDK
  * algorithms. Both quick and merge sort are "in-place", i.e. do not allocate
- * temporary memory (helper arrays). Mergesort is <i>stable</i> (by
- * definition), while quicksort is not. A stable sort is, for example, helpful,
- * if matrices are sorted successively by multiple columns. It preserves the
- * relative position of equal elements.
+ * temporary memory (helper arrays). Mergesort is <i>stable</i> (by definition),
+ * while quicksort is not. A stable sort is, for example, helpful, if matrices
+ * are sorted successively by multiple columns. It preserves the relative
+ * position of equal elements.
  * 
  * @see java.util.Arrays
  * @see cern.colt.Sorting
@@ -259,8 +261,8 @@ public class GenericSorting extends Object {
      * @param comp
      *            Comparison function.
      * @return The largest index i such that, for every j in the range
-     *         <code>[first, i)</code>, <code>comp.apply(array[j], x)</code>
-     *         is <code>true</code>.
+     *         <code>[first, i)</code>, <code>comp.apply(array[j], x)</code> is
+     *         <code>true</code>.
      * @see Sorting#upper_bound
      * @see Sorting#equal_range
      * @see Sorting#binary_search
@@ -523,8 +525,8 @@ public class GenericSorting extends Object {
      * @param comp
      *            Comparison function.
      * @return The largest index i such that, for every j in the range
-     *         <code>[first, i)</code>, <code>comp.apply(x, array[j])</code>
-     *         is <code>false</code>.
+     *         <code>[first, i)</code>, <code>comp.apply(x, array[j])</code> is
+     *         <code>false</code>.
      * @see Sorting#lower_bound
      * @see Sorting#equal_range
      * @see Sorting#binary_search

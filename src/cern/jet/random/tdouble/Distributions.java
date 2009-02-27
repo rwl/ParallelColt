@@ -90,10 +90,10 @@ public class Distributions {
          * ***************************************************************** *
          * FUNCTION : - burr1 samples a random number from one of the * Burr II,
          * VII, VIII, X distributions with * parameter r > 0 , where the no. of
-         * the * distribution is indicated by a pointer * variable. * REFERENCE : -
-         * L. Devroye (1986): Non-Uniform Random Variate * Generation, Springer
-         * Verlag, New York. * SUBPROGRAM : - drand(seed) ... (0,1)-uniform
-         * generator with * unsigned long integer *seed. * *
+         * the * distribution is indicated by a pointer * variable. * REFERENCE
+         * : - L. Devroye (1986): Non-Uniform Random Variate * Generation,
+         * Springer Verlag, New York. * SUBPROGRAM : - drand(seed) ...
+         * (0,1)-uniform generator with * unsigned long integer *seed. * *
          **********************************************************************/
 
         double y;
@@ -184,9 +184,9 @@ public class Distributions {
 
     /**
      * Returns a cauchy distributed random number from the standard Cauchy
-     * distribution C(0,1). <A
-     * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node25.html#SECTION000250000000000000000">
-     * math definition</A> and <A
+     * distribution C(0,1). <A HREF=
+     * "http://www.cern.ch/RD11/rkb/AN16pp/node25.html#SECTION000250000000000000000"
+     * > math definition</A> and <A
      * HREF="http://www.statsoft.com/textbook/glosc.html#Cauchy Distribution">
      * animated definition</A>.
      * <p>
@@ -226,8 +226,8 @@ public class Distributions {
      * <p>
      * <tt>p(k) = p * (1-p)^k</tt> for <tt> k &gt;= 0</tt>.
      * <p>
-     * <b>Implementation:</b> Inversion method. This is a port of
-     * <tt>geo.c</tt> from the <A
+     * <b>Implementation:</b> Inversion method. This is a port of <tt>geo.c</tt>
+     * from the <A
      * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
      * WIN-RAND</A> library.
      * 
@@ -332,8 +332,8 @@ public class Distributions {
      * Returns a random number from the standard Triangular distribution in
      * (-1,1).
      * <p>
-     * <b>Implementation:</b> Inversion method. This is a port of
-     * <tt>tra.c</tt> from the <A
+     * <b>Implementation:</b> Inversion method. This is a port of <tt>tra.c</tt>
+     * from the <A
      * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
      * WIN-RAND</A> library.
      * <p>

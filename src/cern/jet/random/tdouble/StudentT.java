@@ -12,30 +12,30 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 import cern.jet.stat.tdouble.Probability;
 
 /**
- * StudentT distribution (aka T-distribution); See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node279.html#SECTION0002790000000000000000">
- * math definition</A> and <A
+ * StudentT distribution (aka T-distribution); See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node279.html#SECTION0002790000000000000000"
+ * > math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/gloss.html#Student's t Distribution">
  * animated definition</A>.
  * <p>
  * <tt>p(x) = k  *  (1+x^2/f) ^ -(f+1)/2</tt> where
- * <tt>k = g((f+1)/2) / (sqrt(pi*f) * g(f/2))</tt> and <tt>g(a)</tt> being
- * the gamma function and <tt>f</tt> being the degrees of freedom.
+ * <tt>k = g((f+1)/2) / (sqrt(pi*f) * g(f/2))</tt> and <tt>g(a)</tt> being the
+ * gamma function and <tt>f</tt> being the degrees of freedom.
  * <p>
  * Valid parameter ranges: <tt>freedom &gt; 0</tt>.
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b>
- * <dt> Method: Adapted Polar Box-Muller transformation.
- * <dt> This is a port of <A
- * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandStudentT.html">RandStudentT</A>
- * used in <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A>
- * (C++). CLHEP's implementation, in turn, is based on <tt>tpol.c</tt> from
- * the <A HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * <dt>Method: Adapted Polar Box-Muller transformation.
+ * <dt>This is a port of <A HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep/manual/RefGuide/Random/RandStudentT.html"
+ * >RandStudentT</A> used in <A
+ * HREF="http://wwwinfo.cern.ch/asd/lhc++/clhep">CLHEP 1.4.0</A> (C++). CLHEP's
+ * implementation, in turn, is based on <tt>tpol.c</tt> from the <A
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
  * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * R.W. Bailey (1994): Polar generation of random variates with the

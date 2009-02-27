@@ -8,7 +8,6 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.jet.math.tdouble;
 
-
 /**
  * Polynomial functions.
  */

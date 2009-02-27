@@ -229,13 +229,11 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      * 
      * @param other
      *            matrix
-     * @return <tt>true</tt> if both matrices share at least one identical
-     *         cell.
+     * @return <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedDenseFComplexMatrix1D) {
@@ -263,9 +261,9 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseComplexMatrix1D</tt> the new matrix
-     * must also be of type <tt>DenseComplexMatrix1D</tt>. In general, the
-     * new matrix should have internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseComplexMatrix1D</tt> the new matrix must
+     * also be of type <tt>DenseComplexMatrix1D</tt>. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -300,8 +298,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -321,8 +318,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes

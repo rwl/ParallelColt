@@ -39,10 +39,9 @@ class FloatQuantileCalc extends Object {
     }
 
     /**
-     * Returns the smallest <code>long &gt;= value</code>.
-     * <dt>Examples: <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method
-     * is safer than using (long) Math.ceil(value), because of possible rounding
-     * error.
+     * Returns the smallest <code>long &gt;= value</code>. <dt>Examples:
+     * <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method is safer than
+     * using (long) Math.ceil(value), because of possible rounding error.
      */
     public static long ceiling(float value) {
         return Math.round(Math.ceil(value));
@@ -63,16 +62,16 @@ class FloatQuantileCalc extends Object {
      *            (e.g <tt>10^6</tt>).
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To avoid probabilistic answers, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To avoid probabilistic answers, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @param samplingRate
      *            a <tt>float[1]</tt> where the sampling rate is to be filled
      *            in.
@@ -101,8 +100,8 @@ class FloatQuantileCalc extends Object {
      *            determined.
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      */
     protected static long[] known_N_compute_B_and_K_quick(long N, float epsilon) {
         if (epsilon <= 0.0) {
@@ -205,16 +204,16 @@ class FloatQuantileCalc extends Object {
      *            computed (e.g 10^6).
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To avoid probabilistic answers, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To avoid probabilistic answers, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @param samplingRate
      *            a <tt>float[1]</tt> where the sampling rate is to be filled
      *            in.
@@ -252,7 +251,7 @@ class FloatQuantileCalc extends Object {
         // for
         // practical values of epsilon >= 0.001 and delta >= 0.00001
         //
-        final float logarithm = (float)Math.log(2.0 * quantiles / delta);
+        final float logarithm = (float) Math.log(2.0 * quantiles / delta);
         final float c = 2.0f * epsilon * N_float;
         for (long b = 2; b < maxBuffers; b++)
             for (long h = 3; h < maxHeight; h++) {
@@ -268,7 +267,7 @@ class FloatQuantileCalc extends Object {
                     float t = (h - 2) * binomial(b + h - 2, h - 1) - binomial(b + h - 3, h - 3) + binomial(b + h - 3, h - 2);
                     float u = logarithm / epsilon;
                     float v = binomial(b + h - 2, h - 1);
-                    float w = (float)(logarithm / (2.0 * epsilon * epsilon));
+                    float w = (float) (logarithm / (2.0 * epsilon * epsilon));
 
                     // From our SIGMOD 98 paper, we have two equantions to
                     // satisfy:
@@ -282,13 +281,13 @@ class FloatQuantileCalc extends Object {
                     // Plugging in this value into second equation yields
                     // k >= wx^2/v
 
-                    float x = (float)(0.5 + 0.5 * Math.sqrt(1.0 + 4.0 * t / u));
+                    float x = (float) (0.5 + 0.5 * Math.sqrt(1.0 + 4.0 * t / u));
                     long k = ceiling(w * x * x / v);
                     if (b * k < memory) {
                         ret_k = k;
                         ret_b = b;
                         memory = b * k;
-                        sampling_rate = (float)(N_float * 2.0 * epsilon * epsilon / logarithm);
+                        sampling_rate = (float) (N_float * 2.0 * epsilon * epsilon / logarithm);
                     }
                 }
             }
@@ -379,16 +378,16 @@ class FloatQuantileCalc extends Object {
      * 
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact results, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact results, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To get exact results, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To get exact results, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @return <tt>long[3]</tt> - <tt>long[0]</tt>=the number of buffers,
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>long[2]</tt>=the tree height where sampling shall start.
@@ -415,8 +414,8 @@ class FloatQuantileCalc extends Object {
         long best_h = Long.MAX_VALUE;
         long best_memory = Long.MAX_VALUE;
 
-        float pow = (float)Math.pow(2.0, max_H);
-        float logDelta = (float)(Math.log(2.0 / (delta / quantiles)) / (2.0 * epsilon * epsilon));
+        float pow = (float) Math.pow(2.0, max_H);
+        float logDelta = (float) (Math.log(2.0 / (delta / quantiles)) / (2.0 * epsilon * epsilon));
         // float logDelta = Math.log(2.0/(quantiles*delta)) /
         // (2.0*epsilon*epsilon);
 
@@ -434,13 +433,13 @@ class FloatQuantileCalc extends Object {
                     // let's compute c.
                     // float c = Math.log(2.0/(delta/quantiles)) /
                     // (2.0*epsilon*epsilon*Math.min(Ld, 8.0*Ls/3.0));
-                    float c = (float)(logDelta / Math.min(Ld, 8.0 * Ls / 3.0));
+                    float c = (float) (logDelta / Math.min(Ld, 8.0 * Ls / 3.0));
 
                     // now we have k>=d/alpha.
                     // let's compute d.
                     float beta = Ld / Ls;
-                    float cc = (float)((beta - 2.0) * (max_H - 2.0) / (beta + pow - 2.0));
-                    float d = (float)((h + 3 + cc) / (2.0 * epsilon));
+                    float cc = (float) ((beta - 2.0) * (max_H - 2.0) / (beta + pow - 2.0));
+                    float d = (float) ((h + 3 + cc) / (2.0 * epsilon));
 
                     /*
                      * float d = (Ld*(h+max_H-1.0) + Ls*((h+1)*pow -
@@ -454,9 +453,9 @@ class FloatQuantileCalc extends Object {
                     float f = c * c + 4.0f * c * d;
                     if (f < 0.0)
                         continue; // non real solution to equation
-                    float root = (float)Math.sqrt(f);
-                    float alpha_one = (float)((c + 2.0 * d + root) / (2.0 * d));
-                    float alpha_two = (float)((c + 2.0 * d - root) / (2.0 * d));
+                    float root = (float) Math.sqrt(f);
+                    float alpha_one = (float) ((c + 2.0 * d + root) / (2.0 * d));
+                    float alpha_two = (float) ((c + 2.0 * d - root) / (2.0 * d));
 
                     // any alpha must satisfy 0<alpha<1 to yield valid solutions
                     boolean alpha_one_OK = false;
@@ -476,7 +475,7 @@ class FloatQuantileCalc extends Object {
 
                         // now we have k=Ceiling(Max(d/alpha,
                         // (h+1)/(2*epsilon)))
-                        long k = ceiling((float)Math.max(d / alpha, (h + 1) / (2.0 * epsilon)));
+                        long k = ceiling((float) Math.max(d / alpha, (h + 1) / (2.0 * epsilon)));
                         if (k > 0) { // valid solution?
                             long memory = b * k;
                             if (memory < best_memory) {

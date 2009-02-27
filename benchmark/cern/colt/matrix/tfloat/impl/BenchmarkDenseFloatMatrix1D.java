@@ -35,7 +35,7 @@ public class BenchmarkDenseFloatMatrix1D {
     private static double[] viewTimes;
 
     private static float[] a, b;
-    
+
     private static final long millis = 5000;
 
     @BeforeClass
@@ -317,7 +317,7 @@ public class BenchmarkDenseFloatMatrix1D {
     public void testAssignFloat() {
         /* No view */
         FloatMatrix1D A = new DenseFloatMatrix1D(BenchmarkMatrixKernel.MATRIX_SIZE_1D);
-        float value = (float)Math.random();
+        float value = (float) Math.random();
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
@@ -581,11 +581,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).fft();
+            ((DenseFloatMatrix1D) Av).fft();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).fft();
+                ((DenseFloatMatrix1D) Av).fft();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -649,11 +649,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).dct(true);
+            ((DenseFloatMatrix1D) Av).dct(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).dct(true);
+                ((DenseFloatMatrix1D) Av).dct(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -716,11 +716,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).dht();
+            ((DenseFloatMatrix1D) Av).dht();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).dht();
+                ((DenseFloatMatrix1D) Av).dht();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -783,11 +783,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).dst(true);
+            ((DenseFloatMatrix1D) Av).dst(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).dst(true);
+                ((DenseFloatMatrix1D) Av).dst(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -852,11 +852,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            Ac = ((DenseFloatMatrix1D)Av).getFft();
+            Ac = ((DenseFloatMatrix1D) Av).getFft();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                Ac = ((DenseFloatMatrix1D)Av).getFft();
+                Ac = ((DenseFloatMatrix1D) Av).getFft();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -921,11 +921,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            Ac = ((DenseFloatMatrix1D)Av).getIfft(true);
+            Ac = ((DenseFloatMatrix1D) Av).getIfft(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                Ac = ((DenseFloatMatrix1D)Av).getIfft(true);
+                Ac = ((DenseFloatMatrix1D) Av).getIfft(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -963,12 +963,12 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseFloatMatrix1D)Av).getPositiveValues(indexList, valueList);
+            ((DenseFloatMatrix1D) Av).getPositiveValues(indexList, valueList);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 indexList.clear();
                 valueList.clear();
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).getPositiveValues(indexList, valueList);
+                ((DenseFloatMatrix1D) Av).getPositiveValues(indexList, valueList);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1004,17 +1004,17 @@ public class BenchmarkDenseFloatMatrix1D {
         }
         /* View */
         FloatMatrix1D Av = new DenseFloatMatrix1D(a).viewFlip();
-        ((DenseFloatMatrix1D)Av).assign(FloatFunctions.mult(-1));
+        ((DenseFloatMatrix1D) Av).assign(FloatFunctions.mult(-1));
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseFloatMatrix1D)Av).getNegativeValues(indexList, valueList);
+            ((DenseFloatMatrix1D) Av).getNegativeValues(indexList, valueList);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 indexList.clear();
                 valueList.clear();
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).getNegativeValues(indexList, valueList);
+                ((DenseFloatMatrix1D) Av).getNegativeValues(indexList, valueList);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1078,11 +1078,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).idct(true);
+            ((DenseFloatMatrix1D) Av).idct(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).idct(true);
+                ((DenseFloatMatrix1D) Av).idct(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1145,11 +1145,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).idht(true);
+            ((DenseFloatMatrix1D) Av).idht(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).idht(true);
+                ((DenseFloatMatrix1D) Av).idht(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1212,11 +1212,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).idst(true);
+            ((DenseFloatMatrix1D) Av).idst(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).idst(true);
+                ((DenseFloatMatrix1D) Av).idst(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1280,11 +1280,11 @@ public class BenchmarkDenseFloatMatrix1D {
                 break;
             }
             // warm-up
-            ((DenseFloatMatrix1D)Av).ifft(true);
+            ((DenseFloatMatrix1D) Av).ifft(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseFloatMatrix1D)Av).assign(a);
+                ((DenseFloatMatrix1D) Av).assign(a);
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).ifft(true);
+                ((DenseFloatMatrix1D) Av).ifft(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1319,10 +1319,10 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            float[] maxAndLoc = ((DenseFloatMatrix1D)Av).getMaxLocation();
+            float[] maxAndLoc = ((DenseFloatMatrix1D) Av).getMaxLocation();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                maxAndLoc = ((DenseFloatMatrix1D)Av).getMaxLocation();
+                maxAndLoc = ((DenseFloatMatrix1D) Av).getMaxLocation();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1357,10 +1357,10 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            float[] minAndLoc = ((DenseFloatMatrix1D)Av).getMinLocation();
+            float[] minAndLoc = ((DenseFloatMatrix1D) Av).getMinLocation();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                minAndLoc = ((DenseFloatMatrix1D)Av).getMinLocation();
+                minAndLoc = ((DenseFloatMatrix1D) Av).getMinLocation();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1397,10 +1397,10 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            FloatMatrix2D B = ((DenseFloatMatrix1D)Av).reshape(rows, cols);
+            FloatMatrix2D B = ((DenseFloatMatrix1D) Av).reshape(rows, cols);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                B = ((DenseFloatMatrix1D)Av).reshape(rows, cols);
+                B = ((DenseFloatMatrix1D) Av).reshape(rows, cols);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1439,10 +1439,10 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            FloatMatrix3D B = ((DenseFloatMatrix1D)Av).reshape(slices, rows, cols);
+            FloatMatrix3D B = ((DenseFloatMatrix1D) Av).reshape(slices, rows, cols);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                B = ((DenseFloatMatrix1D)Av).reshape(slices, rows, cols);
+                B = ((DenseFloatMatrix1D) Av).reshape(slices, rows, cols);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1481,10 +1481,10 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseFloatMatrix1D)Av).swap(Bv);
+            ((DenseFloatMatrix1D) Av).swap(Bv);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                ((DenseFloatMatrix1D)Av).swap(Bv);
+                ((DenseFloatMatrix1D) Av).swap(Bv);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1519,10 +1519,10 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            float[] array = ((DenseFloatMatrix1D)Av).toArray();
+            float[] array = ((DenseFloatMatrix1D) Av).toArray();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                array = ((DenseFloatMatrix1D)Av).toArray();
+                array = ((DenseFloatMatrix1D) Av).toArray();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1560,10 +1560,10 @@ public class BenchmarkDenseFloatMatrix1D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            float product = ((DenseFloatMatrix1D)Av).zDotProduct(Bv, 5, Bv.size() - 10);
+            float product = ((DenseFloatMatrix1D) Av).zDotProduct(Bv, 5, Bv.size() - 10);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                product = ((DenseFloatMatrix1D)Av).zDotProduct(Bv, 5, Bv.size() - 10);
+                product = ((DenseFloatMatrix1D) Av).zDotProduct(Bv, 5, Bv.size() - 10);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1598,10 +1598,10 @@ public class BenchmarkDenseFloatMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            float aSum = ((DenseFloatMatrix1D)Av).zSum();
+            float aSum = ((DenseFloatMatrix1D) Av).zSum();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                aSum = ((DenseFloatMatrix1D)Av).zSum();
+                aSum = ((DenseFloatMatrix1D) Av).zSum();
                 t.stop();
                 viewTimes[i] += t.millis();
             }

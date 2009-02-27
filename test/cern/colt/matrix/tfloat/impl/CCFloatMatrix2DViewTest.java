@@ -1,6 +1,5 @@
 package cern.colt.matrix.tfloat.impl;
 
-
 public class CCFloatMatrix2DViewTest extends CCFloatMatrix2DTest {
 
     public CCFloatMatrix2DViewTest(String arg0) {

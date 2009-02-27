@@ -22,8 +22,8 @@ public class Utils {
     }
 
     /**
-     * Similar to Math.ceil(value), but adjusts small numerical rounding errors +-
-     * epsilon.
+     * Similar to Math.ceil(value), but adjusts small numerical rounding errors
+     * +- epsilon.
      */
     public static long epsilonCeiling(double value) {
         double epsilon = 0.0000001;

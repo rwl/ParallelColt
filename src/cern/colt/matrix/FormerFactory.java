@@ -12,7 +12,7 @@ package cern.colt.matrix;
  * @version 1.0, 21/07/00
  */
 public class FormerFactory {
-    /**
+/**
      * Constructs and returns a new format instance.
      * 
      * @param format

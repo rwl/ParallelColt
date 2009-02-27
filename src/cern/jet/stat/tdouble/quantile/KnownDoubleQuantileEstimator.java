@@ -24,8 +24,8 @@ import cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant;
  * <dt>1. <tt>N</tt> - the number of values of the data sequence over which
  * quantiles are to be determined.
  * <dt>2. <tt>quantiles</tt> - the number of quantiles to be computed.
- * <dt>3. <tt>epsilon</tt> - the allowed approximation error on quantiles.
- * The approximation guarantee of this algorithm is explicit.
+ * <dt>3. <tt>epsilon</tt> - the allowed approximation error on quantiles. The
+ * approximation guarantee of this algorithm is explicit.
  * 
  * <p>
  * It is also possible to couple the approximation algorithm with random
@@ -33,9 +33,9 @@ import cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant;
  * approximation guarantees are explicit but probabilistic, i.e. they apply with
  * respect to a (user controlled) confidence parameter "delta".
  * 
- * <dt>4. <tt>delta</tt> - the probability allowed that the approximation
- * error fails to be smaller than epsilon. Set <tt>delta</tt> to zero for
- * explicit non probabilistic guarantees.
+ * <dt>4. <tt>delta</tt> - the probability allowed that the approximation error
+ * fails to be smaller than epsilon. Set <tt>delta</tt> to zero for explicit non
+ * probabilistic guarantees.
  * 
  * You usually don't instantiate quantile finders by using the constructor.
  * Instead use the factory <tt>QuantileFinderFactor</tt> to do so. It will set

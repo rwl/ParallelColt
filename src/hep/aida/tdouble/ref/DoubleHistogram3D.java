@@ -50,7 +50,8 @@ public class DoubleHistogram3D extends DoubleAbstractHistogram3D implements Doub
      *            ascending and must not contain multiple identical elements.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>xEdges.length < 1 || yEdges.length < 1|| zEdges.length < 1</tt>.
+     *             <tt>xEdges.length < 1 || yEdges.length < 1|| zEdges.length < 1</tt>
+     *             .
      */
     public DoubleHistogram3D(String title, double[] xEdges, double[] yEdges, double[] zEdges) {
         this(title, new DoubleVariableAxis(xEdges), new DoubleVariableAxis(yEdges), new DoubleVariableAxis(zEdges));

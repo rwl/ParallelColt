@@ -172,7 +172,9 @@ public class RCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
 
     /**
-     * Constructs a matrix with indexes and values given in compressed-row format.
+     * Constructs a matrix with indexes and values given in compressed-row
+     * format.
+     * 
      * @param rows
      * @param columns
      * @param rowPointers
@@ -243,9 +245,50 @@ public class RCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         values = new DoubleArrayList(nzmax);
         rowPointers = new int[rows + 1];
     }
-    
+
+    /**
+     * Constructs a matrix with indexes given in coordinate format and a single
+     * value.
+     * 
+     * @param rows
+     * @param columns
+     * @param rowIndexes
+     * @param columnIndexes
+     * @param value
+     */
+    public RCDoubleMatrix2D(int rows, int columns, IntArrayList rowIndexes, IntArrayList columnIndexes, double value) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        int nnz = rowIndexes.size();
+        int[] rowIndexesElements = rowIndexes.elements();
+        int[] columnIndexesElements = columnIndexes.elements();
+
+        int[] idxs = new int[nnz];
+        double[] vals = new double[nnz];
+        int[] starts = new int[rows + 1];
+        int[] w = new int[rows];
+        int r;
+        for (int k = 0; k < nnz; k++) {
+            w[rowIndexesElements[k]]++;
+        }
+        cumsum(starts, w, rows);
+        for (int k = 0; k < nnz; k++) {
+            idxs[r = w[rowIndexesElements[k]]++] = columnIndexesElements[k];
+            vals[r] = value;
+        }
+        this.rowPointers = starts;
+        this.columnindexes = new IntArrayList(idxs);
+        this.values = new DoubleArrayList(vals);
+    }
+
     /**
      * Constructs a matrix with indexes and values given in coordinate format.
+     * 
      * @param rows
      * @param columns
      * @param rowIndexes
@@ -262,7 +305,7 @@ public class RCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
         int nnz = rowIndexes.size();
         int[] rowIndexesElements = rowIndexes.elements();
-        int[] columnIndexesElements = columnIndexes.elements();        
+        int[] columnIndexesElements = columnIndexes.elements();
         double[] valuesElements = values.elements();
 
         int[] idxs = new int[nnz];
@@ -282,7 +325,7 @@ public class RCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         this.columnindexes = new IntArrayList(idxs);
         this.values = new DoubleArrayList(vals);
     }
-    
+
     private float cumsum(int[] p, int[] c, int n) {
         int nz = 0;
         float nz2 = 0;
@@ -650,8 +693,8 @@ public class RCDoubleMatrix2D extends WrapperDoubleMatrix2D {
      * @return the value at the specified coordinate.
      */
     public double getQuick(int row, int column) {
-                int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
-//        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        //        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
         double v = 0;
         if (k >= 0)
             v = values.getQuick(k);
@@ -731,8 +774,8 @@ public class RCDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *            the value to be filled into the specified cell.
      */
     public synchronized void setQuick(int row, int column, double value) {
-                int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
-//        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        //        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
         if (k >= 0) { // found
             if (value == 0)
                 remove(row, k);
@@ -946,15 +989,15 @@ public class RCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return C;
     }
 
-//    private static int searchFromTo(int[] list, int key, int from, int to) {
-//        while (from <= to) {
-//            if (list[from] == key) {
-//                return from;
-//            } else {
-//                from++;
-//                continue;
-//            }
-//        }
-//        return -(from + 1); // key not found.
-//    }
+    //    private static int searchFromTo(int[] list, int key, int from, int to) {
+    //        while (from <= to) {
+    //            if (list[from] == key) {
+    //                return from;
+    //            } else {
+    //                from++;
+    //                continue;
+    //            }
+    //        }
+    //        return -(from + 1); // key not found.
+    //    }
 }

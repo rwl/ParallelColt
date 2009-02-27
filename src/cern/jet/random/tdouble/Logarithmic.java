@@ -17,14 +17,14 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b>
- * <dt> Method: Inversion/Transformation.
- * <dt> This is a port of <tt>lsk.c</tt> from the <A
- * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND / WIN-RAND</A>
- * library. C-RAND's implementation, in turn, is based upon
+ * <dt>Method: Inversion/Transformation.
+ * <dt>This is a port of <tt>lsk.c</tt> from the <A
+ * HREF="http://www.cis.tu-graz.ac.at/stat/stadl/random.html">C-RAND /
+ * WIN-RAND</A> library. C-RAND's implementation, in turn, is based upon
  * <p>
  * A.W. Kemp (1981): Efficient generation of logarithmically distributed
  * pseudo-random variables, Appl. Statist. 30, 249-253.
@@ -81,9 +81,9 @@ public class Logarithmic extends AbstractContinousDoubleDistribution {
          * FUNCTION: - lsk samples a random number from the * Logarithmic
          * distribution with * parameter 0 < p < 1 . * REFERENCE: - A.W. Kemp
          * (1981): Efficient generation of * logarithmically distributed
-         * pseudo-random * variables, Appl. Statist. 30, 249-253. * SUBPROGRAMS: -
-         * drand(seed) ... (0,1)-Uniform generator with * unsigned long integer
-         * *seed. * *
+         * pseudo-random * variables, Appl. Statist. 30, 249-253. * SUBPROGRAMS:
+         * - drand(seed) ... (0,1)-Uniform generator with * unsigned long
+         * integer *seed. * *
          **********************************************************************/
         double u, v, p, q;
         int k;

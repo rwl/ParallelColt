@@ -1,5 +1,5 @@
 /*
-Copyright � 1999 CERN - European Organization for Nuclear Research.
+Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
 is hereby granted without fee, provided that the above copyright notice appear in all copies and 
 that both that copyright notice and this permission notice appear in supporting documentation. 
@@ -177,7 +177,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             b[1] = Double.NaN;
             return b;
         }
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         double[] a = null;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -235,8 +235,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             b[1] = Double.NaN;
             return b;
         }
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)other.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
         final int rowStrideOther = other.rowStride();
         final int colStrideOther = other.columnStride();
         final double[] elemsOther = (double[]) other.elements();
@@ -292,7 +292,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
     }
 
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexDComplexFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             if (function instanceof cern.jet.math.tdcomplex.DComplexMult) {
@@ -317,14 +317,29 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         double[] tmp = new double[2];
-                        for (int r = startrow; r < stoprow; r++) {
-                            for (int i = idx, c = 0; c < columns; c++) {
-                                tmp = function.apply(elements[i], elements[i+1]);
-                                elements[i] = tmp[0];
-                                elements[i + 1] = tmp[1];
-                                i += columnStride;
+                        if (function instanceof cern.jet.math.tdcomplex.DComplexMult) {
+                            double[] multiplicator = ((cern.jet.math.tdcomplex.DComplexMult) function).multiplicator;
+                            // x[i] = mult*x[i]
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp[0] = elements[i];
+                                    tmp[1] = elements[i + 1];
+                                    elements[i] = tmp[0] * multiplicator[0] - tmp[1] * multiplicator[1];
+                                    elements[i + 1] = tmp[1] * multiplicator[0] + tmp[0] * multiplicator[1];
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
                             }
-                            idx += rowStride;
+                        } else {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp = function.apply(elements[i], elements[i + 1]);
+                                    elements[i] = tmp[0];
+                                    elements[i + 1] = tmp[1];
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
+                            }
                         }
                     }
                 });
@@ -333,21 +348,36 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         } else {
             int idx = zero;
             double[] tmp = new double[2];
-            for (int r = 0; r < rows; r++) {
-                for (int i = idx, c = 0; c < columns; c++) {
-                    tmp = function.apply(elements[i], elements[i+1]);
-                    elements[i] = tmp[0];
-                    elements[i + 1] = tmp[1];
-                    i += columnStride;
+            if (function instanceof cern.jet.math.tdcomplex.DComplexMult) {
+                double[] multiplicator = ((cern.jet.math.tdcomplex.DComplexMult) function).multiplicator;
+                // x[i] = mult*x[i]
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp[0] = elements[i];
+                        tmp[1] = elements[i + 1];
+                        elements[i] = tmp[0] * multiplicator[0] - tmp[1] * multiplicator[1];
+                        elements[i + 1] = tmp[1] * multiplicator[0] + tmp[0] * multiplicator[1];
+                        i += columnStride;
+                    }
+                    idx += rowStride;
                 }
-                idx += rowStride;
+            } else {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp = function.apply(elements[i], elements[i + 1]);
+                        elements[i] = tmp[0];
+                        elements[i + 1] = tmp[1];
+                        i += columnStride;
+                    }
+                    idx += rowStride;
+                }
             }
         }
         return this;
     }
 
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final cern.colt.function.tdcomplex.DComplexDComplexFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -403,7 +433,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
     }
 
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final double[] value) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -456,7 +486,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
     }
 
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexRealFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -474,16 +504,39 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
                     public void run() {
                         int idx = zero + startrow * rowStride;
                         double[] tmp = new double[2];
-                        for (int r = startrow; r < stoprow; r++) {
-                            for (int i = idx, c = 0; c < columns; c++) {
-                                tmp[0] = elements[i];
-                                tmp[1] = elements[i + 1];
-                                tmp[0] = function.apply(tmp);
-                                elements[i] = tmp[0];
-                                elements[i + 1] = 0;
-                                i += columnStride;
+                        if (function == cern.jet.math.tdcomplex.DComplexFunctions.abs) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp[0] = elements[i];
+                                    tmp[1] = elements[i + 1];
+                                    double absX = Math.abs(tmp[0]);
+                                    double absY = Math.abs(tmp[1]);
+                                    if (absX == 0 && absY == 0) {
+                                        elements[i] = 0;
+                                    } else if (absX >= absY) {
+                                        double d = tmp[1] / tmp[0];
+                                        elements[i] = absX * Math.sqrt(1 + d * d);
+                                    } else {
+                                        double d = tmp[0] / tmp[1];
+                                        elements[i] = absY * Math.sqrt(1 + d * d);
+                                    }
+                                    elements[i + 1] = 0;
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
                             }
-                            idx += rowStride;
+                        } else {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, c = 0; c < columns; c++) {
+                                    tmp[0] = elements[i];
+                                    tmp[1] = elements[i + 1];
+                                    tmp[0] = function.apply(tmp);
+                                    elements[i] = tmp[0];
+                                    elements[i + 1] = 0;
+                                    i += columnStride;
+                                }
+                                idx += rowStride;
+                            }
                         }
                     }
                 });
@@ -492,16 +545,39 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         } else {
             int idx = zero;
             double[] tmp = new double[2];
-            for (int r = 0; r < rows; r++) {
-                for (int i = idx, c = 0; c < columns; c++) {
-                    tmp[0] = elements[i];
-                    tmp[1] = elements[i + 1];
-                    tmp[0] = function.apply(tmp);
-                    elements[i] = tmp[0];
-                    elements[i + 1] = 0;
-                    i += columnStride;
+            if (function == cern.jet.math.tdcomplex.DComplexFunctions.abs) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp[0] = elements[i];
+                        tmp[1] = elements[i + 1];
+                        double absX = Math.abs(tmp[0]);
+                        double absY = Math.abs(tmp[1]);
+                        if (absX == 0 && absY == 0) {
+                            elements[i] = 0;
+                        } else if (absX >= absY) {
+                            double d = tmp[1] / tmp[0];
+                            elements[i] = absX * Math.sqrt(1 + d * d);
+                        } else {
+                            double d = tmp[0] / tmp[1];
+                            elements[i] = absY * Math.sqrt(1 + d * d);
+                        }
+                        elements[i + 1] = 0;
+                        i += columnStride;
+                    }
+                    idx += rowStride;
                 }
-                idx += rowStride;
+            } else {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, c = 0; c < columns; c++) {
+                        tmp[0] = elements[i];
+                        tmp[1] = elements[i + 1];
+                        tmp[0] = function.apply(tmp);
+                        elements[i] = tmp[0];
+                        elements[i + 1] = 0;
+                        i += columnStride;
+                    }
+                    idx += rowStride;
+                }
             }
         }
         return this;
@@ -538,8 +614,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             throw new InternalError();
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = rows / np;
@@ -598,8 +674,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             throw new InternalError();
         final int columnStrideOther = y.columnStride();
         final int rowStrideOther = y.rowStride();
-        final int zeroOther = (int)y.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) y.index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -618,20 +694,68 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
                         int idxOther = zeroOther + startrow * rowStrideOther;
                         double[] tmp1 = new double[2];
                         double[] tmp2 = new double[2];
-                        for (int r = startrow; r < stoprow; r++) {
-                            for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-                                tmp1[0] = elements[i];
-                                tmp1[1] = elements[i + 1];
-                                tmp2[0] = elemsOther[j];
-                                tmp2[1] = elemsOther[j + 1];
-                                tmp1 = function.apply(tmp1, tmp2);
-                                elements[i] = tmp1[0];
-                                elements[i + 1] = tmp1[1];
-                                i += columnStride;
-                                j += columnStrideOther;
+                        if (function == cern.jet.math.tdcomplex.DComplexFunctions.mult) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    elements[i] = tmp1[0] * tmp2[0] - tmp1[1] * tmp2[1];
+                                    elements[i + 1] = tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
                             }
-                            idx += rowStride;
-                            idxOther += rowStrideOther;
+                        } else if (function == cern.jet.math.tdcomplex.DComplexFunctions.multConjFirst) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                                    elements[i + 1] = -tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
+                            }
+
+                        } else if (function == cern.jet.math.tdcomplex.DComplexFunctions.multConjSecond) {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                                    elements[i + 1] = tmp1[1] * tmp2[0] - tmp1[0] * tmp2[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
+                            }
+                        } else {
+                            for (int r = startrow; r < stoprow; r++) {
+                                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                                    tmp1[0] = elements[i];
+                                    tmp1[1] = elements[i + 1];
+                                    tmp2[0] = elemsOther[j];
+                                    tmp2[1] = elemsOther[j + 1];
+                                    tmp1 = function.apply(tmp1, tmp2);
+                                    elements[i] = tmp1[0];
+                                    elements[i + 1] = tmp1[1];
+                                    i += columnStride;
+                                    j += columnStrideOther;
+                                }
+                                idx += rowStride;
+                                idxOther += rowStrideOther;
+                            }
                         }
                     }
                 });
@@ -642,27 +766,75 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             double[] tmp2 = new double[2];
             int idx = zero;
             int idxOther = zeroOther;
-            for (int r = 0; r < rows; r++) {
-                for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-                    tmp1[0] = elements[i];
-                    tmp1[1] = elements[i + 1];
-                    tmp2[0] = elemsOther[j];
-                    tmp2[1] = elemsOther[j + 1];
-                    tmp1 = function.apply(tmp1, tmp2);
-                    elements[i] = tmp1[0];
-                    elements[i + 1] = tmp1[1];
-                    i += columnStride;
-                    j += columnStrideOther;
+            if (function == cern.jet.math.tdcomplex.DComplexFunctions.mult) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        elements[i] = tmp1[0] * tmp2[0] - tmp1[1] * tmp2[1];
+                        elements[i + 1] = tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
                 }
-                idx += rowStride;
-                idxOther += rowStrideOther;
+            } else if (function == cern.jet.math.tdcomplex.DComplexFunctions.multConjFirst) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                        elements[i + 1] = -tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
+                }
+
+            } else if (function == cern.jet.math.tdcomplex.DComplexFunctions.multConjSecond) {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                        elements[i + 1] = tmp1[1] * tmp2[0] - tmp1[0] * tmp2[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
+                }
+            } else {
+                for (int r = 0; r < rows; r++) {
+                    for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
+                        tmp1[0] = elements[i];
+                        tmp1[1] = elements[i + 1];
+                        tmp2[0] = elemsOther[j];
+                        tmp2[1] = elemsOther[j + 1];
+                        tmp1 = function.apply(tmp1, tmp2);
+                        elements[i] = tmp1[0];
+                        elements[i + 1] = tmp1[1];
+                        i += columnStride;
+                        j += columnStrideOther;
+                    }
+                    idx += rowStride;
+                    idxOther += rowStrideOther;
+                }
             }
         }
         return this;
     }
 
     public DComplexMatrix2D assign(final double re, final double im) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -711,7 +883,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         if (this.isNoView) {
             System.arraycopy(values, 0, this.elements, 0, values.length);
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = rows / np;
@@ -799,7 +971,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
                 }
             }
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = rows / np;
@@ -850,7 +1022,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
     public DComplexMatrix2D assign(final float[] values) {
         if (values.length != rows * 2 * columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()=" + rows() * 2 * columns());
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -902,8 +1074,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
         final int rowStrideOther = other.rowStride();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final double[] elemsOther = ((DenseDoubleMatrix2D) other).elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -926,7 +1098,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                                 elements[i + 1] = elemsOther[j];
-//                                elements[i] = 0;
+                                //                                elements[i] = 0;
                                 i += columnStride;
                                 j += columnStrideOther;
                             }
@@ -943,7 +1115,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             for (int r = 0; r < rows; r++) {
                 for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                     elements[i + 1] = elemsOther[j];
-//                    elements[i] = 0;
+                    //                    elements[i] = 0;
                     i += columnStride;
                     j += columnStrideOther;
                 }
@@ -958,8 +1130,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
         final int rowStrideOther = other.rowStride();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final double[] elemsOther = ((DenseDoubleMatrix2D) other).elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -982,7 +1154,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                                 elements[i] = elemsOther[j];
-//                                elements[i + 1] = 0;
+                                //                                elements[i + 1] = 0;
                                 i += columnStride;
                                 j += columnStrideOther;
                             }
@@ -999,7 +1171,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             for (int r = 0; r < rows; r++) {
                 for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
                     elements[i] = elemsOther[j];
-//                    elements[i + 1] = 0;
+                    //                    elements[i + 1] = 0;
                     i += columnStride;
                     j += columnStrideOther;
                 }
@@ -1013,7 +1185,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
     public int cardinality() {
         int cardinality = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
@@ -1075,8 +1247,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
      * not a power of 2 number.
      */
     public void fft2() {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
@@ -1096,10 +1268,10 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
      * is not a power of 2 number.
      */
     public void fftColumns() {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int c = 0; c < columns; c++) {
-            ((DenseDComplexMatrix1D)viewColumn(c)).fft();
+            ((DenseDComplexMatrix1D) viewColumn(c)).fft();
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
@@ -1110,16 +1282,16 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
      * power of 2 number.
      */
     public void fftRows() {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int r = 0; r < rows; r++) {
-            ((DenseDComplexMatrix1D)viewRow(r)).fft();
+            ((DenseDComplexMatrix1D) viewRow(r)).fft();
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     public DComplexMatrix2D forEachNonZero(final cern.colt.function.tdcomplex.IntIntDComplexFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1176,7 +1348,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
     public DComplexMatrix2D getConjugateTranspose() {
         DComplexMatrix2D transpose = this.viewDice().copy();
         final double[] elemsOther = ((DenseDComplexMatrix2D) transpose).elements;
-        final int zeroOther = (int)transpose.index(0, 0);
+        final int zeroOther = (int) transpose.index(0, 0);
         final int columnStrideOther = transpose.columnStride();
         final int rowStrideOther = transpose.rowStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1228,8 +1400,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         final double[] elemsOther = (double[]) Im.elements();
         final int columnStrideOther = Im.columnStride();
         final int rowStrideOther = Im.rowStride();
-        final int zeroOther = (int)Im.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) Im.index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1279,7 +1451,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int r = 0; r < rows; r++) {
             for (int i = idx, c = 0; c < columns; c++) {
                 double[] value = new double[2];
@@ -1309,8 +1481,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         final double[] elemsOther = (double[]) R.elements();
         final int columnStrideOther = R.columnStride();
         final int rowStrideOther = R.rowStride();
-        final int zeroOther = (int)R.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) R.index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1366,12 +1538,12 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
      * 
      */
     public void ifft2(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
-      	if (fft2 == null) {
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        if (fft2 == null) {
             fft2 = new DoubleFFT_2D(rows, columns);
         }
-      	if (isNoView == true) {
+        if (isNoView == true) {
             fft2.complexInverse(elements, scale);
         } else {
             DComplexMatrix2D copy = this.copy();
@@ -1390,10 +1562,10 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
      *            if true then scaling is performed
      */
     public void ifftColumns(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int c = 0; c < columns; c++) {
-            ((DenseDComplexMatrix1D)viewColumn(c)).ifft(scale);
+            ((DenseDComplexMatrix1D) viewColumn(c)).ifft(scale);
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
@@ -1407,10 +1579,10 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
      *            if true then scaling is performed
      */
     public void ifftRows(boolean scale) {
-    	int oldNp = ConcurrencyUtils.getNumberOfThreads();
-    	ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNp = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
         for (int r = 0; r < rows; r++) {
-            ((DenseDComplexMatrix1D)viewRow(r)).ifft(scale);
+            ((DenseDComplexMatrix1D) viewRow(r)).ifft(scale);
         }
         ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
@@ -1438,7 +1610,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
     public double[][] toArray() {
         final double[][] values = new double[rows][2 * columns];
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = rows / np;
@@ -1481,8 +1653,8 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
     public DComplexMatrix1D vectorize() {
         final DComplexMatrix1D v = new DenseDComplexMatrix1D(size());
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)v.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) v.index(0);
         final int strideOther = v.stride();
         final double[] elemsOther = (double[]) v.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1549,9 +1721,9 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             throw new InternalError();
         final int strideY = y.stride();
         final int strideZ = zLoc.stride();
-        final int zero = (int)index(0, 0);
-        final int zeroY = (int)y.index(0);
-        final int zeroZ = (int)zLoc.index(0);
+        final int zero = (int) index(0, 0);
+        final int zeroY = (int) y.index(0);
+        final int zeroZ = (int) zLoc.index(0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1827,9 +1999,9 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             noOfTasks = Math.min(width, noOfTasks);
 
             if (noOfTasks < 2) { /*
-                                                                                     * parallelization doesn't pay off (too much start
-                                                                                     * up overhead)
-                                                                                     */
+                                                                                                                                                       * parallelization doesn't pay off (too much start
+                                                                                                                                                       * up overhead)
+                                                                                                                                                       */
                 return this.zMultSeq(B, C, alpha, beta, transposeA, transposeB);
             }
 
@@ -1865,7 +2037,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         }
         return C;
     }
-
 
     protected DComplexMatrix2D zMultSeq(DComplexMatrix2D B, DComplexMatrix2D C, double[] alpha, double[] beta, boolean transposeA, boolean transposeB) {
         if (transposeA)
@@ -1924,9 +2095,9 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         double reC;
         double imC;
         for (; --blocks >= 0;) {
-            int jB = (int)BB.index(0, 0);
-            int indexA = (int)index(rr, 0);
-            int jC = (int)CC.index(rr, 0);
+            int jB = (int) BB.index(0, 0);
+            int indexA = (int) index(rr, 0);
+            int jC = (int) CC.index(rr, 0);
             rr += m_optimal;
             if (blocks == 0)
                 m_optimal += m - rr;
@@ -2002,7 +2173,7 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
     public double[] zSum() {
         double[] sum = new double[2];
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];

@@ -25,7 +25,6 @@ public abstract class FloatMatrix1DTest extends TestCase {
 
     protected float TOL = 1e-3f;
 
- 
     /**
      * Constructor for FloatMatrix1DTest
      */
@@ -45,11 +44,11 @@ public abstract class FloatMatrix1DTest extends TestCase {
         ConcurrencyUtils.setThreadsBeginN_1D(1);
 
         for (int i = 0; i < SIZE; i++) {
-            A.setQuick(i, (float)Math.random());
+            A.setQuick(i, (float) Math.random());
         }
 
         for (int i = 0; i < SIZE; i++) {
-            B.setQuick(i, (float)Math.random());
+            B.setQuick(i, (float) Math.random());
         }
     }
 
@@ -80,7 +79,7 @@ public abstract class FloatMatrix1DTest extends TestCase {
     }
 
     public void testAssignFloat() {
-        float value = (float)Math.random();
+        float value = (float) Math.random();
         A.assign(value);
         for (int i = 0; i < SIZE; i++) {
             assertEquals(value, A.getQuick(i), TOL);
@@ -90,7 +89,7 @@ public abstract class FloatMatrix1DTest extends TestCase {
     public void testAssignFloatArray() {
         float[] expected = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            expected[i] = (float)Math.random();
+            expected[i] = (float) Math.random();
         }
         A.assign(expected);
         for (int i = 0; i < SIZE; i++) {
@@ -102,7 +101,7 @@ public abstract class FloatMatrix1DTest extends TestCase {
         FloatMatrix1D Acopy = A.copy();
         A.assign(FloatFunctions.acos);
         for (int i = 0; i < SIZE; i++) {
-            float expected = (float)Math.acos(Acopy.getQuick(i));
+            float expected = (float) Math.acos(Acopy.getQuick(i));
             assertEquals(expected, A.getQuick(i), TOL);
         }
     }
@@ -256,7 +255,7 @@ public abstract class FloatMatrix1DTest extends TestCase {
             assertEquals(array[i], A.getQuick(i), TOL);
         }
     }
-    
+
     public void testToArrayFloatArray() {
         float[] array = new float[SIZE];
         A.toArray(array);
@@ -342,7 +341,7 @@ public abstract class FloatMatrix1DTest extends TestCase {
     public void testViewSorted() {
         FloatMatrix1D b = A.viewSorted();
         for (int i = 0; i < SIZE - 1; i++) {
-            assertTrue(b.getQuick(i+1) >= b.getQuick(i));
+            assertTrue(b.getQuick(i + 1) >= b.getQuick(i));
         }
     }
 
@@ -363,7 +362,6 @@ public abstract class FloatMatrix1DTest extends TestCase {
         assertEquals(expected, product, TOL);
     }
 
-    
     public void testZDotProductFloatMatrix1DIntInt() {
         float product = A.zDotProduct(B, 5, B.size() - 10);
         float expected = 0;
@@ -385,7 +383,7 @@ public abstract class FloatMatrix1DTest extends TestCase {
         }
         assertEquals(expected, product, TOL);
     }
-    
+
     public void testZSum() {
         float sum = A.zSum();
         float expected = 0;

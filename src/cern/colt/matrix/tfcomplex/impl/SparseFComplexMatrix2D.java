@@ -47,7 +47,8 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
      */
     public SparseFComplexMatrix2D(float[][] values) {
         this(values.length, values.length == 0 ? 0 : values[0].length);
@@ -64,7 +65,8 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>.
+     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             .
      */
     public SparseFComplexMatrix2D(int rows, int columns) {
         setUp(rows, columns);
@@ -216,10 +218,9 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
      */
     public float[] getQuick(int row, int column) {
         float[] elem = this.elements.get(rowZero + row * rowStride + columnZero + column * columnStride);
-        if(elem != null) {
-            return new float[] {elem[0], elem[1]};
-        }
-        else {
+        if (elem != null) {
+            return new float[] { elem[0], elem[1] };
+        } else {
             return new float[2];
         }
     }
@@ -234,9 +235,8 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if at least one of the following
-     * conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if at least one of the following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
@@ -291,9 +291,9 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseComplexMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseComplexMatrix1D</tt>, if the receiver
-     * is an instance of type <tt>SparseComplexMatrix2D</tt> the new matrix
-     * must be of type <tt>SparseComplexMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseComplexMatrix1D</tt>, if the receiver is
+     * an instance of type <tt>SparseComplexMatrix2D</tt> the new matrix must be
+     * of type <tt>SparseComplexMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -306,9 +306,9 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be
-     * of type <tt>DenseComplexMatrix1D</tt>, if the receiver is an instance
-     * of type <tt>SparseComplexMatrix2D</tt> the new matrix must be of type
+     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be of
+     * type <tt>DenseComplexMatrix1D</tt>, if the receiver is an instance of
+     * type <tt>SparseComplexMatrix2D</tt> the new matrix must be of type
      * <tt>SparseComplexMatrix1D</tt>, etc.
      * 
      * @param size
@@ -325,8 +325,8 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -363,7 +363,7 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
         for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
                 float[] elem = getQuick(r, c);
-                if((elem[0] != 0) || (elem[1] != 0)) {
+                if ((elem[0] != 0) || (elem[1] != 0)) {
                     v.setQuick(idx++, elem);
                 }
             }
@@ -372,8 +372,8 @@ public class SparseFComplexMatrix2D extends FComplexMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes

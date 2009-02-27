@@ -50,19 +50,19 @@ public abstract class FloatMatrix2DTest extends TestCase {
         ConcurrencyUtils.setThreadsBeginN_2D(1);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                A.setQuick(r, c, (float)Math.random());
+                A.setQuick(r, c, (float) Math.random());
             }
         }
 
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                B.setQuick(r, c, (float)Math.random());
+                B.setQuick(r, c, (float) Math.random());
             }
         }
 
         for (int r = 0; r < NCOLUMNS; r++) {
             for (int c = 0; c < NROWS; c++) {
-                Bt.setQuick(r, c, (float)Math.random());
+                Bt.setQuick(r, c, (float) Math.random());
             }
         }
     }
@@ -142,7 +142,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
     }
 
     public void testAssignFloat() {
-        float value = (float)Math.random();
+        float value = (float) Math.random();
         A.assign(value);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++)
@@ -150,12 +150,11 @@ public abstract class FloatMatrix2DTest extends TestCase {
         }
     }
 
-
     public void testAssignFloatArrayArray() {
         float[][] expected = new float[NROWS][NCOLUMNS];
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                expected[r][c] = (float)Math.random();
+                expected[r][c] = (float) Math.random();
             }
         }
         A.assign(expected);
@@ -171,7 +170,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
         A.assign(FloatFunctions.acos);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                float expected = (float)Math.acos(Acopy.getQuick(r, c));
+                float expected = (float) Math.acos(Acopy.getQuick(r, c));
                 assertEquals(expected, A.getQuick(r, c), TOL);
             }
         }
@@ -257,7 +256,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
                 }
             }
         }
-    }   
+    }
 
     public void testCardinality() {
         int card = A.cardinality();
@@ -284,7 +283,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
         FloatMatrix2D Acopy = A.copy();
         IntIntFloatFunction function = new IntIntFloatFunction() {
             public float apply(int first, int second, float third) {
-                return (float)Math.sqrt(third);
+                return (float) Math.sqrt(third);
             }
         };
         A.forEachNonZero(function);
@@ -399,7 +398,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
             assertEquals(A.getQuick(r, NCOLUMNS / 2), col.getQuick(r), TOL);
         }
     }
-    
+
     public void testViewColumnFlip() {
         FloatMatrix2D B = A.viewColumnFlip();
         assertEquals(A.size(), B.size());
@@ -409,7 +408,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewDice() {
         FloatMatrix2D B = A.viewDice();
         assertEquals(NROWS, B.columns());
@@ -420,7 +419,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewPart() {
         FloatMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
         assertEquals(NROWS / 3, B.rows());
@@ -431,7 +430,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewRow() {
         FloatMatrix1D B = A.viewRow(NROWS / 2);
         assertEquals(NCOLUMNS, B.size());
@@ -440,7 +439,6 @@ public abstract class FloatMatrix2DTest extends TestCase {
         }
     }
 
-    
     public void testViewRowFlip() {
         FloatMatrix2D B = A.viewRowFlip();
         assertEquals(A.size(), B.size());
@@ -450,7 +448,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewSelectionFloatMatrix1DProcedure() {
         final float value = 2;
         A.assign(0);
@@ -470,10 +468,10 @@ public abstract class FloatMatrix2DTest extends TestCase {
         assertEquals(A.getQuick(NROWS / 4, 0), B.getQuick(0, 0), TOL);
         assertEquals(A.getQuick(NROWS / 2, 0), B.getQuick(1, 0), TOL);
     }
-    
+
     public void testViewSelectionIntArrayIntArray() {
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1};
+        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1 };
         FloatMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
         assertEquals(rowIndexes.length, B.rows());
         assertEquals(colIndexes.length, B.columns());
@@ -483,14 +481,14 @@ public abstract class FloatMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewSorted() {
         FloatMatrix2D B = A.viewSorted(1);
         for (int r = 0; r < NROWS - 1; r++) {
-            assertTrue(B.getQuick(r+1, 1) >= B.getQuick(r, 1));
+            assertTrue(B.getQuick(r + 1, 1) >= B.getQuick(r, 1));
         }
     }
-    
+
     public void testViewStrides() {
         int rowStride = 3;
         int colStride = 5;
@@ -501,11 +499,11 @@ public abstract class FloatMatrix2DTest extends TestCase {
             }
         }
     }
-    
+
     public void testZMultFloatMatrix1DFloatMatrix1DFloatFloatBoolean() {
         FloatMatrix1D y = new DenseFloatMatrix1D(NCOLUMNS);
         for (int i = 0; i < y.size(); i++) {
-            y.setQuick(i, (float)Math.random());
+            y.setQuick(i, (float) Math.random());
         }
         float alpha = 3;
         float beta = 5;
@@ -519,7 +517,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
             }
             expected[r] = s * alpha + expected[r] * beta;
         }
-                
+
         for (int r = 0; r < NROWS; r++) {
             assertEquals(expected[r], z.getQuick(r), TOL);
         }
@@ -537,11 +535,11 @@ public abstract class FloatMatrix2DTest extends TestCase {
         for (int r = 0; r < NROWS; r++) {
             assertEquals(expected[r], z.getQuick(r), TOL);
         }
-        
+
         //transpose
         y = new DenseFloatMatrix1D(NROWS);
         for (int i = 0; i < y.size(); i++) {
-            y.setQuick(i, (float)Math.random());
+            y.setQuick(i, (float) Math.random());
         }
         z = FloatFactory1D.dense.random(NCOLUMNS);
         expected = z.toArray();
@@ -571,7 +569,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
             assertEquals(expected[r], z.getQuick(r), TOL);
         }
     }
-    
+
     public void testZMultFloatMatrix2DFloatMatrix2DFloatFloatBooleanBoolean() {
         float alpha = 3;
         float beta = 5;
@@ -592,7 +590,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
                 assertEquals(expected[r][c], C.getQuick(r, c), TOL);
             }
         }
-        
+
         //---
         C = null;
         C = A.zMult(Bt, C, alpha, beta, false, false);
@@ -611,7 +609,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
                 assertEquals(expected[r][c], C.getQuick(r, c), TOL);
             }
         }
-        
+
         //transposeA
         C = FloatFactory2D.dense.random(NCOLUMNS, NCOLUMNS);
         expected = C.toArray();
@@ -648,7 +646,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
                 assertEquals(expected[r][c], C.getQuick(r, c), TOL);
             }
         }
-        
+
         //transposeB
         C = FloatFactory2D.dense.random(NROWS, NROWS);
         expected = C.toArray();
@@ -723,8 +721,7 @@ public abstract class FloatMatrix2DTest extends TestCase {
         }
 
     }
-    
-    
+
     public void testZSum() {
         float sum = A.zSum();
         float expected = 0;
@@ -735,5 +732,5 @@ public abstract class FloatMatrix2DTest extends TestCase {
         }
         assertEquals(expected, sum, TOL);
     }
-    
+
 }

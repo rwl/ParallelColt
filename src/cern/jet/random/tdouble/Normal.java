@@ -12,14 +12,14 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 import cern.jet.stat.tdouble.Probability;
 
 /**
- * Normal (aka Gaussian) distribution; See the <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node188.html#SECTION0001880000000000000000">
- * math definition</A> and <A
+ * Normal (aka Gaussian) distribution; See the <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node188.html#SECTION0001880000000000000000"
+ * > math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosn.html#Normal Distribution">
  * animated definition</A>.
  * 
  * <pre>
- *                        
+ * 
  *  1                       2
  *  pdf(x) = ---------    exp( - (x-mean) / 2v ) 
  *  sqrt(2pi*v)
@@ -37,8 +37,8 @@ import cern.jet.stat.tdouble.Probability;
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * <b>Implementation:</b> Polar Box-Muller transformation. See G.E.P. Box, M.E.
  * Muller (1958): A note on the generation of random normal deviates, Annals

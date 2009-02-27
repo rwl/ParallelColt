@@ -53,8 +53,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
     }
 
     /**
-     * Returns <tt>true</tt> if the receiver contains the specified value.
-     * Tests for identity.
+     * Returns <tt>true</tt> if the receiver contains the specified value. Tests
+     * for identity.
      * 
      * @return <tt>true</tt> if the receiver contains the specified value.
      */
@@ -67,8 +67,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
     }
 
     /**
-     * Returns a deep copy of the receiver; uses <code>clone()</code> and
-     * casts the result.
+     * Returns a deep copy of the receiver; uses <code>clone()</code> and casts
+     * the result.
      * 
      * @return a deep copy of the receiver.
      */
@@ -101,8 +101,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * </pre>
      * 
      * This implementation first checks if the specified object is this map; if
-     * so it returns <tt>true</tt>. Then, it checks if the specified object
-     * is a map whose size is identical to the size of this set; if not, it it
+     * so it returns <tt>true</tt>. Then, it checks if the specified object is a
+     * map whose size is identical to the size of this set; if not, it it
      * returns <tt>false</tt>. If so, it applies the iteration as described
      * above.
      * 
@@ -135,11 +135,11 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * Applies a procedure to each key of the receiver, if any. Note: Iterates
      * over the keys in no particular order. Subclasses can define a particular
      * order, for example, "sorted by key". All methods which <i>can</i> be
-     * expressed in terms of this method (most methods can) <i>must guarantee</i>
-     * to use the <i>same</i> order defined by this method, even if it is no
-     * particular order. This is necessary so that, for example, methods
-     * <tt>keys</tt> and <tt>values</tt> will yield association pairs, not
-     * two uncorrelated lists.
+     * expressed in terms of this method (most methods can) <i>must
+     * guarantee</i> to use the <i>same</i> order defined by this method, even
+     * if it is no particular order. This is necessary so that, for example,
+     * methods <tt>keys</tt> and <tt>values</tt> will yield association pairs,
+     * not two uncorrelated lists.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -151,8 +151,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
 
     /**
      * Applies a procedure to each (key,value) pair of the receiver, if any.
-     * Iteration order is guaranteed to be <i>identical</i> to the order used
-     * by method {@link #forEachKey(LongProcedure)}.
+     * Iteration order is guaranteed to be <i>identical</i> to the order used by
+     * method {@link #forEachKey(LongProcedure)}.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -176,8 +176,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * 
      * @param key
      *            the key to be searched for.
-     * @return the value associated with the specified key; <tt>null</tt> if
-     *         no such key is present.
+     * @return the value associated with the specified key; <tt>null</tt> if no
+     *         such key is present.
      */
     public abstract Object get(long key);
 
@@ -190,8 +190,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * 
      * @param value
      *            the value to search for.
-     * @return the first key for which holds <tt>get(key) == value</tt>;
-     *         returns <tt>Long.MIN_VALUE</tt> if no such key exists.
+     * @return the first key for which holds <tt>get(key) == value</tt>; returns
+     *         <tt>Long.MIN_VALUE</tt> if no such key exists.
      */
     public long keyOf(final Object value) {
         final long[] foundKey = new long[1];
@@ -247,11 +247,11 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
     }
 
     /**
-     * Fills all keys <i>sorted ascending by their associated value</i> into
-     * the specified list. Fills into the list, starting at index 0. After this
-     * call returns the specified list has a new size that equals
-     * <tt>this.size()</tt>. Primary sort criterium is "value", secondary
-     * sort criterium is "key". This means that if any two values are equal, the
+     * Fills all keys <i>sorted ascending by their associated value</i> into the
+     * specified list. Fills into the list, starting at index 0. After this call
+     * returns the specified list has a new size that equals
+     * <tt>this.size()</tt>. Primary sort criterium is "value", secondary sort
+     * criterium is "key". This means that if any two values are equal, the
      * smaller key comes first.
      * <p>
      * <b>Example:</b> <br>
@@ -278,8 +278,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * 	 public boolean apply(long key, Object value) { return key%2==0; }
      * 	 }
      * 	 keys = (8,7,6), values = (1,2,2) --&gt; keyList = (6,8), valueList = (2,1)
-     * </tt>
-     </pre>
+     * &lt;/tt&gt;
+     * </pre>
      * 
      * @param condition
      *            the condition to be matched. Takes the current key as first
@@ -331,9 +331,9 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * Fills all keys and values <i>sorted ascending by value according to
      * natural ordering</i> into the specified lists. Fills into the lists,
      * starting at index 0. After this call returns the specified lists both
-     * have a new size that equals <tt>this.size()</tt>. Primary sort
-     * criterium is "value", secondary sort criterium is "key". This means that
-     * if any two values are equal, the smaller key comes first.
+     * have a new size that equals <tt>this.size()</tt>. Primary sort criterium
+     * is "value", secondary sort criterium is "key". This means that if any two
+     * values are equal, the smaller key comes first.
      * <p>
      * <b>Example:</b> <br>
      * <tt>keys = (8,7,6), values = (1,2,2) --> keyList = (8,6,7), valueList = (1,2,2)</tt>
@@ -382,10 +382,9 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      *            the key the value shall be associated with.
      * @param value
      *            the value to be associated.
-     * @return <tt>true</tt> if the receiver did not already contain such a
-     *         key; <tt>false</tt> if the receiver did already contain such a
-     *         key - the new value has now replaced the formerly associated
-     *         value.
+     * @return <tt>true</tt> if the receiver did not already contain such a key;
+     *         <tt>false</tt> if the receiver did already contain such a key -
+     *         the new value has now replaced the formerly associated value.
      */
     public abstract boolean put(long key, Object value);
 

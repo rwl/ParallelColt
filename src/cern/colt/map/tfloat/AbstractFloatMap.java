@@ -12,9 +12,9 @@ import cern.colt.map.PrimeFinder;
 
 /**
  * Abstract base class for hash maps holding objects or primitive data types
- * such as <code>int</code>, <code>float</code>, etc. as keys and/or
- * values. First see the <a href="package-summary.html">package summary</a> and
- * javadoc <a href="package-tree.html">tree view</a> to get the broad picture.
+ * such as <code>int</code>, <code>float</code>, etc. as keys and/or values.
+ * First see the <a href="package-summary.html">package summary</a> and javadoc
+ * <a href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * Note that implementations are not synchronized.
  * 
@@ -32,8 +32,8 @@ public abstract class AbstractFloatMap extends cern.colt.PersistentObject {
 
     /**
      * The table capacity c=table.length always satisfies the invariant
-     * <tt>c * minLoadFactor <= s <= c * maxLoadFactor</tt>, where s=size()
-     * is the number of associations currently contained. The term "c *
+     * <tt>c * minLoadFactor <= s <= c * maxLoadFactor</tt>, where s=size() is
+     * the number of associations currently contained. The term "c *
      * minLoadFactor" is called the "lowWaterMark", "c * maxLoadFactor" is
      * called the "highWaterMark". In other words, the table capacity (and
      * proportionally the memory used by this class) oscillates within these
@@ -70,8 +70,8 @@ public abstract class AbstractFloatMap extends cern.colt.PersistentObject {
     /**
      * Chooses a new prime table capacity optimized for growing that
      * (approximately) satisfies the invariant
-     * <tt>c * minLoadFactor <= size <= c * maxLoadFactor</tt> and has at
-     * least one FREE slot for the given size.
+     * <tt>c * minLoadFactor <= size <= c * maxLoadFactor</tt> and has at least
+     * one FREE slot for the given size.
      */
     protected int chooseGrowCapacity(int size, float minLoad, float maxLoad) {
         return nextPrime(Math.max(size + 1, (int) ((4 * size / (3 * minLoad + maxLoad)))));
@@ -105,8 +105,8 @@ public abstract class AbstractFloatMap extends cern.colt.PersistentObject {
     /**
      * Chooses a new prime table capacity neither favoring shrinking nor
      * growing, that (approximately) satisfies the invariant
-     * <tt>c * minLoadFactor <= size <= c * maxLoadFactor</tt> and has at
-     * least one FREE slot for the given size.
+     * <tt>c * minLoadFactor <= size <= c * maxLoadFactor</tt> and has at least
+     * one FREE slot for the given size.
      */
     protected int chooseMeanCapacity(int size, float minLoad, float maxLoad) {
         return nextPrime(Math.max(size + 1, (int) ((2 * size / (minLoad + maxLoad)))));
@@ -115,8 +115,8 @@ public abstract class AbstractFloatMap extends cern.colt.PersistentObject {
     /**
      * Chooses a new prime table capacity optimized for shrinking that
      * (approximately) satisfies the invariant
-     * <tt>c * minLoadFactor <= size <= c * maxLoadFactor</tt> and has at
-     * least one FREE slot for the given size.
+     * <tt>c * minLoadFactor <= size <= c * maxLoadFactor</tt> and has at least
+     * one FREE slot for the given size.
      */
     protected int chooseShrinkCapacity(int size, float minLoad, float maxLoad) {
         return nextPrime(Math.max(size + 1, (int) ((4 * size / (minLoad + 3 * maxLoad)))));
@@ -182,7 +182,9 @@ public abstract class AbstractFloatMap extends cern.colt.PersistentObject {
      *            the maxLoadFactor of the receiver.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      */
     protected void setUp(int initialCapacity, float minLoadFactor, float maxLoadFactor) {
         if (initialCapacity < 0)

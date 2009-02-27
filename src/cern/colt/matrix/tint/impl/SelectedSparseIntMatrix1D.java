@@ -14,9 +14,9 @@ import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix3D;
 
 /**
- * Selection view on sparse 1-d matrices holding <tt>int</tt> elements.
- * First see the <a href="package-summary.html">package summary</a> and javadoc
- * <a href="package-tree.html">tree view</a> to get the broad picture.
+ * Selection view on sparse 1-d matrices holding <tt>int</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
@@ -144,11 +144,11 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix must
-     * also be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseIntMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseIntMatrix1D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix must also
+     * be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of
+     * type <tt>SparseIntMatrix1D</tt> the new matrix must also be of type
+     * <tt>SparseIntMatrix1D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -161,10 +161,10 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseIntMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseIntMatrix2D</tt>, if the receiver
-     * is an instance of type <tt>SparseIntMatrix1D</tt> the new matrix
-     * must be of type <tt>SparseIntMatrix2D</tt>, etc.
+     * receiver is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix
+     * must be of type <tt>DenseIntMatrix2D</tt>, if the receiver is an instance
+     * of type <tt>SparseIntMatrix1D</tt> the new matrix must be of type
+     * <tt>SparseIntMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -185,8 +185,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -224,8 +223,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(IntMatrix1D other) {
         if (other instanceof SelectedSparseIntMatrix1D) {

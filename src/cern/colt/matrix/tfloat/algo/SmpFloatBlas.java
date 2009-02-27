@@ -109,7 +109,7 @@ public class SmpFloatBlas implements FloatBlas {
 
             ra = a / scale;
             rb = b / scale;
-            r = (float)(scale * Math.sqrt(ra * ra + rb * rb));
+            r = (float) (scale * Math.sqrt(ra * ra + rb * rb));
             r = sign(1.0f, roe) * r;
             c = a / r;
             s = b / r;
@@ -117,7 +117,7 @@ public class SmpFloatBlas implements FloatBlas {
             if (Math.abs(a) > Math.abs(b))
                 z = s;
             if ((Math.abs(b) >= Math.abs(a)) && (c != 0.0))
-                z = (float)(1.0 / c);
+                z = (float) (1.0 / c);
 
         } else {
 

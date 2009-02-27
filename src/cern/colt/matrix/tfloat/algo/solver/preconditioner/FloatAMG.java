@@ -203,7 +203,7 @@ public class FloatAMG implements FloatPreconditioner {
      * <code>omega=2/3</code>.
      */
     public FloatAMG() {
-        this(1, 1.85f, 1.85f, 1, 1, 1, 1, 40, (float)(2. / 3));
+        this(1, 1.85f, 1.85f, 1, 1, 1, 1, 40, (float) (2. / 3));
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
@@ -230,13 +230,13 @@ public class FloatAMG implements FloatPreconditioner {
         List<RCFloatMatrix2D> Al = new LinkedList<RCFloatMatrix2D>();
         List<CCFloatMatrix2D> Il = new LinkedList<CCFloatMatrix2D>();
 
-        Al.add((RCFloatMatrix2D)(new RCFloatMatrix2D(A.rows(), A.columns()).assign(A)));
+        Al.add((RCFloatMatrix2D) (new RCFloatMatrix2D(A.rows(), A.columns()).assign(A)));
 
         for (int k = 0; Al.get(k).rows() > min; ++k) {
 
             RCFloatMatrix2D Af = Al.get(k);
 
-            float eps = (float)(0.08 * Math.pow(0.5, k));
+            float eps = (float) (0.08 * Math.pow(0.5, k));
 
             // Create the aggregates
             Aggregator aggregator = new Aggregator(Af, eps);
@@ -737,7 +737,7 @@ public class FloatAMG implements FloatPreconditioner {
                         if (pt[colind[j]] != -1)
                             Ac.setQuick(pt[i], pt[colind[j]], data[j]);
 
-            return (RCFloatMatrix2D)(new RCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (RCFloatMatrix2D) (new RCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
@@ -784,7 +784,7 @@ public class FloatAMG implements FloatPreconditioner {
                 if (pt[i] != -1)
                     If.setQuick(i, pt[i], 1);
 
-            return (CCFloatMatrix2D)(new CCFloatMatrix2D(If.rows(), If.columns()).assign(If));
+            return (CCFloatMatrix2D) (new CCFloatMatrix2D(If.rows(), If.columns()).assign(If));
         }
 
         /**
@@ -902,7 +902,7 @@ public class FloatAMG implements FloatPreconditioner {
                         Ac.setQuick(i, k, itaiCol[i]);
             }
 
-            return (RCFloatMatrix2D)(new RCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (RCFloatMatrix2D) (new RCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
@@ -913,7 +913,7 @@ public class FloatAMG implements FloatPreconditioner {
         }
 
     }
-    
+
     private class SSOR implements FloatPreconditioner {
 
         /**
@@ -951,17 +951,18 @@ public class FloatAMG implements FloatPreconditioner {
          * Constructor for SSOR
          * 
          * @param F
-         *            Matrix to use internally. It will not be modified, thus the
-         *            system matrix may be passed
+         *            Matrix to use internally. It will not be modified, thus
+         *            the system matrix may be passed
          * @param reverse
-         *            True to perform a reverse sweep as well as the forward sweep.
-         *            If false, this preconditioner becomes the SOR method instead
+         *            True to perform a reverse sweep as well as the forward
+         *            sweep. If false, this preconditioner becomes the SOR
+         *            method instead
          * @param omegaF
-         *            Overrelaxation parameter for the forward sweep. Between 0 and
-         *            2.
-         * @param omegaR
-         *            Overrelaxation parameter for the backwards sweep. Between 0
+         *            Overrelaxation parameter for the forward sweep. Between 0
          *            and 2.
+         * @param omegaR
+         *            Overrelaxation parameter for the backwards sweep. Between
+         *            0 and 2.
          */
         public SSOR(RCFloatMatrix2D F, boolean reverse, float omegaF, float omegaR) {
             if (F.rows() != F.columns())
@@ -977,11 +978,12 @@ public class FloatAMG implements FloatPreconditioner {
         }
 
         /**
-         * Constructor for SSOR. Uses <code>omega=1</code> with a backwards sweep
+         * Constructor for SSOR. Uses <code>omega=1</code> with a backwards
+         * sweep
          * 
          * @param F
-         *            Matrix to use internally. It will not be modified, thus the
-         *            system matrix may be passed
+         *            Matrix to use internally. It will not be modified, thus
+         *            the system matrix may be passed
          */
         public SSOR(RCFloatMatrix2D F) {
             this(F, true, 1, 1);
@@ -991,11 +993,11 @@ public class FloatAMG implements FloatPreconditioner {
          * Sets the overrelaxation parameters
          * 
          * @param omegaF
-         *            Overrelaxation parameter for the forward sweep. Between 0 and
-         *            2.
-         * @param omegaR
-         *            Overrelaxation parameter for the backwards sweep. Between 0
+         *            Overrelaxation parameter for the forward sweep. Between 0
          *            and 2.
+         * @param omegaR
+         *            Overrelaxation parameter for the backwards sweep. Between
+         *            0 and 2.
          */
         public void setOmega(float omegaF, float omegaR) {
             if (omegaF < 0 || omegaF > 2)

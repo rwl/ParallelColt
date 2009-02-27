@@ -594,7 +594,6 @@ public class AccuracyCheckDoubleFFT {
     }
 
     public static void main(String[] args) {
-        //        ConcurrencyUtils.setNumberOfThreads(2);
         checkAccuracyComplexFFT_1D();
         checkAccuracyRealFFT_1D();
         checkAccuracyComplexFFT_2D();

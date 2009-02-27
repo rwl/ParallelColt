@@ -15,7 +15,7 @@ public class FloatBiCGILUTTest extends FloatBiCGTest {
     @Override
     protected void createSolver() throws Exception {
         super.createSolver();
-        M = new FloatILUT((RCMFloatMatrix2D)(new RCMFloatMatrix2D(A.rows(), A.columns()).assign(A)));
+        M = new FloatILUT((RCMFloatMatrix2D) (new RCMFloatMatrix2D(A.rows(), A.columns()).assign(A)));
     }
 
 }

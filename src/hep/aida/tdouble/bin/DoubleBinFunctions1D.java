@@ -160,7 +160,8 @@ public class DoubleBinFunctions1D extends Object {
      * Function that returns <tt>bin.quantile(percentage)</tt>.
      * 
      * @param percentage
-     *            the percentage of the quantile (<tt>0 <= percentage <= 1</tt>).
+     *            the percentage of the quantile (<tt>0 <= percentage <= 1</tt>
+     *            ).
      */
     public static DoubleBinFunction1D quantile(final double percentage) {
         return new DoubleBinFunction1D() {

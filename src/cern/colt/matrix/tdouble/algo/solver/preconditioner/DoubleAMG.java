@@ -230,7 +230,7 @@ public class DoubleAMG implements DoublePreconditioner {
         List<RCDoubleMatrix2D> Al = new LinkedList<RCDoubleMatrix2D>();
         List<CCDoubleMatrix2D> Il = new LinkedList<CCDoubleMatrix2D>();
 
-        Al.add((RCDoubleMatrix2D)(new RCDoubleMatrix2D(A.rows(), A.columns()).assign(A)));
+        Al.add((RCDoubleMatrix2D) (new RCDoubleMatrix2D(A.rows(), A.columns()).assign(A)));
 
         for (int k = 0; Al.get(k).rows() > min; ++k) {
 
@@ -737,7 +737,7 @@ public class DoubleAMG implements DoublePreconditioner {
                         if (pt[colind[j]] != -1)
                             Ac.setQuick(pt[i], pt[colind[j]], data[j]);
 
-            return (RCDoubleMatrix2D)(new RCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (RCDoubleMatrix2D) (new RCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
@@ -784,7 +784,7 @@ public class DoubleAMG implements DoublePreconditioner {
                 if (pt[i] != -1)
                     If.setQuick(i, pt[i], 1);
 
-            return (CCDoubleMatrix2D)(new CCDoubleMatrix2D(If.rows(), If.columns()).assign(If));
+            return (CCDoubleMatrix2D) (new CCDoubleMatrix2D(If.rows(), If.columns()).assign(If));
         }
 
         /**
@@ -902,7 +902,7 @@ public class DoubleAMG implements DoublePreconditioner {
                         Ac.setQuick(i, k, itaiCol[i]);
             }
 
-            return (RCDoubleMatrix2D)(new RCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (RCDoubleMatrix2D) (new RCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
@@ -913,7 +913,7 @@ public class DoubleAMG implements DoublePreconditioner {
         }
 
     }
-    
+
     private class SSOR implements DoublePreconditioner {
 
         /**
@@ -951,17 +951,18 @@ public class DoubleAMG implements DoublePreconditioner {
          * Constructor for SSOR
          * 
          * @param F
-         *            Matrix to use internally. It will not be modified, thus the
-         *            system matrix may be passed
+         *            Matrix to use internally. It will not be modified, thus
+         *            the system matrix may be passed
          * @param reverse
-         *            True to perform a reverse sweep as well as the forward sweep.
-         *            If false, this preconditioner becomes the SOR method instead
+         *            True to perform a reverse sweep as well as the forward
+         *            sweep. If false, this preconditioner becomes the SOR
+         *            method instead
          * @param omegaF
-         *            Overrelaxation parameter for the forward sweep. Between 0 and
-         *            2.
-         * @param omegaR
-         *            Overrelaxation parameter for the backwards sweep. Between 0
+         *            Overrelaxation parameter for the forward sweep. Between 0
          *            and 2.
+         * @param omegaR
+         *            Overrelaxation parameter for the backwards sweep. Between
+         *            0 and 2.
          */
         public SSOR(RCDoubleMatrix2D F, boolean reverse, double omegaF, double omegaR) {
             if (F.rows() != F.columns())
@@ -977,11 +978,12 @@ public class DoubleAMG implements DoublePreconditioner {
         }
 
         /**
-         * Constructor for SSOR. Uses <code>omega=1</code> with a backwards sweep
+         * Constructor for SSOR. Uses <code>omega=1</code> with a backwards
+         * sweep
          * 
          * @param F
-         *            Matrix to use internally. It will not be modified, thus the
-         *            system matrix may be passed
+         *            Matrix to use internally. It will not be modified, thus
+         *            the system matrix may be passed
          */
         public SSOR(RCDoubleMatrix2D F) {
             this(F, true, 1, 1);
@@ -991,11 +993,11 @@ public class DoubleAMG implements DoublePreconditioner {
          * Sets the overrelaxation parameters
          * 
          * @param omegaF
-         *            Overrelaxation parameter for the forward sweep. Between 0 and
-         *            2.
-         * @param omegaR
-         *            Overrelaxation parameter for the backwards sweep. Between 0
+         *            Overrelaxation parameter for the forward sweep. Between 0
          *            and 2.
+         * @param omegaR
+         *            Overrelaxation parameter for the backwards sweep. Between
+         *            0 and 2.
          */
         public void setOmega(double omegaF, double omegaR) {
             if (omegaF < 0 || omegaF > 2)

@@ -13,9 +13,9 @@ import cern.colt.matrix.tobject.ObjectMatrix2D;
 import cern.colt.matrix.tobject.ObjectMatrix3D;
 
 /**
- * Selection view on dense 3-d matrices holding <tt>Object</tt> elements.
- * First see the <a href="package-summary.html">package summary</a> and javadoc
- * <a href="package-tree.html">tree view</a> to get the broad picture.
+ * Selection view on dense 3-d matrices holding <tt>Object</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
@@ -39,8 +39,8 @@ import cern.colt.matrix.tobject.ObjectMatrix3D;
  * <p>
  * <b>Memory requirements:</b>
  * <p>
- * <tt>memory [bytes] = 4*(sliceIndexes.length+rowIndexes.length+columnIndexes.length)</tt>.
- * Thus, an index view with 100 x 100 x 100 indexes additionally uses 8 KB.
+ * <tt>memory [bytes] = 4*(sliceIndexes.length+rowIndexes.length+columnIndexes.length)</tt>
+ * . Thus, an index view with 100 x 100 x 100 indexes additionally uses 8 KB.
  * <p>
  * <b>Time complexity:</b>
  * <p>
@@ -138,11 +138,10 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
     protected int _sliceOffset(int absRank) {
         return sliceOffsets[absRank];
     }
-    
+
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
-
 
     /**
      * Returns the matrix cell value at coordinate <tt>[slice,row,column]</tt>.
@@ -173,9 +172,9 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if <tt>other != null</tt> and at
-     * least one of the following conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+     * following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
@@ -235,10 +234,10 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseObjectMatrix3D</tt> the new matrix must also
-     * be of type <tt>DenseObjectMatrix2D</tt>, if the receiver is an
-     * instance of type <tt>SparseObjectMatrix3D</tt> the new matrix must also
-     * be of type <tt>SparseObjectMatrix2D</tt>, etc.
+     * instance of type <tt>DenseObjectMatrix3D</tt> the new matrix must also be
+     * of type <tt>DenseObjectMatrix2D</tt>, if the receiver is an instance of
+     * type <tt>SparseObjectMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseObjectMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -335,17 +334,17 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and rows of the given column. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and rows of the given column. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param column
      *            the index of the column to fix.
@@ -375,17 +374,17 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the slices and columns of the given row. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the slices and columns of the given row. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param row
      *            the index of the row to fix.
@@ -430,17 +429,17 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
     }
 
     /**
-     * Constructs and returns a new 2-dimensional <i>slice view</i>
-     * representing the rows and columns of the given slice. The returned view
-     * is backed by this matrix, so changes in the returned view are reflected
-     * in this matrix, and vice-versa.
+     * Constructs and returns a new 2-dimensional <i>slice view</i> representing
+     * the rows and columns of the given slice. The returned view is backed by
+     * this matrix, so changes in the returned view are reflected in this
+     * matrix, and vice-versa.
      * <p>
-     * To obtain a slice view on subranges, construct a sub-ranging view (<tt>view().part(...)</tt>),
-     * then apply this method to the sub-range view. To obtain 1-dimensional
-     * views, apply this method, then apply another slice view (methods
-     * <tt>viewColumn</tt>, <tt>viewRow</tt>) on the intermediate
-     * 2-dimensional view. To obtain 1-dimensional views on subranges, apply
-     * both steps.
+     * To obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>view().part(...)</tt>), then apply this method to the sub-range view.
+     * To obtain 1-dimensional views, apply this method, then apply another
+     * slice view (methods <tt>viewColumn</tt>, <tt>viewRow</tt>) on the
+     * intermediate 2-dimensional view. To obtain 1-dimensional views on
+     * subranges, apply both steps.
      * 
      * @param slice
      *            the index of the slice to fix.

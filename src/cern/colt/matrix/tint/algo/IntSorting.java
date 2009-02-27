@@ -12,19 +12,20 @@ import cern.colt.function.tint.IntComparator;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix3D;
+
 /**
  * Matrix quicksorts and mergesorts. Use idioms like
- * <tt>Sorting.quickSort.sort(...)</tt> and
- * <tt>Sorting.mergeSort.sort(...)</tt>.
+ * <tt>Sorting.quickSort.sort(...)</tt> and <tt>Sorting.mergeSort.sort(...)</tt>
+ * .
  * <p>
  * This is another case demonstrating one primary goal of this library:
  * Delivering easy to use, yet very efficient APIs. The sorts return convenient
- * <i>sort views</i>. This enables the usage of algorithms which scale well
- * with the problem size: For example, sorting a 1000000 x 10000 or a 1000000 x
- * 100 x 100 matrix performs just as fast as sorting a 1000000 x 1 matrix. This
- * is so, because internally the algorithms only move around integer indexes,
- * they do not physically move around entire rows or slices. The original matrix
- * is left unaffected.
+ * <i>sort views</i>. This enables the usage of algorithms which scale well with
+ * the problem size: For example, sorting a 1000000 x 10000 or a 1000000 x 100 x
+ * 100 matrix performs just as fast as sorting a 1000000 x 1 matrix. This is so,
+ * because internally the algorithms only move around integer indexes, they do
+ * not physically move around entire rows or slices. The original matrix is left
+ * unaffected.
  * <p>
  * The quicksort is a derivative of the JDK 1.2 V1.26 algorithms (which are, in
  * turn, based on Bentley's and McIlroy's fine work). The mergesort is a
@@ -97,7 +98,8 @@ public class IntSorting extends cern.colt.PersistentObject {
      * the returned view are reflected in this matrix, and vice-versa. To sort
      * ranges use sub-ranging views. To sort descending, use flip views ...
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt> 7, 1, 3, 1<br>
      </tt></td>
@@ -123,7 +125,7 @@ public class IntSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final int[] velems = (int[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -155,7 +157,7 @@ public class IntSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final int[] velems = (int[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -210,7 +212,7 @@ public class IntSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final int[] velems = (int[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -239,7 +241,7 @@ public class IntSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final int[] velems = (int[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -270,8 +272,8 @@ public class IntSorting extends cern.colt.PersistentObject {
      * sub-ranging views. To sort columns by rows, use dice views. To sort
      * descending, use flip views ...
      * <p>
-     * <b>Example:</b> Each aggregate is the sum of a row <table border="1"
-     * cellspacing="0">
+     * <b>Example:</b> Each aggregate is the sum of a row
+     * <table border="1" * cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>4 x 2 matrix: <br>
      1, 1<br>
@@ -389,7 +391,8 @@ public class IntSorting extends cern.colt.PersistentObject {
      * sort columns by rows, use dice views. To sort descending, use flip views
      * ...
      * <p>
-     * <b>Example:</b> <table border="1" cellspacing="0">
+     * <b>Example:</b>
+     * <table border="1" cellspacing="0">
      * <tr nowrap>
      * <td valign="top"><tt>4 x 2 matrix: <br>
      7, 6<br>
@@ -541,7 +544,8 @@ public class IntSorting extends cern.colt.PersistentObject {
      *         that the original matrix is left unaffected.</b>
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>row < 0 || row >= matrix.rows() || column < 0 || column >= matrix.columns()</tt>.
+     *             <tt>row < 0 || row >= matrix.rows() || column < 0 || column >= matrix.columns()</tt>
+     *             .
      */
     public IntMatrix3D sort(IntMatrix3D matrix, int row, int column) {
         if (row < 0 || row >= matrix.rows())

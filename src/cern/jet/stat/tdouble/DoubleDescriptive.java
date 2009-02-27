@@ -47,7 +47,8 @@ public class DoubleDescriptive extends Object {
      * 
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>to!=from-1 || from&lt;0 || from&gt;to || to&gt;=size()</tt>.
+     *             <tt>to!=from-1 || from&lt;0 || from&gt;to || to&gt;=size()</tt>
+     *             .
      */
     protected static void checkRangeFromTo(int from, int to, int theSize) {
         if (to == from - 1)
@@ -66,8 +67,8 @@ public class DoubleDescriptive extends Object {
 
     /**
      * Returns the covariance of two data sequences, which is
-     * <tt>cov(x,y) = (1/(size()-1)) * Sum((x[i]-mean(x)) * (y[i]-mean(y)))</tt>.
-     * See the <A
+     * <tt>cov(x,y) = (1/(size()-1)) * Sum((x[i]-mean(x)) * (y[i]-mean(y)))</tt>
+     * . See the <A
      * HREF="http://www.cquest.utoronto.ca/geog/ggr270y/notes/not05efg.html">
      * math definition</A>.
      */
@@ -133,9 +134,9 @@ public class DoubleDescriptive extends Object {
     /**
      * Computes the frequency (number of occurances, count) of each distinct
      * value in the given sorted data. After this call returns both
-     * <tt>distinctValues</tt> and <tt>frequencies</tt> have a new size
-     * (which is equal for both), which is the number of distinct values in the
-     * sorted data.
+     * <tt>distinctValues</tt> and <tt>frequencies</tt> have a new size (which
+     * is equal for both), which is the number of distinct values in the sorted
+     * data.
      * <p>
      * Distinct values are filled into <tt>distinctValues</tt>, starting at
      * index 0. The frequency of each distinct value is filled into
@@ -253,19 +254,16 @@ public class DoubleDescriptive extends Object {
      * @param inOut
      *            the old values in the following format:
      *            <ul>
-     *            <li><tt>inOut[0]</tt> is the old minimum.
-     *            <li><tt>inOut[1]</tt> is the old maximum.
-     *            <li><tt>inOut[2]</tt> is the old sum.
-     *            <li><tt>inOut[3]</tt> is the old sum of squares.
+     *            <li><tt>inOut[0]</tt> is the old minimum. <li><tt>inOut[1]
+     *            </tt> is the old maximum. <li><tt>inOut[2]</tt> is the old
+     *            sum. <li><tt>inOut[3]</tt> is the old sum of squares.
      *            </ul>
      *            If no data sequence elements have so far been recorded set the
      *            values as follows
      *            <ul>
      *            <li><tt>inOut[0] = Double.POSITIVE_INFINITY</tt> as the old
-     *            minimum.
-     *            <li><tt>inOut[1] = Double.NEGATIVE_INFINITY</tt> as the old
-     *            maximum.
-     *            <li><tt>inOut[2] = 0.0</tt> as the old sum.
+     *            minimum. <li><tt>inOut[1] = Double.NEGATIVE_INFINITY</tt> as
+     *            the old maximum. <li><tt>inOut[2] = 0.0</tt> as the old sum.
      *            <li><tt>inOut[3] = 0.0</tt> as the old sum of squares.
      *            </ul>
      * 
@@ -320,9 +318,9 @@ public class DoubleDescriptive extends Object {
      * 
      * Assume we have already recorded some data sequence elements
      * <tt>data[i]</tt> and know the values of
-     * <tt>Sum(data[i]<sup>from</sup>), Sum(data[i]<sup>from+1</sup>), ..., Sum(data[i]<sup>to</sup>)</tt>.
-     * Assume further, we are to record some more elements and to derive updated
-     * values of these sums.
+     * <tt>Sum(data[i]<sup>from</sup>), Sum(data[i]<sup>from+1</sup>), ..., Sum(data[i]<sup>to</sup>)</tt>
+     * . Assume further, we are to record some more elements and to derive
+     * updated values of these sums.
      * <p>
      * This method computes those updated values without needing to know the
      * already recorded elements. Returns the updated values filled into the
@@ -339,8 +337,9 @@ public class DoubleDescriptive extends Object {
      * <tt>moment(k,c) = m(k,c) / data.size()</tt> where <br>
      * <tt>m(k,c) = Sum( -1<sup>i</sup> * b(k,i) * c<sup>i</sup> * sumOfPowers(k-i))</tt>
      * for <tt>i = 0 .. k</tt> and <br>
-     * <tt>b(k,i) = </tt>{@link cern.jet.math.tdouble.DoubleArithmetic#binomial(long,long) binomial(k,i)}
-     * and <br>
+     * <tt>b(k,i) = </tt>
+     * {@link cern.jet.math.tdouble.DoubleArithmetic#binomial(long,long)
+     * binomial(k,i)} and <br>
      * <tt>sumOfPowers(k) = Sum( data[i]<sup>k</sup> )</tt>.
      * <p>
      * 
@@ -357,13 +356,12 @@ public class DoubleDescriptive extends Object {
      * @param sumOfPowers
      *            the old values of the sums in the following format:
      *            <ul>
-     *            <li><tt>sumOfPowers[0]</tt> is the old
-     *            <tt>Sum(data[i]<sup>fromSumIndex</sup>)</tt>.
-     *            <li><tt>sumOfPowers[1]</tt> is the old
-     *            <tt>Sum(data[i]<sup>fromSumIndex+1</sup>)</tt>.
-     *            <li>...
-     *            <li><tt>sumOfPowers[toSumIndex-fromSumIndex]</tt> is the
-     *            old <tt>Sum(data[i]<sup>toSumIndex</sup>)</tt>.
+     *            <li><tt>sumOfPowers[0]</tt> is the old <tt>
+     *            Sum(data[i]<sup>fromSumIndex</sup>)</tt>. <li><tt>
+     *            sumOfPowers[1]</tt> is the old <tt>
+     *            Sum(data[i]<sup>fromSumIndex+1</sup>)</tt>. <li>... <li><tt>
+     *            sumOfPowers[toSumIndex-fromSumIndex]</tt> is the old <tt>
+     *            Sum(data[i]<sup>toSumIndex</sup>)</tt>.
      *            </ul>
      *            If no data sequence elements have so far been recorded set all
      *            old values of the sums to <tt>0.0</tt>.
@@ -494,14 +492,14 @@ public class DoubleDescriptive extends Object {
      * @param inOut
      *            the old values in the following format:
      *            <ul>
-     *            <li><tt>inOut[0]</tt> is the old sum.
-     *            <li><tt>inOut[1]</tt> is the old sum of squares.
+     *            <li><tt>inOut[0]</tt> is the old sum. <li><tt>inOut[1]</tt> is
+     *            the old sum of squares.
      *            </ul>
      *            If no data sequence elements have so far been recorded set the
      *            values as follows
      *            <ul>
-     *            <li><tt>inOut[0] = 0.0</tt> as the old sum.
-     *            <li><tt>inOut[1] = 0.0</tt> as the old sum of squares.
+     *            <li><tt>inOut[0] = 0.0</tt> as the old sum. <li><tt>inOut[1] =
+     *            0.0</tt> as the old sum of squares.
      *            </ul>
      * 
      */
@@ -657,15 +655,15 @@ public class DoubleDescriptive extends Object {
     }
 
     /**
-     * Returns the moment of <tt>k</tt>-th order with constant <tt>c</tt>
-     * of a data sequence, which is
+     * Returns the moment of <tt>k</tt>-th order with constant <tt>c</tt> of a
+     * data sequence, which is
      * <tt>Sum( (data[i]-c)<sup>k</sup> ) / data.size()</tt>.
      * 
      * @param sumOfPowers
      *            <tt>sumOfPowers[m] == Sum( data[i]<sup>m</sup>) )</tt> for
      *            <tt>m = 0,1,..,k</tt> as returned by method
-     *            {@link #incrementalUpdateSumsOfPowers(DoubleArrayList,int,int,int,int,double[])}.
-     *            In particular there must hold
+     *            {@link #incrementalUpdateSumsOfPowers(DoubleArrayList,int,int,int,int,double[])}
+     *            . In particular there must hold
      *            <tt>sumOfPowers.length == k+1</tt>.
      * @param size
      *            the number of elements of the data sequence.
@@ -698,8 +696,8 @@ public class DoubleDescriptive extends Object {
     }
 
     /**
-     * Returns the moment of <tt>k</tt>-th order with constant <tt>c</tt>
-     * of a data sequence, which is
+     * Returns the moment of <tt>k</tt>-th order with constant <tt>c</tt> of a
+     * data sequence, which is
      * <tt>Sum( (data[i]-c)<sup>k</sup> ) / data.size()</tt>.
      */
     public static double moment(DoubleArrayList data, int k, double c) {
@@ -741,9 +739,9 @@ public class DoubleDescriptive extends Object {
     }
 
     /**
-     * Returns the product, which is <tt>Prod( data[i] )</tt>. In other
-     * words: <tt>data[0]*data[1]*...*data[data.size()-1]</tt>. This method
-     * uses the equivalent definition:
+     * Returns the product, which is <tt>Prod( data[i] )</tt>. In other words:
+     * <tt>data[0]*data[1]*...*data[data.size()-1]</tt>. This method uses the
+     * equivalent definition:
      * <tt>prod = pow( exp( Sum( Log(x[i]) ) / size(), size())</tt>.
      */
     public static double product(int size, double sumOfLogarithms) {
@@ -751,8 +749,8 @@ public class DoubleDescriptive extends Object {
     }
 
     /**
-     * Returns the product of a data sequence, which is <tt>Prod( data[i] )</tt>.
-     * In other words: <tt>data[0]*data[1]*...*data[data.size()-1]</tt>. Note
+     * Returns the product of a data sequence, which is <tt>Prod( data[i] )</tt>
+     * . In other words: <tt>data[0]*data[1]*...*data[data.size()-1]</tt>. Note
      * that you may easily get numeric overflows.
      */
     public static double product(DoubleArrayList data) {
@@ -767,10 +765,10 @@ public class DoubleDescriptive extends Object {
     }
 
     /**
-     * Returns the <tt>phi-</tt>quantile; that is, an element <tt>elem</tt>
-     * for which holds that <tt>phi</tt> percent of data elements are less
-     * than <tt>elem</tt>. The quantile need not necessarily be contained in
-     * the data sequence, it can be a linear interpolation.
+     * Returns the <tt>phi-</tt>quantile; that is, an element <tt>elem</tt> for
+     * which holds that <tt>phi</tt> percent of data elements are less than
+     * <tt>elem</tt>. The quantile need not necessarily be contained in the data
+     * sequence, it can be a linear interpolation.
      * 
      * @param sortedData
      *            the data sequence; <b>must be sorted ascending</b>.
@@ -800,14 +798,15 @@ public class DoubleDescriptive extends Object {
 
     /**
      * Returns how many percent of the elements contained in the receiver are
-     * <tt>&lt;= element</tt>. Does linear interpolation if the element is
-     * not contained but lies in between two contained elements.
+     * <tt>&lt;= element</tt>. Does linear interpolation if the element is not
+     * contained but lies in between two contained elements.
      * 
      * @param sortedList
      *            the list to be searched (must be sorted ascending).
      * @param element
      *            the element to search for.
-     * @return the percentage <tt>phi</tt> of elements <tt>&lt;= element</tt> (<tt>0.0 &lt;= phi &lt;= 1.0)</tt>.
+     * @return the percentage <tt>phi</tt> of elements <tt>&lt;= element</tt> (
+     *         <tt>0.0 &lt;= phi &lt;= 1.0)</tt>.
      */
     public static double quantileInverse(DoubleArrayList sortedList, double element) {
         return rankInterpolated(sortedList, element) / sortedList.size();
@@ -874,10 +873,10 @@ public class DoubleDescriptive extends Object {
 
     /**
      * Returns the RMS (Root-Mean-Square) of a data sequence. That is
-     * <tt>Math.sqrt(Sum( data[i]*data[i] ) / data.size())</tt>. The RMS of
-     * data sequence is the square-root of the mean of the squares of the
-     * elements in the data sequence. It is a measure of the average "size" of
-     * the elements of a data sequence.
+     * <tt>Math.sqrt(Sum( data[i]*data[i] ) / data.size())</tt>. The RMS of data
+     * sequence is the square-root of the mean of the squares of the elements in
+     * the data sequence. It is a measure of the average "size" of the elements
+     * of a data sequence.
      * 
      * @param sumOfSquares
      *            <tt>sumOfSquares(data) == Sum( data[i]*data[i] )</tt> of the
@@ -1042,7 +1041,9 @@ public class DoubleDescriptive extends Object {
 
     /**
      * Returns the sample weighted variance of a data sequence. That is
-     * <tt>(sumOfSquaredProducts  -  sumOfProducts * sumOfProducts / sumOfWeights) / (sumOfWeights - 1)</tt>.
+     * 
+     * <tt>(sumOfSquaredProducts  -  sumOfProducts * sumOfProducts / sumOfWeights) / (sumOfWeights - 1)</tt>
+     * .
      * 
      * @param sumOfWeights
      *            <tt>== Sum( weights[i] )</tt>.
@@ -1086,8 +1087,7 @@ public class DoubleDescriptive extends Object {
      * <tt>data = (1,2,3,4,5,8,8,8,10,11)</tt>. <br>
      * <tt>splitters=(2,8)</tt> yields 3 bins:
      * <tt>(1), (2,3,4,5) (8,8,8,10,11)</tt>. <br>
-     * <tt>splitters=()</tt> yields 1 bin: <tt>(1,2,3,4,5,8,8,8,10,11)</tt>.
-     * <br>
+     * <tt>splitters=()</tt> yields 1 bin: <tt>(1,2,3,4,5,8,8,8,10,11)</tt>. <br>
      * <tt>splitters=(-5)</tt> yields 2 bins:
      * <tt>(), (1,2,3,4,5,8,8,8,10,11)</tt>. <br>
      * <tt>splitters=(100)</tt> yields 2 bins:
@@ -1100,8 +1100,8 @@ public class DoubleDescriptive extends Object {
      *            the points at which the list shall be partitioned (must be
      *            sorted ascending).
      * @return the sublists (an array with
-     *         <tt>length == splitters.size() + 1</tt>. Each sublist is
-     *         returned sorted ascending.
+     *         <tt>length == splitters.size() + 1</tt>. Each sublist is returned
+     *         sorted ascending.
      */
     public static DoubleArrayList[] split(DoubleArrayList sortedList, DoubleArrayList splitters) {
         // assertion: data is sorted ascending.
@@ -1215,8 +1215,8 @@ public class DoubleDescriptive extends Object {
     }
 
     /**
-     * Returns <tt>Sum( (data[i]-c)<sup>k</sup> )</tt>; optimized for
-     * common parameters like <tt>c == 0.0</tt> and/or <tt>k == -2 .. 4</tt>.
+     * Returns <tt>Sum( (data[i]-c)<sup>k</sup> )</tt>; optimized for common
+     * parameters like <tt>c == 0.0</tt> and/or <tt>k == -2 .. 4</tt>.
      */
     public static double sumOfPowerDeviations(DoubleArrayList data, int k, double c) {
         return sumOfPowerDeviations(data, k, c, 0, data.size() - 1);
@@ -1424,8 +1424,8 @@ public class DoubleDescriptive extends Object {
 
     /**
      * Returns the weighted RMS (Root-Mean-Square) of a data sequence. That is
-     * <tt>Sum( data[i] * data[i] * weights[i]) / Sum( data[i] * weights[i] )</tt>,
-     * or in other words <tt>sumOfProducts / sumOfSquaredProducts</tt>.
+     * <tt>Sum( data[i] * data[i] * weights[i]) / Sum( data[i] * weights[i] )</tt>
+     * , or in other words <tt>sumOfProducts / sumOfSquaredProducts</tt>.
      * 
      * @param sumOfProducts
      *            <tt>== Sum( data[i] * weights[i] )</tt>.

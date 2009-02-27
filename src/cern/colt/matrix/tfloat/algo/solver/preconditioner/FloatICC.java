@@ -64,7 +64,7 @@ public class FloatICC implements FloatPreconditioner {
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
         // R'y = b, y = R'\b
         upperTransSolve(b, y);
-        
+
         // Rx = R'\b = y
         return upperSolve(y, x);
     }
@@ -123,7 +123,7 @@ public class FloatICC implements FloatPreconditioner {
             // Store the row back into the factorisation matrix
             if (Rk[k] == 0)
                 throw new RuntimeException("Zero diagonal entry encountered on row " + (k + 1) + " during ICC process");
-            float sqRkk = (float)Math.sqrt(Rk[k]);
+            float sqRkk = (float) Math.sqrt(Rk[k]);
 
             for (int i = diagind[k]; i < rowptr[k + 1]; ++i)
                 data[i] = Rk[colind[i]] / sqRkk;

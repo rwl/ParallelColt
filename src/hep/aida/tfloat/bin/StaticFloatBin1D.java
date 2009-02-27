@@ -18,9 +18,9 @@ import cern.jet.stat.tfloat.FloatDescriptive;
  * <p>
  * This class is fully thread safe (all public methods are synchronized). Thus,
  * you can have one or more threads adding to the bin as well as one or more
- * threads reading and viewing the statistics of the bin <i>while it is filled</i>.
- * For high performance, add data in large chunks (buffers) via method
- * <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
+ * threads reading and viewing the statistics of the bin <i>while it is
+ * filled</i>. For high performance, add data in large chunks (buffers) via
+ * method <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
  * <p>
  * <b>Implementation</b>: Incremental maintainance. Performance linear in the
  * number of elements added.
@@ -100,7 +100,8 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
      *            the index of the last element to be added (inclusive).
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>.
+     *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
+     *             .
      */
     public synchronized void addAllOfFromTo(FloatArrayList list, int from, int to) {
         // if (this.arguments == null) setUpCache();
@@ -143,11 +144,10 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
     }
 
     /**
-     * Returns <tt>false</tt>. Returns whether a client can obtain all
-     * elements added to the receiver. In other words, tells whether the
-     * receiver internally preserves all added elements. If the receiver is
-     * rebinnable, the elements can be obtained via <tt>elements()</tt>
-     * methods.
+     * Returns <tt>false</tt>. Returns whether a client can obtain all elements
+     * added to the receiver. In other words, tells whether the receiver
+     * internally preserves all added elements. If the receiver is rebinnable,
+     * the elements can be obtained via <tt>elements()</tt> methods.
      * 
      */
     public synchronized boolean isRebinnable() {

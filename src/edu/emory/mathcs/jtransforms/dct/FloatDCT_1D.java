@@ -40,12 +40,12 @@ import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
- * Computes 1D Discrete Cosine Transform (DCT) of single precision data. The size
- * of data can be an arbitrary number. This is a parallel implementation of
+ * Computes 1D Discrete Cosine Transform (DCT) of single precision data. The
+ * size of data can be an arbitrary number. This is a parallel implementation of
  * split-radix and mixed-radix algorithms optimized for SMP systems. <br>
  * <br>
- * This code is derived from General Purpose FFT Package written by Takuya Ooura
- * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
+ * Part of the code is derived from General Purpose FFT Package written by
+ * Takuya Ooura (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 

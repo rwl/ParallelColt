@@ -159,19 +159,19 @@ public class DoubleQuantileFinderFactory extends Object {
      *            (e.g <tt>10^6</tt>).
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To avoid probabilistic answers, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To avoid probabilistic answers, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @param returnSamplingRate
-     *            output parameter, a <tt>double[1]</tt> where the sampling
-     *            rate is to be filled in.
+     *            output parameter, a <tt>double[1]</tt> where the sampling rate
+     *            is to be filled in.
      * @return <tt>long[2]</tt> - <tt>long[0]</tt>=the number of buffers,
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>returnSamplingRate[0]</tt>=the required sampling rate.
@@ -212,8 +212,8 @@ public class DoubleQuantileFinderFactory extends Object {
      *            determined.
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      */
     protected static long[] known_N_compute_B_and_K_quick(long N, double epsilon) {
         final int maxBuffers = 50;
@@ -308,16 +308,16 @@ public class DoubleQuantileFinderFactory extends Object {
      *            computed (e.g 10^6).
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To avoid probabilistic answers, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To avoid probabilistic answers, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @param samplingRate
      *            a <tt>double[1]</tt> where the sampling rate is to be filled
      *            in.
@@ -408,23 +408,23 @@ public class DoubleQuantileFinderFactory extends Object {
      *            specifies whether the number of elements over which quantiles
      *            are to be computed is known or not.
      * @param N
-     *            if <tt>known_N==true</tt>, the number of elements over
-     *            which quantiles are to be computed. if <tt>known_N==false</tt>,
-     *            the upper limit on the number of elements over which quantiles
-     *            are to be computed. If such an upper limit is a-priori
-     *            unknown, then set <tt>N = Long.MAX_VALUE</tt>.
+     *            if <tt>known_N==true</tt>, the number of elements over which
+     *            quantiles are to be computed. if <tt>known_N==false</tt>, the
+     *            upper limit on the number of elements over which quantiles are
+     *            to be computed. If such an upper limit is a-priori unknown,
+     *            then set <tt>N = Long.MAX_VALUE</tt>.
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
      *            epsilon (e.g. 0.0001) (0 &lt;= delta &lt;= 1). To avoid
      *            probabilistic answers, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @param generator
      *            a uniform random number generator. Set this parameter to
      *            <tt>null</tt> to use a default generator.
@@ -524,16 +524,16 @@ public class DoubleQuantileFinderFactory extends Object {
      * 
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact results, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact results, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To get exact results, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To get exact results, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @return <tt>long[4]</tt> - <tt>long[0]</tt>=the number of buffers,
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>long[2]</tt>=the tree height where sampling shall start,
@@ -570,16 +570,16 @@ public class DoubleQuantileFinderFactory extends Object {
      * 
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To get exact results, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To get exact results, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @return <tt>long[4]</tt> - <tt>long[0]</tt>=the number of buffers,
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>long[2]</tt>=the tree height where sampling shall start,

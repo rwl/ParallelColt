@@ -1,5 +1,15 @@
 Parallel Colt changelog
 
+0.7.1:	February 27, 2009
+	- Fixed bug in build.xml causing generation of incomplete source code distribution.
+	- Fixed bug in DelegateDoubleMatrix1D and DelagateFloatMatrix1D causing NullPointerException 
+	  when toString() method was called.
+	- Fixed bug in JCublas.cublasInit() causing NullPointerException in some cases. 
+	- Added DiagonalDoubleMatrix2D and DiagonalFloatMatrix2D.  
+	- Some optimizations in complex matrices.
+	- JTransforms updated to version 2.3.
+	- Cosmetic changes.	
+
 0.7:	February 14, 2009
 	- Added iterative solvers and preconditioners (adapted from Matrix Toolkits for Java).
 	- Added HyBR solver - a Hybrid Bidiagonalization Regularization.

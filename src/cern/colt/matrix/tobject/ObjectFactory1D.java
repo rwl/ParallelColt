@@ -13,12 +13,13 @@ import cern.colt.matrix.tobject.impl.SparseObjectMatrix1D;
 
 /**
  * Factory for convenient construction of 1-d matrices holding <tt>Object</tt>
- * cells. Use idioms like <tt>ObjectFactory1D.dense.make(1000)</tt> to
- * construct dense matrices, <tt>ObjectFactory1D.sparse.make(1000)</tt> to
- * construct sparse matrices.
+ * cells. Use idioms like <tt>ObjectFactory1D.dense.make(1000)</tt> to construct
+ * dense matrices, <tt>ObjectFactory1D.sparse.make(1000)</tt> to construct
+ * sparse matrices.
  * 
  * If the factory is used frequently it might be useful to streamline the
- * notation. For example by aliasing: <table>
+ * notation. For example by aliasing:
+ * <table>
  * <td class="PRE">
  * 
  * <pre>
@@ -53,8 +54,7 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
 
     /**
      * C = A||B; Constructs a new matrix which is the concatenation of two other
-     * matrices. Example: <tt>0 1</tt> append <tt>3 4</tt> -->
-     * <tt>0 1 3 4</tt>.
+     * matrices. Example: <tt>0 1</tt> append <tt>3 4</tt> --> <tt>0 1 3 4</tt>.
      */
     public ObjectMatrix1D append(ObjectMatrix1D A, ObjectMatrix1D B) {
         // concatenate
@@ -121,8 +121,8 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
 
     /**
      * Constructs a matrix from the values of the given list. The values are
-     * copied. So subsequent changes in <tt>values</tt> are not reflected in
-     * the matrix, and vice-versa.
+     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+     * matrix, and vice-versa.
      * 
      * @param values
      *            The values to be filled into the new matrix.
@@ -144,7 +144,7 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
      * 	 0 1
      * 	 repeat(3) --&gt;
      * 	 0 1 0 1 0 1
-     * 	
+     * 
      * </pre>
      */
     public ObjectMatrix1D repeat(ObjectMatrix1D A, int repeat) {
@@ -158,8 +158,8 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
 
     /**
      * Constructs a list from the given matrix. The values are copied. So
-     * subsequent changes in <tt>values</tt> are not reflected in the list,
-     * and vice-versa.
+     * subsequent changes in <tt>values</tt> are not reflected in the list, and
+     * vice-versa.
      * 
      * @param values
      *            The values to be filled into the new list.

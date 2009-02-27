@@ -26,38 +26,38 @@ import cern.colt.matrix.tfloat.FloatMatrix2D;
  * This class implements the BLAS functions for operations on matrices from the
  * matrix package. It follows the spirit of the <A
  * HREF="http://math.nist.gov/javanumerics/blas.html">Draft Proposal for Java
- * BLAS Interface</A>, by Roldan Pozo of the National Institute of Standards
- * and Technology. Interface definitions are also identical to the Ninja
- * interface. Because the matrix package supports sections, the interface is
- * actually simpler.
+ * BLAS Interface</A>, by Roldan Pozo of the National Institute of Standards and
+ * Technology. Interface definitions are also identical to the Ninja interface.
+ * Because the matrix package supports sections, the interface is actually
+ * simpler.
  * </p>
  * <p>
  * Currently, the following operations are supported:
  * </p>
  * <ol>
- * <li>BLAS Level 1: Vector-Vector operations </li>
+ * <li>BLAS Level 1: Vector-Vector operations</li>
  * <ul>
- * <li>ddot : dot product of two vectors </li>
- * <li>daxpy : scalar times a vector plus a vector </li>
- * <li>drotg : construct a Givens plane rotation </li>
- * <li>drot : apply a plane rotation </li>
- * <li>dcopy : copy vector X into vector Y </li>
- * <li>dswap : interchange vectors X and Y </li>
- * <li>dnrm2 : Euclidean norm of a vector </li>
- * <li>dasum : sum of absolute values of vector components </li>
- * <li>dscal : scale a vector by a scalar </li>
- * <li>idamax: index of element with maximum absolute value </li>
+ * <li>ddot : dot product of two vectors</li>
+ * <li>daxpy : scalar times a vector plus a vector</li>
+ * <li>drotg : construct a Givens plane rotation</li>
+ * <li>drot : apply a plane rotation</li>
+ * <li>dcopy : copy vector X into vector Y</li>
+ * <li>dswap : interchange vectors X and Y</li>
+ * <li>dnrm2 : Euclidean norm of a vector</li>
+ * <li>dasum : sum of absolute values of vector components</li>
+ * <li>dscal : scale a vector by a scalar</li>
+ * <li>idamax: index of element with maximum absolute value</li>
  * </ul>
- * <li>2.BLAS Level 2: Matrix-Vector operations </li>
+ * <li>2.BLAS Level 2: Matrix-Vector operations</li>
  * <ul>
- * <li>dgemv : matrix-vector multiply with general matrix </li>
- * <li>dger : rank-1 update on general matrix </li>
- * <li>dsymv : matrix-vector multiply with symmetric matrix </li>
- * <li>dtrmv : matrix-vector multiply with triangular matrix </li>
+ * <li>dgemv : matrix-vector multiply with general matrix</li>
+ * <li>dger : rank-1 update on general matrix</li>
+ * <li>dsymv : matrix-vector multiply with symmetric matrix</li>
+ * <li>dtrmv : matrix-vector multiply with triangular matrix</li>
  * </ul>
  * <li>3.BLAS Level 3: Matrix-Matrix operations
  * <ul>
- * <li>dgemm : matrix-matrix multiply with general matrices </li>
+ * <li>dgemm : matrix-matrix multiply with general matrices</li>
  * </ul>
  * </li>
  * </ol>
@@ -100,7 +100,8 @@ public interface FloatBlas {
     /**
      * Returns the sum of absolute values; <tt>|x[0]| + |x[1]| + ... </tt>. In
      * fact equivalent to
-     * <tt>x.aggregate(cern.jet.math.Functions.plus, cern.jet.math.Functions.abs)</tt>.
+     * <tt>x.aggregate(cern.jet.math.Functions.plus, cern.jet.math.Functions.abs)</tt>
+     * .
      * 
      * @param x
      *            the first vector.
@@ -108,8 +109,8 @@ public interface FloatBlas {
     public float dasum(FloatMatrix1D x);
 
     /**
-     * Combined vector scaling; <tt>y = y + alpha*x</tt>. In fact equivalent
-     * to <tt>y.assign(x,cern.jet.math.Functions.plusMult(alpha))</tt>.
+     * Combined vector scaling; <tt>y = y + alpha*x</tt>. In fact equivalent to
+     * <tt>y.assign(x,cern.jet.math.Functions.plusMult(alpha))</tt>.
      * 
      * @param alpha
      *            a scale factor.
@@ -125,8 +126,8 @@ public interface FloatBlas {
     public void daxpy(float alpha, FloatMatrix1D x, FloatMatrix1D y);
 
     /**
-     * Combined matrix scaling; <tt>B = B + alpha*A</tt>. In fact equivalent
-     * to <tt>B.assign(A,cern.jet.math.Functions.plusMult(alpha))</tt>.
+     * Combined matrix scaling; <tt>B = B + alpha*A</tt>. In fact equivalent to
+     * <tt>B.assign(A,cern.jet.math.Functions.plusMult(alpha))</tt>.
      * 
      * @param alpha
      *            a scale factor.
@@ -173,8 +174,7 @@ public interface FloatBlas {
 
     /**
      * Returns the dot product of two vectors x and y, which is
-     * <tt>Sum(x[i]*y[i])</tt>. In fact equivalent to
-     * <tt>x.zDotProduct(y)</tt>.
+     * <tt>Sum(x[i]*y[i])</tt>. In fact equivalent to <tt>x.zDotProduct(y)</tt>.
      * 
      * @param x
      *            the first vector.
@@ -253,7 +253,7 @@ public interface FloatBlas {
      * <pre>
      * 	 A = { {6,5}, {7,6} }, x = {1,2}, y = {3,4}, alpha = 1 --&gt;
      * 	 A = { {9,9}, {13,14} }
-     * 	
+     * 
      * </pre>
      * 
      * @param alpha
@@ -329,8 +329,8 @@ public interface FloatBlas {
     public void dscal(float alpha, FloatMatrix2D A);
 
     /**
-     * Swaps the elements of two vectors; <tt>y <==> x</tt>. In fact
-     * equivalent to <tt>y.swap(x)</tt>.
+     * Swaps the elements of two vectors; <tt>y <==> x</tt>. In fact equivalent
+     * to <tt>y.swap(x)</tt>.
      * 
      * @param x
      *            the first vector.
@@ -377,9 +377,9 @@ public interface FloatBlas {
     public void dsymv(boolean isUpperTriangular, float alpha, FloatMatrix2D A, FloatMatrix1D x, float beta, FloatMatrix1D y);
 
     /**
-     * Triangular matrix-vector multiplication; <tt>x = A*x</tt> or
-     * <tt>x = A'*x</tt>. Where x is an n element vector and A is an n by n
-     * unit, or non-unit, upper or lower triangular matrix.
+     * Triangular matrix-vector multiplication; <tt>x = A*x</tt> or <tt>x = A'*x</tt>.
+     * Where x is an n element vector and A is an n by n unit, or non-unit,
+     * upper or lower triangular matrix.
      * 
      * @param isUpperTriangular
      *            is A upper triangular or lower triangular?

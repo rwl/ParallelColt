@@ -47,11 +47,11 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         ConcurrencyUtils.setThreadsBeginN_1D(1);
 
         for (int i = 0; i < SIZE; i++) {
-            A.setQuick(i, new float[] { (float)Math.random(), (float)Math.random() });
+            A.setQuick(i, new float[] { (float) Math.random(), (float) Math.random() });
         }
 
         for (int i = 0; i < SIZE; i++) {
-            B.setQuick(i, new float[] { (float)Math.random(), (float)Math.random() });
+            B.setQuick(i, new float[] { (float) Math.random(), (float) Math.random() });
         }
     }
 
@@ -159,7 +159,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testAssignFloatArray() {
         float[] expected = new float[2 * SIZE];
         for (int i = 0; i < 2 * SIZE; i++) {
-            expected[i] = (float)Math.random();
+            expected[i] = (float) Math.random();
         }
         A.assign(expected);
         for (int i = 0; i < SIZE; i++) {
@@ -171,8 +171,8 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     }
 
     public void testAssignFloatFloat() {
-        float re = (float)Math.random();
-        float im = (float)Math.random();
+        float re = (float) Math.random();
+        float im = (float) Math.random();
         A.assign(re, im);
         for (int i = 0; i < SIZE; i++) {
             float[] elem = A.getQuick(i);
@@ -295,7 +295,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
             assertEquals(elem[1], array[2 * i + 1], TOL);
         }
     }
-    
+
     public void testToArrayFloatArray() {
         float[] array = new float[2 * SIZE];
         A.toArray(array);
@@ -305,21 +305,21 @@ public abstract class FComplexMatrix1DTest extends TestCase {
             assertEquals(elem[1], array[2 * i + 1], TOL);
         }
     }
-    
+
     public void testViewFlip() {
         FComplexMatrix1D B = A.viewFlip();
         for (int i = 0; i < SIZE; i++) {
             assertEquals(A.getQuick(SIZE - 1 - i), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testViewPart() {
         FComplexMatrix1D B = A.viewPart(SIZE / 2, SIZE / 3);
         for (int i = 0; i < SIZE / 3; i++) {
             assertEquals(A.getQuick(SIZE / 2 + i), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testViewSelectionComplexProcedure() {
         FComplexMatrix1D B = A.viewSelection(new FComplexProcedure() {
             public boolean apply(float[] element) {
@@ -337,15 +337,15 @@ public abstract class FComplexMatrix1DTest extends TestCase {
             }
         }
     }
-    
+
     public void testViewSelectionIntArray() {
-        int[] indexes = new int[] {SIZE / 6, SIZE / 5, SIZE / 4, SIZE / 3, SIZE / 2};
+        int[] indexes = new int[] { SIZE / 6, SIZE / 5, SIZE / 4, SIZE / 3, SIZE / 2 };
         FComplexMatrix1D B = A.viewSelection(indexes);
         for (int i = 0; i < indexes.length; i++) {
             assertEquals(A.getQuick(indexes[i]), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testViewStrides() {
         int stride = 3;
         FComplexMatrix1D B = A.viewStrides(stride);
@@ -353,7 +353,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
             assertEquals(A.getQuick(i * stride), B.getQuick(i), TOL);
         }
     }
-    
+
     public void testZDotProductComplexMatrix1D() {
         float[] actual = A.zDotProduct(B);
         float[] expected = new float[2];
@@ -362,7 +362,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     public void testZDotProductComplexMatrix1DIntInt() {
         float[] actual = A.zDotProduct(B, 5, B.size() - 10);
         float[] expected = new float[2];
@@ -371,7 +371,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     public void testZDotProductComplexMatrix1DIntIntIntArrayList() {
         IntArrayList indexList = new IntArrayList();
         ArrayList<float[]> valueList = new ArrayList<float[]>();
@@ -383,7 +383,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     public void testZSum() {
         float[] actual = A.zSum();
         float[] expected = new float[2];
@@ -392,13 +392,11 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         }
         assertEquals(expected, actual, TOL);
     }
-    
+
     protected void assertEquals(float[] expected, float[] actual, float tol) {
         for (int i = 0; i < actual.length; i++) {
             assertEquals(expected[i], actual[i], tol);
         }
     }
 
-
-    
 }

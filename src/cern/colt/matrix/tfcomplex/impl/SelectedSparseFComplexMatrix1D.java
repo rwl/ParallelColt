@@ -17,8 +17,8 @@ import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix1D;
 
 /**
- * Selection view on sparse 1-d matrices holding <tt>complex</tt> elements.
- * Note that this implementation uses ConcurrentHashMap
+ * Selection view on sparse 1-d matrices holding <tt>complex</tt> elements. Note
+ * that this implementation uses ConcurrentHashMap
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * @version 1.0, 12/10/2007
@@ -88,7 +88,6 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
-    
 
     /**
      * Returns the matrix cell value at coordinate <tt>index</tt>.
@@ -112,8 +111,7 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedSparseFComplexMatrix1D) {
@@ -143,9 +141,9 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseComplexMatrix1D</tt> the new matrix
-     * must also be of type <tt>DenseComplexMatrix1D</tt>. In general, the
-     * new matrix should have internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseComplexMatrix1D</tt> the new matrix must
+     * also be of type <tt>DenseComplexMatrix1D</tt>. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -180,8 +178,7 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -203,8 +200,7 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified
-     * value.
+     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes

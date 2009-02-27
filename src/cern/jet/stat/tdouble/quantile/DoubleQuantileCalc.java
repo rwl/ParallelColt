@@ -39,10 +39,9 @@ class DoubleQuantileCalc extends Object {
     }
 
     /**
-     * Returns the smallest <code>long &gt;= value</code>.
-     * <dt>Examples: <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method
-     * is safer than using (long) Math.ceil(value), because of possible rounding
-     * error.
+     * Returns the smallest <code>long &gt;= value</code>. <dt>Examples:
+     * <code>1.0 -> 1, 1.2 -> 2, 1.9 -> 2</code>. This method is safer than
+     * using (long) Math.ceil(value), because of possible rounding error.
      */
     public static long ceiling(double value) {
         return Math.round(Math.ceil(value));
@@ -63,16 +62,16 @@ class DoubleQuantileCalc extends Object {
      *            (e.g <tt>10^6</tt>).
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To avoid probabilistic answers, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To avoid probabilistic answers, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @param samplingRate
      *            a <tt>double[1]</tt> where the sampling rate is to be filled
      *            in.
@@ -101,8 +100,8 @@ class DoubleQuantileCalc extends Object {
      *            determined.
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      */
     protected static long[] known_N_compute_B_and_K_quick(long N, double epsilon) {
         if (epsilon <= 0.0) {
@@ -205,16 +204,16 @@ class DoubleQuantileCalc extends Object {
      *            computed (e.g 10^6).
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact result, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact result, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To avoid probabilistic answers, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To avoid probabilistic answers, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @param samplingRate
      *            a <tt>double[1]</tt> where the sampling rate is to be filled
      *            in.
@@ -379,16 +378,16 @@ class DoubleQuantileCalc extends Object {
      * 
      * @param epsilon
      *            the approximation error which is guaranteed not to be exceeded
-     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>).
-     *            To get exact results, set <tt>epsilon=0.0</tt>;
+     *            (e.g. <tt>0.001</tt>) (<tt>0 &lt;= epsilon &lt;= 1</tt>). To
+     *            get exact results, set <tt>epsilon=0.0</tt>;
      * @param delta
      *            the probability that the approximation error is more than than
-     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>).
-     *            To get exact results, set <tt>delta=0.0</tt>.
+     *            epsilon (e.g. <tt>0.0001</tt>) (<tt>0 &lt;= delta &lt;= 1</tt>
+     *            ). To get exact results, set <tt>delta=0.0</tt>.
      * @param quantiles
-     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (<tt>quantiles &gt;= 1</tt>).
-     *            If unknown in advance, set this number large, e.g.
-     *            <tt>quantiles &gt;= 10000</tt>.
+     *            the number of quantiles to be computed (e.g. <tt>100</tt>) (
+     *            <tt>quantiles &gt;= 1</tt>). If unknown in advance, set this
+     *            number large, e.g. <tt>quantiles &gt;= 10000</tt>.
      * @return <tt>long[3]</tt> - <tt>long[0]</tt>=the number of buffers,
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>long[2]</tt>=the tree height where sampling shall start.

@@ -22,14 +22,14 @@ package cern.jet.random.tdouble.engine;
  * <tt>float</tt>'s and <tt>double</tt>'s in the open unit intervals
  * <tt>(0.0f,1.0f)</tt> and <tt>(0.0,1.0)</tt>, respectively.
  * <p>
- * Subclasses need to override one single method only: <tt>nextInt()</tt>.
- * All other methods generating different data types or ranges are usually
- * layered upon <tt>nextInt()</tt>. <tt>long</tt>'s are formed by
- * concatenating two 32 bit <tt>int</tt>'s. <tt>float</tt>'s are formed by
- * dividing the interval <tt>[0.0f,1.0f]</tt> into 2<sup>32</sup> sub
- * intervals, then randomly choosing one subinterval. <tt>double</tt>'s are
- * formed by dividing the interval <tt>[0.0,1.0]</tt> into 2<sup>64</sup>
- * sub intervals, then randomly choosing one subinterval.
+ * Subclasses need to override one single method only: <tt>nextInt()</tt>. All
+ * other methods generating different data types or ranges are usually layered
+ * upon <tt>nextInt()</tt>. <tt>long</tt>'s are formed by concatenating two 32
+ * bit <tt>int</tt>'s. <tt>float</tt>'s are formed by dividing the interval
+ * <tt>[0.0f,1.0f]</tt> into 2<sup>32</sup> sub intervals, then randomly
+ * choosing one subinterval. <tt>double</tt>'s are formed by dividing the
+ * interval <tt>[0.0,1.0]</tt> into 2<sup>64</sup> sub intervals, then randomly
+ * choosing one subinterval.
  * <p>
  * Note that this implementation is <b>not synchronized</b>.
  * 
@@ -51,18 +51,18 @@ public abstract class DoubleRandomEngine extends cern.colt.PersistentObject impl
     }
 
     /**
-     * Equivalent to <tt>raw()</tt>. This has the effect that random engines
-     * can now be used as function objects, returning a random number upon
-     * function evaluation.
+     * Equivalent to <tt>raw()</tt>. This has the effect that random engines can
+     * now be used as function objects, returning a random number upon function
+     * evaluation.
      */
     public double apply(double dummy) {
         return raw();
     }
 
     /**
-     * Equivalent to <tt>nextInt()</tt>. This has the effect that random
-     * engines can now be used as function objects, returning a random number
-     * upon function evaluation.
+     * Equivalent to <tt>nextInt()</tt>. This has the effect that random engines
+     * can now be used as function objects, returning a random number upon
+     * function evaluation.
      */
     public int apply(int dummy) {
         return nextInt();

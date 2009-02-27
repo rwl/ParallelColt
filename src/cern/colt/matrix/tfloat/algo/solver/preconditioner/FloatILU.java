@@ -39,9 +39,9 @@ public class FloatILU implements FloatPreconditioner {
      * Temporary vector for solving the factorised system
      */
     private final FloatMatrix1D y;
-    
+
     private int[] diagind;
-    
+
     /**
      * Sets up the ILU preconditioner
      * 
@@ -130,7 +130,7 @@ public class FloatILU implements FloatPreconditioner {
 
         return diagind;
     }
-    
+
     private FloatMatrix1D lowerUnitSolve(FloatMatrix1D b, FloatMatrix1D x) {
         float[] bd = ((DenseFloatMatrix1D) b).elements();
         float[] xd = ((DenseFloatMatrix1D) x).elements();
@@ -150,7 +150,7 @@ public class FloatILU implements FloatPreconditioner {
 
         return x;
     }
-    
+
     private FloatMatrix1D loverUnitTransSolve(FloatMatrix1D b, FloatMatrix1D x) {
         x.assign(b);
         float[] xd = ((DenseFloatMatrix1D) x).elements();
@@ -168,8 +168,7 @@ public class FloatILU implements FloatPreconditioner {
 
         return x;
     }
-    
-    
+
     private FloatMatrix1D upperSolve(FloatMatrix1D b, FloatMatrix1D x) {
         float[] bd = ((DenseFloatMatrix1D) b).elements();
         float[] xd = ((DenseFloatMatrix1D) x).elements();
@@ -197,7 +196,7 @@ public class FloatILU implements FloatPreconditioner {
         int[] rowptr = LU.getRowPointers();
         float[] data = LU.getValues().elements();
         int rows = LU.rows();
-        
+
         for (int i = 0; i < rows; ++i) {
 
             // Solve for the current entry
@@ -211,6 +210,5 @@ public class FloatILU implements FloatPreconditioner {
 
         return x;
     }
-    
-    
+
 }

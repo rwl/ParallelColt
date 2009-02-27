@@ -34,7 +34,6 @@
 
 package edu.emory.mathcs.jtransforms.fft;
 
-import java.util.Arrays;
 import java.util.concurrent.Future;
 
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -45,13 +44,13 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * This is a parallel implementation of split-radix and mixed-radix algorithms
  * optimized for SMP systems. <br>
  * <br>
- * This code is derived from General Purpose FFT Package written by Takuya Ooura
- * (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
+ * Part of the code is derived from General Purpose FFT Package written by
+ * Takuya Ooura (http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 
  */
-public class FloatFFT_3D {
+public strictfp class FloatFFT_3D {
 
     private int slices;
 
@@ -141,7 +140,7 @@ public class FloatFFT_3D {
      * columns and rowStride = 2 * columns. Complex number is stored as two
      * float values in sequence: the real and imaginary part, i.e. the input
      * array must be of size slices*rows*2*columns. The physical layout of the
-     * input data has to be as follows:<br>
+     * input data is as follows:
      * 
      * <pre>
      * a[k1*sliceStride + k2*rowStride + 2*k3] = Re[k1][k2][k3], 
@@ -208,9 +207,11 @@ public class FloatFFT_3D {
                     });
                 }
                 ConcurrencyUtils.waitForCompletion(futures);
+
                 for (int l = 0; l < nthreads; l++) {
                     final int firstSlice = l * p;
                     final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * rows];
@@ -242,6 +243,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstRow = l * p;
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * slices];
@@ -329,7 +331,7 @@ public class FloatFFT_3D {
      * <code>a</code>. The data is stored in 3D array. Complex data is
      * represented by 2 float values in sequence: the real and imaginary part,
      * i.e. the input array must be of size slices by rows by 2*columns. The
-     * physical layout of the input data has to be as follows:<br>
+     * physical layout of the input data is as follows:
      * 
      * <pre>
      * a[k1][k2][2*k3] = Re[k1][k2][k3], 
@@ -397,6 +399,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstSlice = l * p;
                     final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * rows];
@@ -425,6 +428,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstRow = l * p;
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * slices];
@@ -504,7 +508,7 @@ public class FloatFFT_3D {
      * columns and rowStride = 2 * columns. Complex number is stored as two
      * float values in sequence: the real and imaginary part, i.e. the input
      * array must be of size slices*rows*2*columns. The physical layout of the
-     * input data has to be as follows:<br>
+     * input data is as follows:
      * 
      * <pre>
      * a[k1*sliceStride + k2*rowStride + 2*k3] = Re[k1][k2][k3], 
@@ -561,6 +565,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstSlice = l * p;
                     final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             for (int s = firstSlice; s < lastSlice; s++) {
@@ -577,6 +582,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstSlice = l * p;
                     final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * rows];
@@ -608,6 +614,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstRow = l * p;
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * slices];
@@ -693,7 +700,7 @@ public class FloatFFT_3D {
      * <code>a</code>. The data is stored in a 3D array. Complex data is
      * represented by 2 float values in sequence: the real and imaginary part,
      * i.e. the input array must be of size slices by rows by 2*columns. The
-     * physical layout of the input data has to be as follows:<br>
+     * physical layout of the input data is as follows:
      * 
      * <pre>
      * a[k1][k2][2*k3] = Re[k1][k2][k3], 
@@ -746,6 +753,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstSlice = l * p;
                     final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             for (int s = firstSlice; s < lastSlice; s++) {
@@ -761,6 +769,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstSlice = l * p;
                     final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * rows];
@@ -789,6 +798,7 @@ public class FloatFFT_3D {
                 for (int l = 0; l < nthreads; l++) {
                     final int firstRow = l * p;
                     final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+
                     futures[l] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             float[] temp = new float[2 * slices];
@@ -865,7 +875,7 @@ public class FloatFFT_3D {
      * i.e. element (i,j,k) of 3-d array x[slices][rows][2*columns] is stored in
      * a[i*sliceStride + j*rowStride + k], where sliceStride = rows * 2 *
      * columns and rowStride = 2 * columns. The physical layout of the output
-     * data is as follows:<br>
+     * data is as follows:
      * 
      * <pre>
      * a[k1*sliceStride + k2*rowStride + 2*k3] = Re[k1][k2][k3]
@@ -956,7 +966,7 @@ public class FloatFFT_3D {
      * Computes 3D forward DFT of real data leaving the result in <code>a</code>
      * . This method only works when the sizes of all three dimensions are
      * power-of-two numbers. The data is stored in a 3D array. The physical
-     * layout of the output data is as follows:<br>
+     * layout of the output data is as follows:
      * 
      * <pre>
      * a[k1][k2][2*k3] = Re[k1][k2][k3]
@@ -1147,7 +1157,7 @@ public class FloatFFT_3D {
      * i.e. element (i,j,k) of 3-d array x[slices][rows][2*columns] is stored in
      * a[i*sliceStride + j*rowStride + k], where sliceStride = rows * 2 *
      * columns and rowStride = 2 * columns. The physical layout of the input
-     * data has to be as follows:<br>
+     * data has to be as follows:
      * 
      * <pre>
      * a[k1*sliceStride + k2*rowStride + 2*k3] = Re[k1][k2][k3]
@@ -1239,7 +1249,7 @@ public class FloatFFT_3D {
      * Computes 3D inverse DFT of real data leaving the result in <code>a</code>
      * . This method only works when the sizes of all three dimensions are
      * power-of-two numbers. The data is stored in a 3D array. The physical
-     * layout of the input data has to be as follows:<br>
+     * layout of the input data has to be as follows:
      * 
      * <pre>
      * a[k1][k2][2*k3] = Re[k1][k2][k3]
@@ -1423,6 +1433,8 @@ public class FloatFFT_3D {
         }
     }
 
+    /* -------- child routines -------- */
+
     private void mixedRadixRealForwardFull(final float[][][] a) {
         float[] temp = new float[2 * rows];
         int ldimn2 = rows / 2 + 1;
@@ -1441,6 +1453,7 @@ public class FloatFFT_3D {
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
                 final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int s = firstSlice; s < lastSlice; s++) {
@@ -1456,6 +1469,7 @@ public class FloatFFT_3D {
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
                 final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] temp = new float[2 * rows];
@@ -1484,7 +1498,8 @@ public class FloatFFT_3D {
             p = ldimn2 / nthreads;
             for (int l = 0; l < nthreads; l++) {
                 final int firstRow = l * p;
-                final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                final int lastRow = (l == (nthreads - 1)) ? ldimn2 : firstRow + p;
+
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] temp = new float[2 * slices];
@@ -1513,6 +1528,7 @@ public class FloatFFT_3D {
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
                 final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
 
@@ -1610,6 +1626,7 @@ public class FloatFFT_3D {
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
                 final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int s = firstSlice; s < lastSlice; s++) {
@@ -1625,6 +1642,7 @@ public class FloatFFT_3D {
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
                 final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] temp = new float[2 * rows];
@@ -1653,7 +1671,7 @@ public class FloatFFT_3D {
             p = ldimn2 / nthreads;
             for (int l = 0; l < nthreads; l++) {
                 final int firstRow = l * p;
-                final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                final int lastRow = (l == (nthreads - 1)) ? ldimn2 : firstRow + p;
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] temp = new float[2 * slices];
@@ -1682,6 +1700,7 @@ public class FloatFFT_3D {
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
                 final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
 
@@ -1774,31 +1793,66 @@ public class FloatFFT_3D {
 
         final int twoSliceStride = 2 * sliceStride;
         final int twoRowStride = 2 * rowStride;
-
-        for (int i = (slices * rows - 1) * columns; i >= columns; i -= columns) {
-            System.arraycopy(a, i, a, 2 * i, columns);
-            Arrays.fill(a, i, i + columns, 0);
-        }
-
+        int n1d2 = slices / 2;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && useThreads && (slices >= nthreads) && (columns >= nthreads) && (ldimn2 >= nthreads)) {
+        if ((nthreads > 1) && useThreads && (n1d2 >= nthreads) && (columns >= nthreads) && (ldimn2 >= nthreads)) {
             Future<?>[] futures = new Future[nthreads];
-            int p = slices / nthreads;
+            int p = n1d2 / nthreads;
             for (int l = 0; l < nthreads; l++) {
-                final int firstSlice = l * p;
-                final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                final int firstSlice = slices - 1 - l * p;
+                final int lastSlice = (l == (nthreads - 1)) ? n1d2 + 1 : firstSlice - p;
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int s = firstSlice; s < lastSlice; s++) {
-                            int idx = s * twoSliceStride;
-                            for (int r = 0; r < rows; r++) {
-                                fftColumns.realForwardFull(a, idx + r * twoRowStride);
+                        float[] temp = new float[twon3];
+                        for (int s = firstSlice; s >= lastSlice; s--) {
+                            int idx1 = s * sliceStride;
+                            int idx2 = s * twoSliceStride;
+                            for (int r = rows - 1; r >= 0; r--) {
+                                System.arraycopy(a, idx1 + r * rowStride, temp, 0, columns);
+                                fftColumns.realForwardFull(temp);
+                                System.arraycopy(temp, 0, a, idx2 + r * twoRowStride, twon3);
                             }
                         }
                     }
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
+
+            final float[][][] temp2 = new float[n1d2 + 1][rows][twon3];
+
+            for (int l = 0; l < nthreads; l++) {
+                final int firstSlice = l * p;
+                final int lastSlice = (l == (nthreads - 1)) ? n1d2 + 1 : firstSlice + p;
+                futures[l] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            int idx1 = s * sliceStride;
+                            for (int r = 0; r < rows; r++) {
+                                System.arraycopy(a, idx1 + r * rowStride, temp2[s][r], 0, columns);
+                                fftColumns.realForwardFull(temp2[s][r]);
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+
+            for (int l = 0; l < nthreads; l++) {
+                final int firstSlice = l * p;
+                final int lastSlice = (l == (nthreads - 1)) ? n1d2 + 1 : firstSlice + p;
+                futures[l] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            int idx1 = s * twoSliceStride;
+                            for (int r = 0; r < rows; r++) {
+                                System.arraycopy(temp2[s][r], 0, a, idx1 + r * twoRowStride, twon3);
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+
             p = slices / nthreads;
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
@@ -1834,7 +1888,7 @@ public class FloatFFT_3D {
             p = ldimn2 / nthreads;
             for (int l = 0; l < nthreads; l++) {
                 final int firstRow = l * p;
-                final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                final int lastRow = (l == (nthreads - 1)) ? ldimn2 : firstRow + p;
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] temp = new float[2 * slices];
@@ -1893,10 +1947,13 @@ public class FloatFFT_3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
 
-            for (int s = 0; s < slices; s++) {
-                int idx = s * twoSliceStride;
-                for (int r = 0; r < rows; r++) {
-                    fftColumns.realForwardFull(a, idx + r * twoRowStride);
+            for (int s = slices - 1; s >= 0; s--) {
+                int idx1 = s * sliceStride;
+                int idx2 = s * twoSliceStride;
+                for (int r = rows - 1; r >= 0; r--) {
+                    System.arraycopy(a, idx1 + r * rowStride, temp, 0, columns);
+                    fftColumns.realForwardFull(temp);
+                    System.arraycopy(temp, 0, a, idx2 + r * twoRowStride, twon3);
                 }
             }
 
@@ -1962,6 +2019,7 @@ public class FloatFFT_3D {
                     }
                 }
             }
+
         }
     }
 
@@ -1978,25 +2036,60 @@ public class FloatFFT_3D {
 
         final int twoSliceStride = 2 * sliceStride;
         final int twoRowStride = 2 * rowStride;
-
-        for (int i = (slices * rows - 1) * columns; i >= columns; i -= columns) {
-            System.arraycopy(a, i, a, 2 * i, columns);
-            Arrays.fill(a, i, i + columns, 0);
-        }
+        int n1d2 = slices / 2;
 
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && useThreads && (slices / 2 >= nthreads) && (columns >= nthreads) && (ldimn2 >= nthreads)) {
+        if ((nthreads > 1) && useThreads && (n1d2 >= nthreads) && (columns >= nthreads) && (ldimn2 >= nthreads)) {
             Future<?>[] futures = new Future[nthreads];
-            int p = slices / nthreads;
+            int p = n1d2 / nthreads;
+            for (int l = 0; l < nthreads; l++) {
+                final int firstSlice = slices - 1 - l * p;
+                final int lastSlice = (l == (nthreads - 1)) ? n1d2 + 1 : firstSlice - p;
+                futures[l] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        float[] temp = new float[twon3];
+                        for (int s = firstSlice; s >= lastSlice; s--) {
+                            int idx1 = s * sliceStride;
+                            int idx2 = s * twoSliceStride;
+                            for (int r = rows - 1; r >= 0; r--) {
+                                System.arraycopy(a, idx1 + r * rowStride, temp, 0, columns);
+                                fftColumns.realInverseFull(temp, scale);
+                                System.arraycopy(temp, 0, a, idx2 + r * twoRowStride, twon3);
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+
+            final float[][][] temp2 = new float[n1d2 + 1][rows][twon3];
+
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
-                final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;
+                final int lastSlice = (l == (nthreads - 1)) ? n1d2 + 1 : firstSlice + p;
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         for (int s = firstSlice; s < lastSlice; s++) {
-                            int idx = s * twoSliceStride;
+                            int idx1 = s * sliceStride;
                             for (int r = 0; r < rows; r++) {
-                                fftColumns.realInverseFull(a, idx + r * twoRowStride, scale);
+                                System.arraycopy(a, idx1 + r * rowStride, temp2[s][r], 0, columns);
+                                fftColumns.realInverseFull(temp2[s][r], scale);
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+
+            for (int l = 0; l < nthreads; l++) {
+                final int firstSlice = l * p;
+                final int lastSlice = (l == (nthreads - 1)) ? n1d2 + 1 : firstSlice + p;
+                futures[l] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            int idx1 = s * twoSliceStride;
+                            for (int r = 0; r < rows; r++) {
+                                System.arraycopy(temp2[s][r], 0, a, idx1 + r * twoRowStride, twon3);
                             }
                         }
                     }
@@ -2039,7 +2132,7 @@ public class FloatFFT_3D {
             p = ldimn2 / nthreads;
             for (int l = 0; l < nthreads; l++) {
                 final int firstRow = l * p;
-                final int lastRow = (l == (nthreads - 1)) ? rows : firstRow + p;
+                final int lastRow = (l == (nthreads - 1)) ? ldimn2 : firstRow + p;
                 futures[l] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] temp = new float[2 * slices];
@@ -2067,6 +2160,7 @@ public class FloatFFT_3D {
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
+
             p = slices / nthreads;
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
@@ -2098,10 +2192,13 @@ public class FloatFFT_3D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
 
-            for (int s = 0; s < slices; s++) {
-                int idx = s * twoSliceStride;
-                for (int r = 0; r < rows; r++) {
-                    fftColumns.realInverseFull(a, idx + r * twoRowStride, scale);
+            for (int s = slices - 1; s >= 0; s--) {
+                int idx1 = s * sliceStride;
+                int idx2 = s * twoSliceStride;
+                for (int r = rows - 1; r >= 0; r--) {
+                    System.arraycopy(a, idx1 + r * rowStride, temp, 0, columns);
+                    fftColumns.realInverseFull(temp, scale);
+                    System.arraycopy(temp, 0, a, idx2 + r * twoRowStride, twon3);
                 }
             }
 
@@ -2269,9 +2366,9 @@ public class FloatFFT_3D {
                     }
                 }
                 if (columns > 4) {
-                    for (int k = 0; k < columns; k += 8) {
+                    for (int c = 0; c < columns; c += 8) {
                         for (int r = 0; r < rows; r++) {
-                            idx1 = idx0 + r * rowStride + k;
+                            idx1 = idx0 + r * rowStride + c;
                             idx2 = 2 * r;
                             idx3 = 2 * rows + 2 * r;
                             idx4 = idx3 + 2 * rows;
@@ -2290,7 +2387,7 @@ public class FloatFFT_3D {
                         fftRows.complexInverse(t, 4 * rows, scale);
                         fftRows.complexInverse(t, 6 * rows, scale);
                         for (int r = 0; r < rows; r++) {
-                            idx1 = idx0 + r * rowStride + k;
+                            idx1 = idx0 + r * rowStride + c;
                             idx2 = 2 * r;
                             idx3 = 2 * rows + 2 * r;
                             idx4 = idx3 + 2 * rows;
@@ -3184,16 +3281,16 @@ public class FloatFFT_3D {
     }
 
     private void xdft3da_subth1(final int icr, final int isgn, final float[] a, final boolean scale) {
-
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
-        int nt = 8 * rows;
+        int nt, i;
+        final int nthreads = Math.min(ConcurrencyUtils.getNumberOfThreads(), slices);
+        nt = 8 * rows;
         if (columns == 4) {
             nt >>= 1;
         } else if (columns < 4) {
             nt >>= 2;
         }
         Future<?>[] futures = new Future[nthreads];
-        for (int i = 0; i < nthreads; i++) {
+        for (i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
             futures[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -3382,15 +3479,17 @@ public class FloatFFT_3D {
     }
 
     private void xdft3da_subth2(final int icr, final int isgn, final float[] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
-        int nt = 8 * rows;
+        int nt, i;
+
+        final int nthreads = Math.min(ConcurrencyUtils.getNumberOfThreads(), slices);
+        nt = 8 * rows;
         if (columns == 4) {
             nt >>= 1;
         } else if (columns < 4) {
             nt >>= 2;
         }
         Future<?>[] futures = new Future[nthreads];
-        for (int i = 0; i < nthreads; i++) {
+        for (i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
             futures[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -3578,15 +3677,17 @@ public class FloatFFT_3D {
     }
 
     private void xdft3da_subth1(final int icr, final int isgn, final float[][][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
-        int nt = 8 * rows;
+        int nt, i;
+
+        final int nthreads = Math.min(ConcurrencyUtils.getNumberOfThreads(), slices);
+        nt = 8 * rows;
         if (columns == 4) {
             nt >>= 1;
         } else if (columns < 4) {
             nt >>= 2;
         }
         Future<?>[] futures = new Future[nthreads];
-        for (int i = 0; i < nthreads; i++) {
+        for (i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
             futures[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -3761,15 +3862,17 @@ public class FloatFFT_3D {
     }
 
     private void xdft3da_subth2(final int icr, final int isgn, final float[][][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
-        int nt = 8 * rows;
+        int nt, i;
+
+        final int nthreads = Math.min(ConcurrencyUtils.getNumberOfThreads(), slices);
+        nt = 8 * rows;
         if (columns == 4) {
             nt >>= 1;
         } else if (columns < 4) {
             nt >>= 2;
         }
         Future<?>[] futures = new Future[nthreads];
-        for (int i = 0; i < nthreads; i++) {
+        for (i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
             futures[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -3943,15 +4046,17 @@ public class FloatFFT_3D {
     }
 
     private void cdft3db_subth(final int isgn, final float[] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
-        int nt = 8 * slices;
+        int nt, i;
+
+        final int nthreads = Math.min(ConcurrencyUtils.getNumberOfThreads(), rows);
+        nt = 8 * slices;
         if (columns == 4) {
             nt >>= 1;
         } else if (columns < 4) {
             nt >>= 2;
         }
         Future<?>[] futures = new Future[nthreads];
-        for (int i = 0; i < nthreads; i++) {
+        for (i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
             futures[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -4134,15 +4239,17 @@ public class FloatFFT_3D {
     }
 
     private void cdft3db_subth(final int isgn, final float[][][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
-        int nt = 8 * slices;
+        int nt, i;
+
+        final int nthreads = Math.min(ConcurrencyUtils.getNumberOfThreads(), rows);
+        nt = 8 * slices;
         if (columns == 4) {
             nt >>= 1;
         } else if (columns < 4) {
             nt >>= 2;
         }
         Future<?>[] futures = new Future[nthreads];
-        for (int i = 0; i < nthreads; i++) {
+        for (i = 0; i < nthreads; i++) {
             final int n0 = i;
             final int startt = nt * i;
             futures[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -4744,7 +4851,6 @@ public class FloatFFT_3D {
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
-
             for (int l = 0; l < nthreads; l++) {
                 final int firstSlice = l * p;
                 final int lastSlice = (l == (nthreads - 1)) ? slices : firstSlice + p;

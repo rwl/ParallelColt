@@ -2,15 +2,15 @@ package hep.aida.tfloat.bin;
 
 /**
  * Abstract base class for all arbitrary-dimensional bins consumes
- * <tt>float</tt> elements. First see the <a
- * href="package-summary.html">package summary</a> and javadoc <a
- * href="package-tree.html">tree view</a> to get the broad picture.
+ * <tt>float</tt> elements. First see the <a href="package-summary.html">package
+ * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get the
+ * broad picture.
  * <p>
  * This class is fully thread safe (all public methods are synchronized). Thus,
  * you can have one or more threads adding to the bin as well as one or more
- * threads reading and viewing the statistics of the bin <i>while it is filled</i>.
- * For high performance, add data in large chunks (buffers) via method
- * <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
+ * threads reading and viewing the statistics of the bin <i>while it is
+ * filled</i>. For high performance, add data in large chunks (buffers) via
+ * method <tt>addAllOf</tt> rather than piecewise via method <tt>add</tt>.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 0.9, 03-Jul-99
@@ -36,9 +36,8 @@ public abstract class AbstractFloatBin extends cern.colt.PersistentObject {
      * example, the center of gravity.
      * 
      * The <i>real</i> absolute center can be obtained as follow:
-     * <tt>partition(i).min(j) * bin(j).offset() + bin(j).center(i)</tt>,
-     * where <tt>i</tt> is the dimension. and <tt>j</tt> is the index of
-     * this bin.
+     * <tt>partition(i).min(j) * bin(j).offset() + bin(j).center(i)</tt>, where
+     * <tt>i</tt> is the dimension. and <tt>j</tt> is the index of this bin.
      * 
      * <p>
      * This default implementation always returns 0.5.

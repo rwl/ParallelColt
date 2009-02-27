@@ -10,8 +10,8 @@ package cern.colt.list;
 
 /**
  * Abstract base class for resizable collections holding objects or primitive
- * data types such as <code>int</code>, <code>float</code>, etc. First see
- * the <a href="package-summary.html">package summary</a> and javadoc <a
+ * data types such as <code>int</code>, <code>float</code>, etc. First see the
+ * <a href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Note that this implementation is not synchronized.</b>
@@ -56,8 +56,8 @@ public abstract class AbstractCollection extends cern.colt.PersistentObject {
     public abstract int size();
 
     /**
-     * Returns a <code>java.util.ArrayList</code> containing all the elements
-     * in the receiver.
+     * Returns a <code>java.util.ArrayList</code> containing all the elements in
+     * the receiver.
      */
     public abstract java.util.ArrayList toList();
 

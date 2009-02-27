@@ -1003,11 +1003,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
     public DoubleMatrix2D copy() {
         return like().assign(this);
     }
-   
-         
-    
 
-    
     /**
      * Returns the elements of this matrix.
      * 
@@ -1049,7 +1045,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
 
         return cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.equals(this, (DoubleMatrix2D) obj);
     }
-   
+
     /**
      * Assigns the result of a function to each <i>non-zero</i> cell;
      * <tt>x[row,col] = function(x[row,col])</tt>. Use this method for fast
@@ -1134,11 +1130,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
     protected DoubleMatrix2D getContent() {
         return this;
     }
-    
-    
-   
-    
-    
+
     /**
      * Fills the coordinates and values of cells having negative values into the
      * specified lists. Fills into the lists, starting at index 0. After this
@@ -1283,10 +1275,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
     protected boolean haveSharedCellsRaw(DoubleMatrix2D other) {
         return false;
     }
-               
-    
-    
-    
+
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of rows and columns. For example,
@@ -1517,26 +1506,25 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
         }
         return new double[] { minValue, rowLocation, columnLocation };
     }
-    
-    /**
-	 * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
-	 * If the matrix contains negative elements then all the values are shifted to
-	 * ensure non-negativity.
-	 */
-	public void normalize() {
-		double min = getMinLocation()[0];
-		if (min < 0) {
-			assign(DoubleFunctions.minus(min));
-		}
-		if (getMaxLocation()[0] == 0) {
-			assign(1.0 / size());
-		} else {
-			double sumScaleFactor = zSum();
-			sumScaleFactor = 1.0 / sumScaleFactor;
-			assign(DoubleFunctions.mult(sumScaleFactor));
-		}
-	}
 
+    /**
+     * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
+     * If the matrix contains negative elements then all the values are shifted
+     * to ensure non-negativity.
+     */
+    public void normalize() {
+        double min = getMinLocation()[0];
+        if (min < 0) {
+            assign(DoubleFunctions.minus(min));
+        }
+        if (getMaxLocation()[0] == 0) {
+            assign(1.0 / size());
+        } else {
+            double sumScaleFactor = zSum();
+            sumScaleFactor = 1.0 / sumScaleFactor;
+            assign(DoubleFunctions.mult(sumScaleFactor));
+        }
+    }
 
     /**
      * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
@@ -1557,7 +1545,6 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
             throw new IndexOutOfBoundsException("row:" + row + ", column:" + column);
         setQuick(row, column, value);
     }
-    
 
     /**
      * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
@@ -1690,7 +1677,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
     public DoubleMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
-        int viewZero = (int)index(0, column);
+        int viewZero = (int) index(0, column);
         int viewStride = this.rowStride;
         return like1D(viewSize, viewZero, viewStride);
     }
@@ -1831,7 +1818,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
     public DoubleMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
-        int viewZero = (int)index(row, 0);
+        int viewZero = (int) index(row, 0);
         int viewStride = this.columnStride;
         return like1D(viewSize, viewZero, viewStride);
     }
@@ -2028,8 +2015,8 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * Sorts the matrix rows into ascending order, according to the <i>natural
      * ordering</i> of the matrix values in the given column. This sort is
      * guaranteed to be <i>stable</i>. For further information, see
-     * {@link cern.colt.matrix.tdouble.algo.DoubleSorting#sort(DoubleMatrix2D,int)}. For
-     * more advanced sorting functionality, see
+     * {@link cern.colt.matrix.tdouble.algo.DoubleSorting#sort(DoubleMatrix2D,int)}
+     * . For more advanced sorting functionality, see
      * {@link cern.colt.matrix.tdouble.algo.DoubleSorting}.
      * 
      * @return a new sorted vector (matrix) view.
@@ -2194,11 +2181,11 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
         if (transposeA)
             return viewDice().zMult(y, z, alpha, beta, false);
         final DoubleMatrix1D z_loc;
-        if (z == null) {            
+        if (z == null) {
             z_loc = new DenseDoubleMatrix1D(rows);
         } else {
             z_loc = z;
-        }        
+        }
         if (columns != y.size() || rows > z_loc.size())
             throw new IllegalArgumentException("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + z_loc.toStringShort());
 
@@ -2278,7 +2265,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);
         if (transposeB)
             return this.zMult(B.viewDice(), C, alpha, beta, transposeA, false);
-        
+
         final int m = rows;
         final int n = columns;
         final int p = B.columns;

@@ -169,7 +169,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     public float aggregate(final FloatFloatFunction aggr, final FloatFunction f) {
         if (size() == 0)
             return Float.NaN;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         float a = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -212,7 +212,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     public float aggregate(final FloatFloatFunction aggr, final FloatFunction f, final FloatProcedure cond) {
         if (size() == 0)
             return Float.NaN;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         float a = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -268,7 +268,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     public float aggregate(final FloatFloatFunction aggr, final FloatFunction f, final IntArrayList rowList, final IntArrayList columnList) {
         if (size() == 0)
             return Float.NaN;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         final int size = rowList.size();
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
@@ -308,8 +308,8 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         checkShape(other);
         if (size() == 0)
             return Float.NaN;
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)other.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
         final int rowStrideOther = other.rowStride();
         final int columnStrideOther = other.columnStride();
         final float[] otherElements = (float[]) other.elements();
@@ -362,7 +362,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
             if (multiplicator == 0)
                 return assign(0);
         }
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -422,7 +422,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     }
 
     public FloatMatrix2D assign(final FloatProcedure cond, final FloatFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -467,7 +467,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     }
 
     public FloatMatrix2D assign(final FloatProcedure cond, final float value) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -512,7 +512,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     }
 
     public FloatMatrix2D assign(final float value) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -554,7 +554,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         if (this.isNoView) {
             System.arraycopy(values, 0, this.elements, 0, values.length);
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = columns / np;
@@ -596,7 +596,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "columns()=" + rows());
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = rows / np;
@@ -660,8 +660,8 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
             other = (DenseColFloatMatrix2D) c;
         }
 
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
         final float[] otherElements = other.elements;
@@ -724,8 +724,8 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         DenseColFloatMatrix2D other = (DenseColFloatMatrix2D) y;
         checkShape(y);
         final float[] otherElements = other.elements;
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -973,8 +973,8 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
         final float[] otherElements = (float[]) other.elements();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride();
         final int rowStrideOther = other.rowStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1011,11 +1011,10 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-
     public int cardinality() {
         int cardinality = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
@@ -1299,7 +1298,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     }
 
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1348,8 +1347,8 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         }
         DenseFComplexMatrix2D C = new DenseFComplexMatrix2D(rows, columns);
         final float[] CElems = (float[]) ((DenseFComplexMatrix2D) C).elements();
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)C.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) C.index(0, 0);
         final int rowStrideOther = C.rowStride() / 2;
         final int columnStrideOther = 1;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1469,8 +1468,8 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         }
         DenseFComplexMatrix2D C = new DenseFComplexMatrix2D(rows, columns);
         final float[] CElems = (float[]) ((DenseFComplexMatrix2D) C).elements();
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)C.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) C.index(0, 0);
         final int rowStrideOther = C.rowStride() / 2;
         final int columnStrideOther = 1;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1585,7 +1584,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int c = 0; c < columns; c++) {
             for (int i = idx, r = 0; r < rows; r++) {
                 float value = elements[i];
@@ -1604,7 +1603,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int c = 0; c < columns; c++) {
             for (int i = idx, r = 0; r < rows; r++) {
                 float value = elements[i];
@@ -1623,7 +1622,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int c = 0; c < columns; c++) {
             for (int i = idx, r = 0; r < rows; r++) {
                 float value = elements[i];
@@ -1885,7 +1884,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     public float[] getMaxLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         float maxValue = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1962,7 +1961,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     public float[] getMinLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         float minValue = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -2043,7 +2042,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     public float[][] toArray() {
         final float[][] values = new float[rows][columns];
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = columns / np;
@@ -2083,8 +2082,8 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         if (isNoView == true) {
             System.arraycopy(elements, 0, (float[]) v.elements(), 0, size);
         } else {
-            final int zero = (int)index(0, 0);
-            final int zeroOther = (int)v.index(0);
+            final int zero = (int) index(0, 0);
+            final int zeroOther = (int) v.index(0);
             final int strideOther = v.stride();
             final float[] otherElements = (float[]) v.elements();
             int np = ConcurrencyUtils.getNumberOfThreads();
@@ -2190,7 +2189,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
         float sum = 0;
         if (elements == null)
             throw new InternalError();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -2248,7 +2247,7 @@ public class DenseColFloatMatrix2D extends FloatMatrix2D {
     }
 
     protected FloatMatrix1D like1D(int size, int zero, int stride) {
-        return new DenseFloatMatrix1D(size, this.elements, (int)zero, stride, true);
+        return new DenseFloatMatrix1D(size, this.elements, (int) zero, stride, true);
     }
 
     protected FloatMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {

@@ -10,8 +10,8 @@ package cern.colt.list;
 
 /**
  * Abstract base class for resizable lists holding objects or primitive data
- * types such as <code>int</code>, <code>float</code>, etc. First see the
- * <a href="package-summary.html">package summary</a> and javadoc <a
+ * types such as <code>int</code>, <code>float</code>, etc. First see the <a
+ * href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Note that this implementation is not synchronized.</b>
@@ -64,9 +64,9 @@ public abstract class AbstractList extends AbstractCollection {
     }
 
     /**
-     * Inserts <tt>length</tt> dummy elements before the specified position
-     * into the receiver. Shifts the element currently at that position (if any)
-     * and any subsequent elements to the right. <b>This method must set the new
+     * Inserts <tt>length</tt> dummy elements before the specified position into
+     * the receiver. Shifts the element currently at that position (if any) and
+     * any subsequent elements to the right. <b>This method must set the new
      * size to be <tt>size()+length</tt>.
      * 
      * @param index
@@ -92,7 +92,8 @@ public abstract class AbstractList extends AbstractCollection {
      * 
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>to!=from-1 || from&lt;0 || from&gt;to || to&gt;=size()</tt>.
+     *             <tt>to!=from-1 || from&lt;0 || from&gt;to || to&gt;=size()</tt>
+     *             .
      */
     protected static void checkRangeFromTo(int from, int to, int theSize) {
         if (to == from - 1)
@@ -155,7 +156,8 @@ public abstract class AbstractList extends AbstractCollection {
      *            the index of the last element (inclusive) to be sorted.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>.
+     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>
+     *             .
      */
     public abstract void mergeSortFromTo(int from, int to);
 
@@ -199,7 +201,8 @@ public abstract class AbstractList extends AbstractCollection {
      *            the index of the last element (inclusive) to be sorted.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>.
+     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>
+     *             .
      */
     public abstract void quickSortFromTo(int from, int to);
 
@@ -218,9 +221,9 @@ public abstract class AbstractList extends AbstractCollection {
 
     /**
      * Removes from the receiver all elements whose index is between
-     * <code>from</code>, inclusive and <code>to</code>, inclusive. Shifts
-     * any succeeding elements to the left (reduces their index). This call
-     * shortens the list by <tt>(to - from + 1)</tt> elements.
+     * <code>from</code>, inclusive and <code>to</code>, inclusive. Shifts any
+     * succeeding elements to the left (reduces their index). This call shortens
+     * the list by <tt>(to - from + 1)</tt> elements.
      * 
      * @param fromIndex
      *            index of first element to be removed.
@@ -228,7 +231,8 @@ public abstract class AbstractList extends AbstractCollection {
      *            index of last element to be removed.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>.
+     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>
+     *             .
      */
     public abstract void removeFromTo(int fromIndex, int toIndex);
 
@@ -259,8 +263,8 @@ public abstract class AbstractList extends AbstractCollection {
      * current size, new null or zero items are added to the end of the
      * receiver. If the new size is less than the current size, all components
      * at index newSize and greater are discarded. This method does not release
-     * any superfluos internal memory. Use method <tt>trimToSize</tt> to
-     * release superfluos internal memory.
+     * any superfluos internal memory. Use method <tt>trimToSize</tt> to release
+     * superfluos internal memory.
      * 
      * @param newSize
      *            the new size of the receiver.
@@ -289,8 +293,8 @@ public abstract class AbstractList extends AbstractCollection {
     }
 
     /**
-     * Randomly permutes the receiver between <code>from</code> (inclusive)
-     * and <code>to</code> (inclusive).
+     * Randomly permutes the receiver between <code>from</code> (inclusive) and
+     * <code>to</code> (inclusive).
      * 
      * @param from
      *            the start position (inclusive)
@@ -298,7 +302,8 @@ public abstract class AbstractList extends AbstractCollection {
      *            the end position (inclusive)
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>.
+     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>
+     *             .
      */
     public abstract void shuffleFromTo(int from, int to);
 
@@ -330,7 +335,8 @@ public abstract class AbstractList extends AbstractCollection {
      *            the index of the last element (inclusive) to be sorted.
      * @throws IndexOutOfBoundsException
      *             if
-     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>.
+     *             <tt>(from&lt;0 || from&gt;to || to&gt;=size()) && to!=from-1</tt>
+     *             .
      */
     public void sortFromTo(int from, int to) {
         quickSortFromTo(from, to);

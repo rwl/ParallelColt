@@ -39,9 +39,9 @@ public class DoubleILU implements DoublePreconditioner {
      * Temporary vector for solving the factorised system
      */
     private final DoubleMatrix1D y;
-    
+
     private int[] diagind;
-    
+
     /**
      * Sets up the ILU preconditioner
      * 
@@ -130,7 +130,7 @@ public class DoubleILU implements DoublePreconditioner {
 
         return diagind;
     }
-    
+
     private DoubleMatrix1D lowerUnitSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         double[] bd = ((DenseDoubleMatrix1D) b).elements();
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
@@ -150,7 +150,7 @@ public class DoubleILU implements DoublePreconditioner {
 
         return x;
     }
-    
+
     private DoubleMatrix1D loverUnitTransSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         x.assign(b);
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
@@ -168,8 +168,7 @@ public class DoubleILU implements DoublePreconditioner {
 
         return x;
     }
-    
-    
+
     private DoubleMatrix1D upperSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         double[] bd = ((DenseDoubleMatrix1D) b).elements();
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
@@ -197,7 +196,7 @@ public class DoubleILU implements DoublePreconditioner {
         int[] rowptr = LU.getRowPointers();
         double[] data = LU.getValues().elements();
         int rows = LU.rows();
-        
+
         for (int i = 0; i < rows; ++i) {
 
             // Solve for the current entry
@@ -211,6 +210,5 @@ public class DoubleILU implements DoublePreconditioner {
 
         return x;
     }
-    
-    
+
 }

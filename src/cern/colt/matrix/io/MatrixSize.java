@@ -84,8 +84,7 @@ public class MatrixSize {
         // We do this to avoid overflows
         long maxR = numRows, maxC = numColumns, max = maxR * maxC;
         if (numEntries > max)
-            throw new IllegalArgumentException(
-                    "numEntries > numRows*numColumns");
+            throw new IllegalArgumentException("numEntries > numRows*numColumns");
     }
 
     /**

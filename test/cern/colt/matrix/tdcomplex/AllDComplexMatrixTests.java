@@ -22,17 +22,17 @@ public class AllDComplexMatrixTests {
         suite.addTestSuite(DenseDComplexMatrix1DViewTest.class);
         suite.addTestSuite(SparseDComplexMatrix1DTest.class);
         suite.addTestSuite(SparseDComplexMatrix1DViewTest.class);
-        
+
         suite.addTestSuite(DenseDComplexMatrix2DTest.class);
         suite.addTestSuite(DenseDComplexMatrix2DViewTest.class);
         suite.addTestSuite(SparseDComplexMatrix2DTest.class);
         suite.addTestSuite(SparseDComplexMatrix2DViewTest.class);
-        
+
         suite.addTestSuite(DenseDComplexMatrix3DTest.class);
         suite.addTestSuite(DenseDComplexMatrix3DViewTest.class);
         suite.addTestSuite(SparseDComplexMatrix3DTest.class);
         suite.addTestSuite(SparseDComplexMatrix3DViewTest.class);
-        
+
         return suite;
     }
 

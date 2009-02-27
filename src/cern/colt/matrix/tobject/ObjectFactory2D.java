@@ -14,8 +14,7 @@ import cern.colt.matrix.tobject.impl.SparseObjectMatrix2D;
 /**
  * Factory for convenient construction of 2-d matrices holding <tt>Object</tt>
  * cells. Also provides convenient methods to compose (concatenate) and
- * decompose (split) matrices from/to constituent blocks.
- * </p>
+ * decompose (split) matrices from/to constituent blocks. </p>
  * <p>
  * &nbsp;
  * </p>
@@ -23,32 +22,32 @@ import cern.colt.matrix.tobject.impl.SparseObjectMatrix2D;
  * <tr align="left" valign="top">
  * <td><i>Construction</i></td>
  * <td>Use idioms like <tt>ObjectFactory2D.dense.make(4,4)</tt> to construct
- * dense matrices, <tt>ObjectFactory2D.sparse.make(4,4)</tt> to construct
- * sparse matrices.</td>
+ * dense matrices, <tt>ObjectFactory2D.sparse.make(4,4)</tt> to construct sparse
+ * matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Construction with initial values </i></td>
- * <td>Use other <tt>make</tt> methods to construct matrices with given
- * initial values. </td>
+ * <td>Use other <tt>make</tt> methods to construct matrices with given initial
+ * values.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Appending rows and columns </i></td>
- * <td>Use methods
- * {@link #appendColumns(ObjectMatrix2D,ObjectMatrix2D) appendColumns},
- * {@link #appendColumns(ObjectMatrix2D,ObjectMatrix2D) appendRows} and {@link 
- * #repeat(ObjectMatrix2D,int,int) repeat} to append rows and columns. </td>
+ * <td>Use methods {@link #appendColumns(ObjectMatrix2D,ObjectMatrix2D)
+ * appendColumns}, {@link #appendColumns(ObjectMatrix2D,ObjectMatrix2D)
+ * appendRows} and {@link #repeat(ObjectMatrix2D,int,int) repeat} to append rows
+ * and columns.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> General block matrices </i></td>
  * <td>Use methods {@link #compose(ObjectMatrix2D[][]) compose} and
- * {@link #decompose(ObjectMatrix2D[][],ObjectMatrix2D)  decompose} to work with
- * general block matrices. </td>
+ * {@link #decompose(ObjectMatrix2D[][],ObjectMatrix2D) decompose} to work with
+ * general block matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Diagonal block matrices </i></td>
  * <td>Use method
- * {@link #composeDiagonal(ObjectMatrix2D,ObjectMatrix2D,ObjectMatrix2D) 
- * composeDiagonal} to work with diagonal block matrices. </td>
+ * {@link #composeDiagonal(ObjectMatrix2D,ObjectMatrix2D,ObjectMatrix2D)
+ * composeDiagonal} to work with diagonal block matrices.</td>
  * </tr>
  * </table>
  * <p>
@@ -104,7 +103,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * 	 --&gt;
      * 	 0 1 2 6 7 
      * 	 3 4 5 8 9
-     * 	
+     * 
      * </pre>
      */
     public ObjectMatrix2D appendColumns(ObjectMatrix2D A, ObjectMatrix2D B) {
@@ -141,7 +140,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * 	 4 5
      * 	 6 7
      * 	 8 9
-     * 	
+     * 
      * </pre>
      */
     public ObjectMatrix2D appendRows(ObjectMatrix2D A, ObjectMatrix2D B) {
@@ -204,11 +203,12 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * method {@link #decompose(ObjectMatrix2D[][], ObjectMatrix2D)}.
      * <p>
      * All matrices of a given column within <tt>parts</tt> must have the same
-     * number of columns. All matrices of a given row within <tt>parts</tt>
-     * must have the same number of rows. Otherwise an
+     * number of columns. All matrices of a given row within <tt>parts</tt> must
+     * have the same number of rows. Otherwise an
      * <tt>IllegalArgumentException</tt> is thrown. Note that <tt>null</tt>s
      * within <tt>parts[row,col]</tt> are an exception to this rule: they are
-     * ignored. Cells are copied. Example: <table border="1" cellspacing="0">
+     * ignored. Cells are copied. Example:
+     * <table border="1" cellspacing="0">
      * <tr align="left" valign="top">
      * <td><tt>Code</tt></td>
      * <td><tt>Result</tt></td>
@@ -366,7 +366,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * <pre>
      * 	 A 0
      * 	 0 B
-     * 	
+     * 
      * </pre>
      * 
      * (The direct sum has <tt>A.rows()+B.rows()</tt> rows and
@@ -393,7 +393,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * 	 A 0 0
      * 	 0 B 0
      * 	 0 0 C
-     * 	
+     * 
      * </pre>
      * 
      * from the given parts. Cells are copied.
@@ -412,11 +412,12 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * {@link #compose(ObjectMatrix2D[][])}.
      * <p>
      * All matrices of a given column within <tt>parts</tt> must have the same
-     * number of columns. All matrices of a given row within <tt>parts</tt>
-     * must have the same number of rows. Otherwise an
+     * number of columns. All matrices of a given row within <tt>parts</tt> must
+     * have the same number of rows. Otherwise an
      * <tt>IllegalArgumentException</tt> is thrown. Note that <tt>null</tt>s
      * within <tt>parts[row,col]</tt> are an exception to this rule: they are
-     * ignored. Cells are copied. Example: <table border="1" cellspacing="0">
+     * ignored. Cells are copied. Example:
+     * <table border="1" cellspacing="0">
      * <tr align="left" valign="top">
      * <td><tt>Code</tt></td>
      * <td><tt>matrix</tt></td>
@@ -442,7 +443,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * 	 System.out.println(&quot;\nB = &quot;+B);
      * 	 System.out.println(&quot;\nC = &quot;+C);
      * 	 System.out.println(&quot;\nD = &quot;+D);
-     * 	
+     * 
      * </pre>
      * 
      * </td>
@@ -565,7 +566,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * 	 5 0 0
      * 	 0 4 0
      * 	 0 0 3
-     * 	
+     * 
      * </pre>
      * 
      * @return a new matrix.
@@ -580,15 +581,15 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a new vector consisting of the diagonal elements of <tt>A</tt>.
-     * Cells values are copied. The new vector is not a view. Example:
+     * Constructs a new vector consisting of the diagonal elements of <tt>A</tt>
+     * . Cells values are copied. The new vector is not a view. Example:
      * 
      * <pre>
      * 	 5 0 0 9
      * 	 0 4 0 9
      * 	 0 0 3 9
      * 	 --&gt; 5 4 3
-     * 	
+     * 
      * </pre>
      * 
      * @param A
@@ -616,7 +617,8 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
      */
     public ObjectMatrix2D make(Object[][] values) {
         if (this == sparse)
@@ -628,8 +630,8 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
     /**
      * Construct a matrix from a one-dimensional column-major packed array, ala
      * Fortran. Has the form
-     * <tt>matrix.get(row,column) == values[row + column*rows]</tt>. The
-     * values are copied.
+     * <tt>matrix.get(row,column) == values[row + column*rows]</tt>. The values
+     * are copied.
      * 
      * @param values
      *            One-dimensional array of Objects, packed by columns (ala
@@ -637,8 +639,8 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * @param rows
      *            the number of rows.
      * @exception IllegalArgumentException
-     *                <tt>values.length</tt> must be a multiple of
-     *                <tt>rows</tt>.
+     *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
+     *                .
      */
     public ObjectMatrix2D make(Object values[], int rows) {
         int columns = (rows != 0 ? values.length / rows : 0);
@@ -694,7 +696,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * 	 2 3 2 3 2 3
      * 	 0 1 0 1 0 1
      * 	 2 3 2 3 2 3
-     * 	
+     * 
      * </pre>
      */
     public ObjectMatrix2D repeat(ObjectMatrix2D A, int rowRepeat, int columnRepeat) {

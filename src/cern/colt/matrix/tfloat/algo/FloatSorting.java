@@ -129,7 +129,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
 
         if (vector instanceof DenseFloatMatrix1D) {
             final float[] velems = (float[]) vector.elements();
-            final int zero = (int)vector.index(0);
+            final int zero = (int) vector.index(0);
             final int stride = vector.stride();
             IntComparator comp = new IntComparator() {
                 public int compare(int a, int b) {
@@ -173,7 +173,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final float[] velems = (float[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -246,7 +246,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final float[] velems = (float[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -275,7 +275,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
             indexes[i] = i;
 
         final float[] velems = (float[]) vector.elements();
-        final int zero = (int)vector.index(0);
+        final int zero = (int) vector.index(0);
         final int stride = vector.stride();
         IntComparator comp = new IntComparator() {
             public int compare(int a, int b) {
@@ -801,8 +801,8 @@ public class FloatSorting extends cern.colt.PersistentObject {
         FloatMatrix1D matrix = new DenseFloatMatrix1D(values);
         cern.colt.function.tfloat.FloatComparator comp = new cern.colt.function.tfloat.FloatComparator() {
             public int compare(float a, float b) {
-                float as = (float)Math.sin(a);
-                float bs = (float)Math.sin(b);
+                float as = (float) Math.sin(a);
+                float bs = (float) Math.sin(b);
                 return as < bs ? -1 : as == bs ? 0 : 1;
             }
         };

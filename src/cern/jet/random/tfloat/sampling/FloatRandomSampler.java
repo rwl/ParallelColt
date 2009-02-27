@@ -12,13 +12,13 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
 
 /**
  * Space and time efficiently computes a sorted <i>Simple Random Sample Without
- * Replacement (SRSWOR)</i>, that is, a sorted set of <tt>n</tt> random
- * numbers from an interval of <tt>N</tt> numbers; Example: Computing
- * <tt>n=3</tt> random numbers from the interval <tt>[1,50]</tt> may yield
- * the sorted random set <tt>(7,13,47)</tt>. Since we are talking about a set
- * (sampling without replacement), no element will occur more than once. Each
- * number from the <tt>N</tt> numbers has the same probability to be included
- * in the <tt>n</tt> chosen numbers.
+ * Replacement (SRSWOR)</i>, that is, a sorted set of <tt>n</tt> random numbers
+ * from an interval of <tt>N</tt> numbers; Example: Computing <tt>n=3</tt>
+ * random numbers from the interval <tt>[1,50]</tt> may yield the sorted random
+ * set <tt>(7,13,47)</tt>. Since we are talking about a set (sampling without
+ * replacement), no element will occur more than once. Each number from the
+ * <tt>N</tt> numbers has the same probability to be included in the <tt>n</tt>
+ * chosen numbers.
  * 
  * <p>
  * <b>Problem:</b> This class solves problems including the following: <i>
@@ -30,16 +30,16 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * jumping back and forth within the file? </i>
  * 
  * <p>
- * <b>Sorted Simple Random Sample Without Replacement (SRSWOR):</b> What are
- * the exact semantics of this class? What is a SRSWOR? In which sense exactly
- * is a returned set "random"? It is random in the sense, that each number from
- * the <tt>N</tt> numbers has the same probability to be included in the
- * <tt>n</tt> chosen numbers. For those who think in implementations rather
- * than abstract interfaces: <i>Suppose, we have an empty list. We pick a random
- * number between 1 and 10^12 and add it to the list only if it was not already
- * picked before, i.e. if it is not already contained in the list. We then do
- * the same thing again and again until we have eventually collected 10^6
- * distinct numbers. Now we sort the set ascending and return it.</i>
+ * <b>Sorted Simple Random Sample Without Replacement (SRSWOR):</b> What are the
+ * exact semantics of this class? What is a SRSWOR? In which sense exactly is a
+ * returned set "random"? It is random in the sense, that each number from the
+ * <tt>N</tt> numbers has the same probability to be included in the <tt>n</tt>
+ * chosen numbers. For those who think in implementations rather than abstract
+ * interfaces: <i>Suppose, we have an empty list. We pick a random number
+ * between 1 and 10^12 and add it to the list only if it was not already picked
+ * before, i.e. if it is not already contained in the list. We then do the same
+ * thing again and again until we have eventually collected 10^6 distinct
+ * numbers. Now we sort the set ascending and return it.</i>
  * <dt>It is exactly in this sense that this class returns "random" sets.
  * <b>Note, however, that the implementation of this class uses a technique
  * orders of magnitudes better (both in time and space) than the one outlined
@@ -47,9 +47,9 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * 
  * <p>
  * <b>Performance:</b> Space requirements are zero. Running time is
- * <tt>O(n)</tt> on average, <tt>O(N)</tt> in the worst case.
- * <h2 align=center>Performance (200Mhz Pentium Pro, JDK 1.2, NT)</h2>
- * <center> <table border="1">
+ * <tt>O(n)</tt> on average, <tt>O(N)</tt> in the worst case. <h2
+ * align=center>Performance (200Mhz Pentium Pro, JDK 1.2, NT)</h2> <center>
+ * <table border="1">
  * <tr>
  * <td align="center" width="20%">n</td>
  * <td align="center" width="20%">N</td>
@@ -90,13 +90,14 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * <td align="center" width="20%">10<sup>12</sup></td>
  * <td align="center" width="20">60</td>
  * </tr>
- * </table> </center>
+ * </table>
+ * </center>
  * 
  * <p>
  * <b>Scalability:</b> This random sampler is designed to be scalable. In
  * iterator style, it is able to compute and deliver sorted random sets stepwise
- * in units called <i>blocks</i>. Example: Computing <tt>n=9</tt> random
- * numbers from the interval <tt>[1,50]</tt> in 3 blocks may yield the blocks
+ * in units called <i>blocks</i>. Example: Computing <tt>n=9</tt> random numbers
+ * from the interval <tt>[1,50]</tt> in 3 blocks may yield the blocks
  * <tt>(7,13,14), (27,37,42), (45,46,49)</tt>. (The maximum of a block is
  * guaranteed to be less than the minimum of its successor block. Every block is
  * sorted ascending. No element will ever occur twice, both within a block and
@@ -121,12 +122,12 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * instance first.
  * 
  * <p>
- * <b>Random number generation:</b> By default uses <tt>MersenneTwister</tt>,
- * a very strong random number generator, much better than
+ * <b>Random number generation:</b> By default uses <tt>MersenneTwister</tt>, a
+ * very strong random number generator, much better than
  * <tt>java.util.Random</tt>. You can also use other strong random number
  * generators of Paul Houle's RngPack package. For example, <tt>Ranecu</tt>,
- * <tt>Ranmar</tt> and <tt>Ranlux</tt> are strong well analyzed research
- * grade pseudo-random number generators with known periods.
+ * <tt>Ranmar</tt> and <tt>Ranlux</tt> are strong well analyzed research grade
+ * pseudo-random number generators with known periods.
  * 
  * <p>
  * <b>Implementation:</b> after J.S. Vitter, An Efficient Algorithm for
@@ -153,8 +154,8 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
     /**
      * Constructs a random sampler that computes and delivers sorted random sets
      * in blocks. A set block can be retrieved with method <tt>nextBlock</tt>.
-     * Successive calls to method <tt>nextBlock</tt> will deliver as many
-     * random numbers as required.
+     * Successive calls to method <tt>nextBlock</tt> will deliver as many random
+     * numbers as required.
      * 
      * @param n
      *            the total number of elements to choose (must be
@@ -164,9 +165,8 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
      *            <tt>[low,low+N-1]</tt>.
      * @param low
      *            the interval to choose random numbers from is
-     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then
-     *            random numbers will be drawn from the interval
-     *            <tt>[0,N-1]</tt>.
+     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then random
+     *            numbers will be drawn from the interval <tt>[0,N-1]</tt>.
      * @param randomGenerator
      *            a random number generator. Set this parameter to <tt>null</tt>
      *            to use the default random number generator.
@@ -209,9 +209,9 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
     }
 
     /**
-     * Computes the next <tt>count</tt> random numbers of the sorted random
-     * set specified on instance construction and fills them into
-     * <tt>values</tt>, starting at index <tt>fromIndex</tt>.
+     * Computes the next <tt>count</tt> random numbers of the sorted random set
+     * specified on instance construction and fills them into <tt>values</tt>,
+     * starting at index <tt>fromIndex</tt>.
      * 
      * <p>
      * Numbers are filled into the specified array starting at index
@@ -246,9 +246,9 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
     }
 
     /**
-     * Efficiently computes a sorted random set of <tt>count</tt> elements
-     * from the interval <tt>[low,low+N-1]</tt>. Since we are talking about a
-     * random set, no element will occur more than once.
+     * Efficiently computes a sorted random set of <tt>count</tt> elements from
+     * the interval <tt>[low,low+N-1]</tt>. Since we are talking about a random
+     * set, no element will occur more than once.
      * 
      * <p>
      * Running time is <tt>O(count)</tt>, on average. Space requirements are
@@ -266,12 +266,12 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
      *            <tt>[low,low+N-1]</tt>.
      * @param count
      *            the number of elements to be filled into <tt>values</tt> by
-     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally,
-     *            you will set <tt>count=n</tt>.
+     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally, you
+     *            will set <tt>count=n</tt>.
      * @param low
      *            the interval to choose random numbers from is
-     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then
-     *            draws random numbers from the interval <tt>[0,N-1]</tt>.
+     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then draws
+     *            random numbers from the interval <tt>[0,N-1]</tt>.
      * @param values
      *            the array into which the random numbers are to be filled; must
      *            have a length <tt>&gt;= count+fromIndex</tt>.
@@ -397,9 +397,9 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
     }
 
     /**
-     * Efficiently computes a sorted random set of <tt>count</tt> elements
-     * from the interval <tt>[low,low+N-1]</tt>. Since we are talking about a
-     * random set, no element will occur more than once.
+     * Efficiently computes a sorted random set of <tt>count</tt> elements from
+     * the interval <tt>[low,low+N-1]</tt>. Since we are talking about a random
+     * set, no element will occur more than once.
      * 
      * <p>
      * Running time is <tt>O(count)</tt>, on average. Space requirements are
@@ -411,13 +411,12 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
      * in the range filled with numbers.
      * 
      * <p>
-     * <b>Random number generation:</b> By default uses
-     * <tt>MersenneTwister</tt>, a very strong random number generator, much
-     * better than <tt>java.util.Random</tt>. You can also use other strong
-     * random number generators of Paul Houle's RngPack package. For example,
-     * <tt>Ranecu</tt>, <tt>Ranmar</tt> and <tt>Ranlux</tt> are strong
-     * well analyzed research grade pseudo-random number generators with known
-     * periods.
+     * <b>Random number generation:</b> By default uses <tt>MersenneTwister</tt>
+     * , a very strong random number generator, much better than
+     * <tt>java.util.Random</tt>. You can also use other strong random number
+     * generators of Paul Houle's RngPack package. For example, <tt>Ranecu</tt>,
+     * <tt>Ranmar</tt> and <tt>Ranlux</tt> are strong well analyzed research
+     * grade pseudo-random number generators with known periods.
      * 
      * @param n
      *            the total number of elements to choose (must be
@@ -427,12 +426,12 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
      *            <tt>[low,low+N-1]</tt>.
      * @param count
      *            the number of elements to be filled into <tt>values</tt> by
-     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally,
-     *            you will set <tt>count=n</tt>.
+     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally, you
+     *            will set <tt>count=n</tt>.
      * @param low
      *            the interval to choose random numbers from is
-     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then
-     *            draws random numbers from the interval <tt>[0,N-1]</tt>.
+     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then draws
+     *            random numbers from the interval <tt>[0,N-1]</tt>.
      * @param values
      *            the array into which the random numbers are to be filled; must
      *            have a length <tt>&gt;= count+fromIndex</tt>.
@@ -468,13 +467,12 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
     }
 
     /**
-     * Computes a sorted random set of <tt>count</tt> elements from the
-     * interval <tt>[low,low+N-1]</tt>. Since we are talking about a random
-     * set, no element will occur more than once.
+     * Computes a sorted random set of <tt>count</tt> elements from the interval
+     * <tt>[low,low+N-1]</tt>. Since we are talking about a random set, no
+     * element will occur more than once.
      * 
      * <p>
-     * Running time is <tt>O(N)</tt>, on average. Space requirements are
-     * zero.
+     * Running time is <tt>O(N)</tt>, on average. Space requirements are zero.
      * 
      * <p>
      * Numbers are filled into the specified array starting at index
@@ -488,12 +486,12 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
      *            <tt>[low,low+N-1]</tt>.
      * @param count
      *            the number of elements to be filled into <tt>values</tt> by
-     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally,
-     *            you will set <tt>count=n</tt>.
+     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally, you
+     *            will set <tt>count=n</tt>.
      * @param low
      *            the interval to choose random numbers from is
-     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then
-     *            draws random numbers from the interval <tt>[0,N-1]</tt>.
+     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then draws
+     *            random numbers from the interval <tt>[0,N-1]</tt>.
      * @param values
      *            the array into which the random numbers are to be filled; must
      *            have a length <tt>&gt;= count+fromIndex</tt>.
@@ -536,9 +534,9 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
     }
 
     /**
-     * Efficiently computes a sorted random set of <tt>count</tt> elements
-     * from the interval <tt>[low,low+N-1]</tt>. Since we are talking about a
-     * random set, no element will occur more than once.
+     * Efficiently computes a sorted random set of <tt>count</tt> elements from
+     * the interval <tt>[low,low+N-1]</tt>. Since we are talking about a random
+     * set, no element will occur more than once.
      * 
      * <p>
      * Running time is <tt>O(count)</tt>, on average. Space requirements are
@@ -556,12 +554,12 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
      *            <tt>[low,low+N-1]</tt>.
      * @param count
      *            the number of elements to be filled into <tt>values</tt> by
-     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally,
-     *            you will set <tt>count=n</tt>.
+     *            this call (must be &gt;= 0 and &lt;=<tt>n</tt>). Normally, you
+     *            will set <tt>count=n</tt>.
      * @param low
      *            the interval to choose random numbers from is
-     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then
-     *            draws random numbers from the interval <tt>[0,N-1]</tt>.
+     *            <tt>[low,low+N-1]</tt>. Hint: If <tt>low==0</tt>, then draws
+     *            random numbers from the interval <tt>[0,N-1]</tt>.
      * @param values
      *            the array into which the random numbers are to be filled; must
      *            have a length <tt>&gt;= count+fromIndex</tt>.

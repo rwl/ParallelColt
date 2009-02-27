@@ -148,7 +148,7 @@ public class DoubleSSOR implements DoublePreconditioner {
         double[] data = F.getValues().elements();
 
         double[] bd = ((DenseDoubleMatrix1D) b).elements();
-//        double[] xd = ((DenseDoubleMatrix1D) x).elements();
+        //        double[] xd = ((DenseDoubleMatrix1D) x).elements();
         double[] xd = new double[x.size()];
 
         int n = F.rows();

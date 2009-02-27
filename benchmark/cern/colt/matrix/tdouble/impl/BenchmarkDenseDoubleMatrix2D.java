@@ -81,8 +81,7 @@ public class BenchmarkDenseDoubleMatrix2D {
         noViewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
         viewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
     }
-    
-    
+
     @Test
     public void testZMultDoubleMatrix2DDoubleMatrix2D() {
         int oldNiters = BenchmarkMatrixKernel.NITERS;
@@ -133,8 +132,6 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.NITERS = oldNiters;
     }
 
-    
-    
     @Test
     public void testZMultDoubleMatrix1DDoubleMatrix1D() {
         /* No view */
@@ -178,7 +175,6 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
 
     @Test
     public void testAggregateDoubleDoubleFunctionDoubleFunction() {
@@ -847,11 +843,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dct2(true);
+            ((DenseDoubleMatrix2D) Av).dct2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dct2(true);
+                ((DenseDoubleMatrix2D) Av).dct2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -885,11 +881,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dctColumns(true);
+            ((DenseDoubleMatrix2D) Av).dctColumns(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dctColumns(true);
+                ((DenseDoubleMatrix2D) Av).dctColumns(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -923,11 +919,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dctRows(true);
+            ((DenseDoubleMatrix2D) Av).dctRows(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dctRows(true);
+                ((DenseDoubleMatrix2D) Av).dctRows(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -960,11 +956,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dht2();
+            ((DenseDoubleMatrix2D) Av).dht2();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dht2();
+                ((DenseDoubleMatrix2D) Av).dht2();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -998,11 +994,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dhtColumns();
+            ((DenseDoubleMatrix2D) Av).dhtColumns();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dhtColumns();
+                ((DenseDoubleMatrix2D) Av).dhtColumns();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1036,11 +1032,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dhtRows();
+            ((DenseDoubleMatrix2D) Av).dhtRows();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dhtRows();
+                ((DenseDoubleMatrix2D) Av).dhtRows();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1050,7 +1046,7 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.writeMatrixBenchmarkResultsToFile(outputFile, method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
     }
-    
+
     @Test
     public void testDst2() {
         /* No view */
@@ -1075,11 +1071,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dst2(true);
+            ((DenseDoubleMatrix2D) Av).dst2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dst2(true);
+                ((DenseDoubleMatrix2D) Av).dst2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1113,11 +1109,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dstColumns(true);
+            ((DenseDoubleMatrix2D) Av).dstColumns(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dstColumns(true);
+                ((DenseDoubleMatrix2D) Av).dstColumns(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1152,11 +1148,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).dstRows(true);
+            ((DenseDoubleMatrix2D) Av).dstRows(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).dstRows(true);
+                ((DenseDoubleMatrix2D) Av).dstRows(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1193,11 +1189,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).fft2();
+            ((DenseDoubleMatrix2D) Av).fft2();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).fft2();
+                ((DenseDoubleMatrix2D) Av).fft2();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1225,7 +1221,7 @@ public class BenchmarkDenseDoubleMatrix2D {
             A.forEachNonZero(function);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-            	A.forEachNonZero(function);
+                A.forEachNonZero(function);
                 t.stop();
                 noViewTimes[i] += t.millis();
             }
@@ -1237,10 +1233,10 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).forEachNonZero(function);
+            ((DenseDoubleMatrix2D) Av).forEachNonZero(function);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).forEachNonZero(function);
+                ((DenseDoubleMatrix2D) Av).forEachNonZero(function);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1251,7 +1247,6 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-
 
     @Test
     public void testGetFft2() {
@@ -1278,11 +1273,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            Ac = ((DenseDoubleMatrix2D)Av).getFft2();
+            Ac = ((DenseDoubleMatrix2D) Av).getFft2();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                Ac = ((DenseDoubleMatrix2D)Av).getFft2();
+                Ac = ((DenseDoubleMatrix2D) Av).getFft2();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1318,11 +1313,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            Ac = ((DenseDoubleMatrix2D)Av).getFftColumns();
+            Ac = ((DenseDoubleMatrix2D) Av).getFftColumns();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                Ac = ((DenseDoubleMatrix2D)Av).getFftColumns();
+                Ac = ((DenseDoubleMatrix2D) Av).getFftColumns();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1359,11 +1354,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            Ac = ((DenseDoubleMatrix2D)Av).getFftRows();
+            Ac = ((DenseDoubleMatrix2D) Av).getFftRows();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                Ac = ((DenseDoubleMatrix2D)Av).getFftRows();
+                Ac = ((DenseDoubleMatrix2D) Av).getFftRows();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1400,11 +1395,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).ifft2(true);
+            ((DenseDoubleMatrix2D) Av).ifft2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).ifft2(true);
+                ((DenseDoubleMatrix2D) Av).ifft2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1440,11 +1435,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            Ac = ((DenseDoubleMatrix2D)Av).getIfftColumns(true);
+            Ac = ((DenseDoubleMatrix2D) Av).getIfftColumns(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                Ac = ((DenseDoubleMatrix2D)Av).getIfftColumns(true);
+                Ac = ((DenseDoubleMatrix2D) Av).getIfftColumns(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1481,11 +1476,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            Ac = ((DenseDoubleMatrix2D)Av).getIfftRows(true);
+            Ac = ((DenseDoubleMatrix2D) Av).getIfftRows(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                Ac = ((DenseDoubleMatrix2D)Av).getIfftRows(true);
+                Ac = ((DenseDoubleMatrix2D) Av).getIfftRows(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1497,7 +1492,6 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-
 
     @Test
     public void testGetNonZerosIntArrayListIntArrayListDoubleArrayList() {
@@ -1530,13 +1524,13 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).getNonZeros(rowList, colList, valueList);
+            ((DenseDoubleMatrix2D) Av).getNonZeros(rowList, colList, valueList);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 rowList.clear();
                 colList.clear();
                 valueList.clear();
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).getNonZeros(rowList, colList, valueList);
+                ((DenseDoubleMatrix2D) Av).getNonZeros(rowList, colList, valueList);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1577,13 +1571,13 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).getPositiveValues(rowList, columnList, valueList);
+            ((DenseDoubleMatrix2D) Av).getPositiveValues(rowList, columnList, valueList);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 rowList.clear();
                 columnList.clear();
                 valueList.clear();
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).getPositiveValues(rowList, columnList, valueList);
+                ((DenseDoubleMatrix2D) Av).getPositiveValues(rowList, columnList, valueList);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1594,7 +1588,7 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testGetNegativeValuesIntArrayListIntArrayListDoubleArrayList() {
         /* No view */
@@ -1621,18 +1615,18 @@ public class BenchmarkDenseDoubleMatrix2D {
         }
         /* View */
         DoubleMatrix2D Av = new DenseDoubleMatrix2D(a_2d).viewDice();
-        ((DenseDoubleMatrix2D)Av).assign(DoubleFunctions.mult(-1));
+        ((DenseDoubleMatrix2D) Av).assign(DoubleFunctions.mult(-1));
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).getNegativeValues(rowList, columnList, valueList);
+            ((DenseDoubleMatrix2D) Av).getNegativeValues(rowList, columnList, valueList);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 rowList.clear();
                 columnList.clear();
                 valueList.clear();
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).getNegativeValues(rowList, columnList, valueList);
+                ((DenseDoubleMatrix2D) Av).getNegativeValues(rowList, columnList, valueList);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1643,7 +1637,6 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-
 
     @Test
     public void testIdct2() {
@@ -1669,11 +1662,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idct2(true);
+            ((DenseDoubleMatrix2D) Av).idct2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idct2(true);
+                ((DenseDoubleMatrix2D) Av).idct2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1708,11 +1701,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idctColumns(true);
+            ((DenseDoubleMatrix2D) Av).idctColumns(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idctColumns(true);
+                ((DenseDoubleMatrix2D) Av).idctColumns(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1748,11 +1741,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idctRows(true);
+            ((DenseDoubleMatrix2D) Av).idctRows(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idctRows(true);
+                ((DenseDoubleMatrix2D) Av).idctRows(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1764,7 +1757,7 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-    
+
     @Test
     public void testIdht2() {
         /* No view */
@@ -1789,11 +1782,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idht2(true);
+            ((DenseDoubleMatrix2D) Av).idht2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idht2(true);
+                ((DenseDoubleMatrix2D) Av).idht2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1828,11 +1821,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idhtColumns(true);
+            ((DenseDoubleMatrix2D) Av).idhtColumns(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idhtColumns(true);
+                ((DenseDoubleMatrix2D) Av).idhtColumns(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1868,11 +1861,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idhtRows(true);
+            ((DenseDoubleMatrix2D) Av).idhtRows(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idhtRows(true);
+                ((DenseDoubleMatrix2D) Av).idhtRows(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1909,11 +1902,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idst2(true);
+            ((DenseDoubleMatrix2D) Av).idst2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idst2(true);
+                ((DenseDoubleMatrix2D) Av).idst2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1948,11 +1941,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idstColumns(true);
+            ((DenseDoubleMatrix2D) Av).idstColumns(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idstColumns(true);
+                ((DenseDoubleMatrix2D) Av).idstColumns(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -1987,11 +1980,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).idstRows(true);
+            ((DenseDoubleMatrix2D) Av).idstRows(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).idstRows(true);
+                ((DenseDoubleMatrix2D) Av).idstRows(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2028,11 +2021,11 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            ((DenseDoubleMatrix2D)Av).ifft2(true);
+            ((DenseDoubleMatrix2D) Av).ifft2(true);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                ((DenseDoubleMatrix2D)Av).assign(a_2d);
+                ((DenseDoubleMatrix2D) Av).assign(a_2d);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).ifft2(true);
+                ((DenseDoubleMatrix2D) Av).ifft2(true);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2067,10 +2060,10 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            double[] maxAndLoc = ((DenseDoubleMatrix2D)Av).getMaxLocation();
+            double[] maxAndLoc = ((DenseDoubleMatrix2D) Av).getMaxLocation();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                maxAndLoc = ((DenseDoubleMatrix2D)Av).getMaxLocation();
+                maxAndLoc = ((DenseDoubleMatrix2D) Av).getMaxLocation();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2105,10 +2098,10 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            double[] minAndLoc = ((DenseDoubleMatrix2D)Av).getMinLocation();
+            double[] minAndLoc = ((DenseDoubleMatrix2D) Av).getMinLocation();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                minAndLoc = ((DenseDoubleMatrix2D)Av).getMinLocation();
+                minAndLoc = ((DenseDoubleMatrix2D) Av).getMinLocation();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2143,10 +2136,10 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            double aSum = ((DenseDoubleMatrix2D)Av).zSum();
+            double aSum = ((DenseDoubleMatrix2D) Av).zSum();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                aSum = ((DenseDoubleMatrix2D)Av).zSum();
+                aSum = ((DenseDoubleMatrix2D) Av).zSum();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2181,10 +2174,10 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            double[][] array = ((DenseDoubleMatrix2D)Av).toArray();
+            double[][] array = ((DenseDoubleMatrix2D) Av).toArray();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                array = ((DenseDoubleMatrix2D)Av).toArray();
+                array = ((DenseDoubleMatrix2D) Av).toArray();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2219,10 +2212,10 @@ public class BenchmarkDenseDoubleMatrix2D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            DoubleMatrix1D B = ((DenseDoubleMatrix2D)Av).vectorize();
+            DoubleMatrix1D B = ((DenseDoubleMatrix2D) Av).vectorize();
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                B = ((DenseDoubleMatrix2D)Av).vectorize();
+                B = ((DenseDoubleMatrix2D) Av).vectorize();
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2233,7 +2226,6 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes, viewTimes);
 
     }
-   
 
     @Test
     public void testZMultDoubleMatrix1DDoubleMatrix1DDoubleDoubleBoolean() {
@@ -2265,11 +2257,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).zMult(y, z, alpha, beta, false);
+            ((DenseDoubleMatrix2D) Av).zMult(y, z, alpha, beta, false);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 z.assign(0);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).zMult(y, z, alpha, beta, false);
+                ((DenseDoubleMatrix2D) Av).zMult(y, z, alpha, beta, false);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -2281,7 +2273,6 @@ public class BenchmarkDenseDoubleMatrix2D {
 
     }
 
-    
     @Test
     public void testZMultDoubleMatrix2DDoubleMatrix2DDoubleDoubleBooleanBoolean() {
         int oldNiters = BenchmarkMatrixKernel.NITERS;
@@ -2318,11 +2309,11 @@ public class BenchmarkDenseDoubleMatrix2D {
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
             // warm-up
-            ((DenseDoubleMatrix2D)Av).zMult(Bv, Cv, alpha, beta, false, false);
+            ((DenseDoubleMatrix2D) Av).zMult(Bv, Cv, alpha, beta, false, false);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 Cv.assign(0);
                 t.reset().start();
-                ((DenseDoubleMatrix2D)Av).zMult(Bv, Cv, alpha, beta, false, false);
+                ((DenseDoubleMatrix2D) Av).zMult(Bv, Cv, alpha, beta, false, false);
                 t.stop();
                 viewTimes[i] += t.millis();
             }

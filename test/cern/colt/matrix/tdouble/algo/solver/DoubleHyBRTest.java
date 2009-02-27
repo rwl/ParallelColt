@@ -1,6 +1,5 @@
 package cern.colt.matrix.tdouble.algo.solver;
 
-
 /**
  * Test of DoubleHyBR
  */

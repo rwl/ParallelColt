@@ -165,9 +165,8 @@ public class FloatILUT implements FloatPreconditioner {
             // Store back into the LU matrix, dropping as needed
             gather(rowi, taui, i);
         }
-//        System.out.println(LU.toString());
+        //        System.out.println(LU.toString());
     }
-
 
     /**
      * Copies the dense array back into the sparse vector, applying a numerical

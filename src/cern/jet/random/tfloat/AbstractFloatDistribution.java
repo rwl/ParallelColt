@@ -13,20 +13,20 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
 /**
  * Abstract base class for all random distributions.
  * 
- * A subclass of this class need to override method <tt>nextFloat()</tt> and,
- * in rare cases, also <tt>nextInt()</tt>.
+ * A subclass of this class need to override method <tt>nextFloat()</tt> and, in
+ * rare cases, also <tt>nextInt()</tt>.
  * <p>
  * Currently all subclasses use a uniform pseudo-random number generation engine
  * and transform its results to the target distribution. Thus, they expect such
  * a uniform engine upon instance construction.
  * <p>
- * {@link cern.jet.random.tfloat.engine.FloatMersenneTwister} is recommended as uniform
- * pseudo-random number generation engine, since it is very strong and at the
- * same time quick. {@link #makeDefaultGenerator()} will conveniently construct
- * and return such a magic thing. You can also, for example, use
- * {@link cern.jet.random.tdouble.engine.DRand}, a quicker (but much weaker) uniform
- * random number generation engine. Of course, you can also use other strong
- * uniform random number generation engines.
+ * {@link cern.jet.random.tfloat.engine.FloatMersenneTwister} is recommended as
+ * uniform pseudo-random number generation engine, since it is very strong and
+ * at the same time quick. {@link #makeDefaultGenerator()} will conveniently
+ * construct and return such a magic thing. You can also, for example, use
+ * {@link cern.jet.random.tdouble.engine.DRand}, a quicker (but much weaker)
+ * uniform random number generation engine. Of course, you can also use other
+ * strong uniform random number generation engines.
  * 
  * <p>
  * <b>Ressources on the Web:</b>
@@ -38,17 +38,17 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * Textbook</A> - the definite web book.
  * <p>
  * <b>Other useful ressources:</b>
- * <dt><A
- * HREF="http://www.stats.gla.ac.uk/steps/glossary/probability_distributions.html">
+ * <dt><A HREF=
+ * "http://www.stats.gla.ac.uk/steps/glossary/probability_distributions.html">
  * Another site </A> and <A
  * HREF="http://www.statlets.com/usermanual/glossary.htm"> yet another site
  * </A>describing the definitions of several distributions.
  * <dt>You may want to check out a <A
  * HREF="http://www.stat.berkeley.edu/users/stark/SticiGui/Text/gloss.htm">
  * Glossary of Statistical Terms</A>.
- * <dt>The GNU Scientific Library contains an extensive (but hardly readable)
- * <A HREF="http://sourceware.cygnus.com/gsl/html/gsl-ref_toc.html#TOC26"> list
- * of definition of distributions</A>.
+ * <dt>The GNU Scientific Library contains an extensive (but hardly readable) <A
+ * HREF="http://sourceware.cygnus.com/gsl/html/gsl-ref_toc.html#TOC26"> list of
+ * definition of distributions</A>.
  * <dt>Use this Web interface to <A
  * HREF="http://www.stat.ucla.edu/calculators/cdf"> plot all sort of
  * distributions</A>.
@@ -59,7 +59,8 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * <A HREF="http://www.stat.umn.edu/~jkuhn/courses/stat3091f/stat3091f.html">
  * another text book</A>.
  * <dt>Finally, a good link list <A
- * HREF="http://www.execpc.com/~helberg/statistics.html"> Statistics on the Web</A>.
+ * HREF="http://www.execpc.com/~helberg/statistics.html"> Statistics on the
+ * Web</A>.
  * <p>
  * 
  * @see cern.jet.random.tfloat.engine
@@ -86,9 +87,9 @@ public abstract class AbstractFloatDistribution extends cern.colt.PersistentObje
     }
 
     /**
-     * Equivalent to <tt>nextInt()</tt>. This has the effect that
-     * distributions can now be used as function objects, returning a random
-     * number upon function evaluation.
+     * Equivalent to <tt>nextInt()</tt>. This has the effect that distributions
+     * can now be used as function objects, returning a random number upon
+     * function evaluation.
      */
     public int apply(int dummy) {
         return nextInt();

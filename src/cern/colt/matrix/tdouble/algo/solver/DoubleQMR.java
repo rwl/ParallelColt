@@ -177,7 +177,7 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
             rho = DoubleAlgebra.DEFAULT.norm(y, Norm.Two);
 
             A.zMult(q, w_tld.assign(w, DoubleFunctions.multSecond(-beta)), 1, 1, true);
-            
+
             M2.transApply(w_tld, z);
             xi = DoubleAlgebra.DEFAULT.norm(z, Norm.Two);
 
@@ -192,7 +192,7 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
             eta = -eta * rho_1 * gamma * gamma / (beta * gamma_1 * gamma_1);
 
             if (iter.isFirst()) {
-                d.assign(p, DoubleFunctions.multSecond(eta));                
+                d.assign(p, DoubleFunctions.multSecond(eta));
                 s.assign(p_tld, DoubleFunctions.multSecond(eta));
             } else {
                 double val = theta_1 * theta_1 * gamma * gamma;

@@ -13,8 +13,8 @@ import cern.colt.list.tfloat.FloatArrayList;
 /**
  * The interface shared by all quantile finders, no matter if they are exact or
  * approximate. It is usually completely sufficient to operate on this interface
- * only. Also see {@link hep.aida.tfloat.bin.QuantileFloatBin1D}, demonstrating how
- * this package can be used.
+ * only. Also see {@link hep.aida.tfloat.bin.QuantileFloatBin1D}, demonstrating
+ * how this package can be used.
  */
 public interface FloatQuantileFinder extends java.io.Serializable {
     // public interface FloatQuantileFinder extends
@@ -68,8 +68,8 @@ public interface FloatQuantileFinder extends java.io.Serializable {
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
      *            returns <tt>false</tt>, otherwise continues.
-     * @return <tt>false</tt> if the procedure stopped before all elements
-     *         where iterated over, <tt>true</tt> otherwise.
+     * @return <tt>false</tt> if the procedure stopped before all elements where
+     *         iterated over, <tt>true</tt> otherwise.
      */
     public boolean forEach(cern.colt.function.tfloat.FloatProcedure procedure);
 
@@ -82,15 +82,16 @@ public interface FloatQuantileFinder extends java.io.Serializable {
 
     /**
      * Returns how many percent of the elements contained in the receiver are
-     * <tt>&lt;= element</tt>. Does linear interpolation if the element is
-     * not contained but lies in between two contained elements.
+     * <tt>&lt;= element</tt>. Does linear interpolation if the element is not
+     * contained but lies in between two contained elements.
      * 
      * Writing a wrapper is a good idea if you can think of better ways of doing
      * interpolation. Same if you want to keep min,max and other such measures.
      * 
      * @param element
      *            the element to search for.
-     * @return the percentage <tt>p</tt> of elements <tt>&lt;= element</tt> (<tt>0.0 &lt;= p &lt;=1.0)</tt>.
+     * @return the percentage <tt>p</tt> of elements <tt>&lt;= element</tt> (
+     *         <tt>0.0 &lt;= p &lt;=1.0)</tt>.
      */
     public float phi(float element);
 

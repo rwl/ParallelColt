@@ -37,8 +37,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * <p>
  * <b>Memory requirements:</b>
  * <p>
- * <tt>memory [bytes] = 4*(rowIndexes.length+columnIndexes.length)</tt>.
- * Thus, an index view with 1000 x 1000 indexes additionally uses 8 KB.
+ * <tt>memory [bytes] = 4*(rowIndexes.length+columnIndexes.length)</tt>. Thus,
+ * an index view with 1000 x 1000 indexes additionally uses 8 KB.
  * <p>
  * <b>Time complexity:</b>
  * <p>
@@ -182,9 +182,9 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share common cells. More
-     * formally, returns <tt>true</tt> if <tt>other != null</tt> and at
-     * least one of the following conditions is met
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+     * following conditions is met
      * <ul>
      * <li>the receiver is a view of the other matrix
      * <li>the other matrix is a view of the receiver
@@ -250,8 +250,8 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be
-     * of type <tt>DenseComplexMatrix1D</tt>.
+     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be of
+     * type <tt>DenseComplexMatrix1D</tt>.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -269,8 +269,8 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -311,8 +311,8 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -374,8 +374,8 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the rows of
      * the given column. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * 
      * @param the
      *            column to fix.
@@ -398,8 +398,8 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the columns
      * of the given row. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * 
      * @param the
      *            row to fix.

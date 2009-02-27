@@ -148,8 +148,8 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * as the receiver, having the specified size. For example, if the receiver
      * is an instance of type <tt>DenseFloatMatrix1D</tt> the new matrix must
      * also be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
+     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also be
+     * of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
      * should have internal parametrization as similar as possible.
      * 
      * @param size
@@ -164,9 +164,9 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is
-     * an instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be
-     * of type <tt>SparseFloatMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -184,7 +184,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
         }
         FloatMatrix2D M = new DenseFloatMatrix2D(rows, cols);
         final float[] elemsOther = (float[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0);
+        final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int idxOther;
@@ -205,7 +205,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
         }
         FloatMatrix3D M = new DenseFloatMatrix3D(slices, rows, cols);
         final float[] elemsOther = (float[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0, 0);
+        final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();

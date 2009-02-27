@@ -13,14 +13,14 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
 
 /**
  * Conveniently computes a stable <i>Simple Random Sample Without Replacement
- * (SRSWOR)</i> subsequence of <tt>n</tt> elements from a given input
- * sequence of <tt>N</tt> elements; Example: Computing a sublist of
- * <tt>n=3</tt> random elements from a list <tt>(1,...,50)</tt> may yield
- * the sublist <tt>(7,13,47)</tt>. The subsequence is guaranteed to be
- * <i>stable</i>, i.e. elements never change position relative to each other.
- * Each element from the <tt>N</tt> elements has the same probability to be
- * included in the <tt>n</tt> chosen elements. This class is a convenience
- * adapter for <tt>RandomSampler</tt> using blocks.
+ * (SRSWOR)</i> subsequence of <tt>n</tt> elements from a given input sequence
+ * of <tt>N</tt> elements; Example: Computing a sublist of <tt>n=3</tt> random
+ * elements from a list <tt>(1,...,50)</tt> may yield the sublist
+ * <tt>(7,13,47)</tt>. The subsequence is guaranteed to be <i>stable</i>, i.e.
+ * elements never change position relative to each other. Each element from the
+ * <tt>N</tt> elements has the same probability to be included in the <tt>n</tt>
+ * chosen elements. This class is a convenience adapter for
+ * <tt>RandomSampler</tt> using blocks.
  * 
  * @see FloatRandomSampler
  * @author wolfgang.hoschek@cern.ch
@@ -42,8 +42,8 @@ public class FloatRandomSamplingAssistant extends cern.colt.PersistentObject {
     static final int MAX_BUFFER_SIZE = 200;
 
     /**
-     * Constructs a random sampler that samples <tt>n</tt> random elements
-     * from an input sequence of <tt>N</tt> elements.
+     * Constructs a random sampler that samples <tt>n</tt> random elements from
+     * an input sequence of <tt>N</tt> elements.
      * 
      * @param n
      *            the total number of elements to choose (must be &gt;= 0).

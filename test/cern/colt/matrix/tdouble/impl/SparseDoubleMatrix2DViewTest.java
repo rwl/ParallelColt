@@ -1,6 +1,5 @@
 package cern.colt.matrix.tdouble.impl;
 
-
 public class SparseDoubleMatrix2DViewTest extends SparseDoubleMatrix2DTest {
 
     public SparseDoubleMatrix2DViewTest(String arg0) {

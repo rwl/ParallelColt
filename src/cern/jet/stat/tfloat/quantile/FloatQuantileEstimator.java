@@ -182,8 +182,8 @@ abstract class FloatQuantileEstimator extends cern.colt.PersistentObject impleme
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
      *            returns <tt>false</tt>, otherwise continues.
-     * @return <tt>false</tt> if the procedure stopped before all elements
-     *         where iterated over, <tt>true</tt> otherwise.
+     * @return <tt>false</tt> if the procedure stopped before all elements where
+     *         iterated over, <tt>true</tt> otherwise.
      */
     public boolean forEach(cern.colt.function.tfloat.FloatProcedure procedure) {
         return this.bufferSet.forEach(procedure);
@@ -205,12 +205,13 @@ abstract class FloatQuantileEstimator extends cern.colt.PersistentObject impleme
 
     /**
      * Returns how many percent of the elements contained in the receiver are
-     * <tt>&lt;= element</tt>. Does linear interpolation if the element is
-     * not contained but lies in between two contained elements.
+     * <tt>&lt;= element</tt>. Does linear interpolation if the element is not
+     * contained but lies in between two contained elements.
      * 
      * @param the
      *            element to search for.
-     * @return the percentage <tt>p</tt> of elements <tt>&lt;= element</tt> (<tt>0.0 &lt;= p &lt;=1.0)</tt>.
+     * @return the percentage <tt>p</tt> of elements <tt>&lt;= element</tt> (
+     *         <tt>0.0 &lt;= p &lt;=1.0)</tt>.
      */
     public float phi(float element) {
         return bufferSet.phi(element);

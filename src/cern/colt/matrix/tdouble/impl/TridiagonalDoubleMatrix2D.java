@@ -57,7 +57,8 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
      */
     public TridiagonalDoubleMatrix2D(double[][] values) {
         this(values.length, values.length == 0 ? 0 : values[0].length);
@@ -74,7 +75,8 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>.
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+     *             .
      */
     public TridiagonalDoubleMatrix2D(int rows, int columns) {
         super(null);
@@ -357,9 +359,9 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseDoubleMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver
-     * is an instance of type <tt>SparseDoubleMatrix2D</tt> the new matrix
-     * must be of type <tt>SparseDoubleMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver is
+     * an instance of type <tt>SparseDoubleMatrix2D</tt> the new matrix must be
+     * of type <tt>SparseDoubleMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -370,8 +372,8 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -500,12 +502,12 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         DenseDoubleMatrix1D zz = (DenseDoubleMatrix1D) z;
         final double[] zElements = zz.elements;
         final int zStride = zz.stride();
-        final int zi = (int)z.index(0);
+        final int zi = (int) z.index(0);
 
         DenseDoubleMatrix1D yy = (DenseDoubleMatrix1D) y;
         final double[] yElements = yy.elements;
         final int yStride = yy.stride();
-        final int yi = (int)y.index(0);
+        final int yi = (int) y.index(0);
 
         if (yElements == null || zElements == null)
             throw new InternalError();

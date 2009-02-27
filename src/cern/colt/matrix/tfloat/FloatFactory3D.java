@@ -13,12 +13,13 @@ import cern.colt.matrix.tfloat.impl.SparseFloatMatrix3D;
 
 /**
  * Factory for convenient construction of 3-d matrices holding <tt>float</tt>
- * cells. Use idioms like <tt>FloatFactory3D.dense.make(4,4,4)</tt> to
- * construct dense matrices, <tt>FloatFactory3D.sparse.make(4,4,4)</tt> to
- * construct sparse matrices.
+ * cells. Use idioms like <tt>FloatFactory3D.dense.make(4,4,4)</tt> to construct
+ * dense matrices, <tt>FloatFactory3D.sparse.make(4,4,4)</tt> to construct
+ * sparse matrices.
  * 
  * If the factory is used frequently it might be useful to streamline the
- * notation. For example by aliasing: <table>
+ * notation. For example by aliasing:
+ * <table>
  * <td class="PRE">
  * 
  * <pre>
@@ -92,10 +93,12 @@ public class FloatFactory3D extends cern.colt.PersistentObject {
      * @return <tt>this</tt> (for convenience only).
      * @throws IllegalArgumentException
      *             if
-     *             <tt>values.length != slices() || for any 0 &lt;= slice &lt; slices(): values[slice].length != rows()</tt>.
+     *             <tt>values.length != slices() || for any 0 &lt;= slice &lt; slices(): values[slice].length != rows()</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != columns()</tt>.
+     *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != columns()</tt>
+     *             .
      */
     public FloatMatrix3D make(float[][][] values) {
         if (this == sparse)

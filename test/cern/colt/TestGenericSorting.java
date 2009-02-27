@@ -136,7 +136,6 @@ class TestGenericSorting extends Object {
 
         for (int run = 0; run < runs; run++) {
             int maxSize = 50;
-            int maxSplittersSize = 2 * maxSize;
 
             int size = gen.nextIntFromTo(1, maxSize);
             int from, to;

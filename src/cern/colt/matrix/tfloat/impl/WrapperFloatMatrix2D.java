@@ -60,6 +60,54 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return content.getQuick(row, column);
     }
 
+    public boolean equals(float value) {
+        if (content instanceof DiagonalFloatMatrix2D) {
+            float epsilon = cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.tolerance();
+            float[] elements = (float[]) content.elements();
+            for (int r = 0; r < elements.length; r++) {
+                float x = elements[r];
+                float diff = Math.abs(value - x);
+                if ((diff != diff) && ((value != value && x != x) || value == x))
+                    diff = 0;
+                if (!(diff <= epsilon)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return super.equals(value);
+        }
+    }
+
+    public boolean equals(Object obj) {
+        if (content instanceof DiagonalFloatMatrix2D && obj instanceof DiagonalFloatMatrix2D) {
+            float epsilon = cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.tolerance();
+            if (this == obj)
+                return true;
+            if (!(this != null && obj != null))
+                return false;
+            DiagonalFloatMatrix2D A = (DiagonalFloatMatrix2D) content;
+            DiagonalFloatMatrix2D B = (DiagonalFloatMatrix2D) obj;
+            if (A.columns() != B.columns() || A.rows() != B.rows() || A.dindex() != B.dindex() || A.dlength() != B.dlength())
+                return false;
+            float[] AElements = (float[]) A.elements();
+            float[] BElements = (float[]) B.elements();
+            for (int r = 0; r < AElements.length; r++) {
+                float x = AElements[r];
+                float value = BElements[r];
+                float diff = Math.abs(value - x);
+                if ((diff != diff) && ((value != value && x != x) || value == x))
+                    diff = 0;
+                if (!(diff <= epsilon)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return super.equals(obj);
+        }
+    }
+
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified number of rows and columns. For
@@ -67,8 +115,8 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -84,9 +132,9 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver
-     * is an instance of type <tt>SparseFloatMatrix2D</tt> the new matrix
-     * must be of type <tt>SparseFloatMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -97,8 +145,8 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the
-     * specified value.
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
      * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
@@ -168,14 +216,15 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the rows of
      * the given column. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>viewColumn(0) ==></td>
      * <td valign="top">Matrix1D of size 2:<br>
      * 1, 4</td>
@@ -194,17 +243,18 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the column axis.
-     * What used to be column <tt>0</tt> is now column <tt>columns()-1</tt>,
-     * ..., what used to be column <tt>columns()-1</tt> is now column
-     * <tt>0</tt>. The returned view is backed by this matrix, so changes in
-     * the returned view are reflected in this matrix, and vice-versa.
+     * Constructs and returns a new <i>flip view</i> along the column axis. What
+     * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
+     * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
+     * returned view is backed by this matrix, so changes in the returned view
+     * are reflected in this matrix, and vice-versa.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>columnFlip ==></td>
      * <td valign="top">2 x 3 matrix:<br>
      * 3, 2, 1 <br>
@@ -212,7 +262,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * <td>columnFlip ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 
@@ -230,7 +280,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
             public void setQuick(int row, int column, float value) {
                 content.setQuick(row, columns - 1 - column, value);
             }
-            
+
             public float get(int row, int column) {
                 return content.get(row, columns - 1 - column);
             }
@@ -247,18 +297,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * axes; example: 3 x 4 matrix --> 4 x 3 matrix. The view has both
      * dimensions exchanged; what used to be columns become rows, what used to
      * be rows become columns. In other words:
-     * <tt>view.get(row,column)==this.get(column,row)</tt>. This is a
-     * zero-copy transposition, taking O(1), i.e. constant time. The returned
-     * view is backed by this matrix, so changes in the returned view are
-     * reflected in this matrix, and vice-versa. Use idioms like
+     * <tt>view.get(row,column)==this.get(column,row)</tt>. This is a zero-copy
+     * transposition, taking O(1), i.e. constant time. The returned view is
+     * backed by this matrix, so changes in the returned view are reflected in
+     * this matrix, and vice-versa. Use idioms like
      * <tt>result = viewDice(A).copy()</tt> to generate an independent
      * transposed matrix.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>transpose ==></td>
      * <td valign="top">3 x 2 matrix:<br>
      * 1, 4 <br>
@@ -267,7 +318,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * <td>transpose ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 
@@ -282,6 +333,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
             public void setQuick(int row, int column, float value) {
                 content.setQuick(column, row, value);
             }
+
             public float get(int row, int column) {
                 return content.get(column, row);
             }
@@ -294,17 +346,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         view.setNcolumns(rows);
         return view;
     }
-    
+
     /**
      * Sets the number of rows of this matrix
+     * 
      * @param columns
      */
     public void setNcolumns(int columns) {
         this.columns = columns;
     }
-    
+
     /**
      * Sets the number of rows of this matrix
+     * 
      * @param rows
      */
     public void setNrows(int rows) {
@@ -325,11 +379,11 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * <p>
      * The view contains the cells from <tt>[row,column]</tt> to
      * <tt>[row+height-1,column+width-1]</tt>, all inclusive. and has
-     * <tt>view.rows() == height; view.columns() == width;</tt>. A view's
-     * legal coordinates are again zero based, as usual. In other words, legal
+     * <tt>view.rows() == height; view.columns() == width;</tt>. A view's legal
+     * coordinates are again zero based, as usual. In other words, legal
      * coordinates of the view range from <tt>[0,0]</tt> to
-     * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As
-     * usual, any attempt to access a cell at a coordinate
+     * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As usual,
+     * any attempt to access a cell at a coordinate
      * <tt>column&lt;0 || column&gt;=view.columns() || row&lt;0 || row&gt;=view.rows()</tt>
      * will throw an <tt>IndexOutOfBoundsException</tt>.
      * 
@@ -357,6 +411,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
             public void setQuick(int i, int j, float value) {
                 content.setQuick(row + i, column + j, value);
             }
+
             public float get(int i, int j) {
                 return content.get(row + i, column + j);
             }
@@ -374,14 +429,15 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * Constructs and returns a new <i>slice view</i> representing the columns
      * of the given row. The returned view is backed by this matrix, so changes
      * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (<tt>viewPart(...)</tt>),
-     * then apply this method to the sub-range view.
+     * obtain a slice view on subranges, construct a sub-ranging view (
+     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>viewRow(0) ==></td>
      * <td valign="top">Matrix1D of size 3:<br>
      * 1, 2, 3</td>
@@ -399,19 +455,20 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         checkRow(row);
         return new DelegateFloatMatrix1D(this, row);
     }
-    
+
     /**
      * Constructs and returns a new <i>flip view</i> along the row axis. What
-     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what
-     * used to be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned
-     * view is backed by this matrix, so changes in the returned view are
-     * reflected in this matrix, and vice-versa.
+     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
+     * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
+     * backed by this matrix, so changes in the returned view are reflected in
+     * this matrix, and vice-versa.
      * <p>
-     * <b>Example:</b> <table border="0">
+     * <b>Example:</b>
+     * <table border="0">
      * <tr nowrap>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * <td>rowFlip ==></td>
      * <td valign="top">2 x 3 matrix:<br>
      * 4, 5, 6 <br>
@@ -419,7 +476,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * <td>rowFlip ==></td>
      * <td valign="top">2 x 3 matrix: <br>
      * 1, 2, 3<br>
-     * 4, 5, 6 </td>
+     * 4, 5, 6</td>
      * </tr>
      * </table>
      * 
@@ -437,6 +494,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
             public void setQuick(int row, int column, float value) {
                 content.setQuick(rows - 1 - row, column, value);
             }
+
             public float get(int row, int column) {
                 return content.get(rows - 1 - row, column);
             }
@@ -467,7 +525,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      *   view = 2 x 4 matrix:
      *   2, 1, 2, 1
      *   5, 4, 5, 4
-     *  
+     * 
      * </pre>
      * 
      * Note that modifying the index arguments after this call has returned has
@@ -520,6 +578,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
             public void setQuick(int i, int j, float value) {
                 content.setQuick(rix[i], cix[j], value);
             }
+
             public float get(int i, int j) {
                 return content.get(rix[i], cix[j]);
             }
@@ -562,6 +621,7 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
             public void setQuick(int row, int column, float value) {
                 content.setQuick(_rowStride * row, _columnStride * column, value);
             }
+
             public float get(int row, int column) {
                 return content.get(_rowStride * row, _columnStride * column);
             }
@@ -591,8 +651,8 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
      * instance of type <tt>DenseFloatMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseFloatMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseFloatMatrix2D</tt> the new matrix must be of type
+     * type <tt>DenseFloatMatrix1D</tt>, if the receiver is an instance of type
+     * <tt>SparseFloatMatrix2D</tt> the new matrix must be of type
      * <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size

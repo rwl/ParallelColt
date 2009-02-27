@@ -20,8 +20,8 @@ import cern.colt.map.PrimeFinder;
  * Hash map holding (key,value) associations of type <tt>(double-->int)</tt>;
  * Automatically grows and shrinks as needed; Implemented using open addressing
  * with double hashing. First see the <a href="package-summary.html">package
- * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get
- * the broad picture.
+ * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get the
+ * broad picture.
  * 
  * Overrides many methods for performance reasons only.
  * 
@@ -96,7 +96,9 @@ public class OpenDoubleIntHashMap extends AbstractDoubleIntMap {
      *            the maximum load factor.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      */
     public OpenDoubleIntHashMap(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         setUp(initialCapacity, minLoadFactor, maxLoadFactor);
@@ -172,11 +174,11 @@ public class OpenDoubleIntHashMap extends AbstractDoubleIntMap {
      * Applies a procedure to each key of the receiver, if any. Note: Iterates
      * over the keys in no particular order. Subclasses can define a particular
      * order, for example, "sorted by key". All methods which <i>can</i> be
-     * expressed in terms of this method (most methods can) <i>must guarantee</i>
-     * to use the <i>same</i> order defined by this method, even if it is no
-     * particular order. This is necessary so that, for example, methods
-     * <tt>keys</tt> and <tt>values</tt> will yield association pairs, not
-     * two uncorrelated lists.
+     * expressed in terms of this method (most methods can) <i>must
+     * guarantee</i> to use the <i>same</i> order defined by this method, even
+     * if it is no particular order. This is necessary so that, for example,
+     * methods <tt>keys</tt> and <tt>values</tt> will yield association pairs,
+     * not two uncorrelated lists.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -195,8 +197,8 @@ public class OpenDoubleIntHashMap extends AbstractDoubleIntMap {
 
     /**
      * Applies a procedure to each (key,value) pair of the receiver, if any.
-     * Iteration order is guaranteed to be <i>identical</i> to the order used
-     * by method {@link #forEachKey(DoubleProcedure)}.
+     * Iteration order is guaranteed to be <i>identical</i> to the order used by
+     * method {@link #forEachKey(DoubleProcedure)}.
      * 
      * @param procedure
      *            the procedure to be applied. Stops iteration if the procedure
@@ -348,8 +350,8 @@ public class OpenDoubleIntHashMap extends AbstractDoubleIntMap {
      * 
      * @param value
      *            the value to search for.
-     * @return the first key for which holds <tt>get(key) == value</tt>;
-     *         returns <tt>Double.NaN</tt> if no such key exists.
+     * @return the first key for which holds <tt>get(key) == value</tt>; returns
+     *         <tt>Double.NaN</tt> if no such key exists.
      */
     public double keyOf(int value) {
         // returns the first key found; there may be more matching keys,
@@ -400,8 +402,8 @@ public class OpenDoubleIntHashMap extends AbstractDoubleIntMap {
      * 	 public boolean apply(double key, int value) { return value%2==0; }
      * 	 }
      * 	 keys = (8,7,6), values = (1,2,2) --&gt; keyList = (6,8), valueList = (2,1)
-     * </tt>
-     </pre>
+     * &lt;/tt&gt;
+     * </pre>
      * 
      * @param condition
      *            the condition to be matched. Takes the current key as first
@@ -431,10 +433,9 @@ public class OpenDoubleIntHashMap extends AbstractDoubleIntMap {
      *            the key the value shall be associated with.
      * @param value
      *            the value to be associated.
-     * @return <tt>true</tt> if the receiver did not already contain such a
-     *         key; <tt>false</tt> if the receiver did already contain such a
-     *         key - the new value has now replaced the formerly associated
-     *         value.
+     * @return <tt>true</tt> if the receiver did not already contain such a key;
+     *         <tt>false</tt> if the receiver did already contain such a key -
+     *         the new value has now replaced the formerly associated value.
      */
     public boolean put(double key, int value) {
         int i = indexOfInsertion(key);
@@ -549,7 +550,9 @@ public class OpenDoubleIntHashMap extends AbstractDoubleIntMap {
      *            the maxLoadFactor of the receiver.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>.
+     * 
+     *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+     *             .
      */
     protected void setUp(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         int capacity = initialCapacity;

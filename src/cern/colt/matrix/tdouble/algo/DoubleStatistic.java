@@ -26,9 +26,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * correlation, distance matrix. Random sampling views. Conversion to histograms
  * with and without OLAP cube operators. Conversion to bins with retrieval of
  * statistical bin measures. Also see {@link cern.jet.stat} and
- * {@link hep.aida.tdouble.bin}, in particular {@link hep.aida.tdouble.bin.DynamicDoubleBin1D}.
+ * {@link hep.aida.tdouble.bin}, in particular
+ * {@link hep.aida.tdouble.bin.DynamicDoubleBin1D}.
  * <p>
- * Examples: <table border="1" cellspacing="0" dwcopytype="CopyTableRow">
+ * Examples:
+ * <table border="1" cellspacing="0" dwcopytype="CopyTableRow">
  * <tr valign="top" align="center">
  * <td><tt>A</tt></td>
  * <td><tt>covariance(A)</tt></td>
@@ -40,7 +42,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  1&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;3<br>
  2&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;6<br>
  3&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;9<br>
- 4&nbsp;-8&nbsp;-10 </tt> </td>
+ 4&nbsp;-8&nbsp;-10 </tt></td>
  * <td><tt> 3&nbsp;x&nbsp;3&nbsp;matrix<br>
  &nbsp;1.25&nbsp;-3.5&nbsp;-4.5<br>
  -3.5&nbsp;&nbsp;29&nbsp;&nbsp;&nbsp;39&nbsp;&nbsp;<br>
@@ -143,9 +145,9 @@ public class DoubleStatistic extends Object {
 
     /**
      * Applies the given aggregation functions to each column and stores the
-     * results in a the result matrix. If matrix has shape <tt>m x n</tt>,
-     * then result must have shape <tt>aggr.length x n</tt>. Tip: To do
-     * aggregations on rows use dice views (transpositions), as in
+     * results in a the result matrix. If matrix has shape <tt>m x n</tt>, then
+     * result must have shape <tt>aggr.length x n</tt>. Tip: To do aggregations
+     * on rows use dice views (transpositions), as in
      * <tt>aggregate(matrix.viewDice(),aggr,result.viewDice())</tt>.
      * 
      * @param matrix
@@ -179,8 +181,9 @@ public class DoubleStatistic extends Object {
      * Fills all cell values of the given vector into a bin from which
      * statistics measures can be retrieved efficiently. Cells values are
      * copied. <br>
-     * Tip: Use <tt>System.out.println(bin(vector))</tt> to print most
-     * measures computed by the bin. Example: <table>
+     * Tip: Use <tt>System.out.println(bin(vector))</tt> to print most measures
+     * computed by the bin. Example:
+     * <table>
      * <td class="PRE">
      * 
      * <pre>
@@ -222,7 +225,7 @@ public class DoubleStatistic extends Object {
      * 	 18.86124362967137
      * 	 quantileInverse(mean): 0.559163335012079
      * 	 Distinct elements &amp; frequencies not printed (too many).
-     * 	
+     * 
      * </pre>
      * 
      * </td>
@@ -252,9 +255,8 @@ public class DoubleStatistic extends Object {
      * (for a perfect negative relationship) to +1 (for a perfect positive
      * relationship). See the <A
      * HREF="http://www.cquest.utoronto.ca/geog/ggr270y/notes/not05efg.html">
-     * math definition</A> and <A
-     * HREF="http://www.stat.berkeley.edu/users/stark/SticiGui/Text/gloss.htm#correlation_coef">
-     * another def</A>. Compares two column vectors at a time. Use dice views
+     * math definition</A> and <A HREF="http://www.stat.berkeley.edu/users/stark/SticiGui/Text/gloss.htm#correlation_coef"
+     * > another def</A>. Compares two column vectors at a time. Use dice views
      * to compare two row vectors at a time.
      * 
      * @param covariance
@@ -288,9 +290,8 @@ public class DoubleStatistic extends Object {
      * variables, the cells represent covariance coefficients. The diagonal
      * cells (i.e. the covariance between a variable and itself) will equal the
      * variances. The covariance of two column vectors x and y is given by
-     * <tt>cov(x,y) = (1/n) * Sum((x[i]-mean(x)) * (y[i]-mean(y)))</tt>. See
-     * the <A
-     * HREF="http://www.cquest.utoronto.ca/geog/ggr270y/notes/not05efg.html">
+     * <tt>cov(x,y) = (1/n) * Sum((x[i]-mean(x)) * (y[i]-mean(y)))</tt>. See the
+     * <A HREF="http://www.cquest.utoronto.ca/geog/ggr270y/notes/not05efg.html">
      * math definition</A>. Compares two column vectors at a time. Use dice
      * views to compare two row vectors at a time.
      * 
@@ -331,7 +332,8 @@ public class DoubleStatistic extends Object {
      * Computes the distinct values of x and y, yielding histogram axes that
      * capture one distinct value per bin. Then fills the histogram.
      * <p>
-     * Example output: <table>
+     * Example output:
+     * <table>
      * <td class="PRE">
      * 
      * <pre>
@@ -352,8 +354,8 @@ public class DoubleStatistic extends Object {
      * 	   1   |  54  94 103  99 115  92  98  97 103  90  44 |  989
      * 	   0   |  24  54  52  44  42  56  46  47  56  53  20 |  494
      * 	 ----------------------------------------------------------
-     * 	   Sum | 234 522 518 480 509 470 535 476 537 493 226 |     
-     * 	
+     * 	   Sum | 234 522 518 480 509 470 535 476 537 493 226 |
+     * 
      * </pre>
      * 
      * </td>
@@ -412,7 +414,8 @@ public class DoubleStatistic extends Object {
      * @return the histogram containing the cube.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>.
+     *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>
+     *             .
      */
     public static hep.aida.tdouble.DoubleIHistogram3D cube(DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D z, DoubleMatrix1D weights) {
         if (x.size() != y.size() || x.size() != z.size() || x.size() != weights.size())
@@ -571,7 +574,7 @@ public class DoubleStatistic extends Object {
      * @return <tt>histo</tt> (for convenience only).
      */
     public static hep.aida.tdouble.DoubleIHistogram1D histogram(final hep.aida.tdouble.DoubleIHistogram1D histo, final DoubleMatrix2D matrix) {
-        histo.fill_2D((double[]) matrix.elements(), matrix.rows(), matrix.columns(), (int)matrix.index(0, 0), matrix.rowStride(), matrix.columnStride());
+        histo.fill_2D((double[]) matrix.elements(), matrix.rows(), matrix.columns(), (int) matrix.index(0, 0), matrix.rowStride(), matrix.columnStride());
         return histo;
     }
 
@@ -622,7 +625,7 @@ public class DoubleStatistic extends Object {
                         for (int r = startrow; r < stoprow; r++) {
                             for (int c = 0; c < n; c++) {
                                 view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                                histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int)view.index(0, 0), view.rowStride(), view.columnStride());
+                                histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int) view.index(0, 0), view.rowStride(), view.columnStride());
                             }
                         }
                     }
@@ -634,7 +637,7 @@ public class DoubleStatistic extends Object {
             for (int r = 0; r < m; r++) {
                 for (int c = 0; c < n; c++) {
                     view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                    histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int)view.index(0, 0), view.rowStride(), view.columnStride());
+                    histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int) view.index(0, 0), view.rowStride(), view.columnStride());
                 }
             }
         }
@@ -680,7 +683,8 @@ public class DoubleStatistic extends Object {
      * @return <tt>histo</tt> (for convenience only).
      * @throws IllegalArgumentException
      *             if
-     *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>.
+     *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>
+     *             .
      */
     public static hep.aida.tdouble.DoubleIHistogram3D histogram(hep.aida.tdouble.DoubleIHistogram3D histo, DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D z, DoubleMatrix1D weights) {
         if (x.size() != y.size() || x.size() != z.size() || x.size() != weights.size())
@@ -703,8 +707,8 @@ public class DoubleStatistic extends Object {
 
     /**
      * Constructs and returns a sampling view with a size of
-     * <tt>round(matrix.size() * fraction)</tt>. Samples "without
-     * replacement" from the uniform distribution.
+     * <tt>round(matrix.size() * fraction)</tt>. Samples "without replacement"
+     * from the uniform distribution.
      * 
      * @param matrix
      *            any matrix.
@@ -717,7 +721,8 @@ public class DoubleStatistic extends Object {
      * @return the sampling view.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>! (0 <= rowFraction <= 1 && 0 <= columnFraction <= 1)</tt>.
+     *             <tt>! (0 <= rowFraction <= 1 && 0 <= columnFraction <= 1)</tt>
+     *             .
      * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
      */
     public static DoubleMatrix1D viewSample(DoubleMatrix1D matrix, double fraction, DoubleRandomEngine randomGenerator) {
@@ -755,15 +760,16 @@ public class DoubleStatistic extends Object {
      * <tt>round(matrix.rows() * rowFraction)</tt> rows and
      * <tt>round(matrix.columns() * columnFraction)</tt> columns. Samples
      * "without replacement". Rows and columns are randomly chosen from the
-     * uniform distribution. Examples: <table border="1" cellspacing="0">
+     * uniform distribution. Examples:
+     * <table border="1" cellspacing="0">
      * <tr valign="top" align="center">
-     * <td> <div align="left"><tt>matrix</tt></div> </td>
-     * <td> <div align="left"><tt>rowFraction=0.2<br>
-     columnFraction=0.2</tt></div> </td>
-     * <td> <div align="left"><tt>rowFraction=0.2<br>
-     columnFraction=1.0 </tt></div> </td>
-     * <td> <div align="left"><tt>rowFraction=1.0<br>
-     columnFraction=0.2 </tt></div> </td>
+     * <td><div align="left"><tt>matrix</tt></div></td>
+     * <td><div align="left"><tt>rowFraction=0.2<br>
+     columnFraction=0.2</tt></div></td>
+     * <td><div align="left"><tt>rowFraction=0.2<br>
+     columnFraction=1.0 </tt></div></td>
+     * <td><div align="left"><tt>rowFraction=1.0<br>
+     columnFraction=0.2 </tt></div></td>
      * </tr>
      * <tr valign="top">
      * <td><tt> 10&nbsp;x&nbsp;10&nbsp;matrix<br>
@@ -777,16 +783,14 @@ public class DoubleStatistic extends Object {
      71&nbsp;72&nbsp;73&nbsp;74&nbsp;75&nbsp;76&nbsp;77&nbsp;78&nbsp;79&nbsp;&nbsp;80<br>
      81&nbsp;82&nbsp;83&nbsp;84&nbsp;85&nbsp;86&nbsp;87&nbsp;88&nbsp;89&nbsp;&nbsp;90<br>
      91&nbsp;92&nbsp;93&nbsp;94&nbsp;95&nbsp;96&nbsp;97&nbsp;98&nbsp;99&nbsp;100 
-     </tt>
-     * </td>
+     </tt></td>
      * <td><tt> 2&nbsp;x&nbsp;2&nbsp;matrix<br>
      43&nbsp;50<br>
      53&nbsp;60 </tt></td>
      * <td><tt> 2&nbsp;x&nbsp;10&nbsp;matrix<br>
      41&nbsp;42&nbsp;43&nbsp;44&nbsp;45&nbsp;46&nbsp;47&nbsp;48&nbsp;49&nbsp;&nbsp;50<br>
      91&nbsp;92&nbsp;93&nbsp;94&nbsp;95&nbsp;96&nbsp;97&nbsp;98&nbsp;99&nbsp;100 
-     </tt>
-     * </td>
+     </tt></td>
      * <td><tt> 10&nbsp;x&nbsp;2&nbsp;matrix<br>
      &nbsp;4&nbsp;&nbsp;8<br>
      14&nbsp;18<br>
@@ -797,7 +801,7 @@ public class DoubleStatistic extends Object {
      64&nbsp;68<br>
      74&nbsp;78<br>
      84&nbsp;88<br>
-     94&nbsp;98 </tt> </td>
+     94&nbsp;98 </tt></td>
      * </tr>
      * </table>
      * 
@@ -814,7 +818,8 @@ public class DoubleStatistic extends Object {
      * @return the sampling view.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>! (0 <= rowFraction <= 1 && 0 <= columnFraction <= 1)</tt>.
+     *             <tt>! (0 <= rowFraction <= 1 && 0 <= columnFraction <= 1)</tt>
+     *             .
      * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
      */
     public static DoubleMatrix2D viewSample(DoubleMatrix2D matrix, double rowFraction, double columnFraction, DoubleRandomEngine randomGenerator) {
@@ -886,7 +891,8 @@ public class DoubleStatistic extends Object {
      * @return the sampling view.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>! (0 <= sliceFraction <= 1 && 0 <= rowFraction <= 1 && 0 <= columnFraction <= 1)</tt>.
+     *             <tt>! (0 <= sliceFraction <= 1 && 0 <= rowFraction <= 1 && 0 <= columnFraction <= 1)</tt>
+     *             .
      * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
      */
     public static DoubleMatrix3D viewSample(DoubleMatrix3D matrix, double sliceFraction, double rowFraction, double columnFraction, DoubleRandomEngine randomGenerator) {

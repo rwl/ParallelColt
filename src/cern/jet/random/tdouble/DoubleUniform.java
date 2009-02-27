@@ -11,16 +11,16 @@ package cern.jet.random.tdouble;
 import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 
 /**
- * Uniform distribution; <A
- * HREF="http://www.cern.ch/RD11/rkb/AN16pp/node292.html#SECTION0002920000000000000000">
- * Math definition</A> and <A
+ * Uniform distribution; <A HREF=
+ * "http://www.cern.ch/RD11/rkb/AN16pp/node292.html#SECTION0002920000000000000000"
+ * > Math definition</A> and <A
  * HREF="http://www.statsoft.com/textbook/glosu.html#Uniform Distribution">
  * animated definition</A>.
  * <p>
  * Instance methods operate on a user supplied uniform random number generator;
  * they are unsynchronized.
- * <dt> Static methods operate on a default uniform random number generator;
- * they are synchronized.
+ * <dt>Static methods operate on a default uniform random number generator; they
+ * are synchronized.
  * <p>
  * 
  * @author wolfgang.hoschek@cern.ch
@@ -36,8 +36,8 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
 
     /**
      * Constructs a uniform distribution with the given minimum and maximum,
-     * using a {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} seeded with
-     * the given seed.
+     * using a {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister}
+     * seeded with the given seed.
      */
     public DoubleUniform(double min, double max, int seed) {
         this(min, max, new cern.jet.random.tdouble.engine.DoubleMersenneTwister(seed));
@@ -257,8 +257,8 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
     }
 
     /**
-     * Sets the uniform random number generation engine shared by all <b>static</b>
-     * methods.
+     * Sets the uniform random number generation engine shared by all
+     * <b>static</b> methods.
      * 
      * @param randomGenerator
      *            the new uniform random number generation engine to be shared.

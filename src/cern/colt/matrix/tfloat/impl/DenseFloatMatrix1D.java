@@ -132,7 +132,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
                         int idx = zero + (firstIdx - 1) * stride;
                         float a = f.apply(elements[idx]);
                         for (int i = firstIdx - 1; --i >= lastIdx;) {
-                            a = aggr.apply(a, f.apply(elements[idx-=stride]));
+                            a = aggr.apply(a, f.apply(elements[idx -= stride]));
                         }
                         return a;
                     }
@@ -143,7 +143,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
             int idx = zero + (size - 1) * stride;
             a = f.apply(elements[idx]);
             for (int i = size - 1; --i >= 0;) {
-                a = aggr.apply(a, f.apply(elements[idx-=stride]));
+                a = aggr.apply(a, f.apply(elements[idx -= stride]));
             }
         }
         return a;
@@ -156,7 +156,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         checkSize(other);
         if (size == 0)
             return Float.NaN;
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final float[] elemsOther = (float[]) other.elements();
         float a = 0;
@@ -246,18 +246,18 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
-        } else {            
+        } else {
             int idx = zero - stride;
             // specialization for speed
             if (function instanceof cern.jet.math.tfloat.FloatMult) {
                 // x[i] = mult*x[i]
-                for (int k = size; --k>=0;) {
-                    elements[idx+= stride] *= multiplicator;
-                }                
+                for (int k = size; --k >= 0;) {
+                    elements[idx += stride] *= multiplicator;
+                }
             } else {
                 // the general case x[i] = f(x[i])
-                for (int k = size; --k>=0;) {
-                    elements[idx+= stride] = function.apply(elements[idx]);
+                for (int k = size; --k >= 0;) {
+                    elements[idx += stride] = function.apply(elements[idx]);
                 }
             }
         }
@@ -466,7 +466,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         final float[] elemsOther = other.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -512,7 +512,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
             return this;
         }
         checkSize(y);
-        final int zeroOther = (int)y.index(0);
+        final int zeroOther = (int) y.index(0);
         final int strideOther = y.stride();
         final float[] elemsOther = (float[]) y.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1239,7 +1239,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         }
         FloatMatrix2D M = new DenseFloatMatrix2D(rows, cols);
         final float[] elemsOther = (float[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0);
+        final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1292,7 +1292,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         }
         FloatMatrix3D M = new DenseFloatMatrix3D(slices, rows, cols);
         final float[] elemsOther = (float[]) M.elements();
-        final int zeroOther = (int)M.index(0, 0, 0);
+        final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
@@ -1360,7 +1360,7 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         final float[] elemsOther = y.elements;
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        final int zeroOther = (int)other.index(0);
+        final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -1410,79 +1410,79 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         else
             super.toArray(values);
     }
-    
-//    public float zDotProduct(FloatMatrix1D y) {
-//        if (!(y instanceof DenseFloatMatrix1D)) {
-//            return super.zDotProduct(y);
-//        }
-//        DenseFloatMatrix1D yy = (DenseFloatMatrix1D) y;
-//        final float[] elemsOther = yy.elements;
-//        int zeroThis = index(0);
-//        int zeroOther = yy.index(0);
-//        int strideOther = yy.stride;
-//        if (elements == null || elemsOther == null)
-//            throw new InternalError();
-//        float sum = 0;
-//        int np = ConcurrencyUtils.getNumberOfProcessors();
-//        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-//            final int zeroThisF = zeroThis;
-//            final int zeroOtherF = zeroOther;
-//            final int strideOtherF = strideOther;
-//            Future<?>[] futures = new Future[np];
-//            Float[] results = new Float[np];
-//            int k = size / np;
-//            for (int j = 0; j < np; j++) {
-//                final int startidx = j * k;
-//                final int stopidx;
-//                if (j == np - 1) {
-//                    stopidx = size;
-//                } else {
-//                    stopidx = startidx + k;
-//                }
-//                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Float>() {
-//                    public Float call() throws Exception {
-//                        int idx = zeroThisF + startidx * stride;
-//                        int idxOther = zeroOtherF + startidx * strideOtherF;
-//                        idx -= stride;
-//                        idxOther -= strideOtherF;
-//                        float sum = 0;
-//                        int min = stopidx - startidx;
-//                        for (int k = min / 4; --k >= 0;) {
-//                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
-//                        }
-//                        for (int k = min % 4; --k >= 0;) {
-//                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF];
-//                        }
-//                        return sum;
-//                    }
-//                });
-//            }
-//            try {
-//                for (int j = 0; j < np; j++) {
-//                    results[j] = (Float) futures[j].get();
-//                }
-//                sum = results[0];
-//                for (int j = 1; j < np; j++) {
-//                    sum += results[j];
-//                }
-//            } catch (ExecutionException ex) {
-//                ex.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            zeroThis -= stride;
-//            zeroOther -= strideOther;
-//            for (int k = size / 4; --k >= 0;) {
-//                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride]
-//                        * elemsOther[zeroOther += strideOther];
-//            }
-//            for (int k = size % 4; --k >= 0;) {
-//                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
-//            }
-//        }
-//        return sum;
-//    }
+
+    //    public float zDotProduct(FloatMatrix1D y) {
+    //        if (!(y instanceof DenseFloatMatrix1D)) {
+    //            return super.zDotProduct(y);
+    //        }
+    //        DenseFloatMatrix1D yy = (DenseFloatMatrix1D) y;
+    //        final float[] elemsOther = yy.elements;
+    //        int zeroThis = index(0);
+    //        int zeroOther = yy.index(0);
+    //        int strideOther = yy.stride;
+    //        if (elements == null || elemsOther == null)
+    //            throw new InternalError();
+    //        float sum = 0;
+    //        int np = ConcurrencyUtils.getNumberOfProcessors();
+    //        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    //            final int zeroThisF = zeroThis;
+    //            final int zeroOtherF = zeroOther;
+    //            final int strideOtherF = strideOther;
+    //            Future<?>[] futures = new Future[np];
+    //            Float[] results = new Float[np];
+    //            int k = size / np;
+    //            for (int j = 0; j < np; j++) {
+    //                final int startidx = j * k;
+    //                final int stopidx;
+    //                if (j == np - 1) {
+    //                    stopidx = size;
+    //                } else {
+    //                    stopidx = startidx + k;
+    //                }
+    //                futures[j] = ConcurrencyUtils.threadPool.submit(new Callable<Float>() {
+    //                    public Float call() throws Exception {
+    //                        int idx = zeroThisF + startidx * stride;
+    //                        int idxOther = zeroOtherF + startidx * strideOtherF;
+    //                        idx -= stride;
+    //                        idxOther -= strideOtherF;
+    //                        float sum = 0;
+    //                        int min = stopidx - startidx;
+    //                        for (int k = min / 4; --k >= 0;) {
+    //                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+    //                        }
+    //                        for (int k = min % 4; --k >= 0;) {
+    //                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+    //                        }
+    //                        return sum;
+    //                    }
+    //                });
+    //            }
+    //            try {
+    //                for (int j = 0; j < np; j++) {
+    //                    results[j] = (Float) futures[j].get();
+    //                }
+    //                sum = results[0];
+    //                for (int j = 1; j < np; j++) {
+    //                    sum += results[j];
+    //                }
+    //            } catch (ExecutionException ex) {
+    //                ex.printStackTrace();
+    //            } catch (InterruptedException e) {
+    //                e.printStackTrace();
+    //            }
+    //        } else {
+    //            zeroThis -= stride;
+    //            zeroOther -= strideOther;
+    //            for (int k = size / 4; --k >= 0;) {
+    //                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride]
+    //                        * elemsOther[zeroOther += strideOther];
+    //            }
+    //            for (int k = size % 4; --k >= 0;) {
+    //                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
+    //            }
+    //        }
+    //        return sum;
+    //    }
 
     public float zDotProduct(FloatMatrix1D y, int from, int length) {
         if (!(y instanceof DenseFloatMatrix1D)) {
@@ -1498,8 +1498,8 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         if (y.size() < tail)
             tail = y.size();
         final float[] elemsOther = yy.elements;
-        int zeroThis = (int)index(from);
-        int zeroOther = (int)yy.index(from);
+        int zeroThis = (int) index(from);
+        int zeroOther = (int) yy.index(from);
         int strideOther = yy.stride;
         if (elements == null || elemsOther == null)
             throw new InternalError();

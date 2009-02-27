@@ -46,10 +46,12 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      *            The values to be filled into the new matrix.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>.
+     *             <tt>for any 1 &lt;= slice &lt; values.length: values[slice].length != values[slice-1].length</tt>
+     *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>.
+     *             <tt>for any 1 &lt;= row &lt; values[0].length: values[slice][row].length != values[slice][row-1].length</tt>
+     *             .
      */
     public SparseFComplexMatrix3D(float[][][] values) {
         this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
@@ -159,10 +161,9 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      */
     public float[] getQuick(int slice, int row, int column) {
         float[] elem = elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride);
-        if(elem != null) {
-            return new float[] {elem[0], elem[1]};
-        }
-        else {
+        if (elem != null) {
+            return new float[] { elem[0], elem[1] };
+        } else {
             return new float[2];
         }
     }
@@ -177,8 +178,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
     }
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical
-     * cell.
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
     protected boolean haveSharedCellsRaw(FComplexMatrix3D other) {
         if (other instanceof SelectedSparseFComplexMatrix3D) {
@@ -232,9 +232,9 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
      * instance of type <tt>DenseComplexMatrix3D</tt> the new matrix must also
-     * be of type <tt>DenseComplexMatrix2D</tt>, if the receiver is an
-     * instance of type <tt>SparseComplexMatrix3D</tt> the new matrix must
-     * also be of type <tt>SparseComplexMatrix2D</tt>, etc.
+     * be of type <tt>DenseComplexMatrix2D</tt>, if the receiver is an instance
+     * of type <tt>SparseComplexMatrix3D</tt> the new matrix must also be of
+     * type <tt>SparseComplexMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.

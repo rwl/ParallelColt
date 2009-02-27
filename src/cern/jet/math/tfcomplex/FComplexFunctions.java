@@ -65,7 +65,7 @@ public class FComplexFunctions {
             z[1] = -re;
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
 
@@ -125,7 +125,7 @@ public class FComplexFunctions {
             z[1] = -re;
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
 
@@ -175,7 +175,7 @@ public class FComplexFunctions {
 
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
 
@@ -206,7 +206,7 @@ public class FComplexFunctions {
             z[1] = -x[1];
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             z[0] = re;
@@ -242,7 +242,7 @@ public class FComplexFunctions {
 
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
 
@@ -279,7 +279,7 @@ public class FComplexFunctions {
             z[1] = (float) (scalar * Math.sin(x[1]));
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             float scalar = (float) Math.exp(re);
@@ -293,9 +293,9 @@ public class FComplexFunctions {
         public final float[] apply(float[] x) {
             return x;
         }
-        
+
         public final float[] apply(float re, float im) {
-            return new float[] {re, im};
+            return new float[] { re, im };
         }
     };
 
@@ -319,7 +319,7 @@ public class FComplexFunctions {
             }
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             if (im != 0.0) {
@@ -348,7 +348,7 @@ public class FComplexFunctions {
             z[1] = FComplex.arg(x);
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             z[0] = (float) Math.log(FComplex.abs(re, im));
@@ -361,7 +361,7 @@ public class FComplexFunctions {
         public final float[] apply(float[] x) {
             return new float[] { -x[0], -x[1] };
         }
-        
+
         public final float[] apply(float re, float im) {
             return new float[] { -re, -im };
         }
@@ -393,7 +393,7 @@ public class FComplexFunctions {
 
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             float re1, im1, re2, im2;
@@ -445,7 +445,7 @@ public class FComplexFunctions {
             }
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             float absx = FComplex.abs(re, im);
@@ -478,7 +478,7 @@ public class FComplexFunctions {
             z[1] = x[1] * x[0] + x[0] * x[1];
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             z[0] = re * re - im * im;
@@ -522,7 +522,7 @@ public class FComplexFunctions {
 
             return z;
         }
-        
+
         public final float[] apply(float re, float im) {
             float[] z = new float[2];
             float scalar;
@@ -704,9 +704,9 @@ public class FComplexFunctions {
             public final float[] apply(float[] var) {
                 return function.apply(c, var);
             }
-            
+
             public final float[] apply(float re, float im) {
-                return function.apply(c, new float[] {re, im});
+                return function.apply(c, new float[] { re, im });
             }
         };
     }
@@ -716,9 +716,9 @@ public class FComplexFunctions {
             public final float[] apply(float[] var) {
                 return function.apply(var, c);
             }
-            
+
             public final float[] apply(float re, float im) {
-                return function.apply(new float[] {re, im}, c);
+                return function.apply(new float[] { re, im }, c);
             }
         };
     }
@@ -746,7 +746,7 @@ public class FComplexFunctions {
             }
 
             public final float[] apply(float re, float im) {
-                return g.apply(h.apply(new float[] {re, im}));
+                return g.apply(h.apply(new float[] { re, im }));
             }
         };
     }
@@ -756,9 +756,9 @@ public class FComplexFunctions {
             public final float[] apply(float[] x) {
                 return c;
             }
-            
+
             public final float[] apply(float re, float im) {
-                return new float[] {re, im};
+                return new float[] { re, im };
             }
         };
     }
@@ -826,7 +826,7 @@ public class FComplexFunctions {
                 z[1] = x[1] + y[1];
                 return z;
             }
-            
+
             public final float[] apply(float re, float im) {
                 float[] z = new float[2];
                 z[0] = re + y[0];
@@ -851,7 +851,7 @@ public class FComplexFunctions {
                 z[1] = (float) (scalar * Math.sin(im));
                 return z;
             }
-            
+
             public final float[] apply(float re, float im) {
                 float[] z = new float[2];
                 float re2 = (float) (y * Math.log(FComplex.abs(re, im)));
@@ -899,7 +899,7 @@ public class FComplexFunctions {
                 z[1] = (float) (scalar * Math.sin(im2));
                 return z;
             }
-            
+
             public final float[] apply(float re, float im) {
                 float[] z = new float[2];
                 float re1 = (float) Math.log(FComplex.abs(re, im));
@@ -926,7 +926,7 @@ public class FComplexFunctions {
         public float[] apply(float[] argument) {
             return new float[] { (float) Math.random(), (float) Math.random() };
         }
-        
+
         public float[] apply(float re, float im) {
             return new float[] { (float) Math.random(), (float) Math.random() };
         }

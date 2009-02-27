@@ -18,9 +18,9 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding
- * <tt>int</tt> elements. First see the <a
- * href="package-summary.html">package summary</a> and javadoc <a
- * href="package-tree.html">tree view</a> to get the broad picture.
+ * <tt>int</tt> elements. First see the <a href="package-summary.html">package
+ * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get the
+ * broad picture.
  * <p>
  * A matrix has a number of cells (its <i>size</i>), which are assigned upon
  * instance construction. Elements are accessed via zero based indexes. Legal
@@ -700,7 +700,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
         IntMatrix1D copy = like();
         copy.assign(this);
         return copy;
-    }    
+    }
 
     /**
      * Returns the elements of this matrix.
@@ -724,9 +724,8 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     /**
      * Compares this object against the specified object. The result is
      * <code>true</code> if and only if the argument is not <code>null</code>
-     * and is at least a <code>IntMatrix1D</code> object that has the same
-     * sizes as the receiver and has exactly the same values at the same
-     * indexes.
+     * and is at least a <code>IntMatrix1D</code> object that has the same sizes
+     * as the receiver and has exactly the same values at the same indexes.
      * 
      * @param obj
      *            the object to compare with.
@@ -988,11 +987,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same size. For example, if the receiver is an
-     * instance of type <tt>DenseIntMatrix1D</tt> the new matrix must also be
-     * of type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseIntMatrix1D</tt> the new matrix must also be of type
-     * <tt>SparseIntMatrix1D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * instance of type <tt>DenseIntMatrix1D</tt> the new matrix must also be of
+     * type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of type
+     * <tt>SparseIntMatrix1D</tt> the new matrix must also be of type
+     * <tt>SparseIntMatrix1D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1003,11 +1002,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix must
-     * also be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseIntMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseIntMatrix1D</tt>, etc. In general, the new matrix
-     * should have internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix must also
+     * be of type <tt>DenseIntMatrix1D</tt>, if the receiver is an instance of
+     * type <tt>SparseIntMatrix1D</tt> the new matrix must also be of type
+     * <tt>SparseIntMatrix1D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
@@ -1018,10 +1017,10 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseIntMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseIntMatrix2D</tt>, if the receiver is
-     * an instance of type <tt>SparseIntMatrix1D</tt> the new matrix must be
-     * of type <tt>SparseIntMatrix2D</tt>, etc.
+     * receiver is an instance of type <tt>DenseIntMatrix1D</tt> the new matrix
+     * must be of type <tt>DenseIntMatrix2D</tt>, if the receiver is an instance
+     * of type <tt>SparseIntMatrix1D</tt> the new matrix must be of type
+     * <tt>SparseIntMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -1168,8 +1167,8 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     }
 
     /**
-     * Returns new IntMatrix2D of size rows x columns whose elements are
-     * taken column-wise from this matrix.
+     * Returns new IntMatrix2D of size rows x columns whose elements are taken
+     * column-wise from this matrix.
      * 
      * @param rows
      *            number of rows
@@ -1180,8 +1179,8 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     public abstract IntMatrix2D reshape(int rows, int cols);
 
     /**
-     * Returns new IntMatrix3D of size slices x rows x columns, whose
-     * elements are taken column-wise from this matrix.
+     * Returns new IntMatrix3D of size slices x rows x columns, whose elements
+     * are taken column-wise from this matrix.
      * 
      * @param rows
      *            number of rows
@@ -1223,16 +1222,15 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      */
     public abstract void setQuick(int index, int value);
 
-    
     /**
      * Sets the size of this matrix.
-     * @param size 
+     * 
+     * @param size
      */
     public void setSize(int size) {
         this.size = size;
     }
-    
-    
+
     /**
      * Swaps each element <tt>this[i]</tt> with <tt>other[i]</tt>.
      * 
@@ -1482,7 +1480,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
         checkIndexes(indexes);
         int[] offsets = new int[indexes.length];
         for (int i = 0; i < indexes.length; i++) {
-            offsets[i] = (int)index(indexes[i]);
+            offsets[i] = (int) index(indexes[i]);
         }
         return viewSelectionLike(offsets);
     }
@@ -1500,8 +1498,8 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * Sorts the vector into ascending order, according to the <i>natural
      * ordering</i>. This sort is guaranteed to be <i>stable</i>. For further
      * information, see
-     * {@link cern.colt.matrix.tint.algo.IntSorting#sort(IntMatrix1D)}.
-     * For more advanced sorting functionality, see
+     * {@link cern.colt.matrix.tint.algo.IntSorting#sort(IntMatrix1D)}. For more
+     * advanced sorting functionality, see
      * {@link cern.colt.matrix.tint.algo.IntSorting}.
      * 
      * @return a new sorted vector (matrix) view.

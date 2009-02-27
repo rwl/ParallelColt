@@ -169,7 +169,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f) {
         if (size() == 0)
             return Double.NaN;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         double a = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -212,7 +212,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f, final DoubleProcedure cond) {
         if (size() == 0)
             return Double.NaN;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         double a = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -268,7 +268,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f, final IntArrayList rowList, final IntArrayList columnList) {
         if (size() == 0)
             return Double.NaN;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         final int size = rowList.size();
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
@@ -308,8 +308,8 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         checkShape(other);
         if (size() == 0)
             return Double.NaN;
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)other.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
         final int rowStrideOther = other.rowStride();
         final int columnStrideOther = other.columnStride();
         final double[] otherElements = (double[]) other.elements();
@@ -362,7 +362,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
             if (multiplicator == 0)
                 return assign(0);
         }
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -422,7 +422,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     public DoubleMatrix2D assign(final DoubleProcedure cond, final DoubleFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -467,7 +467,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     public DoubleMatrix2D assign(final DoubleProcedure cond, final double value) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -512,7 +512,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     public DoubleMatrix2D assign(final double value) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -554,7 +554,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         if (this.isNoView) {
             System.arraycopy(values, 0, this.elements, 0, values.length);
         } else {
-            final int zero = (int)index(0, 0);
+            final int zero = (int) index(0, 0);
             if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 Future<?>[] futures = new Future[np];
                 int k = columns / np;
@@ -596,7 +596,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "columns()=" + rows());
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = rows / np;
@@ -660,8 +660,8 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
             other = (DenseColDoubleMatrix2D) c;
         }
 
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
         final double[] otherElements = other.elements;
@@ -724,8 +724,8 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         DenseColDoubleMatrix2D other = (DenseColDoubleMatrix2D) y;
         checkShape(y);
         final double[] otherElements = other.elements;
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride;
         final int rowStrideOther = other.rowStride;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -973,8 +973,8 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         final int[] rowElements = rowList.elements();
         final int[] columnElements = columnList.elements();
         final double[] otherElements = (double[]) other.elements();
-        final int zeroOther = (int)other.index(0, 0);
-        final int zero = (int)index(0, 0);
+        final int zeroOther = (int) other.index(0, 0);
+        final int zero = (int) index(0, 0);
         final int columnStrideOther = other.columnStride();
         final int rowStrideOther = other.rowStride();
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1014,7 +1014,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public DoubleMatrix2D assign(final float[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*columns()=" + rows() * columns());
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1055,7 +1055,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public int cardinality() {
         int cardinality = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             Integer[] results = new Integer[np];
@@ -1339,7 +1339,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -1388,8 +1388,8 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         }
         DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         final double[] CElems = (double[]) ((DenseDComplexMatrix2D) C).elements();
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)C.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) C.index(0, 0);
         final int rowStrideOther = C.rowStride() / 2;
         final int columnStrideOther = 1;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1509,8 +1509,8 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         }
         DenseDComplexMatrix2D C = new DenseDComplexMatrix2D(rows, columns);
         final double[] CElems = (double[]) ((DenseDComplexMatrix2D) C).elements();
-        final int zero = (int)index(0, 0);
-        final int zeroOther = (int)C.index(0, 0);
+        final int zero = (int) index(0, 0);
+        final int zeroOther = (int) C.index(0, 0);
         final int rowStrideOther = C.rowStride() / 2;
         final int columnStrideOther = 1;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -1625,7 +1625,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int c = 0; c < columns; c++) {
             for (int i = idx, r = 0; r < rows; r++) {
                 double value = elements[i];
@@ -1644,7 +1644,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int c = 0; c < columns; c++) {
             for (int i = idx, r = 0; r < rows; r++) {
                 double value = elements[i];
@@ -1663,7 +1663,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         rowList.clear();
         columnList.clear();
         valueList.clear();
-        int idx = (int)index(0, 0);
+        int idx = (int) index(0, 0);
         for (int c = 0; c < columns; c++) {
             for (int i = idx, r = 0; r < rows; r++) {
                 double value = elements[i];
@@ -1925,7 +1925,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public double[] getMaxLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         double maxValue = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -2002,7 +2002,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public double[] getMinLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         double minValue = 0;
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -2083,7 +2083,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     public double[][] toArray() {
         final double[][] values = new double[rows][columns];
         int np = ConcurrencyUtils.getNumberOfThreads();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
             int k = columns / np;
@@ -2123,8 +2123,8 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         if (isNoView == true) {
             System.arraycopy(elements, 0, (double[]) v.elements(), 0, size);
         } else {
-            final int zero = (int)index(0, 0);
-            final int zeroOther = (int)v.index(0);
+            final int zero = (int) index(0, 0);
+            final int zeroOther = (int) v.index(0);
             final int strideOther = v.stride();
             final double[] otherElements = (double[]) v.elements();
             int np = ConcurrencyUtils.getNumberOfThreads();
@@ -2230,7 +2230,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
         double sum = 0;
         if (elements == null)
             throw new InternalError();
-        final int zero = (int)index(0, 0);
+        final int zero = (int) index(0, 0);
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             Future<?>[] futures = new Future[np];
@@ -2288,7 +2288,7 @@ public class DenseColDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     protected DoubleMatrix1D like1D(int size, int zero, int stride) {
-        return new DenseDoubleMatrix1D(size, this.elements, (int)zero, stride, true);
+        return new DenseDoubleMatrix1D(size, this.elements, (int) zero, stride, true);
     }
 
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {

@@ -13,13 +13,13 @@ See the target "usage" further below for instructions on how to build the softwa
 <!-- ================================================================= -->
 <project name="parallelcolt" default="help" basedir=".">
 	
-	<property name="version" value="0.7" />
+	<property name="version" value="0.7.1" />
 
-	<property name="compiler" value="javac1.6" />
+	<property name="compiler" value="javac1.5" />
 	
-	<property name="source" value="1.6" />
+	<property name="source" value="1.5" />
 	
-	<property name="target" value="1.6" />
+	<property name="target" value="1.5" />
 	
 	<property name="dist.dir" value="../${ant.project.name}-dist" />
 
@@ -46,11 +46,11 @@ See the target "usage" further below for instructions on how to build the softwa
 	<property name="jar.filename" value="${ant.project.name}-${version}.jar" />
 
 	<!-- file patterns to be excluded from tar in dist targets -->
-	<property name="src.tar.excludes" value="**/${javac.dest}/** **/${jar.filename} **/${doc.dest}/** **/*.jardesc" />
+	<property name="src.tar.excludes" value="*/${javac.dest}/** */${jar.filename} */${doc.dest}/** */*.jardesc" />
 
-	<property name="doc.tar.includes" value="**/${doc.dest}/**" />
+	<property name="doc.tar.includes" value="${doc.dest}/**" />
 	
-	<property name="classpath" value="${lib.dir}/junit-4.4.jar:${lib.dir}/arpack-combo-0.1.jar:${lib.dir}/netlib-java-0.9.1.jar:${lib.dir}/optimization.jar"/>
+	<property name="classpath" value="${lib.dir}/junit-4.4.jar:${lib.dir}/arpack-combo-0.1.jar:${lib.dir}/netlib-java-0.9.1.jar"/>
 
 	<!-- ================================================================= -->
 	<!-- Default target                                                    -->
@@ -177,7 +177,7 @@ Further individual targets used internally by above targets:
 		<tar tarfile="${dist.dir}/${ant.project.name}-${version}-src.tar.bz2" basedir=".." includes="${proj.basename}/" excludes="${src.tar.excludes}" compression="bzip2" longfile="gnu" />
 		<!-- ============================================================= -->
 		<!-- Generate parallelcolt-src.zip -->
-		<zip zipfile="${dist.dir}/${ant.project.name}-${version}-src.zip" basedir=".." includes="${proj.basename}/" excludes="${src.tar.excludes}" />
+		<zip zipfile="${dist.dir}/${ant.project.name}-${version}-src.zip" basedir=".." includes="${proj.basename}/" excludes="${src.tar.excludes}"/>
 		<!-- ============================================================= -->
 		<!-- Generate parallelcolt-doc.tar.bz2 -->
 		<basename property="proj.basename" file="." />

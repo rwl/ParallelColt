@@ -119,10 +119,9 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
      */
     public double[] getQuick(int index) {
         double[] elem = elements.get(zero + index * stride);
-        if(elem != null) {
-            return new double[] {elem[0], elem[1]};
-        }
-        else {
+        if (elem != null) {
+            return new double[] { elem[0], elem[1] };
+        } else {
             return new double[2];
         }
     }
