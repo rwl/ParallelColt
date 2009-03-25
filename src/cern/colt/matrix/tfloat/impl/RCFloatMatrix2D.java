@@ -145,36 +145,11 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
     /*
      * The elements of the matrix.
      */
-    protected IntArrayList columnindexes;
+    protected IntArrayList columnIndexes;
 
     protected FloatArrayList values;
 
     protected int[] rowPointers;
-
-    //    public RCFloatMatrix2D(FloatMatrix2D A) {
-    //        super(null);
-    //        try {
-    //            setUp(A.rows(), A.columns());
-    //        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-    //            if (!"matrix too large".equals(exc.getMessage()))
-    //                throw exc;
-    //        }
-    //        if (A instanceof RCFloatMatrix2D) {
-    //            RCFloatMatrix2D Ac = (RCFloatMatrix2D) A;
-    //            int rplength = Ac.getRowPointers().length;
-    //            this.rowPointers = new int[rplength];
-    //            System.arraycopy(Ac.getRowPointers(), 0, this.rowPointers, 0, rplength);
-    //            this.columnindexes = Ac.getColumnindexes().copy();
-    //            this.values = Ac.getValues().copy();
-    //        } else {
-    //            RCFloatMatrix2D Ac = new COFloatMatrix2D(A).convertToRCFloatMatrix2D();
-    //            int rplength = Ac.getRowPointers().length;
-    //            this.rowPointers = new int[rplength];
-    //            System.arraycopy(Ac.getRowPointers(), 0, this.rowPointers, 0, rplength);
-    //            this.columnindexes = Ac.getColumnindexes().copy();
-    //            this.values = Ac.getValues().copy();
-    //        }
-    //    }
 
     /**
      * Constructs a matrix with a copy of the given values. <tt>values</tt> is
@@ -215,8 +190,60 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
                 throw exc;
         }
         this.rowPointers = rowPointers;
-        this.columnindexes = columnIndexes;
+        this.columnIndexes = columnIndexes;
         this.values = values;
+    }
+
+    /**
+     * Constructs a matrix with a given number of rows and columns. All entries
+     * are initially <tt>0</tt>.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             .
+     */
+    public RCFloatMatrix2D(int rows, int columns) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        columnIndexes = new IntArrayList();
+        values = new FloatArrayList();
+        rowPointers = new int[rows + 1];
+    }
+
+    /**
+     * Constructs a matrix with a given number of rows and columns. All entries
+     * are initially <tt>0</tt>.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             .
+     */
+    public RCFloatMatrix2D(int rows, int columns, int nzmax) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        columnIndexes = new IntArrayList(nzmax);
+        values = new FloatArrayList(nzmax);
+        rowPointers = new int[rows + 1];
     }
 
     /**
@@ -255,7 +282,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
             vals[r] = value;
         }
         this.rowPointers = starts;
-        this.columnindexes = new IntArrayList(idxs);
+        this.columnIndexes = new IntArrayList(idxs);
         this.values = new FloatArrayList(vals);
     }
 
@@ -295,7 +322,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
             vals[r] = valuesElements[k];
         }
         this.rowPointers = starts;
-        this.columnindexes = new IntArrayList(idxs);
+        this.columnIndexes = new IntArrayList(idxs);
         this.values = new FloatArrayList(vals);
     }
 
@@ -313,58 +340,6 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
     }
 
     /**
-     * Constructs a matrix with a given number of rows and columns. All entries
-     * are initially <tt>0</tt>.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
-     *             .
-     */
-    public RCFloatMatrix2D(int rows, int columns) {
-        super(null);
-        try {
-            setUp(rows, columns);
-        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-            if (!"matrix too large".equals(exc.getMessage()))
-                throw exc;
-        }
-        columnindexes = new IntArrayList();
-        values = new FloatArrayList();
-        rowPointers = new int[rows + 1];
-    }
-
-    /**
-     * Constructs a matrix with a given number of rows and columns. All entries
-     * are initially <tt>0</tt>.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
-     *             .
-     */
-    public RCFloatMatrix2D(int rows, int columns, int nzmax) {
-        super(null);
-        try {
-            setUp(rows, columns);
-        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-            if (!"matrix too large".equals(exc.getMessage()))
-                throw exc;
-        }
-        columnindexes = new IntArrayList(nzmax);
-        values = new FloatArrayList(nzmax);
-        rowPointers = new int[rows + 1];
-    }
-
-    /**
      * Sets all nonzero cells to the state specified by <tt>value</tt>.
      * 
      * @param value
@@ -374,7 +349,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
     public FloatMatrix2D assign(float value) {
         // overriden for performance only
         if (value == 0) {
-            columnindexes.clear();
+            columnIndexes.clear();
             values.clear();
             rowPointers = new int[rows + 1];
             //            for (int i = starts.length; --i >= 0;)
@@ -487,10 +462,10 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         RCFloatMatrix2D other = (RCFloatMatrix2D) source;
 
         System.arraycopy(other.rowPointers, 0, this.rowPointers, 0, this.rowPointers.length);
-        int s = other.columnindexes.size();
-        this.columnindexes.setSize(s);
+        int s = other.columnIndexes.size();
+        this.columnIndexes.setSize(s);
         this.values.setSize(s);
-        this.columnindexes.replaceFromToWithFrom(0, s - 1, other.columnindexes, 0);
+        this.columnIndexes.replaceFromToWithFrom(0, s - 1, other.columnIndexes, 0);
         this.values.replaceFromToWithFrom(0, s - 1, other.values, 0);
 
         return this;
@@ -498,23 +473,76 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
 
     public FloatMatrix2D assign(final FloatMatrix2D y, cern.colt.function.tfloat.FloatFloatFunction function) {
         checkShape(y);
+        if ((y instanceof RCFloatMatrix2D) && (function == cern.jet.math.tfloat.FloatFunctions.plus)) { // x[i] = x[i] + y[i] 
+            RCFloatMatrix2D yy = (RCFloatMatrix2D) y;
+            final int[] ArowPointersE = rowPointers;
+            final int[] AindexesE = columnIndexes.elements();
+            final float[] AvaluesE = values.elements();
 
-        //        if (y instanceof COFloatMatrix2D) {
-        //            COFloatMatrix2D yy = (COFloatMatrix2D) y;
-        //            int[] yRowindexes = yy.getRowindexes();
-        //            int[] yColumnindexes = yy.getColumnindexes();
-        //            float[] yValues = yy.getValues();
-        //            int nnz = yRowindexes.length;
-        //
-        //            if (function == cern.jet.math.tfloat.FloatFunctions.plus) {
-        //                for (int i = 0; i < nnz; i++) {
-        //                    int r = yRowindexes[i];
-        //                    int c = yColumnindexes[i];
-        //                    setQuick(r, c, getQuick(r, c) + yValues[i]);
-        //                }
-        //            }
-        //            return this;
-        //        }
+            final int[] BrowPointersE = yy.rowPointers;
+            final int[] BindexesE = yy.columnIndexes.elements();
+            final float[] BvaluesE = yy.values.elements();
+
+            final int[] CrowPointersE = new int[ArowPointersE.length];
+            final int[] CindexesE = new int[AindexesE.length];
+            final float[] CvaluesE = new float[AvaluesE.length];
+
+            int nrow = rows;
+            int ncol = columns;
+            int nzmax = AvaluesE.length;
+            int nnz = cardinality();
+            if (function == cern.jet.math.tfloat.FloatFunctions.plus) { // x[i] = x[i] + y[i]
+                int kc = 0;
+                CrowPointersE[0] = kc;
+                int j1, j2;
+                for (int i = 0; i < nrow; i++) {
+                    int ka = ArowPointersE[i];
+                    int kb = BrowPointersE[i];
+                    int kamax = ArowPointersE[i + 1] - 1;
+                    int kbmax = BrowPointersE[i + 1] - 1;
+                    while (ka <= kamax || kb <= kbmax) {
+                        if (ka <= kamax) {
+                            j1 = AindexesE[ka];
+                        } else {
+                            j1 = ncol + 1;
+                        }
+                        if (kb <= kbmax) {
+                            j2 = BindexesE[kb];
+                        } else {
+                            j2 = ncol + 1;
+                        }
+                        if (j1 == j2) {
+                            CvaluesE[kc] = AvaluesE[ka] + BvaluesE[kb];
+                            CindexesE[kc] = j1;
+                            ka++;
+                            kb++;
+                            kc++;
+                        } else if (j1 < j2) {
+                            CindexesE[kc] = j1;
+                            CvaluesE[kc] = AvaluesE[ka];
+                            ka++;
+                            kc++;
+                        } else if (j1 > j2) {
+                            CindexesE[kc] = j2;
+                            CvaluesE[kc] = BvaluesE[kb];
+                            kb++;
+                            kc++;
+                            nnz++;
+                        }
+                        if (kc >= nzmax) {
+                            throw new IllegalArgumentException("The number of elements in C exceeds nzmax");
+                        }
+                    }
+                    CrowPointersE[i + 1] = kc;
+                }
+                this.rowPointers = CrowPointersE;
+                this.columnIndexes = new IntArrayList(CindexesE);
+                this.columnIndexes.setSizeRaw(nnz);
+                this.values = new FloatArrayList(CvaluesE);
+                this.values.setSizeRaw(nnz);
+                return this;
+            }
+        }
 
         if (function instanceof cern.jet.math.tfloat.FloatPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
             final float alpha = ((cern.jet.math.tfloat.FloatPlusMultSecond) function).multiplicator;
@@ -542,101 +570,42 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
             return this;
         }
 
-        int np = ConcurrencyUtils.getNumberOfThreads();
-
         if (function == cern.jet.math.tfloat.FloatFunctions.mult) { // x[i] = x[i] * y[i]
-            final int[] indexesE = columnindexes.elements();
+            final int[] indexesE = columnIndexes.elements();
             final float[] valuesE = values.elements();
-
-            if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future<?>[] futures = new Future[np];
-                int k = (rowPointers.length - 1) / np;
-                for (int j = 0; j < np; j++) {
-                    final int startidx = j * k;
-                    final int stopidx;
-                    if (j == np - 1) {
-                        stopidx = rowPointers.length - 1;
-                    } else {
-                        stopidx = startidx + k;
-                    }
-                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                        public void run() {
-                            for (int i = startidx; i < stopidx; i++) {
-                                int high = rowPointers[i + 1];
-                                for (int k = rowPointers[i]; k < high; k++) {
-                                    int j = indexesE[k];
-                                    valuesE[k] *= y.getQuick(i, j);
-                                    if (valuesE[k] == 0)
-                                        remove(i, j);
-                                }
-                            }
-                        }
-                    });
-                }
-                ConcurrencyUtils.waitForCompletion(futures);
-            } else {
-                for (int i = rowPointers.length - 1; --i >= 0;) {
-                    int low = rowPointers[i];
-                    for (int k = rowPointers[i + 1]; --k >= low;) {
-                        int j = indexesE[k];
-                        valuesE[k] *= y.getQuick(i, j);
-                        if (valuesE[k] == 0)
-                            remove(i, j);
-                    }
+            for (int i = rowPointers.length - 1; --i >= 0;) {
+                int low = rowPointers[i];
+                for (int k = rowPointers[i + 1]; --k >= low;) {
+                    int j = indexesE[k];
+                    valuesE[k] *= y.getQuick(i, j);
+                    if (valuesE[k] == 0)
+                        remove(i, j);
                 }
             }
             return this;
         }
 
         if (function == cern.jet.math.tfloat.FloatFunctions.div) { // x[i] = x[i] / y[i]
-            final int[] indexesE = columnindexes.elements();
+            final int[] indexesE = columnIndexes.elements();
             final float[] valuesE = values.elements();
 
-            if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future<?>[] futures = new Future[np];
-                int k = (rowPointers.length - 1) / np;
-                for (int j = 0; j < np; j++) {
-                    final int startidx = j * k;
-                    final int stopidx;
-                    if (j == np - 1) {
-                        stopidx = rowPointers.length - 1;
-                    } else {
-                        stopidx = startidx + k;
-                    }
-                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                        public void run() {
-                            for (int i = startidx; i < stopidx; i++) {
-                                int high = rowPointers[i + 1];
-                                for (int k = rowPointers[i]; k < high; k++) {
-                                    int j = indexesE[k];
-                                    valuesE[k] /= y.getQuick(i, j);
-                                    if (valuesE[k] == 0)
-                                        remove(i, j);
-                                }
-                            }
-                        }
-                    });
-                }
-                ConcurrencyUtils.waitForCompletion(futures);
-            } else {
-                for (int i = rowPointers.length - 1; --i >= 0;) {
-                    int low = rowPointers[i];
-                    for (int k = rowPointers[i + 1]; --k >= low;) {
-                        int j = indexesE[k];
-                        valuesE[k] /= y.getQuick(i, j);
-                        if (valuesE[k] == 0)
-                            remove(i, j);
-                    }
+            for (int i = rowPointers.length - 1; --i >= 0;) {
+                int low = rowPointers[i];
+                for (int k = rowPointers[i + 1]; --k >= low;) {
+                    int j = indexesE[k];
+                    valuesE[k] /= y.getQuick(i, j);
+                    if (valuesE[k] == 0)
+                        remove(i, j);
                 }
             }
             return this;
         }
-
         return super.assign(y, function);
+
     }
 
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
-        final int[] indexesE = columnindexes.elements();
+        final int[] indexesE = columnIndexes.elements();
         final float[] valuesE = values.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -690,7 +659,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
     }
 
     public IntArrayList getColumnindexes() {
-        return columnindexes;
+        return columnIndexes;
     }
 
     public int[] getRowPointers() {
@@ -718,8 +687,8 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the value at the specified coordinate.
      */
     public float getQuick(int row, int column) {
-        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
-        //        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnIndexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        //        int k = searchFromTo(columnIndexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
         float v = 0;
         if (k >= 0)
             v = values.getQuick(k);
@@ -727,7 +696,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
     }
 
     protected synchronized void insert(int row, int column, int index, float value) {
-        columnindexes.beforeInsert(index, column);
+        columnIndexes.beforeInsert(index, column);
         values.beforeInsert(index, value);
         for (int i = rowPointers.length; --i > row;)
             rowPointers[i]++;
@@ -740,8 +709,8 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
-     * internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should
+     * have internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -757,9 +726,9 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirely independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
-     * type <tt>SparseFloatMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is
+     * an instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be
+     * of type <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -770,14 +739,14 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
     }
 
     protected void remove(int row, int index) {
-        columnindexes.remove(index);
+        columnIndexes.remove(index);
         values.remove(index);
         for (int i = rowPointers.length; --i > row;)
             rowPointers[i]--;
     }
 
     public int cardinality() {
-        return columnindexes.size();
+        return columnIndexes.size();
     }
 
     /**
@@ -799,8 +768,8 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
      *            the value to be filled into the specified cell.
      */
     public synchronized void setQuick(int row, int column, float value) {
-        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
-        //        int k = searchFromTo(columnindexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnIndexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        //        int k = searchFromTo(columnIndexes.elements(), column, rowPointers[row], rowPointers[row + 1] - 1);
         if (k >= 0) { // found
             if (value == 0)
                 remove(row, k);
@@ -826,7 +795,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
     }
 
     public void trimToSize() {
-        columnindexes.trimToSize();
+        columnIndexes.trimToSize();
         values.trimToSize();
     }
 
@@ -858,7 +827,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         final float[] yElements = yy.elements;
         final int yStride = yy.stride();
         final int yi = (int) y.index(0);
-        final int[] idx = columnindexes.elements();
+        final int[] idx = columnIndexes.elements();
         final float[] vals = values.elements();
 
         if (transposeA) {
@@ -964,6 +933,107 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
         return z;
     }
 
+    //    public FloatMatrix2D zMult(FloatMatrix2D B, FloatMatrix2D C, final float alpha, float beta, final boolean transposeA, boolean transposeB) {
+    //        if (transposeB)
+    //            B = B.viewDice();
+    //        int m = rows;
+    //        int n = columns;
+    //        if (transposeA) {
+    //            m = columns;
+    //            n = rows;
+    //        }
+    //        int p = B.columns();
+    //        boolean ignore = (C == null);
+    //        if (C == null)
+    //            C = new RCFloatMatrix2D(m, p, cardinality());
+    //
+    //        if (B.rows() != n)
+    //            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
+    //        if (C.rows() != m || C.columns() != p)
+    //            throw new IllegalArgumentException("Incompatible result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
+    //        if (this == C || B == C)
+    //            throw new IllegalArgumentException("Matrices must not be identical");
+    //
+    //        if (!ignore && beta != 1.0) {
+    //            C.assign(cern.jet.math.tfloat.FloatFunctions.mult(beta));
+    //        }
+    //
+    //        if (!(B instanceof RCFloatMatrix2D) || !(C instanceof RCFloatMatrix2D)) {
+    //            // cache views
+    //            final FloatMatrix1D[] Brows = new FloatMatrix1D[n];
+    //            for (int i = n; --i >= 0;)
+    //                Brows[i] = B.viewRow(i);
+    //            final FloatMatrix1D[] Crows = new FloatMatrix1D[m];
+    //            for (int i = m; --i >= 0;)
+    //                Crows[i] = C.viewRow(i);
+    //
+    //            final cern.jet.math.tfloat.FloatPlusMultSecond fun = cern.jet.math.tfloat.FloatPlusMultSecond.plusMult(0);
+    //
+    //            final int[] columnIndexesA = columnIndexes.elements();
+    //            final float[] valuesA = values.elements();
+    //            for (int i = rowPointers.length - 1; --i >= 0;) {
+    //                int low = rowPointers[i];
+    //                for (int k = rowPointers[i + 1]; --k >= low;) {
+    //                    int j = columnIndexesA[k];
+    //                    fun.multiplicator = valuesA[k] * alpha;
+    //                    if (!transposeA)
+    //                        Crows[i].assign(Brows[j], fun);
+    //                    else
+    //                        Crows[j].assign(Brows[i], fun);
+    //                }
+    //            }
+    //        } else {
+    //            RCFloatMatrix2D BB = (RCFloatMatrix2D) B;
+    //            RCFloatMatrix2D CC = (RCFloatMatrix2D) C;
+    //
+    //            int[] rowPointersA = rowPointers;
+    //            int[] columnIndexesA = columnIndexes.elements();
+    //            float[] valuesA = values.elements();
+    //
+    //            int[] rowPointersB = BB.rowPointers;
+    //            int[] columnIndexesB = BB.columnIndexes.elements();
+    //            float[] valuesB = BB.values.elements();
+    //
+    //            int[] rowPointersC = CC.rowPointers;
+    //            int[] columnIndexesC = CC.columnIndexes.elements();
+    //            float[] valuesC = CC.values.elements();
+    //            int nzmax = valuesC.length;
+    //
+    //            int[] iw = new int[n];
+    //            int len = 0;
+    //            for (int ii = 0; ii < m; ii++) {
+    //                int highA = rowPointersA[ii + 1];
+    //                for (int ka = rowPointersA[ii]; ka < highA; ka++) {
+    //                    float scal = valuesA[ka] * alpha;
+    //                    int jj = columnIndexesA[ka];
+    //                    int highB = rowPointersB[jj + 1];
+    //                    for (int kb = rowPointersB[jj]; kb < highB; kb++) {
+    //                        int jcol = columnIndexesB[kb];
+    //                        int jpos = iw[jcol];
+    //                        if (jpos == 0) {
+    //                            len++;
+    //                            if (len > nzmax) {
+    //                                throw new IllegalArgumentException("The max number of nonzero elements in C is too small.");
+    //                            }
+    //                            columnIndexesC[len - 1] = jcol;
+    //                            CC.columnIndexes.setSize(CC.columnIndexes.size() + 1);
+    //                            iw[jcol] = len;
+    //                            valuesC[len - 1] = scal * valuesB[kb];
+    //                            CC.values.setSize(CC.values.size() + 1);
+    //                        } else {
+    //                            valuesC[jpos] += scal * valuesB[kb];
+    //                        }
+    //                    }
+    //                }
+    //                for (int k = rowPointersC[ii]; k < len; k++) {
+    //                    iw[columnIndexesC[k]] = 0;
+    //                }
+    //                rowPointersC[ii + 1] = len + 1;
+    //            }
+    //        }
+    //        return C;
+    //    }
+
     public FloatMatrix2D zMult(FloatMatrix2D B, FloatMatrix2D C, final float alpha, float beta, final boolean transposeA, boolean transposeB) {
         if (transposeB)
             B = B.viewDice();
@@ -998,7 +1068,7 @@ public class RCFloatMatrix2D extends WrapperFloatMatrix2D {
 
         final cern.jet.math.tfloat.FloatPlusMultSecond fun = cern.jet.math.tfloat.FloatPlusMultSecond.plusMult(0);
 
-        final int[] indexesE = columnindexes.elements();
+        final int[] indexesE = columnIndexes.elements();
         final float[] valuesE = values.elements();
         for (int i = rowPointers.length - 1; --i >= 0;) {
             int low = rowPointers[i];

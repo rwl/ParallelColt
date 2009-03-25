@@ -45,6 +45,10 @@ public class DoubleDiagonal implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         if (!(x instanceof DenseDoubleMatrix1D) || !(b instanceof DenseDoubleMatrix1D))
             throw new IllegalArgumentException("a nad b must be dense vectors");
 
@@ -58,6 +62,10 @@ public class DoubleDiagonal implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         return apply(b, x);
     }
 

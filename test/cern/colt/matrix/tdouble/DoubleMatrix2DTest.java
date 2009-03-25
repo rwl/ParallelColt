@@ -186,10 +186,10 @@ public abstract class DoubleMatrix2DTest extends TestCase {
 
     public void testAssignDoubleMatrix2DDoubleDoubleFunction() {
         DoubleMatrix2D Acopy = A.copy();
-        A.assign(B, DoubleFunctions.div);
+        A.assign(B, DoubleFunctions.plus);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(Acopy.getQuick(r, c) / B.getQuick(r, c), A.getQuick(r, c), TOL);
+                assertEquals(Acopy.getQuick(r, c) + B.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }
     }

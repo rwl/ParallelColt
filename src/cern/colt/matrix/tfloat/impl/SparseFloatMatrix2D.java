@@ -178,19 +178,39 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      * 
      * @param rows
      * @param columns
-     * @param rowindexes
-     * @param columnindexes
+     * @param rowIndexes
+     * @param columnIndexes
      * @param values
      */
-    public SparseFloatMatrix2D(int rows, int columns, int[] rowindexes, int[] columnindexes, float[] values) {
+    public SparseFloatMatrix2D(int rows, int columns, int[] rowIndexes, int[] columnIndexes, float[] values) {
         try {
             setUp(rows, columns);
         } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
             if (!"matrix too large".equals(exc.getMessage()))
                 throw exc;
         }
-        this.elements = new OpenLongFloatHashMap(rowindexes.length);
-        insert(rowindexes, columnindexes, values);
+        this.elements = new OpenLongFloatHashMap(rowIndexes.length);
+        insert(rowIndexes, columnIndexes, values);
+    }
+
+    /**
+     * Constructs a matrix with a copy of the given indexes and value.
+     * 
+     * @param rows
+     * @param columns
+     * @param rowIndexes
+     * @param columnIndexes
+     * @param value
+     */
+    public SparseFloatMatrix2D(int rows, int columns, int[] rowIndexes, int[] columnIndexes, float value) {
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        this.elements = new OpenLongFloatHashMap(rowIndexes.length);
+        insert(rowIndexes, columnIndexes, value);
     }
 
     /**
@@ -222,27 +242,27 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
                 throw exc;
         }
         int numEntries = size.numEntries();
-        int[] columnindexes = new int[numEntries];
-        int[] rowindexes = new int[numEntries];
+        int[] columnIndexes = new int[numEntries];
+        int[] rowIndexes = new int[numEntries];
         float[] values = new float[numEntries];
-        r.readCoordinate(rowindexes, columnindexes, values);
+        r.readCoordinate(rowIndexes, columnIndexes, values);
         if (info.isSymmetric() || info.isSkewSymmetric()) {
-            this.elements = new OpenLongFloatHashMap(2 * rowindexes.length);
+            this.elements = new OpenLongFloatHashMap(2 * rowIndexes.length);
         } else {
-            this.elements = new OpenLongFloatHashMap(rowindexes.length);
+            this.elements = new OpenLongFloatHashMap(rowIndexes.length);
         }
-        insert(rowindexes, columnindexes, values);
+        insert(rowIndexes, columnIndexes, values);
 
         if (info.isSymmetric()) {
             for (int i = 0; i < numEntries; i++) {
-                if (rowindexes[i] != columnindexes[i]) {
-                    set(columnindexes[i], rowindexes[i], values[i]);
+                if (rowIndexes[i] != columnIndexes[i]) {
+                    set(columnIndexes[i], rowIndexes[i], values[i]);
                 }
             }
         } else if (info.isSkewSymmetric()) {
             for (int i = 0; i < numEntries; i++) {
-                if (rowindexes[i] != columnindexes[i]) {
-                    set(columnindexes[i], rowindexes[i], -values[i]);
+                if (rowIndexes[i] != columnIndexes[i]) {
+                    set(columnIndexes[i], rowIndexes[i], -values[i]);
                 }
             }
         }
@@ -419,13 +439,13 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
 
     }
 
-    public SparseFloatMatrix2D assign(final int[] rowindexes, final int[] columnindexes, final float[] values, final cern.colt.function.tfloat.FloatFloatFunction function) {
-        int size = rowindexes.length;
+    public SparseFloatMatrix2D assign(final int[] rowIndexes, final int[] columnIndexes, final float[] values, final cern.colt.function.tfloat.FloatFloatFunction function) {
+        int size = rowIndexes.length;
         if (function == cern.jet.math.tfloat.FloatFunctions.plus) { // x[i] = x[i] + y[i]
             for (int i = 0; i < size; i++) {
                 float value = values[i];
-                long row = (long) rowindexes[i];
-                long column = (long) columnindexes[i];
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
                 if (row >= rows || column >= columns) {
                     throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
                 }
@@ -441,8 +461,8 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         } else {
             for (int i = 0; i < size; i++) {
                 float value = values[i];
-                long row = (long) rowindexes[i];
-                long column = (long) columnindexes[i];
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
                 if (row >= rows || column >= columns) {
                     throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
                 }
@@ -451,6 +471,44 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
                 value = function.apply(elem, value);
                 if (value != 0) {
                     elements.put(index, value);
+                } else {
+                    elements.removeKey(index);
+                }
+            }
+        }
+        return this;
+    }
+
+    public SparseFloatMatrix2D assign(final int[] rowIndexes, final int[] columnIndexes, final float value, final cern.colt.function.tfloat.FloatFloatFunction function) {
+        int size = rowIndexes.length;
+        if (function == cern.jet.math.tfloat.FloatFunctions.plus) { // x[i] = x[i] + y[i]
+            for (int i = 0; i < size; i++) {
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
+                if (row >= rows || column >= columns) {
+                    throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
+                }
+                long index = (long) rowZero + row * (long) rowStride + (long) columnZero + column * (long) columnStride;
+                float elem = elements.get(index);
+                float sum = elem + value;
+                if (sum != 0) {
+                    elements.put(index, sum);
+                } else {
+                    elements.removeKey(index);
+                }
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
+                if (row >= rows || column >= columns) {
+                    throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
+                }
+                long index = (long) rowZero + row * (long) rowStride + (long) columnZero + column * (long) columnStride;
+                float elem = elements.get(index);
+                float result = function.apply(elem, value);
+                if (result != 0) {
+                    elements.put(index, result);
                 } else {
                     elements.removeKey(index);
                 }
@@ -471,27 +529,28 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
 
     public RCFloatMatrix2D convertToRCFloatMatrix2D() {
         int nnz = cardinality();
-        LongArrayList keysList = new LongArrayList();
-        FloatArrayList valuesList = new FloatArrayList();
+        LongArrayList keysList = new LongArrayList(elements.size());
+        FloatArrayList valuesList = new FloatArrayList(elements.size());
         elements.pairsSortedByKey(keysList, valuesList);
-        long[] keys = keysList.elements();
+        final long[] keys = keysList.elements();
         float[] values = valuesList.elements();
-        int[] rowindexes = new int[nnz];
-        int[] columnindexes = new int[nnz];
+        final int[] rowIndexes = new int[nnz];
+        final int[] columnIndexes = new int[nnz];
 
         int[] idxs = new int[nnz];
         float[] vals = new float[nnz];
         int[] starts = new int[rows + 1];
-        int[] w = new int[rows];
+        final int[] w = new int[rows];
         int r;
         for (int k = 0; k < nnz; k++) {
-            rowindexes[k] = (int) (keys[k] / columns);
-            columnindexes[k] = (int) (keys[k] % columns);
-            w[rowindexes[k]]++;
+            long key = keys[k];
+            rowIndexes[k] = (int) (key / columns);
+            columnIndexes[k] = (int) (key % columns);
+            w[rowIndexes[k]]++;
         }
         cumsum(starts, w, rows);
         for (int k = 0; k < nnz; k++) {
-            idxs[r = w[rowindexes[k]]++] = columnindexes[k];
+            idxs[r = w[rowIndexes[k]]++] = columnIndexes[k];
             vals[r] = values[k];
         }
         RCFloatMatrix2D M = new RCFloatMatrix2D(rows, columns, starts, new IntArrayList(idxs), new FloatArrayList(vals));
@@ -505,8 +564,8 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         elements.pairsSortedByKey(keysList, valuesList);
         long[] keys = keysList.elements();
         float[] values = valuesList.elements();
-        int[] rowindexes = new int[nnz];
-        int[] columnindexes = new int[nnz];
+        int[] rowIndexes = new int[nnz];
+        int[] columnIndexes = new int[nnz];
 
         int[] idxs = new int[nnz];
         float[] vals = new float[nnz];
@@ -514,13 +573,13 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         int[] w = new int[columns];
         int r;
         for (int k = 0; k < nnz; k++) {
-            rowindexes[k] = (int) (keys[k] / columns);
-            columnindexes[k] = (int) (keys[k] % columns);
-            w[columnindexes[k]]++;
+            rowIndexes[k] = (int) (keys[k] / columns);
+            columnIndexes[k] = (int) (keys[k] % columns);
+            w[columnIndexes[k]]++;
         }
         cumsum(starts, w, columns);
         for (int k = 0; k < nnz; k++) {
-            idxs[r = w[columnindexes[k]]++] = rowindexes[k];
+            idxs[r = w[columnIndexes[k]]++] = rowIndexes[k];
             vals[r] = values[k];
         }
         CCFloatMatrix2D M = new CCFloatMatrix2D(rows, columns, starts, new IntArrayList(idxs), new FloatArrayList(vals));
@@ -644,8 +703,8 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
      * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
-     * internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should
+     * have internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -661,9 +720,9 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
-     * type <tt>SparseFloatMatrix1D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is
+     * an instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be
+     * of type <tt>SparseFloatMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -922,12 +981,37 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return new SelectedSparseFloatMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }
 
-    private void insert(int[] rowindexes, int[] columnindexes, float[] values) {
-        int size = rowindexes.length;
+    private void insert(int[] rowIndexes, int[] columnIndexes, float value) {
+        int size = rowIndexes.length;
+        for (int i = 0; i < size; i++) {
+            long row = (long) rowIndexes[i];
+            long column = (long) columnIndexes[i];
+            if (row >= rows || column >= columns) {
+                throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
+            }
+            if (value != 0) {
+                long index = (long) rowZero + row * (long) rowStride + (long) columnZero + column * (long) columnStride;
+                float elem = elements.get(index);
+                if (elem == 0) {
+                    elements.put(index, value);
+                } else {
+                    float sum = elem + value;
+                    if (sum == 0) {
+                        elements.removeKey(index);
+                    } else {
+                        elements.put(index, sum);
+                    }
+                }
+            }
+        }
+    }
+
+    private void insert(int[] rowIndexes, int[] columnIndexes, float[] values) {
+        int size = rowIndexes.length;
         for (int i = 0; i < size; i++) {
             float value = values[i];
-            long row = (long) rowindexes[i];
-            long column = (long) columnindexes[i];
+            long row = (long) rowIndexes[i];
+            long column = (long) columnIndexes[i];
             if (row >= rows || column >= columns) {
                 throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
             }

@@ -13,7 +13,7 @@ See the target "usage" further below for instructions on how to build the softwa
 <!-- ================================================================= -->
 <project name="parallelcolt" default="help" basedir=".">
 	
-	<property name="version" value="0.7.1" />
+	<property name="version" value="0.7.2" />
 
 	<property name="compiler" value="javac1.5" />
 	

@@ -196,6 +196,53 @@ public class DoubleQRDecomposition implements java.io.Serializable {
         }
         return true;
     }
+    
+    
+    /**
+     * Least squares solution of <tt>A*x = b</tt>; <tt>returns x</tt>.
+     * 
+     * @param b
+     *            right-hand side.
+     * @return <tt>x</tt> that minimizes the two norm of <tt>Q*R*x - b</tt>.
+     * @exception IllegalArgumentException
+     *                if <tt>b.size() != A.rows()</tt>.
+     * @exception IllegalArgumentException
+     *                if <tt>!this.hasFullRank()</tt> (<tt>A</tt> is rank
+     *                deficient).
+     */
+    public DoubleMatrix1D solve(DoubleMatrix1D b) {
+        cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
+        if (b.size() != m) {
+            throw new IllegalArgumentException("Matrix row dimensions must agree.");
+        }
+        if (!this.hasFullRank()) {
+            throw new IllegalArgumentException("Matrix is rank deficient.");
+        }
+
+        // Copy right hand side
+        DoubleMatrix1D x = b.copy();
+
+        // Compute y = transpose(Q)*b
+        for (int k = 0; k < n; k++) {
+                double s = 0.0;
+                for (int i = k; i < m; i++) {
+                    s += QR.getQuick(i, k) * x.getQuick(i);
+                }
+                s = -s / QR.getQuick(k, k);
+                for (int i = k; i < m; i++) {
+                    x.setQuick(i, x.getQuick(i) + s * QR.getQuick(i, k));
+                }
+        }
+        // Solve R*x = y;
+        
+        for (int k = n - 1; k >= 0; k--) {
+            x.setQuick(k, x.getQuick(k) / Rdiag.getQuick(k));
+            for (int i = 0; i < k; i++) {
+                    x.setQuick(i, x.getQuick(i) - x.getQuick(k) * QR.getQuick(i, k));
+            }
+        }
+        return x.viewPart(0, n).copy();
+    }
 
     /**
      * Least squares solution of <tt>A*X = B</tt>; <tt>returns X</tt>.

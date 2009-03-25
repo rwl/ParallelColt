@@ -619,6 +619,10 @@ public class IntArrayList extends AbstractIntList {
     public void setQuick(int index, int element) {
         elements[index] = element;
     }
+    
+    public void setSizeRaw(int size) {
+        this.size = size;
+    }
 
     /**
      * Randomly permutes the part of the receiver between <code>from</code>

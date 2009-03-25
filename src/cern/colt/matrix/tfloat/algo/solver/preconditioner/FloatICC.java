@@ -62,6 +62,10 @@ public class FloatICC implements FloatPreconditioner {
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         // R'y = b, y = R'\b
         upperTransSolve(b, y);
 
@@ -70,6 +74,10 @@ public class FloatICC implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         return apply(b, x);
     }
 

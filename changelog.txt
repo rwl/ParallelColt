@@ -1,5 +1,13 @@
 Parallel Colt changelog
 
+0.7.2:	March 25, 2009
+	- Added new aggregate() method in 1D dense matrices.
+	- Added Modified Residual Norm Steepest Descent (MRNSD) solver.
+	- Added Conjugate Gradient for Least Squares (CGLS) solver.
+	- Added new solve() method in DoubleQRDecomposition and FloatQRDecomposition.
+	- Fixed few bugs in HyBR.
+	- Performance improvements in row-compressed sparse matrices.
+
 0.7.1:	February 27, 2009
 	- Fixed bug in build.xml causing generation of incomplete source code distribution.
 	- Fixed bug in DelegateDoubleMatrix1D and DelagateFloatMatrix1D causing NullPointerException 

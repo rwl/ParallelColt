@@ -77,7 +77,7 @@ public class DefaultFloatIterationMonitor extends AbstractFloatIterationMonitor 
 
     /**
      * Constructor for DefaultIterationMonitor. Default is 100000 iterations at
-     * most, relative tolerance of 1e-5, absolute tolerance of 1e-50 and a
+     * most, relative tolerance of 1e-5, absolute tolerance of 1e-25 and a
      * divergence tolerance of 1e+5.
      */
     public DefaultFloatIterationMonitor() {
@@ -105,34 +105,62 @@ public class DefaultFloatIterationMonitor extends AbstractFloatIterationMonitor 
     }
 
     /**
-     * Sets the relative tolerance
+     * Sets the relative convergence tolerance
      * 
      * @param rtol
-     *            Relative convergence tolerance (to initial residual)
+     *            relative convergence tolerance (to initial residual)
      */
     public void setRelativeTolerance(float rtol) {
         this.rtol = rtol;
     }
 
     /**
-     * Sets the absolute tolerance
+     * Returns the relative convergence tolerance
+     * 
+     * @return relative convergence tolerance (to initial residual)
+     */
+    public float getRelativeTolerance() {
+        return rtol;
+    }
+
+    /**
+     * Sets the absolute convergence tolerance
      * 
      * @param atol
-     *            Absolute convergence tolerance
+     *            absolute convergence tolerance
      */
     public void setAbsoluteTolerance(float atol) {
         this.atol = atol;
     }
 
     /**
-     * Sets the divergence tolerance
+     * Returns the absolute convergence tolerance
+     * 
+     * @return absolute convergence tolerance
+     */
+    public float getAbsoluteTolerance() {
+        return atol;
+    }
+
+    /**
+     * Sets the relative divergence tolerance
      * 
      * @param dtol
-     *            Relative divergence tolerance (to initial residual)
+     *            relative divergence tolerance (to initial residual)
      */
     public void setDivergenceTolerance(float dtol) {
         this.dtol = dtol;
     }
+    
+    
+    /**
+     * Returns the relative divergence tolerance
+     * @return relative divergence tolerance (to initial residual)
+     */
+    public float getDivergenceTolerance() {
+        return dtol;
+    }
+       
 
     @Override
     protected boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException {

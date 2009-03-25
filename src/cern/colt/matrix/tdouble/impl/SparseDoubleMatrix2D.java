@@ -178,19 +178,39 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
      * 
      * @param rows
      * @param columns
-     * @param rowindexes
-     * @param columnindexes
+     * @param rowIndexes
+     * @param columnIndexes
      * @param values
      */
-    public SparseDoubleMatrix2D(int rows, int columns, int[] rowindexes, int[] columnindexes, double[] values) {
+    public SparseDoubleMatrix2D(int rows, int columns, int[] rowIndexes, int[] columnIndexes, double[] values) {
         try {
             setUp(rows, columns);
         } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
             if (!"matrix too large".equals(exc.getMessage()))
                 throw exc;
         }
-        this.elements = new OpenLongDoubleHashMap(rowindexes.length);
-        insert(rowindexes, columnindexes, values);
+        this.elements = new OpenLongDoubleHashMap(rowIndexes.length);
+        insert(rowIndexes, columnIndexes, values);
+    }
+
+    /**
+     * Constructs a matrix with a copy of the given indexes and value.
+     * 
+     * @param rows
+     * @param columns
+     * @param rowIndexes
+     * @param columnIndexes
+     * @param value
+     */
+    public SparseDoubleMatrix2D(int rows, int columns, int[] rowIndexes, int[] columnIndexes, double value) {
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        this.elements = new OpenLongDoubleHashMap(rowIndexes.length);
+        insert(rowIndexes, columnIndexes, value);
     }
 
     /**
@@ -222,27 +242,27 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
                 throw exc;
         }
         int numEntries = size.numEntries();
-        int[] columnindexes = new int[numEntries];
-        int[] rowindexes = new int[numEntries];
+        int[] columnIndexes = new int[numEntries];
+        int[] rowIndexes = new int[numEntries];
         double[] values = new double[numEntries];
-        r.readCoordinate(rowindexes, columnindexes, values);
+        r.readCoordinate(rowIndexes, columnIndexes, values);
         if (info.isSymmetric() || info.isSkewSymmetric()) {
-            this.elements = new OpenLongDoubleHashMap(2 * rowindexes.length);
+            this.elements = new OpenLongDoubleHashMap(2 * rowIndexes.length);
         } else {
-            this.elements = new OpenLongDoubleHashMap(rowindexes.length);
+            this.elements = new OpenLongDoubleHashMap(rowIndexes.length);
         }
-        insert(rowindexes, columnindexes, values);
+        insert(rowIndexes, columnIndexes, values);
 
         if (info.isSymmetric()) {
             for (int i = 0; i < numEntries; i++) {
-                if (rowindexes[i] != columnindexes[i]) {
-                    set(columnindexes[i], rowindexes[i], values[i]);
+                if (rowIndexes[i] != columnIndexes[i]) {
+                    set(columnIndexes[i], rowIndexes[i], values[i]);
                 }
             }
         } else if (info.isSkewSymmetric()) {
             for (int i = 0; i < numEntries; i++) {
-                if (rowindexes[i] != columnindexes[i]) {
-                    set(columnindexes[i], rowindexes[i], -values[i]);
+                if (rowIndexes[i] != columnIndexes[i]) {
+                    set(columnIndexes[i], rowIndexes[i], -values[i]);
                 }
             }
         }
@@ -419,13 +439,13 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
 
     }
 
-    public SparseDoubleMatrix2D assign(final int[] rowindexes, final int[] columnindexes, final double[] values, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
-        int size = rowindexes.length;
+    public SparseDoubleMatrix2D assign(final int[] rowIndexes, final int[] columnIndexes, final double[] values, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
+        int size = rowIndexes.length;
         if (function == cern.jet.math.tdouble.DoubleFunctions.plus) { // x[i] = x[i] + y[i]
             for (int i = 0; i < size; i++) {
                 double value = values[i];
-                long row = (long) rowindexes[i];
-                long column = (long) columnindexes[i];
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
                 if (row >= rows || column >= columns) {
                     throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
                 }
@@ -441,8 +461,8 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         } else {
             for (int i = 0; i < size; i++) {
                 double value = values[i];
-                long row = (long) rowindexes[i];
-                long column = (long) columnindexes[i];
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
                 if (row >= rows || column >= columns) {
                     throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
                 }
@@ -451,6 +471,44 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
                 value = function.apply(elem, value);
                 if (value != 0) {
                     elements.put(index, value);
+                } else {
+                    elements.removeKey(index);
+                }
+            }
+        }
+        return this;
+    }
+
+    public SparseDoubleMatrix2D assign(final int[] rowIndexes, final int[] columnIndexes, final double value, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
+        int size = rowIndexes.length;
+        if (function == cern.jet.math.tdouble.DoubleFunctions.plus) { // x[i] = x[i] + y[i]
+            for (int i = 0; i < size; i++) {
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
+                if (row >= rows || column >= columns) {
+                    throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
+                }
+                long index = (long) rowZero + row * (long) rowStride + (long) columnZero + column * (long) columnStride;
+                double elem = elements.get(index);
+                double sum = elem + value;
+                if (sum != 0) {
+                    elements.put(index, sum);
+                } else {
+                    elements.removeKey(index);
+                }
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                long row = (long) rowIndexes[i];
+                long column = (long) columnIndexes[i];
+                if (row >= rows || column >= columns) {
+                    throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
+                }
+                long index = (long) rowZero + row * (long) rowStride + (long) columnZero + column * (long) columnStride;
+                double elem = elements.get(index);
+                double result = function.apply(elem, value);
+                if (result != 0) {
+                    elements.put(index, result);
                 } else {
                     elements.removeKey(index);
                 }
@@ -471,27 +529,28 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
 
     public RCDoubleMatrix2D convertToRCDoubleMatrix2D() {
         int nnz = cardinality();
-        LongArrayList keysList = new LongArrayList();
-        DoubleArrayList valuesList = new DoubleArrayList();
+        LongArrayList keysList = new LongArrayList(elements.size());
+        DoubleArrayList valuesList = new DoubleArrayList(elements.size());
         elements.pairsSortedByKey(keysList, valuesList);
-        long[] keys = keysList.elements();
+        final long[] keys = keysList.elements();
         double[] values = valuesList.elements();
-        int[] rowindexes = new int[nnz];
-        int[] columnindexes = new int[nnz];
+        final int[] rowIndexes = new int[nnz];
+        final int[] columnIndexes = new int[nnz];
 
         int[] idxs = new int[nnz];
         double[] vals = new double[nnz];
         int[] starts = new int[rows + 1];
-        int[] w = new int[rows];
+        final int[] w = new int[rows];
         int r;
         for (int k = 0; k < nnz; k++) {
-            rowindexes[k] = (int) (keys[k] / columns);
-            columnindexes[k] = (int) (keys[k] % columns);
-            w[rowindexes[k]]++;
+            long key = keys[k];
+            rowIndexes[k] = (int) (key / columns);
+            columnIndexes[k] = (int) (key % columns);
+            w[rowIndexes[k]]++;
         }
         cumsum(starts, w, rows);
         for (int k = 0; k < nnz; k++) {
-            idxs[r = w[rowindexes[k]]++] = columnindexes[k];
+            idxs[r = w[rowIndexes[k]]++] = columnIndexes[k];
             vals[r] = values[k];
         }
         RCDoubleMatrix2D M = new RCDoubleMatrix2D(rows, columns, starts, new IntArrayList(idxs), new DoubleArrayList(vals));
@@ -505,8 +564,8 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         elements.pairsSortedByKey(keysList, valuesList);
         long[] keys = keysList.elements();
         double[] values = valuesList.elements();
-        int[] rowindexes = new int[nnz];
-        int[] columnindexes = new int[nnz];
+        int[] rowIndexes = new int[nnz];
+        int[] columnIndexes = new int[nnz];
 
         int[] idxs = new int[nnz];
         double[] vals = new double[nnz];
@@ -514,13 +573,13 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         int[] w = new int[columns];
         int r;
         for (int k = 0; k < nnz; k++) {
-            rowindexes[k] = (int) (keys[k] / columns);
-            columnindexes[k] = (int) (keys[k] % columns);
-            w[columnindexes[k]]++;
+            rowIndexes[k] = (int) (keys[k] / columns);
+            columnIndexes[k] = (int) (keys[k] % columns);
+            w[columnIndexes[k]]++;
         }
         cumsum(starts, w, columns);
         for (int k = 0; k < nnz; k++) {
-            idxs[r = w[columnindexes[k]]++] = rowindexes[k];
+            idxs[r = w[columnIndexes[k]]++] = rowIndexes[k];
             vals[r] = values[k];
         }
         CCDoubleMatrix2D M = new CCDoubleMatrix2D(rows, columns, starts, new IntArrayList(idxs), new DoubleArrayList(vals));
@@ -922,12 +981,37 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return new SelectedSparseDoubleMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }
 
-    private void insert(int[] rowindexes, int[] columnindexes, double[] values) {
-        int size = rowindexes.length;
+    private void insert(int[] rowIndexes, int[] columnIndexes, double value) {
+        int size = rowIndexes.length;
+        for (int i = 0; i < size; i++) {
+            long row = (long) rowIndexes[i];
+            long column = (long) columnIndexes[i];
+            if (row >= rows || column >= columns) {
+                throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
+            }
+            if (value != 0) {
+                long index = (long) rowZero + row * (long) rowStride + (long) columnZero + column * (long) columnStride;
+                double elem = elements.get(index);
+                if (elem == 0) {
+                    elements.put(index, value);
+                } else {
+                    double sum = elem + value;
+                    if (sum == 0) {
+                        elements.removeKey(index);
+                    } else {
+                        elements.put(index, sum);
+                    }
+                }
+            }
+        }
+    }
+
+    private void insert(int[] rowIndexes, int[] columnIndexes, double[] values) {
+        int size = rowIndexes.length;
         for (int i = 0; i < size; i++) {
             double value = values[i];
-            long row = (long) rowindexes[i];
-            long column = (long) columnindexes[i];
+            long row = (long) rowIndexes[i];
+            long column = (long) columnIndexes[i];
             if (row >= rows || column >= columns) {
                 throw new IndexOutOfBoundsException("row: " + row + ", column: " + column);
             }

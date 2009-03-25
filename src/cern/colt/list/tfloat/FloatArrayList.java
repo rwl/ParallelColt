@@ -551,6 +551,10 @@ public class FloatArrayList extends AbstractFloatList {
         elements[index] = element;
     }
 
+    public void setSizeRaw(int size) {
+        this.size = size;
+    }
+    
     /**
      * Replaces the element at the specified position in the receiver with the
      * specified element; <b>WARNING:</b> Does not check preconditions. Provided

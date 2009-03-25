@@ -554,6 +554,10 @@ public class DoubleArrayList extends AbstractDoubleList {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         elements[index] = element;
     }
+    
+    public void setSizeRaw(int size) {
+        this.size = size;
+    }
 
     /**
      * Replaces the element at the specified position in the receiver with the

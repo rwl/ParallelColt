@@ -143,7 +143,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     /*
      * The elements of the matrix.
      */
-    protected IntArrayList columnindexes;
+    protected IntArrayList columnIndexes;
 
     protected IntArrayList values;
 
@@ -178,7 +178,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
                 throw exc;
         }
         this.rowPointers = rowPointers;
-        this.columnindexes = columnIndexes;
+        this.columnIndexes = columnIndexes;
         this.values = values;
     }
 
@@ -203,7 +203,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
             if (!"matrix too large".equals(exc.getMessage()))
                 throw exc;
         }
-        columnindexes = new IntArrayList();
+        columnIndexes = new IntArrayList();
         values = new IntArrayList();
         rowPointers = new int[rows + 1];
     }
@@ -229,7 +229,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
             if (!"matrix too large".equals(exc.getMessage()))
                 throw exc;
         }
-        columnindexes = new IntArrayList(nzmax);
+        columnIndexes = new IntArrayList(nzmax);
         values = new IntArrayList(nzmax);
         rowPointers = new int[rows + 1];
     }
@@ -244,7 +244,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     public IntMatrix2D assign(int value) {
         // overriden for performance only
         if (value == 0) {
-            columnindexes.clear();
+            columnIndexes.clear();
             values.clear();
             rowPointers = new int[rows + 1];
             //            for (int i = starts.length; --i >= 0;)
@@ -357,10 +357,10 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
         RCIntMatrix2D other = (RCIntMatrix2D) source;
 
         System.arraycopy(other.rowPointers, 0, this.rowPointers, 0, this.rowPointers.length);
-        int s = other.columnindexes.size();
-        this.columnindexes.setSize(s);
+        int s = other.columnIndexes.size();
+        this.columnIndexes.setSize(s);
         this.values.setSize(s);
-        this.columnindexes.replaceFromToWithFrom(0, s - 1, other.columnindexes, 0);
+        this.columnIndexes.replaceFromToWithFrom(0, s - 1, other.columnIndexes, 0);
         this.values.replaceFromToWithFrom(0, s - 1, other.values, 0);
 
         return this;
@@ -398,7 +398,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
         int np = ConcurrencyUtils.getNumberOfThreads();
 
         if (function == cern.jet.math.tint.IntFunctions.mult) { // x[i] = x[i] * y[i]
-            final int[] indexesE = columnindexes.elements();
+            final int[] indexesE = columnIndexes.elements();
             final int[] valuesE = values.elements();
 
             if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -442,7 +442,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
         }
 
         if (function == cern.jet.math.tint.IntFunctions.div) { // x[i] = x[i] / y[i]
-            final int[] indexesE = columnindexes.elements();
+            final int[] indexesE = columnIndexes.elements();
             final int[] valuesE = values.elements();
 
             if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -489,7 +489,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     }
 
     public IntMatrix2D forEachNonZero(final cern.colt.function.tint.IntIntIntFunction function) {
-        final int[] indexesE = columnindexes.elements();
+        final int[] indexesE = columnIndexes.elements();
         final int[] valuesE = values.elements();
         int np = ConcurrencyUtils.getNumberOfThreads();
         if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -543,7 +543,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     }
 
     public IntArrayList getColumnindexes() {
-        return columnindexes;
+        return columnIndexes;
     }
 
     public int[] getRowPointers() {
@@ -571,7 +571,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
      * @return the value at the specified coordinate.
      */
     public int getQuick(int row, int column) {
-        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnIndexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
         int v = 0;
         if (k >= 0)
             v = values.getQuick(k);
@@ -579,7 +579,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     }
 
     protected synchronized void insert(int row, int column, int index, int value) {
-        columnindexes.beforeInsert(index, column);
+        columnIndexes.beforeInsert(index, column);
         values.beforeInsert(index, value);
         for (int i = rowPointers.length; --i > row;)
             rowPointers[i]++;
@@ -621,14 +621,14 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     }
 
     protected void remove(int row, int index) {
-        columnindexes.remove(index);
+        columnIndexes.remove(index);
         values.remove(index);
         for (int i = rowPointers.length; --i > row;)
             rowPointers[i]--;
     }
 
     public int cardinality() {
-        return columnindexes.size();
+        return columnIndexes.size();
     }
 
     /**
@@ -650,7 +650,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
      *            the value to be filled into the specified cell.
      */
     public synchronized void setQuick(int row, int column, int value) {
-        int k = columnindexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
+        int k = columnIndexes.binarySearchFromTo(column, rowPointers[row], rowPointers[row + 1] - 1);
         if (k >= 0) { // found
             if (value == 0)
                 remove(row, k);
@@ -677,7 +677,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
     }
 
     public void trimToSize() {
-        columnindexes.trimToSize();
+        columnIndexes.trimToSize();
         values.trimToSize();
     }
 
@@ -705,7 +705,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
         final int yStride = yy.stride();
         final int yi = (int) y.index(0);
 
-        final int[] columnindexesElements = columnindexes.elements();
+        final int[] columnIndexesElements = columnIndexes.elements();
         final int[] valuesElements = values.elements();
 
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -727,7 +727,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
                             int high = rowPointers[i + 1];
                             int sum = 0;
                             for (int k = rowPointers[i]; k < high; k++) {
-                                int j = columnindexesElements[k];
+                                int j = columnIndexesElements[k];
                                 sum += valuesElements[k] * yElements[yi + yStride * j];
                             }
                             zElements[zidx] = sum;
@@ -745,7 +745,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
                 int high = rowPointers[i + 1];
                 int sum = 0;
                 for (int k = rowPointers[i]; k < high; k++) {
-                    int j = columnindexesElements[k];
+                    int j = columnIndexesElements[k];
                     sum += valuesElements[k] * yElements[yi + yStride * j];
                 }
                 zElements[zidx] = sum;
@@ -789,7 +789,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
                 z.assign(cern.jet.math.tint.IntFunctions.mult(beta));
         }
 
-        final int[] idx = columnindexes.elements();
+        final int[] idx = columnIndexes.elements();
         final int[] vals = values.elements();
         int s = rowPointers.length - 1;
         int np = ConcurrencyUtils.getNumberOfThreads();
@@ -911,7 +911,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
 
         final cern.jet.math.tint.IntPlusMultSecond fun = cern.jet.math.tint.IntPlusMultSecond.plusMult(0);
 
-        final int[] indexesE = columnindexes.elements();
+        final int[] indexesE = columnIndexes.elements();
         final int[] valuesE = values.elements();
         for (int i = rowPointers.length - 1; --i >= 0;) {
             int low = rowPointers[i];
@@ -958,7 +958,7 @@ public class RCIntMatrix2D extends WrapperIntMatrix2D {
 
         final cern.jet.math.tint.IntPlusMultSecond fun = cern.jet.math.tint.IntPlusMultSecond.plusMult(0);
 
-        final int[] indexesE = columnindexes.elements();
+        final int[] indexesE = columnIndexes.elements();
         final int[] valuesE = values.elements();
         for (int i = rowPointers.length - 1; --i >= 0;) {
             int low = rowPointers[i];

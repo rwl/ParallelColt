@@ -207,6 +207,10 @@ public class DoubleAMG implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         u[0].assign(x);
         f[0].assign(b);
 
@@ -217,6 +221,10 @@ public class DoubleAMG implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         u[0].assign(x);
         f[0].assign(b);
 

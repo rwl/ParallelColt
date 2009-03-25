@@ -148,6 +148,53 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
         return a;
     }
+    
+    public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleFunction f, final IntArrayList indexList) {
+        if (size() == 0)
+            return Double.NaN;
+        final int size = indexList.size();
+        final int[] indexElements = indexList.elements();
+        double a = 0;
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            Future<?>[] futures = new Future[np];
+            int k = size / np;
+            for (int j = 0; j < np; j++) {
+                final int startidx = j * k;
+                final int stopidx;
+                if (j == np - 1) {
+                    stopidx = size;
+                } else {
+                    stopidx = startidx + k;
+                }
+                futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
+
+                    public Double call() throws Exception {
+                        int idx = zero + indexElements[startidx] * stride;
+                        double a = f.apply(elements[idx]);
+                        double elem;
+                        for (int i = startidx + 1; i < stopidx; i++) {
+                            idx = zero + indexElements[i] * stride;
+                            elem = elements[idx];
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            double elem;
+            int idx = zero + indexElements[0] * stride;
+            a = f.apply(elements[idx]);
+            for (int i = 1; i < size; i++) {
+                idx = zero + indexElements[i] * stride;
+                elem = elements[idx];
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
 
     public double aggregate(final DoubleMatrix1D other, final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleDoubleFunction f) {
         if (!(other instanceof DenseDoubleMatrix1D)) {
@@ -895,15 +942,23 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
     }
 
     public void getNonZeros(final IntArrayList indexList, final DoubleArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
-        int idx = zero;
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
+        int idx = zero;
         if (rem == 1) {
             double value = elements[idx];
             if (value != 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(0);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
 
@@ -911,29 +966,45 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         for (int i = rem; i < size; i += 2) {
             double value = elements[idx];
             if (value != 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
             value = elements[idx];
             if (value != 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
         }
     }
 
     public void getPositiveValues(final IntArrayList indexList, final DoubleArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
-        int idx = zero;
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
+        int idx = zero;
         if (rem == 1) {
             double value = elements[idx];
             if (value > 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(0);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
 
@@ -941,29 +1012,45 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         for (int i = rem; i < size; i += 2) {
             double value = elements[idx];
             if (value > 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
             value = elements[idx];
             if (value > 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
         }
     }
 
     public void getNegativeValues(final IntArrayList indexList, final DoubleArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
-        int idx = zero;
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
+        int idx = zero;
         if (rem == 1) {
             double value = elements[idx];
             if (value < 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(0);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
 
@@ -971,14 +1058,22 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         for (int i = rem; i < size; i += 2) {
             double value = elements[idx];
             if (value < 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
             value = elements[idx];
             if (value < 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             idx += stride;
         }

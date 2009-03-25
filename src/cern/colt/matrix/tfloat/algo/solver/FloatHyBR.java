@@ -20,6 +20,8 @@ package cern.colt.matrix.tfloat.algo.solver;
 import optimization.FloatFmin;
 import optimization.FloatFmin_methods;
 import cern.colt.list.tfloat.FloatArrayList;
+import cern.colt.matrix.tdouble.algo.solver.HyBRInnerSolver;
+import cern.colt.matrix.tdouble.algo.solver.HyBRRegularizationMethod;
 import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
@@ -64,66 +66,13 @@ import cern.jet.stat.tfloat.FloatDescriptive;
  */
 public class FloatHyBR extends AbstractFloatIterativeSolver {
 
-    public enum RegularizationMethod {
-        GCV, WGCV, ADAPTWGCV, NONE
-    }
+    private HyBRInnerSolver innerSolver;
 
-    public enum InnerSolver {
-        TIKHONOV, NONE
-    }
-
-    public class HyBROutput {
-        private String stoppingCondition;
-        private int stoppingIteration;
-        private float rnorm;
-
-        public HyBROutput() {
-            stoppingCondition = "";
-            stoppingIteration = 0;
-            rnorm = 0;
-        }
-
-        public void setStoppingCondition(String flag) {
-            this.stoppingCondition = flag;
-        }
-
-        public void setStoppingIteration(int stoppingIteration) {
-            this.stoppingIteration = stoppingIteration;
-        }
-
-        public void setRnorm(float rnorm) {
-            this.rnorm = rnorm;
-        }
-
-        public String getStoppingCondition() {
-            return stoppingCondition;
-        }
-
-        public int getStoppingIteration() {
-            return stoppingIteration;
-        }
-
-        public float getRnorm() {
-            return rnorm;
-        }
-
-        public String toString() {
-
-            return "Stopping condition = " + stoppingCondition + "\nStopping iteration = " + stoppingIteration + "\nRelative residual norm = " + rnorm;
-        }
-    }
-
-    private HyBROutput hybrOutput;
-
-    private InnerSolver innerSolver;
-
-    private RegularizationMethod regMethod;
+    private HyBRRegularizationMethod regMethod;
 
     private float regPar;
 
     private float omega;
-
-    private int maxIts;
 
     private boolean reorth;
 
@@ -131,27 +80,26 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
 
     private float flatTol;
 
+    private boolean computeRnrm;
+
     private static final FloatAlgebra alg = FloatAlgebra.DEFAULT;
 
     private static final float FMIN_TOL = 1.0e-4f;
-
-    private boolean computeRnorm = false;
 
     /**
      * Creates new instance of HyBR solver with default parameters:<br>
      * <br>
      * innerSolver = HyBR.InnerSolver.TIKHONOV<br>
      * regularizationMethod = HyBR.RegularizationMethod.ADAPTWGCV<br>
-     * regularizationParameter = -1<br>
+     * regularizationParameter = 0<br>
      * omega = 0<br>
-     * maxIterations = 100<br>
      * reorthogonalize = false<br>
      * beginRegularization = 2<br>
      * flatTolerance = 1e-6<br>
-     * computeRnorm = false;
+     * computeRnrm = false;
      */
     public FloatHyBR() {
-        this(InnerSolver.TIKHONOV, RegularizationMethod.ADAPTWGCV, -1, 0, 100, false, 2, 1e-6f, false);
+        this(HyBRInnerSolver.TIKHONOV, HyBRRegularizationMethod.ADAPTWGCV, 0, 0, false, 2, 1e-6f, false);
     }
 
     /**
@@ -163,57 +111,57 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
      *            a method for choosing a regularization parameter
      * @param regularizationParameter
      *            if regularizationMethod == HyBR.RegularizationMethod.NONE then
-     *            the regularization parameter has to be specified here
+     *            the regularization parameter has to be specified here (value
+     *            from the interval (0,1))
      * @param omega
      *            regularizationMethod == HyBR.RegularizationMethod.WGCV then
-     *            omega has to be specified here
-     * @param maxIterations
-     *            maximum number of Lanczos iterations
+     *            omega has to be specified here (must be nonnegative)
      * @param reorthogonalize
      *            if thue then Lanczos subspaces are reorthogonalized
      * @param beginRegularization
-     *            begin regularization after this iteration
+     *            begin regularization after this iteration (must be at least 2)
      * @param flatTolerance
      *            tolerance for detecting flatness in the GCV curve as a
-     *            stopping criteria
-     * @param computeRnorm
-     *            if true then the relative residual norm is computed.
+     *            stopping criteria (must be nonnegative)
+     *@param computeRnorm
+     *            if true then the norm of relative residual is computed
      */
-    public FloatHyBR(InnerSolver innerSolver, RegularizationMethod regularizationMethod, float regularizationParameter, float omega, int maxIterations, boolean reorthogonalize, int beginRegularization, float flatTolerance, boolean computeRnorm) {
+    public FloatHyBR(HyBRInnerSolver innerSolver, HyBRRegularizationMethod regularizationMethod, float regularizationParameter, float omega, boolean reorthogonalize, int beginRegularization, float flatTolerance, boolean computeRnrm) {
         this.innerSolver = innerSolver;
         this.regMethod = regularizationMethod;
+        if ((regularizationParameter < 0.0) || (regularizationParameter > 1.0)) {
+            throw new IllegalArgumentException("regularizationParameter must be a number between 0 and 1.");
+        }
         this.regPar = regularizationParameter;
+        if (omega < 0.0) {
+            throw new IllegalArgumentException("omega must be a nonnegative number.");
+        }
         this.omega = omega;
-        this.maxIts = maxIterations;
         this.reorth = reorthogonalize;
+        if (beginRegularization < 2) {
+            throw new IllegalArgumentException("beginRegularization must be greater or equal 2");
+        }
         this.begReg = beginRegularization;
+        if (flatTolerance < 0.0) {
+            throw new IllegalArgumentException("flatTolerance must be a nonnegative number.");
+        }
         this.flatTol = flatTolerance;
-        this.computeRnorm = computeRnorm;
-        this.hybrOutput = new HyBROutput();
-        this.iter = null; // HyBR doesn't use an IterationMonitor
-    }
-
-    public FloatIterationMonitor getIterationMonitor() {
-        throw new IllegalAccessError("HyBR doesn't use an IterationMonitor. Use getHyBROutput() instead.");
-    }
-
-    public void setIterationMonitor(FloatIterationMonitor iter) {
-        throw new IllegalAccessError("HyBR doesn't use an IterationMonitor. Use getHyBROutput() instead.");
-    }
-
-    public HyBROutput getHyBROutput() {
-        return hybrOutput;
+        this.computeRnrm = computeRnrm;
+        this.iter = new HyBRFloatIterationMonitor();
     }
 
     public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
+        if (!(iter instanceof HyBRFloatIterationMonitor)) {
+            this.iter = new HyBRFloatIterationMonitor();
+        }
         checkSizes(A, b, x);
         int columns = A.columns();
         boolean bump = false;
-        boolean terminate = true;
         boolean warning = false;
+        float rnrm = -1.0f;
         int iterationsSave = 0;
         float alpha, beta;
-        InnerSolver inSolver = InnerSolver.NONE;
+        HyBRInnerSolver inSolver = HyBRInnerSolver.NONE;
         FloatLBD lbd;
         FloatMatrix1D v;
         FloatMatrix1D work;
@@ -221,33 +169,36 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
         FloatMatrix1D f = null;
         FloatMatrix1D xSave = null;
         float[] sv;
-        FloatArrayList omegaList = new FloatArrayList();
-        FloatArrayList GCV = new FloatArrayList(new float[begReg - 1]);
+        FloatArrayList omegaList = new FloatArrayList(new float[begReg - 2]);
+        FloatArrayList GCV = new FloatArrayList(new float[begReg - 2]);
         FloatMatrix2D U = new DenseFloatMatrix2D(1, b.size());
         FloatMatrix2D B = null;
         FloatMatrix2D V = null;
         FloatSingularValueDecompositionDC svd;
-        work = b.copy();
-        //        A.zMult(x, work, -1, 1, false);
-        //        hybrOutput.setRnorm(alg.norm2(work));
+        if (computeRnrm) {
+            work = b.copy();
+            A.zMult(x, work, -1, 1, false);
+            rnrm = alg.norm2(work);
+        }
         if (M instanceof FloatIdentity) {
             beta = alg.norm2(b);
-            U.viewRow(0).assign(b, FloatFunctions.multSecond((float) (1.0 / beta)));
+            U.viewRow(0).assign(b, FloatFunctions.multSecond((float)(1.0 / beta)));
             lbd = new FloatSimpleLBD(A, U, reorth);
         } else {
             work = new DenseFloatMatrix1D(b.size());
             work = M.apply(b, work);
             beta = alg.norm2(work);
-            U.viewRow(0).assign(work, FloatFunctions.multSecond((float) (1.0 / beta)));
+            U.viewRow(0).assign(work, FloatFunctions.multSecond((float)(1.0 / beta)));
             lbd = new FloatPLBD(M, A, U, reorth);
         }
-        for (int i = 0; i <= maxIts; i++) {
+        for (iter.setFirst(); !iter.converged(rnrm, x); iter.next()) {
             lbd.apply();
             U = lbd.getU();
             B = lbd.getB();
             V = lbd.getV();
             v = new DenseFloatMatrix1D(U.rows());
             v.setQuick(0, beta);
+            int i = iter.iterations();
             if (i >= 1) {
                 if (i >= begReg - 1) {
                     inSolver = innerSolver;
@@ -258,7 +209,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                     Ub = svd.getU();
                     sv = svd.getSingularValues();
                     Vb = svd.getV();
-                    if (regMethod == RegularizationMethod.ADAPTWGCV) {
+                    if (regMethod == HyBRRegularizationMethod.ADAPTWGCV) {
                         work = new DenseFloatMatrix1D(Ub.rows());
                         Ub.zMult(v, work, 1, 0, true);
                         omegaList.add(Math.min(1, findOmega(work, sv)));
@@ -267,41 +218,40 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                     f = new DenseFloatMatrix1D(Vb.rows());
                     alpha = tikhonovSolver(Ub, sv, Vb, v, f);
                     GCV.add(GCVstopfun(alpha, Ub.viewRow(0), sv, beta, columns));
-                    if ((i > 1) && (terminate == true)) {
-                        if (Math.abs((GCV.get(i) - GCV.get(i - 1))) / GCV.get(begReg) < flatTol) {
+                    if (i > 1) {
+                        if (Math.abs((GCV.getQuick(i - 1) - GCV.getQuick(i - 2))) / GCV.get(begReg - 2) < flatTol) {
                             V.zMult(f, x);
-                            hybrOutput.setStoppingCondition("flat GCV curve");
-                            hybrOutput.setStoppingIteration(i);
-                            if (computeRnorm) {
+                            ((HyBRFloatIterationMonitor) iter).setStoppingCondition(HyBRFloatIterationMonitor.HyBRStoppingCondition.FLAT_GCV_CURVE);
+                            if (computeRnrm) {
                                 work = b.copy();
                                 A.zMult(x, work, -1, 1, false);
-                                hybrOutput.setRnorm(alg.norm2(work));
+                                ((HyBRFloatIterationMonitor) iter).residual = alg.norm2(work);
                             }
                             return x;
                         } else if ((warning == true) && (GCV.size() > iterationsSave + 3)) {
-                            for (int j = iterationsSave; j < GCV.size() - 1; j++) {
-                                if (GCV.get(iterationsSave) > GCV.get(j + 1)) {
+                            for (int j = iterationsSave; j < GCV.size(); j++) {
+                                if (GCV.getQuick(iterationsSave - 1) > GCV.get(j)) {
                                     bump = true;
                                 }
                             }
                             if (bump == false) {
                                 x.assign(xSave);
-                                hybrOutput.setStoppingCondition("min of GCV curve (within window of 4 iterations)");
-                                hybrOutput.setStoppingIteration(iterationsSave);
-                                if (computeRnorm) {
+                                ((HyBRFloatIterationMonitor) iter).setStoppingCondition(HyBRFloatIterationMonitor.HyBRStoppingCondition.MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS);
+                                ((HyBRFloatIterationMonitor) iter).iter = iterationsSave;
+                                if (computeRnrm) {
                                     work = b.copy();
                                     A.zMult(x, work, -1, 1, false);
-                                    hybrOutput.setRnorm(alg.norm2(work));
+                                    ((HyBRFloatIterationMonitor) iter).residual = alg.norm2(work);
                                 }
                                 return x;
 
                             } else {
                                 bump = false;
                                 warning = false;
-                                iterationsSave = maxIts;
+                                iterationsSave = iter.getMaxIterations();
                             }
                         } else if (warning == false) {
-                            if (GCV.get(i - 1) < GCV.get(i)) {
+                            if (GCV.get(i - 2) < GCV.get(i - 1)) {
                                 warning = true;
                                 xSave = new DenseFloatMatrix1D(V.rows());
                                 V.zMult(f, xSave);
@@ -315,15 +265,13 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                     break;
                 }
                 V.zMult(f, x);
+                if (computeRnrm) {
+                    work = b.copy();
+                    A.zMult(x, work, -1, 1, false);
+                    rnrm = alg.norm2(work);
+                }
             }
         }
-        if (computeRnorm) {
-            work = b.copy();
-            A.zMult(x, work, -1, 1, false);
-            hybrOutput.setRnorm(alg.norm2(work));
-        }
-        hybrOutput.setStoppingCondition("performed max number of iterations");
-        hybrOutput.setStoppingIteration(maxIts);
         return x;
 
     }
@@ -445,7 +393,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
         FloatMatrix1D t2 = t1.copy();
         t2.assign(u.viewPart(0, k), FloatFunctions.mult);
         t2.assign(FloatFunctions.mult(alpha2));
-        float num = (float) (beta2 * (t2.aggregate(FloatFunctions.plus, FloatFunctions.square) + Math.pow(Math.abs(u.getQuick(k)), 2)) / (float) n);
+        float num = (float)(beta2 * (t2.aggregate(FloatFunctions.plus, FloatFunctions.square) + Math.pow(Math.abs(u.getQuick(k)), 2)) / (float) n);
         float den = (n - t1.aggregate(s2, FloatFunctions.plus, FloatFunctions.mult)) / (float) n;
         den = den * den;
         return num / den;

@@ -140,6 +140,10 @@ public class DoubleSSOR implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         if (!(b instanceof DenseDoubleMatrix1D) || !(x instanceof DenseDoubleMatrix1D))
             throw new IllegalArgumentException("b and x must be a DenseDoubleMatrix1D");
 
@@ -195,6 +199,10 @@ public class DoubleSSOR implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         // Assume a symmetric matrix
         return apply(b, x);
     }

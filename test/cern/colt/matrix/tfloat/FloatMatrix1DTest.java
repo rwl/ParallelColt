@@ -7,6 +7,7 @@ import org.junit.Test;
 import cern.colt.function.tfloat.FloatProcedure;
 import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tint.IntArrayList;
+import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tfloat.FloatFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
@@ -66,6 +67,20 @@ public abstract class FloatMatrix1DTest extends TestCase {
         float result = A.aggregate(FloatFunctions.plus, FloatFunctions.square);
         assertEquals(expected, result, TOL);
     }
+    
+    public void testAggregateFloatFloatFunctionFloatFunctionIntArrayList() {
+        IntArrayList indexList = new IntArrayList();
+        for (int i = 0; i < SIZE; i++) {
+                 indexList.add(i);
+         }
+         float expected = 0;
+         for (int i = 0; i < SIZE; i++) {
+                 float elem = A.getQuick(i);
+                 expected += elem * elem;
+         }
+         float result = A.aggregate(FloatFunctions.plus, FloatFunctions.square, indexList);
+         assertEquals(expected, result, TOL);
+     }
 
     public void testAggregateFloatMatrix2DFloatFloatFunctionFloatFloatFunction() {
         float expected = 0;

@@ -641,7 +641,7 @@ public abstract class AbstractLongList extends AbstractList {
         checkRangeFromTo(from, to, mySize);
 
         long[] myElements = elements();
-        cern.colt.Sorting.quickSort(myElements, from, to + 1, c);
+        cern.colt.Sorting.parallelQuickSort(myElements, from, to + 1, c);
         elements(myElements);
         setSizeRaw(mySize);
     }

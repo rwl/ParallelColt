@@ -640,7 +640,8 @@ public class FloatFunctions extends Object {
             return a * b;
         }
     };
-
+    
+   
     /**
      * Function that returns <tt>-(a * b)</tt>.
      */

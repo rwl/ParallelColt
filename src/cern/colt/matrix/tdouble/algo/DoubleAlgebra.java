@@ -1007,19 +1007,16 @@ public class DoubleAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Solves A*x = b. A has to be square.
+     * Solves A*x = b.
      * 
-     * @return x; a solution
+     * @return x; a new independent matrix; solution if A is square, least
+     *         squares solution otherwise.
      */
     public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b) {
-        if (A.rows() != A.columns()) {
-            throw new IllegalArgumentException("This method only applies to square matrices");
-        }
-        return lu(A).solve(b);
+        return (A.rows() == A.columns() ? (lu(A).solve(b)) : (qr(A).solve(b)));
     }
 
     /**
-     * Solves A*X = B.
      * 
      * @return X; a new independent matrix; solution if A is square, least
      *         squares solution otherwise.

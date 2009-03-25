@@ -207,6 +207,9 @@ public class FloatAMG implements FloatPreconditioner {
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
         u[0].assign(x);
         f[0].assign(b);
 
@@ -217,6 +220,9 @@ public class FloatAMG implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
         u[0].assign(x);
         f[0].assign(b);
 

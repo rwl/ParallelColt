@@ -190,23 +190,23 @@ public class DenseDoubleMatrix2D extends DoubleMatrix2D {
         setUp(size.numRows(), size.numColumns());
         this.elements = new double[rows * columns];
         int numEntries = size.numEntries();
-        int[] columnindexes = new int[numEntries];
-        int[] rowindexes = new int[numEntries];
+        int[] columnIndexes = new int[numEntries];
+        int[] rowIndexes = new int[numEntries];
         double[] values = new double[numEntries];
-        r.readCoordinate(rowindexes, columnindexes, values);
+        r.readCoordinate(rowIndexes, columnIndexes, values);
         for (int i = 0; i < numEntries; i++) {
-            set(rowindexes[i], columnindexes[i], values[i]);
+            setQuick(rowIndexes[i], columnIndexes[i], values[i]);
         }
         if (info.isSymmetric()) {
             for (int i = 0; i < numEntries; i++) {
-                if (rowindexes[i] != columnindexes[i]) {
-                    set(columnindexes[i], rowindexes[i], values[i]);
+                if (rowIndexes[i] != columnIndexes[i]) {
+                    setQuick(columnIndexes[i], rowIndexes[i], values[i]);
                 }
             }
         } else if (info.isSkewSymmetric()) {
             for (int i = 0; i < numEntries; i++) {
-                if (rowindexes[i] != columnindexes[i]) {
-                    set(columnindexes[i], rowindexes[i], -values[i]);
+                if (rowIndexes[i] != columnIndexes[i]) {
+                    setQuick(columnIndexes[i], rowIndexes[i], -values[i]);
                 }
             }
         }

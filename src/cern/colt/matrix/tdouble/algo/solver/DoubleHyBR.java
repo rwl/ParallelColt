@@ -64,66 +64,13 @@ import cern.jet.stat.tdouble.DoubleDescriptive;
  */
 public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
-    public enum RegularizationMethod {
-        GCV, WGCV, ADAPTWGCV, NONE
-    }
+    private HyBRInnerSolver innerSolver;
 
-    public enum InnerSolver {
-        TIKHONOV, NONE
-    }
-
-    public class HyBROutput {
-        private String stoppingCondition;
-        private int stoppingIteration;
-        private double rnorm;
-
-        public HyBROutput() {
-            stoppingCondition = "";
-            stoppingIteration = 0;
-            rnorm = 0;
-        }
-
-        public void setStoppingCondition(String flag) {
-            this.stoppingCondition = flag;
-        }
-
-        public void setStoppingIteration(int stoppingIteration) {
-            this.stoppingIteration = stoppingIteration;
-        }
-
-        public void setRnorm(double rnorm) {
-            this.rnorm = rnorm;
-        }
-
-        public String getStoppingCondition() {
-            return stoppingCondition;
-        }
-
-        public int getStoppingIteration() {
-            return stoppingIteration;
-        }
-
-        public double getRnorm() {
-            return rnorm;
-        }
-
-        public String toString() {
-
-            return "Stopping condition = " + stoppingCondition + "\nStopping iteration = " + stoppingIteration + "\nRelative residual norm = " + rnorm;
-        }
-    }
-
-    private HyBROutput hybrOutput;
-
-    private InnerSolver innerSolver;
-
-    private RegularizationMethod regMethod;
+    private HyBRRegularizationMethod regMethod;
 
     private double regPar;
 
     private double omega;
-
-    private int maxIts;
 
     private boolean reorth;
 
@@ -131,27 +78,26 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
     private double flatTol;
 
+    private boolean computeRnrm;
+
     private static final DoubleAlgebra alg = DoubleAlgebra.DEFAULT;
 
     private static final double FMIN_TOL = 1.0e-4;
-
-    private boolean computeRnorm = false;
 
     /**
      * Creates new instance of HyBR solver with default parameters:<br>
      * <br>
      * innerSolver = HyBR.InnerSolver.TIKHONOV<br>
      * regularizationMethod = HyBR.RegularizationMethod.ADAPTWGCV<br>
-     * regularizationParameter = -1<br>
+     * regularizationParameter = 0<br>
      * omega = 0<br>
-     * maxIterations = 100<br>
      * reorthogonalize = false<br>
      * beginRegularization = 2<br>
      * flatTolerance = 1e-6<br>
-     * computeRnorm = false;
+     * computeRnrm = false;
      */
     public DoubleHyBR() {
-        this(InnerSolver.TIKHONOV, RegularizationMethod.ADAPTWGCV, -1, 0, 100, false, 2, 1e-6, false);
+        this(HyBRInnerSolver.TIKHONOV, HyBRRegularizationMethod.ADAPTWGCV, 0, 0, false, 2, 1e-6, false);
     }
 
     /**
@@ -163,57 +109,57 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
      *            a method for choosing a regularization parameter
      * @param regularizationParameter
      *            if regularizationMethod == HyBR.RegularizationMethod.NONE then
-     *            the regularization parameter has to be specified here
+     *            the regularization parameter has to be specified here (value
+     *            from the interval (0,1))
      * @param omega
      *            regularizationMethod == HyBR.RegularizationMethod.WGCV then
-     *            omega has to be specified here
-     * @param maxIterations
-     *            maximum number of Lanczos iterations
+     *            omega has to be specified here (must be nonnegative)
      * @param reorthogonalize
      *            if thue then Lanczos subspaces are reorthogonalized
      * @param beginRegularization
-     *            begin regularization after this iteration
+     *            begin regularization after this iteration (must be at least 2)
      * @param flatTolerance
      *            tolerance for detecting flatness in the GCV curve as a
-     *            stopping criteria
-     * @param computeRnorm
-     *            if true then the relative residual norm is computed.
+     *            stopping criteria (must be nonnegative)
+     *@param computeRnorm
+     *            if true then the norm of relative residual is computed
      */
-    public DoubleHyBR(InnerSolver innerSolver, RegularizationMethod regularizationMethod, double regularizationParameter, double omega, int maxIterations, boolean reorthogonalize, int beginRegularization, double flatTolerance, boolean computeRnorm) {
+    public DoubleHyBR(HyBRInnerSolver innerSolver, HyBRRegularizationMethod regularizationMethod, double regularizationParameter, double omega, boolean reorthogonalize, int beginRegularization, double flatTolerance, boolean computeRnrm) {
         this.innerSolver = innerSolver;
         this.regMethod = regularizationMethod;
+        if ((regularizationParameter < 0.0) || (regularizationParameter > 1.0)) {
+            throw new IllegalArgumentException("regularizationParameter must be a number between 0 and 1.");
+        }
         this.regPar = regularizationParameter;
+        if (omega < 0.0) {
+            throw new IllegalArgumentException("omega must be a nonnegative number.");
+        }
         this.omega = omega;
-        this.maxIts = maxIterations;
         this.reorth = reorthogonalize;
+        if (beginRegularization < 2) {
+            throw new IllegalArgumentException("beginRegularization must be greater or equal 2");
+        }
         this.begReg = beginRegularization;
+        if (flatTolerance < 0.0) {
+            throw new IllegalArgumentException("flatTolerance must be a nonnegative number.");
+        }
         this.flatTol = flatTolerance;
-        this.computeRnorm = computeRnorm;
-        this.hybrOutput = new HyBROutput();
-        this.iter = null; // HyBR doesn't use an IterationMonitor
-    }
-
-    public DoubleIterationMonitor getIterationMonitor() {
-        throw new IllegalAccessError("HyBR doesn't use an IterationMonitor. Use getHyBROutput() instead.");
-    }
-
-    public void setIterationMonitor(DoubleIterationMonitor iter) {
-        throw new IllegalAccessError("HyBR doesn't use an IterationMonitor. Use getHyBROutput() instead.");
-    }
-
-    public HyBROutput getHyBROutput() {
-        return hybrOutput;
+        this.computeRnrm = computeRnrm;
+        this.iter = new HyBRDoubleIterationMonitor();
     }
 
     public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+        if (!(iter instanceof HyBRDoubleIterationMonitor)) {
+            this.iter = new HyBRDoubleIterationMonitor();
+        }
         checkSizes(A, b, x);
         int columns = A.columns();
         boolean bump = false;
-        boolean terminate = true;
         boolean warning = false;
+        double rnrm = -1.0;
         int iterationsSave = 0;
         double alpha, beta;
-        InnerSolver inSolver = InnerSolver.NONE;
+        HyBRInnerSolver inSolver = HyBRInnerSolver.NONE;
         DoubleLBD lbd;
         DoubleMatrix1D v;
         DoubleMatrix1D work;
@@ -221,15 +167,17 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         DoubleMatrix1D f = null;
         DoubleMatrix1D xSave = null;
         double[] sv;
-        DoubleArrayList omegaList = new DoubleArrayList();
-        DoubleArrayList GCV = new DoubleArrayList(new double[begReg - 1]);
+        DoubleArrayList omegaList = new DoubleArrayList(new double[begReg - 2]);
+        DoubleArrayList GCV = new DoubleArrayList(new double[begReg - 2]);
         DoubleMatrix2D U = new DenseDoubleMatrix2D(1, b.size());
         DoubleMatrix2D B = null;
         DoubleMatrix2D V = null;
         DoubleSingularValueDecompositionDC svd;
-        work = b.copy();
-        //        A.zMult(x, work, -1, 1, false);
-        //        hybrOutput.setRnorm(alg.norm2(work));
+        if (computeRnrm) {
+            work = b.copy();
+            A.zMult(x, work, -1, 1, false);
+            rnrm = alg.norm2(work);
+        }
         if (M instanceof DoubleIdentity) {
             beta = alg.norm2(b);
             U.viewRow(0).assign(b, DoubleFunctions.multSecond(1.0 / beta));
@@ -241,13 +189,14 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
             U.viewRow(0).assign(work, DoubleFunctions.multSecond(1.0 / beta));
             lbd = new DoublePLBD(M, A, U, reorth);
         }
-        for (int i = 0; i <= maxIts; i++) {
+        for (iter.setFirst(); !iter.converged(rnrm, x); iter.next()) {
             lbd.apply();
             U = lbd.getU();
             B = lbd.getB();
             V = lbd.getV();
             v = new DenseDoubleMatrix1D(U.rows());
             v.setQuick(0, beta);
+            int i = iter.iterations();
             if (i >= 1) {
                 if (i >= begReg - 1) {
                     inSolver = innerSolver;
@@ -258,7 +207,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                     Ub = svd.getU();
                     sv = svd.getSingularValues();
                     Vb = svd.getV();
-                    if (regMethod == RegularizationMethod.ADAPTWGCV) {
+                    if (regMethod == HyBRRegularizationMethod.ADAPTWGCV) {
                         work = new DenseDoubleMatrix1D(Ub.rows());
                         Ub.zMult(v, work, 1, 0, true);
                         omegaList.add(Math.min(1, findOmega(work, sv)));
@@ -267,41 +216,40 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                     f = new DenseDoubleMatrix1D(Vb.rows());
                     alpha = tikhonovSolver(Ub, sv, Vb, v, f);
                     GCV.add(GCVstopfun(alpha, Ub.viewRow(0), sv, beta, columns));
-                    if ((i > 1) && (terminate == true)) {
-                        if (Math.abs((GCV.get(i) - GCV.get(i - 1))) / GCV.get(begReg) < flatTol) {
+                    if (i > 1) {
+                        if (Math.abs((GCV.getQuick(i - 1) - GCV.getQuick(i - 2))) / GCV.get(begReg - 2) < flatTol) {
                             V.zMult(f, x);
-                            hybrOutput.setStoppingCondition("flat GCV curve");
-                            hybrOutput.setStoppingIteration(i);
-                            if (computeRnorm) {
+                            ((HyBRDoubleIterationMonitor) iter).setStoppingCondition(HyBRDoubleIterationMonitor.HyBRStoppingCondition.FLAT_GCV_CURVE);
+                            if (computeRnrm) {
                                 work = b.copy();
                                 A.zMult(x, work, -1, 1, false);
-                                hybrOutput.setRnorm(alg.norm2(work));
+                                ((HyBRDoubleIterationMonitor) iter).residual = alg.norm2(work);
                             }
                             return x;
                         } else if ((warning == true) && (GCV.size() > iterationsSave + 3)) {
-                            for (int j = iterationsSave; j < GCV.size() - 1; j++) {
-                                if (GCV.get(iterationsSave) > GCV.get(j + 1)) {
+                            for (int j = iterationsSave; j < GCV.size(); j++) {
+                                if (GCV.getQuick(iterationsSave - 1) > GCV.get(j)) {
                                     bump = true;
                                 }
                             }
                             if (bump == false) {
                                 x.assign(xSave);
-                                hybrOutput.setStoppingCondition("min of GCV curve (within window of 4 iterations)");
-                                hybrOutput.setStoppingIteration(iterationsSave);
-                                if (computeRnorm) {
+                                ((HyBRDoubleIterationMonitor) iter).setStoppingCondition(HyBRDoubleIterationMonitor.HyBRStoppingCondition.MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS);
+                                ((HyBRDoubleIterationMonitor) iter).iter = iterationsSave;
+                                if (computeRnrm) {
                                     work = b.copy();
                                     A.zMult(x, work, -1, 1, false);
-                                    hybrOutput.setRnorm(alg.norm2(work));
+                                    ((HyBRDoubleIterationMonitor) iter).residual = alg.norm2(work);
                                 }
                                 return x;
 
                             } else {
                                 bump = false;
                                 warning = false;
-                                iterationsSave = maxIts;
+                                iterationsSave = iter.getMaxIterations();
                             }
                         } else if (warning == false) {
-                            if (GCV.get(i - 1) < GCV.get(i)) {
+                            if (GCV.get(i - 2) < GCV.get(i - 1)) {
                                 warning = true;
                                 xSave = new DenseDoubleMatrix1D(V.rows());
                                 V.zMult(f, xSave);
@@ -315,15 +263,13 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                     break;
                 }
                 V.zMult(f, x);
+                if (computeRnrm) {
+                    work = b.copy();
+                    A.zMult(x, work, -1, 1, false);
+                    rnrm = alg.norm2(work);
+                }
             }
         }
-        if (computeRnorm) {
-            work = b.copy();
-            A.zMult(x, work, -1, 1, false);
-            hybrOutput.setRnorm(alg.norm2(work));
-        }
-        hybrOutput.setStoppingCondition("performed max number of iterations");
-        hybrOutput.setStoppingIteration(maxIts);
         return x;
 
     }

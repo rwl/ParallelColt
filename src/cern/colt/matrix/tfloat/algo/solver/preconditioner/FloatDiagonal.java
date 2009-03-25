@@ -45,6 +45,10 @@ public class FloatDiagonal implements FloatPreconditioner {
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         if (!(x instanceof DenseFloatMatrix1D) || !(b instanceof DenseFloatMatrix1D))
             throw new IllegalArgumentException("a nad b must be dense vectors");
 
@@ -58,6 +62,10 @@ public class FloatDiagonal implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         return apply(b, x);
     }
 

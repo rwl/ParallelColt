@@ -105,34 +105,62 @@ public class DefaultDoubleIterationMonitor extends AbstractDoubleIterationMonito
     }
 
     /**
-     * Sets the relative tolerance
+     * Sets the relative convergence tolerance
      * 
      * @param rtol
-     *            Relative convergence tolerance (to initial residual)
+     *            relative convergence tolerance (to initial residual)
      */
     public void setRelativeTolerance(double rtol) {
         this.rtol = rtol;
     }
 
     /**
-     * Sets the absolute tolerance
+     * Returns the relative convergence tolerance
+     * 
+     * @return relative convergence tolerance (to initial residual)
+     */
+    public double getRelativeTolerance() {
+        return rtol;
+    }
+
+    /**
+     * Sets the absolute convergence tolerance
      * 
      * @param atol
-     *            Absolute convergence tolerance
+     *            absolute convergence tolerance
      */
     public void setAbsoluteTolerance(double atol) {
         this.atol = atol;
     }
 
     /**
-     * Sets the divergence tolerance
+     * Returns the absolute convergence tolerance
+     * 
+     * @return absolute convergence tolerance
+     */
+    public double getAbsoluteTolerance() {
+        return atol;
+    }
+
+    /**
+     * Sets the relative divergence tolerance
      * 
      * @param dtol
-     *            Relative divergence tolerance (to initial residual)
+     *            relative divergence tolerance (to initial residual)
      */
     public void setDivergenceTolerance(double dtol) {
         this.dtol = dtol;
     }
+    
+    
+    /**
+     * Returns the relative divergence tolerance
+     * @return relative divergence tolerance (to initial residual)
+     */
+    public double getDivergenceTolerance() {
+        return dtol;
+    }
+       
 
     @Override
     protected boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException {

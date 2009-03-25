@@ -20,9 +20,9 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding
- * <tt>float</tt> elements. First see the <a href="package-summary.html">package
- * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get the
- * broad picture.
+ * <tt>float</tt> elements. First see the <a
+ * href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * A matrix has a number of cells (its <i>size</i>), which are assigned upon
  * instance construction. Elements are accessed via zero based indexes. Legal
@@ -180,6 +180,66 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
         } else {
             for (int i = 1; i < size; i++) {
                 a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
+            }
+        }
+        return a;
+    }
+
+    /**
+     * 
+     * Applies a function to all cells with a given indexes and aggregates the
+     * results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param indexList
+     *            indexes.
+     * 
+     * @return the aggregated measure.
+     * @see cern.jet.math.tfloat.FloatFunctions
+     */
+    public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr, final cern.colt.function.tfloat.FloatFunction f, final IntArrayList indexList) {
+        if (size() == 0)
+            return Float.NaN;
+        final int size = indexList.size();
+        final int[] indexElements = indexList.elements();
+        float a = 0;
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            Future<?>[] futures = new Future[np];
+            int k = size / np;
+            for (int j = 0; j < np; j++) {
+                final int startidx = j * k;
+                final int stopidx;
+                if (j == np - 1) {
+                    stopidx = size;
+                } else {
+                    stopidx = startidx + k;
+                }
+                futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
+
+                    public Float call() throws Exception {
+                        float a = f.apply(getQuick(indexElements[startidx]));
+                        float elem;
+                        for (int i = startidx + 1; i < stopidx; i++) {
+                            elem = getQuick(indexElements[i]);
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            float elem;
+            a = f.apply(getQuick(indexElements[0]));
+            for (int i = 1; i < size; i++) {
+                elem = getQuick(indexElements[i]);
+                a = aggr.apply(a, f.apply(elem));
             }
         }
         return a;
@@ -781,27 +841,43 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      *            the list to be filled with values, can have any size.
      */
     public void getNegativeValues(final IntArrayList indexList, final FloatArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
         if (rem == 1) {
             float value = getQuick(0);
             if (value < 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(0);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
 
         for (int i = rem; i < size; i += 2) {
             float value = getQuick(i);
             if (value < 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
             value = getQuick(i + 1);
             if (value < 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
     }
@@ -836,27 +912,43 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      *            the list to be filled with values, can have any size.
      */
     public void getNonZeros(final IntArrayList indexList, final FloatArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
         if (rem == 1) {
             float value = getQuick(0);
             if (value != 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(0);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
 
         for (int i = rem; i < size; i += 2) {
             float value = getQuick(i);
             if (value != 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             value = getQuick(i + 1);
             if (value != 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
     }
@@ -929,27 +1021,43 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      *            the list to be filled with values, can have any size.
      */
     public void getPositiveValues(final IntArrayList indexList, final FloatArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
         if (rem == 1) {
             float value = getQuick(0);
             if (value > 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(0);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
 
         for (int i = rem; i < size; i += 2) {
             float value = getQuick(i);
             if (value > 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
             value = getQuick(i + 1);
             if (value > 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
     }
@@ -993,8 +1101,8 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * instance of type <tt>DenseFloatMatrix1D</tt> the new matrix must also be
      * of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an instance of
      * type <tt>SparseFloatMatrix1D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix should have
-     * internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix should
+     * have internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1007,8 +1115,8 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * as the receiver, having the specified size. For example, if the receiver
      * is an instance of type <tt>DenseFloatMatrix1D</tt> the new matrix must
      * also be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also be
-     * of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
+     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also
+     * be of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
      * should have internal parametrization as similar as possible.
      * 
      * @param size
@@ -1021,9 +1129,9 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be of
-     * type <tt>SparseFloatMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is
+     * an instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be
+     * of type <tt>SparseFloatMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -1180,17 +1288,17 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
             assign(FloatFunctions.minus(min));
         }
         if (getMaxLocation()[0] == 0) {
-            assign((float) (1.0 / size()));
+            assign((float)(1.0 / size()));
         } else {
             float sumScaleFactor = zSum();
-            sumScaleFactor = (float) (1.0 / sumScaleFactor);
+            sumScaleFactor = (float)(1.0 / sumScaleFactor);
             assign(FloatFunctions.mult(sumScaleFactor));
         }
     }
 
     /**
-     * Returns new FloatMatrix2D of size rows x columns whose elements are taken
-     * column-wise from this matrix.
+     * Returns new FloatMatrix2D of size rows x columns whose elements are
+     * taken column-wise from this matrix.
      * 
      * @param rows
      *            number of rows
@@ -1201,8 +1309,8 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     public abstract FloatMatrix2D reshape(int rows, int cols);
 
     /**
-     * Returns new FloatMatrix3D of size slices x rows x columns, whose elements
-     * are taken column-wise from this matrix.
+     * Returns new FloatMatrix3D of size slices x rows x columns, whose
+     * elements are taken column-wise from this matrix.
      * 
      * @param rows
      *            number of rows

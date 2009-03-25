@@ -107,6 +107,10 @@ public class FloatILUT implements FloatPreconditioner {
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         // Ly = b, y = L\b
         unitLowerSolve(b, y);
 
@@ -115,6 +119,10 @@ public class FloatILUT implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         // U'y = b, y = U'\b
         upperTransSolve(b, y);
         // L'x = U'\b = y

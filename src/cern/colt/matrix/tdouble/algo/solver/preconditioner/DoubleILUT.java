@@ -107,6 +107,10 @@ public class DoubleILUT implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         // Ly = b, y = L\b
         unitLowerSolve(b, y);
 
@@ -115,6 +119,10 @@ public class DoubleILUT implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         // U'y = b, y = U'\b
         upperTransSolve(b, y);
         // L'x = U'\b = y

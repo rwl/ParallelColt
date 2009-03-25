@@ -186,10 +186,10 @@ public abstract class FloatMatrix2DTest extends TestCase {
 
     public void testAssignFloatMatrix2DFloatFloatFunction() {
         FloatMatrix2D Acopy = A.copy();
-        A.assign(B, FloatFunctions.div);
+        A.assign(B, FloatFunctions.plus);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(Acopy.getQuick(r, c) / B.getQuick(r, c), A.getQuick(r, c), TOL);
+                assertEquals(Acopy.getQuick(r, c) + B.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }
     }

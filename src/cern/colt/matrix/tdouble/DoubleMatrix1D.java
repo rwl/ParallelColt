@@ -186,6 +186,66 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
     }
 
     /**
+     * 
+     * Applies a function to all cells with a given indexes and aggregates the
+     * results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param indexList
+     *            indexes.
+     * 
+     * @return the aggregated measure.
+     * @see cern.jet.math.tdouble.DoubleFunctions
+     */
+    public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleFunction f, final IntArrayList indexList) {
+        if (size() == 0)
+            return Double.NaN;
+        final int size = indexList.size();
+        final int[] indexElements = indexList.elements();
+        double a = 0;
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            Future<?>[] futures = new Future[np];
+            int k = size / np;
+            for (int j = 0; j < np; j++) {
+                final int startidx = j * k;
+                final int stopidx;
+                if (j == np - 1) {
+                    stopidx = size;
+                } else {
+                    stopidx = startidx + k;
+                }
+                futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
+
+                    public Double call() throws Exception {
+                        double a = f.apply(getQuick(indexElements[startidx]));
+                        double elem;
+                        for (int i = startidx + 1; i < stopidx; i++) {
+                            elem = getQuick(indexElements[i]);
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            double elem;
+            a = f.apply(getQuick(indexElements[0]));
+            for (int i = 1; i < size; i++) {
+                elem = getQuick(indexElements[i]);
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
+
+    /**
      * Assigns the result of a function to each cell;
      * <tt>x[i] = function(x[i])</tt>. (Iterates downwards from
      * <tt>[size()-1]</tt> to <tt>[0]</tt>).
@@ -781,27 +841,43 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
      *            the list to be filled with values, can have any size.
      */
     public void getNegativeValues(final IntArrayList indexList, final DoubleArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
         if (rem == 1) {
             double value = getQuick(0);
             if (value < 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(0);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
 
         for (int i = rem; i < size; i += 2) {
             double value = getQuick(i);
             if (value < 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
             value = getQuick(i + 1);
             if (value < 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
     }
@@ -836,27 +912,43 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
      *            the list to be filled with values, can have any size.
      */
     public void getNonZeros(final IntArrayList indexList, final DoubleArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
         if (rem == 1) {
             double value = getQuick(0);
             if (value != 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(0);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
 
         for (int i = rem; i < size; i += 2) {
             double value = getQuick(i);
             if (value != 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
             value = getQuick(i + 1);
             if (value != 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if(fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if(fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
     }
@@ -929,27 +1021,43 @@ public abstract class DoubleMatrix1D extends AbstractMatrix1D {
      *            the list to be filled with values, can have any size.
      */
     public void getPositiveValues(final IntArrayList indexList, final DoubleArrayList valueList) {
-        indexList.clear();
-        valueList.clear();
+        boolean fillIndexList = indexList != null;
+        boolean fillValueList = valueList != null;
+        if (fillIndexList)
+            indexList.clear();
+        if (fillValueList)
+            valueList.clear();
         int rem = size % 2;
         if (rem == 1) {
             double value = getQuick(0);
             if (value > 0) {
-                indexList.add(0);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(0);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
 
         for (int i = rem; i < size; i += 2) {
             double value = getQuick(i);
             if (value > 0) {
-                indexList.add(i);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
             value = getQuick(i + 1);
             if (value > 0) {
-                indexList.add(i + 1);
-                valueList.add(value);
+                if (fillIndexList) {
+                    indexList.add(i + 1);
+                }
+                if (fillValueList) {
+                    valueList.add(value);
+                }
             }
         }
     }

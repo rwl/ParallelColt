@@ -66,6 +66,20 @@ public abstract class DoubleMatrix1DTest extends TestCase {
         double result = A.aggregate(DoubleFunctions.plus, DoubleFunctions.square);
         assertEquals(expected, result, TOL);
     }
+    
+    public void testAggregateDoubleDoubleFunctionDoubleFunctionIntArrayList() {
+       IntArrayList indexList = new IntArrayList();
+       for (int i = 0; i < SIZE; i++) {
+                indexList.add(i);
+        }
+        double expected = 0;
+        for (int i = 0; i < SIZE; i++) {
+                double elem = A.getQuick(i);
+                expected += elem * elem;
+        }
+        double result = A.aggregate(DoubleFunctions.plus, DoubleFunctions.square, indexList);
+        assertEquals(expected, result, TOL);
+    }
 
     public void testAggregateDoubleMatrix2DDoubleDoubleFunctionDoubleDoubleFunction() {
         double expected = 0;

@@ -1007,15 +1007,13 @@ public class FloatAlgebra extends cern.colt.PersistentObject {
     }
 
     /**
-     * Solves A*x = b. A has to be square.
+     * Solves A*x = b.
      * 
-     * @return x; a solution
+     * @return x; a new independent matrix; solution if A is square, least
+     *         squares solution otherwise.
      */
     public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b) {
-        if (A.rows() != A.columns()) {
-            throw new IllegalArgumentException("This method only applies to square matrices");
-        }
-        return lu(A).solve(b);
+        return (A.rows() == A.columns() ? (lu(A).solve(b)) : (qr(A).solve(b)));
     }
 
     /**

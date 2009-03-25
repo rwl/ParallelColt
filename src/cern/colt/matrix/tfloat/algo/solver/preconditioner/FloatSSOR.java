@@ -140,6 +140,10 @@ public class FloatSSOR implements FloatPreconditioner {
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         if (!(b instanceof DenseFloatMatrix1D) || !(x instanceof DenseFloatMatrix1D))
             throw new IllegalArgumentException("b and x must be a DenseFloatMatrix1D");
 
@@ -195,6 +199,10 @@ public class FloatSSOR implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
+        if(x == null) {
+            x = b.like();
+        }
+
         // Assume a symmetric matrix
         return apply(b, x);
     }
