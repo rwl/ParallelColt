@@ -18,6 +18,7 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
+import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.random.tdouble.engine.DoubleRandomEngine;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
@@ -71,7 +72,7 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction EUCLID = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return (double) Math.sqrt(a.aggregate(b, F.plus, F.chain(F.square, F.minus)));
+            return Math.sqrt(a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.square, DoubleFunctions.minus)));
         }
     };
 
@@ -81,7 +82,7 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction BRAY_CURTIS = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return a.aggregate(b, F.plus, F.chain(F.abs, F.minus)) / a.aggregate(b, F.plus, F.plus);
+            return a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.abs, DoubleFunctions.minus)) / a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.plus);
         }
     };
 
@@ -97,7 +98,7 @@ public class DoubleStatistic extends Object {
         };
 
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return a.aggregate(b, F.plus, fun);
+            return a.aggregate(b, DoubleFunctions.plus, fun);
         }
     };
 
@@ -106,7 +107,7 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction MAXIMUM = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return a.aggregate(b, F.max, F.chain(F.abs, F.minus));
+            return a.aggregate(b, DoubleFunctions.max, DoubleFunctions.chain(DoubleFunctions.abs, DoubleFunctions.minus));
         }
     };
 
@@ -115,7 +116,7 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction MANHATTAN = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return a.aggregate(b, F.plus, F.chain(F.abs, F.minus));
+            return a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.abs, DoubleFunctions.minus));
         }
     };
 
@@ -133,7 +134,8 @@ public class DoubleStatistic extends Object {
          *            the second argument vector passed to the function.
          * @return the result of the function.
          */
-        abstract public double apply(cern.colt.matrix.tdouble.DoubleMatrix1D x, cern.colt.matrix.tdouble.DoubleMatrix1D y);
+        abstract public double apply(cern.colt.matrix.tdouble.DoubleMatrix1D x,
+                cern.colt.matrix.tdouble.DoubleMatrix1D y);
     }
 
     /**
@@ -161,7 +163,8 @@ public class DoubleStatistic extends Object {
      * @see hep.aida.tdouble.bin.DoubleBinFunction1D
      * @see hep.aida.tdouble.bin.DoubleBinFunctions1D
      */
-    public static DoubleMatrix2D aggregate(DoubleMatrix2D matrix, hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr, DoubleMatrix2D result) {
+    public static DoubleMatrix2D aggregate(DoubleMatrix2D matrix, hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr,
+            DoubleMatrix2D result) {
         DynamicDoubleBin1D bin = new DynamicDoubleBin1D();
         double[] elements = new double[matrix.rows()];
         cern.colt.list.tdouble.DoubleArrayList values = new cern.colt.list.tdouble.DoubleArrayList(elements);
@@ -268,8 +271,8 @@ public class DoubleStatistic extends Object {
     public static DoubleMatrix2D correlation(DoubleMatrix2D covariance) {
         for (int i = covariance.columns(); --i >= 0;) {
             for (int j = i; --j >= 0;) {
-                double stdDev1 = (double) Math.sqrt(covariance.getQuick(i, i));
-                double stdDev2 = (double) Math.sqrt(covariance.getQuick(j, j));
+                double stdDev1 = Math.sqrt(covariance.getQuick(i, i));
+                double stdDev2 = Math.sqrt(covariance.getQuick(j, j));
                 double cov = covariance.getQuick(i, j);
                 double corr = cov / (stdDev1 * stdDev2);
 
@@ -372,7 +375,7 @@ public class DoubleStatistic extends Object {
 
         double epsilon = 1.0E-5f;
         cern.colt.list.tdouble.DoubleArrayList distinct = new cern.colt.list.tdouble.DoubleArrayList();
-        double[] vals = new double[x.size()];
+        double[] vals = new double[(int) x.size()];
         cern.colt.list.tdouble.DoubleArrayList sorted = new cern.colt.list.tdouble.DoubleArrayList(vals);
 
         // compute distinct values of x
@@ -417,13 +420,14 @@ public class DoubleStatistic extends Object {
      *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>
      *             .
      */
-    public static hep.aida.tdouble.DoubleIHistogram3D cube(DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D z, DoubleMatrix1D weights) {
+    public static hep.aida.tdouble.DoubleIHistogram3D cube(DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D z,
+            DoubleMatrix1D weights) {
         if (x.size() != y.size() || x.size() != z.size() || x.size() != weights.size())
             throw new IllegalArgumentException("vectors must have same size");
 
         double epsilon = 1.0E-5f;
         cern.colt.list.tdouble.DoubleArrayList distinct = new cern.colt.list.tdouble.DoubleArrayList();
-        double[] vals = new double[x.size()];
+        double[] vals = new double[(int) x.size()];
         cern.colt.list.tdouble.DoubleArrayList sorted = new cern.colt.list.tdouble.DoubleArrayList(vals);
 
         // compute distinct values of x
@@ -459,7 +463,8 @@ public class DoubleStatistic extends Object {
         distinct.trimToSize();
         hep.aida.tdouble.DoubleIAxis zaxis = new hep.aida.tdouble.ref.DoubleVariableAxis(distinct.elements());
 
-        hep.aida.tdouble.DoubleIHistogram3D histo = new hep.aida.tdouble.ref.DoubleHistogram3D("Cube", xaxis, yaxis, zaxis);
+        hep.aida.tdouble.DoubleIHistogram3D histo = new hep.aida.tdouble.ref.DoubleHistogram3D("Cube", xaxis, yaxis,
+                zaxis);
         return histogram(histo, x, y, z, weights);
     }
 
@@ -509,7 +514,8 @@ public class DoubleStatistic extends Object {
      * Demonstrates usage of this class.
      */
     public static void demo3(VectorVectorFunction norm) {
-        double[][] values = { { -0.9611052f, -0.25421095f }, { 0.4308269f, -0.69932648f }, { -1.2071029f, 0.62030596f }, { 1.5345166f, 0.02135884f }, { -1.1341542f, 0.20388430f } };
+        double[][] values = { { -0.9611052f, -0.25421095f }, { 0.4308269f, -0.69932648f },
+                { -1.2071029f, 0.62030596f }, { 1.5345166f, 0.02135884f }, { -1.1341542f, 0.20388430f } };
 
         System.out.println("\n\ninitializing...");
         DoubleFactory2D factory = DoubleFactory2D.dense;
@@ -561,8 +567,9 @@ public class DoubleStatistic extends Object {
      * 
      * @return <tt>histo</tt> (for convenience only).
      */
-    public static hep.aida.tdouble.DoubleIHistogram1D histogram(hep.aida.tdouble.DoubleIHistogram1D histo, DoubleMatrix1D vector) {
-        for (int i = vector.size(); --i >= 0;) {
+    public static hep.aida.tdouble.DoubleIHistogram1D histogram(hep.aida.tdouble.DoubleIHistogram1D histo,
+            DoubleMatrix1D vector) {
+        for (int i = (int) vector.size(); --i >= 0;) {
             histo.fill(vector.getQuick(i));
         }
         return histo;
@@ -573,8 +580,10 @@ public class DoubleStatistic extends Object {
      * 
      * @return <tt>histo</tt> (for convenience only).
      */
-    public static hep.aida.tdouble.DoubleIHistogram1D histogram(final hep.aida.tdouble.DoubleIHistogram1D histo, final DoubleMatrix2D matrix) {
-        histo.fill_2D((double[]) matrix.elements(), matrix.rows(), matrix.columns(), (int) matrix.index(0, 0), matrix.rowStride(), matrix.columnStride());
+    public static hep.aida.tdouble.DoubleIHistogram1D histogram(final hep.aida.tdouble.DoubleIHistogram1D histo,
+            final DoubleMatrix2D matrix) {
+        histo.fill_2D((double[]) matrix.elements(), matrix.rows(), matrix.columns(), (int) matrix.index(0, 0), matrix
+                .rowStride(), matrix.columnStride());
         return histo;
     }
 
@@ -584,7 +593,8 @@ public class DoubleStatistic extends Object {
      * 
      * @return <tt>histo</tt> (for convenience only).
      */
-    public static hep.aida.tdouble.DoubleIHistogram1D[][] histogram(final hep.aida.tdouble.DoubleIHistogram1D[][] histo, final DoubleMatrix2D matrix, final int m, final int n) {
+    public static hep.aida.tdouble.DoubleIHistogram1D[][] histogram(
+            final hep.aida.tdouble.DoubleIHistogram1D[][] histo, final DoubleMatrix2D matrix, final int m, final int n) {
         int rows = matrix.rows();
         int cols = matrix.columns();
         if (m >= rows) {
@@ -606,26 +616,23 @@ public class DoubleStatistic extends Object {
         }
         width[n - 1] = cols - (n - 1) * col_size;
 
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = m / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = m;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, m);
+            Future<?>[] futures = new Future[nthreads];
+            int k = m / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? m : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         DoubleMatrix2D view = null;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < n; c++) {
                                 view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                                histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int) view.index(0, 0), view.rowStride(), view.columnStride());
+                                histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int) view
+                                        .index(0, 0), view.rowStride(), view.columnStride());
                             }
                         }
                     }
@@ -637,7 +644,8 @@ public class DoubleStatistic extends Object {
             for (int r = 0; r < m; r++) {
                 for (int c = 0; c < n; c++) {
                     view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                    histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(), (int) view.index(0, 0), view.rowStride(), view.columnStride());
+                    histo[r][c].fill_2D((double[]) view.elements(), view.rows(), view.columns(),
+                            (int) view.index(0, 0), view.rowStride(), view.columnStride());
                 }
             }
         }
@@ -651,10 +659,11 @@ public class DoubleStatistic extends Object {
      * @throws IllegalArgumentException
      *             if <tt>x.size() != y.size()</tt>.
      */
-    public static hep.aida.tdouble.DoubleIHistogram2D histogram(hep.aida.tdouble.DoubleIHistogram2D histo, DoubleMatrix1D x, DoubleMatrix1D y) {
+    public static hep.aida.tdouble.DoubleIHistogram2D histogram(hep.aida.tdouble.DoubleIHistogram2D histo,
+            DoubleMatrix1D x, DoubleMatrix1D y) {
         if (x.size() != y.size())
             throw new IllegalArgumentException("vectors must have same size");
-        for (int i = x.size(); --i >= 0;) {
+        for (int i = (int) x.size(); --i >= 0;) {
             histo.fill(x.getQuick(i), y.getQuick(i));
         }
         return histo;
@@ -668,10 +677,11 @@ public class DoubleStatistic extends Object {
      *             if
      *             <tt>x.size() != y.size() || y.size() != weights.size()</tt>.
      */
-    public static hep.aida.tdouble.DoubleIHistogram2D histogram(hep.aida.tdouble.DoubleIHistogram2D histo, DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D weights) {
+    public static hep.aida.tdouble.DoubleIHistogram2D histogram(hep.aida.tdouble.DoubleIHistogram2D histo,
+            DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D weights) {
         if (x.size() != y.size() || y.size() != weights.size())
             throw new IllegalArgumentException("vectors must have same size");
-        for (int i = x.size(); --i >= 0;) {
+        for (int i = (int) x.size(); --i >= 0;) {
             histo.fill(x.getQuick(i), y.getQuick(i), weights.getQuick(i));
         }
         return histo;
@@ -686,10 +696,11 @@ public class DoubleStatistic extends Object {
      *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>
      *             .
      */
-    public static hep.aida.tdouble.DoubleIHistogram3D histogram(hep.aida.tdouble.DoubleIHistogram3D histo, DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D z, DoubleMatrix1D weights) {
+    public static hep.aida.tdouble.DoubleIHistogram3D histogram(hep.aida.tdouble.DoubleIHistogram3D histo,
+            DoubleMatrix1D x, DoubleMatrix1D y, DoubleMatrix1D z, DoubleMatrix1D weights) {
         if (x.size() != y.size() || x.size() != z.size() || x.size() != weights.size())
             throw new IllegalArgumentException("vectors must have same size");
-        for (int i = x.size(); --i >= 0;) {
+        for (int i = (int) x.size(); --i >= 0;) {
             histo.fill(x.getQuick(i), y.getQuick(i), z.getQuick(i), weights.getQuick(i));
         }
         return histo;
@@ -746,7 +757,7 @@ public class DoubleStatistic extends Object {
 
         // sample
         int n = ncols;
-        int N = matrix.size();
+        int N = (int) matrix.size();
         cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
         for (int i = 0; i < n; i++)
@@ -822,7 +833,8 @@ public class DoubleStatistic extends Object {
      *             .
      * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
      */
-    public static DoubleMatrix2D viewSample(DoubleMatrix2D matrix, double rowFraction, double columnFraction, DoubleRandomEngine randomGenerator) {
+    public static DoubleMatrix2D viewSample(DoubleMatrix2D matrix, double rowFraction, double columnFraction,
+            DoubleRandomEngine randomGenerator) {
         // check preconditions and allow for a little tolerance
         double epsilon = 1e-05f;
         if (rowFraction < 0 - epsilon || rowFraction > 1 + epsilon)
@@ -895,7 +907,8 @@ public class DoubleStatistic extends Object {
      *             .
      * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
      */
-    public static DoubleMatrix3D viewSample(DoubleMatrix3D matrix, double sliceFraction, double rowFraction, double columnFraction, DoubleRandomEngine randomGenerator) {
+    public static DoubleMatrix3D viewSample(DoubleMatrix3D matrix, double sliceFraction, double rowFraction,
+            double columnFraction, DoubleRandomEngine randomGenerator) {
         // check preconditions and allow for a little tolerance
         double epsilon = 1e-05f;
         if (sliceFraction < 0 - epsilon || sliceFraction > 1 + epsilon)
@@ -955,95 +968,5 @@ public class DoubleStatistic extends Object {
             selectedCols[i] = (int) selected[i];
 
         return matrix.viewSelection(selectedSlices, selectedRows, selectedCols);
-    }
-
-    /**
-     * Constructs and returns the distance matrix of the given matrix. The
-     * distance matrix is a square, symmetric matrix consisting of nothing but
-     * distance coefficients. The rows and the columns represent the variables,
-     * the cells represent distance coefficients. The diagonal cells (i.e. the
-     * distance between a variable and itself) will be zero. Compares two column
-     * vectors at a time. Use dice views to compare two row vectors at a time.
-     * 
-     * @param matrix
-     *            any matrix; a column holds the values of a given variable
-     *            (vector).
-     * @param norm
-     *            the kind of norm to be used (EUCLID, CANBERRA, ...).
-     * @return the distance matrix (<tt>n x n, n=matrix.columns</tt>).
-     */
-    private static DoubleMatrix2D xdistanceOld(DoubleMatrix2D matrix, int norm) {
-        /*
-         * int rows = matrix.rows(); int columns = matrix.columns();
-         * DoubleMatrix2D distance = new
-         * cern.colt.matrix.impl.DenseDoubleMatrix2D(columns,columns); // cache
-         * views DoubleMatrix1D[] cols = new DoubleMatrix1D[columns]; for (int
-         * i=columns; --i >= 0; ) { cols[i] = matrix.viewColumn(i); } // setup
-         * distance function cern.jet.math.Functions F =
-         * cern.jet.math.Functions.functions; DoubleDoubleFunction function =
-         * null; //DoubleDoubleFunction function2 = null; if (norm==EUCLID)
-         * function = F.chain(F.square,F.minus); else if (norm==BRAY_CURTIS)
-         * function = F.chain(F.abs,F.minus); else if (norm==CANBERRA) function =
-         * new DoubleDoubleFunction() { public final double apply(double a,
-         * double b) { return Math.abs(a-b) / Math.abs(a+b);} }; else if
-         * (norm==MAXIMUM) function = F.chain(F.abs,F.minus); else if
-         * (norm==MANHATTAN) function = F.chain(F.abs,F.minus); else throw new
-         * IllegalArgumentException("Unknown norm"); // work out all
-         * permutations for (int i=columns; --i >= 0; ) { for (int j=i; --j >=
-         * 0; ) { double d = 0; if (norm==EUCLID) d =
-         * Math.sqrt(cols[i].aggregate(cols[j], F.plus, function)); else if
-         * (norm==BRAY_CURTIS) d = cols[i].aggregate(cols[j], F.plus, function) /
-         * cols[i].aggregate(cols[j], F.plus, F.plus); else if (norm==CANBERRA)
-         * d = cols[i].aggregate(cols[j], F.plus, function); else if
-         * (norm==MAXIMUM) d = cols[i].aggregate(cols[j], F.max, function); else
-         * if (norm==MANHATTAN) d = cols[i].aggregate(cols[j], F.plus,
-         * function); distance.setQuick(i,j,d); distance.setQuick(j,i,d); //
-         * symmetric } } return distance;
-         */
-        return null;
-    }
-
-    /**
-     * Constructs and returns the distance matrix of the given matrix. The
-     * distance matrix is a square, symmetric matrix consisting of nothing but
-     * distance coefficients. The rows and the columns represent the variables,
-     * the cells represent distance coefficients. The diagonal cells (i.e. the
-     * distance between a variable and itself) will be zero. Compares two column
-     * vectors at a time. Use dice views to compare two row vectors at a time.
-     * 
-     * @param matrix
-     *            any matrix; a column holds the values of a given variable
-     *            (vector).
-     * @param norm
-     *            the kind of norm to be used (EUCLID, CANBERRA, ...).
-     * @return the distance matrix (<tt>n x n, n=matrix.columns</tt>).
-     */
-    private static DoubleMatrix2D xdistanceOld2(DoubleMatrix2D matrix, int norm) {
-        /*
-         * // setup distance function final cern.jet.math.Functions F =
-         * cern.jet.math.Functions.functions; VectorVectorFunction function; if
-         * (norm==EUCLID) function = new VectorVectorFunction() { public final
-         * double apply(DoubleMatrix1D a, DoubleMatrix1D b) { return
-         * Math.sqrt(a.aggregate(b, F.plus, F.chain(F.square,F.minus))); } };
-         * else if (norm==BRAY_CURTIS) function = new VectorVectorFunction() {
-         * public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-         * return a.aggregate(b, F.plus, F.chain(F.abs,F.minus)) /
-         * a.aggregate(b, F.plus, F.plus); } }; else if (norm==CANBERRA)
-         * function = new VectorVectorFunction() { DoubleDoubleFunction fun =
-         * new DoubleDoubleFunction() { public final double apply(double a,
-         * double b) { return Math.abs(a-b) / Math.abs(a+b); } }; public final
-         * double apply(DoubleMatrix1D a, DoubleMatrix1D b) { return
-         * a.aggregate(b, F.plus, fun); } }; else if (norm==MAXIMUM) function =
-         * new VectorVectorFunction() { public final double apply(DoubleMatrix1D
-         * a, DoubleMatrix1D b) { return a.aggregate(b, F.max,
-         * F.chain(F.abs,F.minus)); } }; else if (norm==MANHATTAN) function =
-         * new VectorVectorFunction() { public final double apply(DoubleMatrix1D
-         * a, DoubleMatrix1D b) { return a.aggregate(b, F.plus,
-         * F.chain(F.abs,F.minus)); } }; else throw new
-         * IllegalArgumentException("Unknown norm");
-         * 
-         * return distance(matrix,function);
-         */
-        return null;
     }
 }

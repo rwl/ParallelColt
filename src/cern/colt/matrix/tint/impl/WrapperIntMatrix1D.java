@@ -23,6 +23,10 @@ import cern.colt.matrix.tint.IntMatrix3D;
  * @version 1.1, 08/22/2007
  */
 public class WrapperIntMatrix1D extends IntMatrix1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /*
      * The elements of the matrix.
      */
@@ -30,7 +34,7 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
 
     public WrapperIntMatrix1D(IntMatrix1D newContent) {
         if (newContent != null)
-            setUp(newContent.size());
+            setUp((int) newContent.size());
         this.content = newContent;
     }
 
@@ -38,6 +42,7 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
      * otherwise. Override this method in wrappers.
      */
+    @Override
     protected IntMatrix1D getContent() {
         return this.content;
     }
@@ -55,10 +60,12 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
+    @Override
     public int getQuick(int index) {
         return content.getQuick(index);
     }
 
+    @Override
     public Object elements() {
         return content.elements();
     }
@@ -76,6 +83,7 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public IntMatrix1D like(int size) {
         return content.like(size);
     }
@@ -94,14 +102,17 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public IntMatrix2D like2D(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
+    @Override
     public IntMatrix2D reshape(int rows, int cols) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
+    @Override
     public IntMatrix3D reshape(int slices, int rows, int cols) {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -120,6 +131,7 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int index, int value) {
         content.setQuick(index, value);
     }
@@ -133,12 +145,20 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      * 
      * @return a new flip view.
      */
+    @Override
     public IntMatrix1D viewFlip() {
         IntMatrix1D view = new WrapperIntMatrix1D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int index) {
                 return content.get(size - 1 - index);
             }
 
+            @Override
             public void setQuick(int index, int value) {
                 content.set(size - 1 - index, value);
             }
@@ -174,13 +194,21 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      * @return the new view.
      * 
      */
+    @Override
     public IntMatrix1D viewPart(final int index, int width) {
         checkRange(index, width);
         IntMatrix1D view = new WrapperIntMatrix1D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int i) {
                 return content.get(index + i);
             }
 
+            @Override
             public void setQuick(int i, int value) {
                 content.set(index + i, value);
             }
@@ -220,6 +248,7 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      *             if <tt>!(0 <= indexes[i] < size())</tt> for any
      *             <tt>i=0..indexes.length()-1</tt>.
      */
+    @Override
     public IntMatrix1D viewSelection(int[] indexes) {
         // check for "all"
         if (indexes == null) {
@@ -232,10 +261,17 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
         final int[] idx = indexes;
 
         IntMatrix1D view = new WrapperIntMatrix1D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int i) {
                 return content.get(idx[i]);
             }
 
+            @Override
             public void setQuick(int i, int value) {
                 content.set(idx[i], value);
             }
@@ -251,6 +287,7 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected IntMatrix1D viewSelectionLike(int[] offsets) {
         throw new InternalError(); // should never get called
     }
@@ -268,14 +305,22 @@ public class WrapperIntMatrix1D extends IntMatrix1D {
      * @return the new view.
      * 
      */
+    @Override
     public IntMatrix1D viewStrides(final int _stride) {
         if (stride <= 0)
             throw new IndexOutOfBoundsException("illegal stride: " + stride);
         IntMatrix1D view = new WrapperIntMatrix1D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int index) {
                 return content.get(index * _stride);
             }
 
+            @Override
             public void setQuick(int index, int value) {
                 content.set(index * _stride, value);
             }

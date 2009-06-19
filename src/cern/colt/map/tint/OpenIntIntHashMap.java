@@ -30,6 +30,11 @@ import cern.colt.map.PrimeFinder;
  */
 public class OpenIntIntHashMap extends AbstractIntIntMap {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The hash table keys.
      * 
      * @serial
@@ -107,6 +112,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * Removes all (key,value) associations from the receiver. Implicitly calls
      * <tt>trimToSize()</tt>.
      */
+    @Override
     public void clear() {
         new ByteArrayList(this.state).fillFromToWith(0, this.state.length - 1, FREE);
         // new IntArrayList(values).fillFromToWith(0, state.length-1, 0); //
@@ -122,11 +128,12 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         OpenIntIntHashMap copy = (OpenIntIntHashMap) super.clone();
-        copy.table = (int[]) copy.table.clone();
-        copy.values = (int[]) copy.values.clone();
-        copy.state = (byte[]) copy.state.clone();
+        copy.table = copy.table.clone();
+        copy.values = copy.values.clone();
+        copy.state = copy.state.clone();
         return copy;
     }
 
@@ -135,6 +142,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified key.
      */
+    @Override
     public boolean containsKey(int key) {
         return indexOfKey(key) >= 0;
     }
@@ -144,6 +152,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified value.
      */
+    @Override
     public boolean containsValue(int value) {
         return indexOfValue(value) >= 0;
     }
@@ -162,6 +171,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @param minCapacity
      *            the desired minimum capacity.
      */
+    @Override
     public void ensureCapacity(int minCapacity) {
         if (table.length < minCapacity) {
             int newCapacity = nextPrime(minCapacity);
@@ -185,6 +195,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
+    @Override
     public boolean forEachKey(IntProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -205,6 +216,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
+    @Override
     public boolean forEachPair(final IntIntProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -225,6 +237,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @return the value associated with the specified key; <tt>0</tt> if no
      *         such key is present.
      */
+    @Override
     public int get(int key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -353,6 +366,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
      *         <tt>Integer.MIN_VALUE</tt> if no such key exists.
      */
+    @Override
     public int keyOf(int value) {
         // returns the first key found; there may be more matching keys,
         // however.
@@ -374,6 +388,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @param list
      *            the list to be filled, can have any size.
      */
+    @Override
     public void keys(IntArrayList list) {
         list.setSize(distinct);
         int[] elements = list.elements();
@@ -413,6 +428,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
+    @Override
     public void pairsMatching(final IntIntProcedure condition, final IntArrayList keyList, final IntArrayList valueList) {
         keyList.clear();
         valueList.clear();
@@ -437,6 +453,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      *         <tt>false</tt> if the receiver did already contain such a key -
      *         the new value has now replaced the formerly associated value.
      */
+    @Override
     public boolean put(int key, int value) {
         int i = indexOfInsertion(key);
         if (i < 0) { // already contained
@@ -517,6 +534,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @return <tt>true</tt> if the receiver contained the specified key,
      *         <tt>false</tt> otherwise.
      */
+    @Override
     public boolean removeKey(int key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -554,6 +572,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      */
+    @Override
     protected void setUp(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         int capacity = initialCapacity;
         super.setUp(capacity, minLoadFactor, maxLoadFactor);
@@ -592,6 +611,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * Releases any superfluous internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
+    @Override
     public void trimToSize() {
         // * 1.2 because open addressing's performance exponentially degrades
         // beyond that point
@@ -614,6 +634,7 @@ public class OpenIntIntHashMap extends AbstractIntIntMap {
      * @param list
      *            the list to be filled, can have any size.
      */
+    @Override
     public void values(IntArrayList list) {
         list.setSize(distinct);
         int[] elements = list.elements();

@@ -42,7 +42,13 @@ package cern.jet.random.tdouble.engine;
 // public abstract class RandomEngine extends
 // edu.cornell.lassp.houle.RngPack.RandomSeedable implements
 // cern.colt.function.DoubleFunction, cern.colt.function.IntFunction {
-public abstract class DoubleRandomEngine extends cern.colt.PersistentObject implements cern.colt.function.tdouble.DoubleFunction, cern.colt.function.tint.IntFunction {
+public abstract class DoubleRandomEngine extends cern.colt.PersistentObject implements
+        cern.colt.function.tdouble.DoubleFunction, cern.colt.function.tint.IntFunction {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
@@ -88,7 +94,7 @@ public abstract class DoubleRandomEngine extends cern.colt.PersistentObject impl
             // -9.223372036854776E18 == (double) Long.MIN_VALUE
             // 5.421010862427522E-20 == 1 / Math.pow(2,64) == 1 / ((double)
             // Long.MAX_VALUE - (double) Long.MIN_VALUE);
-            nextDouble = ((double) nextLong() - -9.223372036854776E18) * 5.421010862427522E-20;
+            nextDouble = (nextLong() - -9.223372036854776E18) * 5.421010862427522E-20;
         }
         // catch loss of precision of long --> double conversion
         while (!(nextDouble > 0.0 && nextDouble < 1.0));
@@ -153,7 +159,7 @@ public abstract class DoubleRandomEngine extends cern.colt.PersistentObject impl
 
         // transform to (0.0,1.0)-interval
         // 2.3283064365386963E-10 == 1.0 / Math.pow(2,32)
-        return (double) (nextInt & 0xFFFFFFFFL) * 2.3283064365386963E-10;
+        return (nextInt & 0xFFFFFFFFL) * 2.3283064365386963E-10;
 
         /*
          * nextInt == Integer.MAX_VALUE --> 0.49999999976716936 nextInt ==

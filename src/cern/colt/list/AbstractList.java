@@ -24,6 +24,11 @@ package cern.colt.list;
  */
 public abstract class AbstractList extends AbstractCollection {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
@@ -106,6 +111,7 @@ public abstract class AbstractList extends AbstractCollection {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns, but keep its current capacity.
      */
+    @Override
     public void clear() {
         removeFromTo(0, size() - 1);
     }

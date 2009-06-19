@@ -20,6 +20,8 @@ package cern.colt.matrix;
  * @version 1.0, 09/24/99
  */
 public abstract class AbstractMatrix2D extends AbstractMatrix {
+    private static final long serialVersionUID = 1L;
+
     /** the number of colums and rows this matrix (view) has */
     protected int columns, rows;
 
@@ -99,7 +101,8 @@ public abstract class AbstractMatrix2D extends AbstractMatrix {
      */
     protected void checkBox(int row, int column, int height, int width) {
         if (column < 0 || width < 0 || column + width > columns || row < 0 || height < 0 || row + height > rows)
-            throw new IndexOutOfBoundsException(toStringShort() + ", column:" + column + ", row:" + row + " ,width:" + width + ", height:" + height);
+            throw new IndexOutOfBoundsException(toStringShort() + ", column:" + column + ", row:" + row + " ,width:"
+                    + width + ", height:" + height);
     }
 
     /**
@@ -163,7 +166,8 @@ public abstract class AbstractMatrix2D extends AbstractMatrix {
      */
     public void checkShape(AbstractMatrix2D B) {
         if (columns != B.columns || rows != B.rows)
-            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + " and " + B.toStringShort());
+            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + " and "
+                    + B.toStringShort());
     }
 
     /**
@@ -177,7 +181,8 @@ public abstract class AbstractMatrix2D extends AbstractMatrix {
      */
     public void checkShape(AbstractMatrix2D B, AbstractMatrix2D C) {
         if (columns != B.columns || rows != B.rows || columns != C.columns || rows != C.rows)
-            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
+            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + ", " + B.toStringShort()
+                    + ", " + C.toStringShort());
     }
 
     /**
@@ -280,7 +285,8 @@ public abstract class AbstractMatrix2D extends AbstractMatrix {
     /**
      * Returns the number of cells which is <tt>rows()*columns()</tt>.
      */
-    public int size() {
+    @Override
+    public long size() {
         return rows * columns;
     }
 

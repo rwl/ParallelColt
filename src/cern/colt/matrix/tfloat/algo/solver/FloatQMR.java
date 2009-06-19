@@ -26,7 +26,7 @@ package cern.colt.matrix.tfloat.algo.solver;
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
-import cern.colt.matrix.tfloat.algo.FloatAlgebra;
+import cern.colt.matrix.tfloat.algo.DenseFloatAlgebra;
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatPreconditioner;
 import cern.jet.math.tfloat.FloatFunctions;
 
@@ -115,28 +115,31 @@ public class FloatQMR extends AbstractFloatIterativeSolver {
         p_tld = template.copy();
     }
 
-    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
+            throws IterativeSolverFloatNotConvergedException {
         checkSizes(A, b, x);
 
-        float rho = 0, rho_1 = 0, xi = 0, gamma = 1.0f, gamma_1 = 0, theta = 0, theta_1 = 0, eta = -1.0f, delta = 0, ep = 0, beta = 0;
+        float rho = 0, rho_1 = 0, xi = 0, gamma = 1.f, gamma_1 = 0, theta = 0, theta_1 = 0, eta = -1.f, delta = 0, ep = 0, beta = 0;
 
         A.zMult(x, r.assign(b), -1, 1, false);
 
         v_tld.assign(r);
         M1.apply(v_tld, y);
-        rho = FloatAlgebra.DEFAULT.norm(y, Norm.Two);
+        rho = DenseFloatAlgebra.DEFAULT.norm(y, Norm.Two);
 
         w_tld.assign(r);
         M2.transApply(w_tld, z);
-        xi = FloatAlgebra.DEFAULT.norm(z, Norm.Two);
+        xi = DenseFloatAlgebra.DEFAULT.norm(z, Norm.Two);
 
         for (iter.setFirst(); !iter.converged(r, x); iter.next()) {
 
             if (rho == 0)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "rho", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "rho",
+                        iter);
 
             if (xi == 0)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "xi", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "xi",
+                        iter);
 
             v.assign(v_tld, FloatFunctions.multSecond(1 / rho));
             y.assign(FloatFunctions.mult(1 / rho));
@@ -146,7 +149,8 @@ public class FloatQMR extends AbstractFloatIterativeSolver {
             delta = z.zDotProduct(y);
 
             if (delta == 0)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "delta", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown,
+                        "delta", iter);
 
             M2.apply(y, y_tld);
             M1.transApply(z, z_tld);
@@ -164,30 +168,33 @@ public class FloatQMR extends AbstractFloatIterativeSolver {
             ep = q.zDotProduct(p_tld);
 
             if (ep == 0)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "ep", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "ep",
+                        iter);
 
             beta = ep / delta;
 
             if (beta == 0)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "beta", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown,
+                        "beta", iter);
 
             v_tld.assign(v, FloatFunctions.multSecond(-beta)).assign(p_tld, FloatFunctions.plus);
             M1.apply(v_tld, y);
             rho_1 = rho;
-            rho = FloatAlgebra.DEFAULT.norm(y, Norm.Two);
+            rho = DenseFloatAlgebra.DEFAULT.norm(y, Norm.Two);
 
             A.zMult(q, w_tld.assign(w, FloatFunctions.multSecond(-beta)), 1, 1, true);
 
             M2.transApply(w_tld, z);
-            xi = FloatAlgebra.DEFAULT.norm(z, Norm.Two);
+            xi = DenseFloatAlgebra.DEFAULT.norm(z, Norm.Two);
 
             gamma_1 = gamma;
             theta_1 = theta;
             theta = rho / (gamma_1 * beta);
-            gamma = (float) (1 / Math.sqrt(1 + theta * theta));
+            gamma = 1 / (float) Math.sqrt(1 + theta * theta);
 
             if (gamma == 0)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "gamma", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown,
+                        "gamma", iter);
 
             eta = -eta * rho_1 * gamma * gamma / (beta * gamma_1 * gamma_1);
 

@@ -14,6 +14,11 @@ import hep.aida.tdouble.DoubleIHistogram2D;
  * @version 1.0, 23/03/2000
  */
 public class DoubleHistogram2D extends DoubleAbstractHistogram2D implements DoubleIHistogram2D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private double[][] heights;
 
     private double[][] errors;
@@ -95,6 +100,7 @@ public class DoubleHistogram2D extends DoubleAbstractHistogram2D implements Doub
 
     }
 
+    @Override
     public int allEntries() {
         return nEntry;
     }
@@ -118,6 +124,7 @@ public class DoubleHistogram2D extends DoubleAbstractHistogram2D implements Doub
         return sumWeight * sumWeight / sumWeightSquared;
     }
 
+    @Override
     public void fill(double x, double y) {
         // int xBin = xAxis.getBin(x);
         // int yBin = xAxis.getBin(y);
@@ -162,6 +169,7 @@ public class DoubleHistogram2D extends DoubleAbstractHistogram2D implements Doub
      * <b>Note 2</b>indexY1 and indexY2 may include the use of under and over
      * flow bins <b>Note 3</b>There is no note 3 (yet)
      */
+    @Override
     protected DoubleIHistogram1D internalSliceX(String title, int indexY1, int indexY2) {
         // Attention: our internal definition of bins has been choosen
         // so that this works properly even if the indeces passed in include
@@ -197,6 +205,7 @@ public class DoubleHistogram2D extends DoubleAbstractHistogram2D implements Doub
      * <b>Note 2</b>indexX1 and indexX2 may include the use of under and over
      * flow bins <b>Note 3</b>There is no note 3 (yet)
      */
+    @Override
     protected DoubleIHistogram1D internalSliceY(String title, int indexX1, int indexX2) {
         // Attention: our internal definition of bins has been choosen
         // so that this works properly even if the indeces passed in include
@@ -275,6 +284,7 @@ public class DoubleHistogram2D extends DoubleAbstractHistogram2D implements Doub
         rmsY = Double.NaN;
     }
 
+    @Override
     public double sumAllBinHeights() {
         return sumWeight;
     }

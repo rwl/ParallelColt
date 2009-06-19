@@ -7,6 +7,10 @@ package hep.aida.tfloat.ref;
  * @version 1.0, 23/03/2000
  */
 abstract class FloatHistogram implements hep.aida.tfloat.FloatIHistogram {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private String title;
 
     FloatHistogram(String title) {

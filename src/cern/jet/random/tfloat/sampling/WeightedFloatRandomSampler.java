@@ -28,6 +28,11 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * @version 1.0, 02/05/99
  */
 public class WeightedFloatRandomSampler extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public class BlockedRandomSampler extends Object implements
     // java.io.Serializable {
     protected int skip;
@@ -74,6 +79,7 @@ public class WeightedFloatRandomSampler extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         WeightedFloatRandomSampler copy = (WeightedFloatRandomSampler) super.clone();
         copy.generator = (FloatUniform) this.generator.clone();

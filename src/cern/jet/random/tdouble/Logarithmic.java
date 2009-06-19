@@ -33,6 +33,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class Logarithmic extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double my_p;
 
     // cached vars for method nextDouble(a) (for performance only)
@@ -52,6 +57,7 @@ public class Logarithmic extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(this.my_p);
     }
@@ -104,7 +110,7 @@ public class Logarithmic extends AbstractContinousDoubleDistribution {
                 // System.out.println("u="+u+", p="+p);
                 u -= p;
                 k++;
-                p *= a * (k - 1.0) / (double) k;
+                p *= a * (k - 1.0) / k;
             }
             return k;
         }
@@ -142,6 +148,7 @@ public class Logarithmic extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + my_p + ")";
     }

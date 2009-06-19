@@ -31,6 +31,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class Exponential extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double lambda;
 
     // The uniform random number generated shared by all <b>static</b> methods.
@@ -56,6 +61,7 @@ public class Exponential extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(lambda);
     }
@@ -96,6 +102,7 @@ public class Exponential extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + lambda + ")";
     }

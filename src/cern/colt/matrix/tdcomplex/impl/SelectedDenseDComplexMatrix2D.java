@@ -34,23 +34,12 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * accesses per get/set.
  * <p>
  * Note that this implementation is not synchronized.
- * <p>
- * <b>Memory requirements:</b>
- * <p>
- * <tt>memory [bytes] = 4*(rowIndexes.length+columnIndexes.length)</tt>. Thus,
- * an index view with 1000 x 1000 indexes additionally uses 8 KB.
- * <p>
- * <b>Time complexity:</b>
- * <p>
- * Depends on the parent view holding cells.
- * <p>
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 11/26/2007
  */
 class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
 
-    private static final long serialVersionUID = -6212926540247811567L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The elements of this matrix.
@@ -109,7 +98,8 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedDenseDComplexMatrix2D(int rows, int columns, double[] elements, int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedDenseDComplexMatrix2D(int rows, int columns, double[] elements, int rowZero, int columnZero,
+            int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -121,63 +111,27 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         this.isNoView = false;
     }
 
-    /**
-     * Returns the position of the given absolute rank within the (virtual or
-     * non-virtual) internal 1-dimensional array. Default implementation.
-     * Override, if necessary.
-     * 
-     * @param rank
-     *            the absolute rank of the element.
-     * @return the position.
-     */
+    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
 
-    /**
-     * Returns the position of the given absolute rank within the (virtual or
-     * non-virtual) internal 1-dimensional array. Default implementation.
-     * Override, if necessary.
-     * 
-     * @param rank
-     *            the absolute rank of the element.
-     * @return the position.
-     */
+    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
 
-    /**
-     * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may return invalid objects
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @return the value at the specified coordinate.
-     */
+    @Override
     public double[] getQuick(int row, int column) {
         int idxr = rowZero + row * rowStride;
         int idxc = columnZero + column * columnStride;
-        return new double[] { elements[offset + rowOffsets[idxr] + columnOffsets[idxc]], elements[offset + rowOffsets[idxr] + columnOffsets[idxc] + 1] };
+        return new double[] { elements[offset + rowOffsets[idxr] + columnOffsets[idxc]],
+                elements[offset + rowOffsets[idxr] + columnOffsets[idxc] + 1] };
     }
 
-    /**
-     * This method is not supported for SelectedDenseComplexMatrix2D.
-     * 
-     * @return
-     * @throws IllegalAccessException
-     *             always.
-     */
+    @Override
     public double[] elements() {
-        throw new IllegalAccessError("getElements() is not supported for SelectedDenseComplexMatrix2D.");
+        throw new IllegalAccessError("This method is not supported.");
 
     }
 
@@ -191,6 +145,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(DComplexMatrix2D other) {
         if (other instanceof SelectedDenseDComplexMatrix2D) {
             SelectedDenseDComplexMatrix2D otherMatrix = (SelectedDenseDComplexMatrix2D) other;
@@ -202,90 +157,29 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return false;
     }
 
-    /**
-     * Returns the position of the given coordinate within the (virtual or
-     * non-virtual) internal 1-dimensional array.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     */
+    @Override
     public long index(int row, int column) {
         return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
     }
 
-    /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseComplexMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseComplexMatrix2D</tt>. In general, the new matrix should have
-     * internal parametrization as similar as possible.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @return a new empty matrix of the same dynamic type.
-     */
+    @Override
     public DComplexMatrix2D like(int rows, int columns) {
         return new DenseDComplexMatrix2D(rows, columns);
     }
 
-    /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseComplexMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseComplexMatrix1D</tt>.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     public DComplexMatrix1D like1D(int size) {
         return new DenseDComplexMatrix1D(size);
     }
 
-    /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseComplexMatrix1D</tt>.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @param zero
-     *            the index of the first element.
-     * @param stride
-     *            the number of indexes between any two elements, i.e.
-     *            <tt>index(i+1)-index(i)</tt>.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     protected DComplexMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
         // properly.
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-     * value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param value
-     *            the value to be filled into the specified cell.
-     */
+    @Override
     public void setQuick(int row, int column, double[] value) {
         int idxr = rowZero + row * rowStride;
         int idxc = columnZero + column * columnStride;
@@ -293,45 +187,12 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         elements[offset + rowOffsets[idxr] + columnOffsets[idxc] + 1] = value[1];
     }
 
-    /**
-     * Returns a vector obtained by stacking the columns of the matrix on top of
-     * one another.
-     * 
-     * @return
-     */
+    @Override
     public DComplexMatrix1D vectorize() {
-        DenseDComplexMatrix1D v = new DenseDComplexMatrix1D(size());
-        int idx = 0;
-        for (int c = 0; c < columns; c++) {
-            for (int r = 0; r < rows; r++) {
-                v.setQuick(idx++, getQuick(c, r));
-            }
-        }
-        return v;
+        throw new IllegalAccessError("This method is not supported.");
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-     * value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param re
-     *            the real part of the value to be filled into the specified
-     *            cell.
-     * @param im
-     *            the imaginary part of the value to be filled into the
-     *            specified cell.
-     */
+    @Override
     public void setQuick(int row, int column, double re, double im) {
         int idxr = rowZero + row * rowStride;
         int idxc = columnZero + column * columnStride;
@@ -339,16 +200,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         elements[offset + rowOffsets[idxr] + columnOffsets[idxc] + 1] = im;
     }
 
-    /**
-     * Sets up a matrix with a given number of rows and columns.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @throws IllegalArgumentException
-     *             if <tt>(double)columns*rows > Integer.MAX_VALUE</tt>.
-     */
+    @Override
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -356,9 +208,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         this.offset = 0;
     }
 
-    /**
-     * Self modifying version of viewDice().
-     */
+    @Override
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -370,20 +220,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    /**
-     * Constructs and returns a new <i>slice view</i> representing the rows of
-     * the given column. The returned view is backed by this matrix, so changes
-     * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (
-     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-     * 
-     * @param the
-     *            column to fix.
-     * @return a new slice view.
-     * @throws IllegalArgumentException
-     *             if <tt>column < 0 || column >= columns()</tt>.
-     * @see #viewRow(int)
-     */
+    @Override
     public DComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -394,20 +231,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return new SelectedDenseDComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets, viewOffset);
     }
 
-    /**
-     * Constructs and returns a new <i>slice view</i> representing the columns
-     * of the given row. The returned view is backed by this matrix, so changes
-     * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (
-     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-     * 
-     * @param the
-     *            row to fix.
-     * @return a new slice view.
-     * @throws IndexOutOfBoundsException
-     *             if <tt>row < 0 || row >= rows()</tt>.
-     * @see #viewColumn(int)
-     */
+    @Override
     public DComplexMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -418,42 +242,26 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return new SelectedDenseDComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets, viewOffset);
     }
 
-    /**
-     * Construct and returns a new selection view.
-     * 
-     * @param rowOffsets
-     *            the offsets of the visible elements.
-     * @param columnOffsets
-     *            the offsets of the visible elements.
-     * @return a new view.
-     */
+    @Override
     protected DComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDComplexMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }
 
-    /**
-     * Returns the real part of this matrix
-     * 
-     * @return the real part
-     */
+    @Override
     public DoubleMatrix2D getRealPart() {
         final DenseDoubleMatrix2D R = new DenseDoubleMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] tmp;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 tmp = getQuick(r, c);
                                 R.setQuick(r, c, tmp[0]);
@@ -475,29 +283,21 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return R;
     }
 
-    /**
-     * Returns the imaginary part of this matrix
-     * 
-     * @return the imaginary part
-     */
+    @Override
     public DoubleMatrix2D getImaginaryPart() {
         final DenseDoubleMatrix2D Im = new DenseDoubleMatrix2D(rows, columns);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] tmp;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 tmp = getQuick(r, c);
                                 Im.setQuick(r, c, tmp[1]);

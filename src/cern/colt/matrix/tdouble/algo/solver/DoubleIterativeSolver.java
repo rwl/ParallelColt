@@ -41,7 +41,8 @@ public interface DoubleIterativeSolver {
      *            Solution is stored here. Also used as initial guess
      * @return The solution vector x
      */
-    DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException;
+    DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException;
 
     /**
      * Sets preconditioner

@@ -33,23 +33,12 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * addressing overhead is 1 additional array index access per get/set.
  * <p>
  * Note that this implementation is not synchronized.
- * <p>
- * <b>Memory requirements:</b>
- * <p>
- * <tt>memory [bytes] = 4*indexes.length</tt>. Thus, an index view with 1000
- * indexes additionally uses 4 KB.
- * <p>
- * <b>Time complexity:</b>
- * <p>
- * Depends on the parent view holding cells.
- * <p>
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 11/25/2007
  */
 class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
 
-    private static final long serialVersionUID = 1358904244890406059L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The elements of this matrix.
@@ -103,61 +92,33 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         this.isNoView = false;
     }
 
-    /**
-     * Returns the position of the given absolute rank within the (virtual or
-     * non-virtual) internal 1-dimensional array. Default implementation.
-     * Override, if necessary.
-     * 
-     * @param rank
-     *            the absolute rank of the element.
-     * @return the position.
-     */
+    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
 
-    /**
-     * Returns the matrix cell value at coordinate <tt>index</tt>.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may return invalid objects
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
-     * 
-     * @param index
-     *            the index of the cell.
-     * @return the value of the specified cell.
-     */
+    @Override
     public float[] getQuick(int index) {
         int idx = zero + index * stride;
         return new float[] { elements[offset + offsets[idx]], elements[offset + offsets[idx] + 1] };
     }
 
-    /**
-     * Returns the real part of this matrix
-     * 
-     * @return the real part
-     */
+    @Override
     public FloatMatrix1D getRealPart() {
         final DenseFloatMatrix1D R = new DenseFloatMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] tmp;
 
                     public void run() {
-                        for (int k = startidx; k < stopidx; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             tmp = getQuick(k);
                             R.setQuick(k, tmp[0]);
                         }
@@ -175,30 +136,22 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         return R;
     }
 
-    /**
-     * Returns the imaginary part of this matrix
-     * 
-     * @return the imaginary part
-     */
+    @Override
     public FloatMatrix1D getImaginaryPart() {
         final DenseFloatMatrix1D Im = new DenseFloatMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] tmp;
 
                     public void run() {
-                        for (int k = startidx; k < stopidx; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             tmp = getQuick(k);
                             Im.setQuick(k, tmp[1]);
                         }
@@ -217,15 +170,9 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         return Im;
     }
 
-    /**
-     * This method is not supported for SelectedDenseComplexMatrix1D.
-     * 
-     * @return
-     * @throws IllegalAccessException
-     *             always.
-     */
+    @Override
     public float[] elements() {
-        throw new IllegalAccessError("getElements() is not supported for SelectedDenseComplexMatrix1D.");
+        throw new IllegalAccessError("This method is not supported.");
     }
 
     /**
@@ -235,6 +182,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
      *            matrix
      * @return <tt>true</tt> if both matrices share at least one identical cell.
      */
+    @Override
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedDenseFComplexMatrix1D) {
             SelectedDenseFComplexMatrix1D otherMatrix = (SelectedDenseFComplexMatrix1D) other;
@@ -246,120 +194,52 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         return false;
     }
 
-    /**
-     * Returns the position of the element with the given relative rank within
-     * the (virtual or non-virtual) internal 1-dimensional array. You may want
-     * to override this method for performance.
-     * 
-     * @param rank
-     *            the rank of the element.
-     */
+    @Override
     public long index(int rank) {
         return offset + offsets[zero + rank * stride];
     }
 
-    /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseComplexMatrix1D</tt> the new matrix must
-     * also be of type <tt>DenseComplexMatrix1D</tt>. In general, the new matrix
-     * should have internal parametrization as similar as possible.
-     * 
-     * @param size
-     *            the number of cell the matrix shall have.
-     * @return a new empty matrix of the same dynamic type.
-     */
+    @Override
     public FComplexMatrix1D like(int size) {
         return new DenseFComplexMatrix1D(size);
     }
 
-    /**
-     * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
-     * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseComplexMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseComplexMatrix2D</tt>.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new DenseFComplexMatrix2D(rows, columns);
     }
 
+    @Override
     public FComplexMatrix2D reshape(int rows, int cols) {
-        throw new IllegalAccessError("reshape is not supported.");
+        throw new IllegalAccessError("This method is not supported.");
     }
 
+    @Override
     public FComplexMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalAccessError("reshape is not supported");
+        throw new IllegalAccessError("This method is not supported.");
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
-     * 
-     * @param index
-     *            the index of the cell.
-     * @param value
-     *            the value to be filled into the specified cell.
-     */
+    @Override
     public void setQuick(int index, float[] value) {
         int idx = zero + index * stride;
         elements[offset + offsets[idx]] = value[0];
         elements[offset + offsets[idx] + 1] = value[1];
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
-     * 
-     * @param index
-     *            the index of the cell.
-     * @param re
-     *            the real part of the value to be filled into the specified
-     *            cell.
-     * @param im
-     *            the imaginary part of the value to be filled into the
-     *            specified cell.
-     * 
-     */
+    @Override
     public void setQuick(int index, float re, float im) {
         int idx = zero + index * stride;
         elements[offset + offsets[idx]] = re;
         elements[offset + offsets[idx] + 1] = im;
     }
 
-    /**
-     * Sets up a matrix with a given number of cells.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     */
+    @Override
     protected void setUp(int size) {
         super.setUp(size, 0, 1);
         this.offset = 0;
     }
 
-    /**
-     * Construct and returns a new selection view.
-     * 
-     * @param offsets
-     *            the offsets of the visible elements.
-     * @return a new view.
-     */
+    @Override
     protected FComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseFComplexMatrix1D(this.elements, offsets);
     }

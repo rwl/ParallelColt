@@ -20,6 +20,11 @@ import java.util.Date;
  */
 public class MersenneTwister64 extends DoubleMersenneTwister {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Constructs and returns a random number generator with a default seed,
      * which is a <b>constant</b>.
      */
@@ -54,6 +59,7 @@ public class MersenneTwister64 extends DoubleMersenneTwister {
      * Returns a 64 bit uniformly distributed random number in the open unit
      * interval <code>(0.0,1.0)</code> (excluding 0.0 and 1.0).
      */
+    @Override
     public double raw() {
         return nextDouble();
     }

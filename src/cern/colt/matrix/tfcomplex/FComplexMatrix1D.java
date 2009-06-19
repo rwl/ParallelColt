@@ -33,6 +33,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public abstract class FComplexMatrix1D extends AbstractMatrix1D {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
@@ -52,32 +54,28 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the aggregated measure.
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
-    public float[] aggregate(final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr, final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
+    public float[] aggregate(final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
+            final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
         float[] b = new float[2];
-        int size = size();
+        int size = (int) size();
         if (size == 0) {
             b[0] = Float.NaN;
             b[1] = Float.NaN;
             return b;
         }
         float[] a = f.apply(getQuick(0));
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
-                        float[] a = f.apply(getQuick(startsize));
-                        for (int i = startsize + 1; i < stopsize; i++) {
+                        float[] a = f.apply(getQuick(firstIdx));
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             a = aggr.apply(a, f.apply(getQuick(i)));
                         }
                         return a;
@@ -111,9 +109,11 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *             if <tt>size() != other.size()</tt>.
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
-    public float[] aggregate(final FComplexMatrix1D other, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
+    public float[] aggregate(final FComplexMatrix1D other,
+            final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
+            final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
         checkSize(other);
-        int size = size();
+        int size = (int) size();
         if (size == 0) {
             float[] b = new float[2];
             b[0] = Float.NaN;
@@ -121,23 +121,18 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
             return b;
         }
         float[] a = f.apply(getQuick(0), other.getQuick(0));
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
-                        float[] a = f.apply(getQuick(startsize), other.getQuick(startsize));
-                        for (int i = startsize + 1; i < stopsize; i++) {
+                        float[] a = f.apply(getQuick(firstIdx), other.getQuick(firstIdx));
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
                         }
                         return a;
@@ -162,22 +157,18 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
-        int size = size();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int size = (int) size();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, f.apply(getQuick(i)));
                         }
                     }
@@ -203,24 +194,21 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return <tt>this</tt> (for convenience only).
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
-    public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+    public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond,
+            final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] elem;
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (cond.apply(elem) == true) {
                                 setQuick(i, f.apply(elem));
@@ -254,23 +242,19 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * 
      */
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     float[] elem;
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (cond.apply(elem) == true) {
                                 setQuick(i, value);
@@ -302,22 +286,18 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexRealFunction f) {
-        int size = size();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int size = (int) size();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, f.apply(getQuick(i)), 0);
                         }
                     }
@@ -356,21 +336,17 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
         } else {
             otherLoc = other;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, otherLoc.getQuick(i));
                         }
                     }
@@ -399,24 +375,21 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *             if <tt>size() != y.size()</tt>.
      * @see cern.jet.math.tfcomplex.FComplexFunctions
      */
-    public FComplexMatrix1D assign(final FComplexMatrix1D y, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
-        int size = size();
+    public FComplexMatrix1D assign(final FComplexMatrix1D y,
+            final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
+        int size = (int) size();
         checkSize(y);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, f.apply(getQuick(i), y.getQuick(i)));
                         }
                     }
@@ -442,22 +415,18 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return <tt>this</tt> (for convenience only).
      */
     public FComplexMatrix1D assign(final float re, final float im) {
-        int size = size();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int size = (int) size();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, re, im);
                         }
 
@@ -489,24 +458,20 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *             if <tt>values.length != 2*size()</tt>.
      */
     public FComplexMatrix1D assign(final float[] values) {
-        int size = size();
+        int size = (int) size();
         if (values.length != 2 * size)
             throw new IllegalArgumentException("The length of values[] must be equal to 2*size()=" + size());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, values[2 * i], values[2 * i + 1]);
                         }
 
@@ -535,21 +500,17 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      */
     public FComplexMatrix1D assignImaginary(final FloatMatrix1D other) {
         checkSize(other);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             float re = getQuick(i)[0];
                             float im = other.getQuick(i);
                             setQuick(i, re, im);
@@ -581,21 +542,17 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      */
     public FComplexMatrix1D assignReal(final FloatMatrix1D other) {
         checkSize(other);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             float re = other.getQuick(i);
                             float im = getQuick(i)[1];
                             setQuick(i, re, im);
@@ -620,26 +577,22 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the number of cells having non-zero values.
      */
     public int cardinality() {
-        int size = size();
+        int size = (int) size();
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
                         float[] tmp = new float[2];
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             tmp = getQuick(i);
                             if ((tmp[0] != 0.0) || (tmp[1] != 0.0))
                                 cardinality++;
@@ -649,11 +602,11 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -697,7 +650,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *         <tt>false</tt> otherwise.
      */
     public boolean equals(float[] value) {
-        return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, value);
+        return cern.colt.matrix.tfcomplex.algo.FComplexProperty.DEFAULT.equals(this, value);
     }
 
     /**
@@ -712,6 +665,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -720,7 +674,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
         if (!(obj instanceof FComplexMatrix1D))
             return false;
 
-        return cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.equals(this, (FComplexMatrix1D) obj);
+        return cern.colt.matrix.tfcomplex.algo.FComplexProperty.DEFAULT.equals(this, (FComplexMatrix1D) obj);
     }
 
     /**
@@ -733,7 +687,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *             if <tt>index&lt;0 || index&gt;=size()</tt>.
      */
     public float[] get(int index) {
-        int size = size();
+        int size = (int) size();
         if (index < 0 || index >= size)
             checkIndex(index);
         return getQuick(index);
@@ -773,7 +727,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
     public void getNonZeros(final IntArrayList indexList, final ArrayList<float[]> valueList) {
         indexList.clear();
         valueList.clear();
-        int s = size();
+        int s = (int) size();
         for (int i = 0; i < s; i++) {
             float[] value = getQuick(i);
             if (value[0] != 0 || value[1] != 0) {
@@ -816,7 +770,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return a new empty matrix of the same dynamic type.
      */
     public FComplexMatrix1D like() {
-        int size = size();
+        int size = (int) size();
         return like(size);
     }
 
@@ -887,7 +841,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *             if <tt>index&lt;0 || index&gt;=size()</tt>.
      */
     public void set(int index, float re, float im) {
-        int size = size();
+        int size = (int) size();
         if (index < 0 || index >= size)
             checkIndex(index);
         setQuick(index, re, im);
@@ -906,7 +860,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *             if <tt>index&lt;0 || index&gt;=size()</tt>.
      */
     public void set(int index, float[] value) {
-        int size = size();
+        int size = (int) size();
         if (index < 0 || index >= size)
             checkIndex(index);
         setQuick(index, value);
@@ -956,24 +910,20 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *             if <tt>size() != other.size()</tt>.
      */
     public void swap(final FComplexMatrix1D other) {
-        int size = size();
+        int size = (int) size();
         checkSize(other);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp;
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             tmp = getQuick(i);
                             setQuick(i, other.getQuick(i));
                             other.setQuick(i, tmp);
@@ -998,15 +948,15 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * reflected in the matrix, and vice-versa. The returned array
      * <tt>values</tt> has the form <br>
      * <tt>for (int i = 0; i < size; i++) {
-     *        tmp = getQuick(i);
-     *        values[2 * i] = tmp[0]; //real part
-     *        values[2 * i + 1] = tmp[1]; //imaginary part
-     *     }</tt>
+     * 		  tmp = getQuick(i);
+     * 		  values[2 * i] = tmp[0]; //real part
+     * 		  values[2 * i + 1] = tmp[1]; //imaginary part
+     * 	   }</tt>
      * 
      * @return an array filled with the values of the cells.
      */
     public float[] toArray() {
-        int size = size();
+        int size = (int) size();
         float[] values = new float[2 * size];
         toArray(values);
         return values;
@@ -1018,34 +968,30 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * the matrix, and vice-versa. After this call returns the array
      * <tt>values</tt> has the form <br>
      * <tt>for (int i = 0; i < size; i++) {
-     *        tmp = getQuick(i);
-     *        values[2 * i] = tmp[0]; //real part
-     *        values[2 * i + 1] = tmp[1]; //imaginary part
-     *     }</tt>
+     * 		  tmp = getQuick(i);
+     * 		  values[2 * i] = tmp[0]; //real part
+     * 		  values[2 * i + 1] = tmp[1]; //imaginary part
+     * 	   }</tt>
      * 
      * @throws IllegalArgumentException
      *             if <tt>values.length < 2*size()</tt>.
      */
     public void toArray(final float[] values) {
-        int size = size();
+        int size = (int) size();
         if (values.length < 2 * size)
             throw new IllegalArgumentException("values too small");
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp = new float[2];
-                        for (int i = startsize; i < stopsize; i++) {
+                        float[] tmp;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             tmp = getQuick(i);
                             values[2 * i] = tmp[0];
                             values[2 * i + 1] = tmp[1];
@@ -1055,7 +1001,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
             }
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp = new float[2];
+            float[] tmp;
             for (int i = 0; i < size; i++) {
                 tmp = getQuick(i);
                 values[2 * i] = tmp[0];
@@ -1069,6 +1015,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * 
      * @return a string representation of the matrix.
      */
+    @Override
     public String toString() {
         return toString("%.4f");
     }
@@ -1161,7 +1108,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the new view.
      */
     public FComplexMatrix1D viewSelection(cern.colt.function.tfcomplex.FComplexProcedure condition) {
-        int size = size();
+        int size = (int) size();
         IntArrayList matches = new IntArrayList();
         for (int i = 0; i < size; i++) {
             if (condition.apply(getQuick(i)))
@@ -1194,7 +1141,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      */
     public FComplexMatrix1D viewSelection(int[] indexes) {
         // check for "all"
-        int size = size();
+        int size = (int) size();
         if (indexes == null) {
             indexes = new int[size];
             for (int i = size - 1; --i >= 0;)
@@ -1235,7 +1182,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the sum of products.
      */
     public float[] zDotProduct(FComplexMatrix1D y) {
-        int size = size();
+        int size = (int) size();
         return zDotProduct(y, 0, size);
     }
 
@@ -1252,7 +1199,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the sum of products; zero if <tt>from<0 || length<0</tt>.
      */
     public float[] zDotProduct(final FComplexMatrix1D y, final int from, int length) {
-        int size = size();
+        int size = (int) size();
         if (from < 0 || length <= 0)
             return new float[] { 0, 0 };
 
@@ -1262,43 +1209,38 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
         if (y.size < tail)
             tail = y.size;
         length = tail - from;
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         float[] sum = new float[2];
 
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = length / np;
-            for (int j = 0; j < np; j++) {
-                final int startlength = j * k;
-                final int stoplength;
-                if (j == np - 1) {
-                    stoplength = length;
-                } else {
-                    stoplength = startlength + k;
-                }
-
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, length);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = length / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
                         float[] sum = new float[2];
                         float[] tmp;
                         int idx;
-                        for (int k = startlength; k < stoplength; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             idx = k + from;
                             tmp = y.getQuick(idx);
                             tmp[1] = -tmp[1]; // complex conjugate
-                            sum = FComplex.plus(sum, FComplex.mult(getQuick(idx), tmp));
+                            sum = FComplex.plus(sum, FComplex.mult(tmp, getQuick(idx)));
                         }
                         return sum;
                     }
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (float[]) futures[j].get();
                 }
                 sum = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum = FComplex.plus(sum, results[j]);
                 }
             } catch (ExecutionException ex) {
@@ -1313,7 +1255,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
                 idx = k + from;
                 tmp = y.getQuick(idx);
                 tmp[1] = -tmp[1]; // complex conjugate
-                sum = FComplex.plus(sum, FComplex.mult(getQuick(idx), tmp));
+                sum = FComplex.plus(sum, FComplex.mult(tmp, getQuick(idx)));
             }
         }
         return sum;
@@ -1329,7 +1271,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the sum of products.
      */
     public float[] zDotProduct(FComplexMatrix1D y, int from, int length, IntArrayList nonZeroIndexes) {
-        int size = size();
+        int size = (int) size();
         if (from < 0 || length <= 0)
             return new float[] { 0, 0 };
 
@@ -1361,7 +1303,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
         while ((--length >= 0) && (index < s) && ((i = nonZeroIndexElements[index]) < tail)) {
             tmp = y.getQuick(i);
             tmp[1] = -tmp[1]; // complex conjugate
-            sum = FComplex.plus(sum, FComplex.mult(getQuick(i), tmp));
+            sum = FComplex.plus(sum, FComplex.mult(tmp, getQuick(i)));
             index++;
         }
 
@@ -1374,9 +1316,46 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the sum.
      */
     public float[] zSum() {
-        if (size() == 0)
-            return new float[] { 0, 0 };
-        return aggregate(cern.jet.math.tfcomplex.FComplexFunctions.plus, cern.jet.math.tfcomplex.FComplexFunctions.identity);
+        float[] sum = new float[2];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
+                    public float[] call() throws Exception {
+                        float[] sum = new float[2];
+                        for (int k = firstIdx; k < lastIdx; k++) {
+                            sum = FComplex.plus(sum, getQuick(k));
+                        }
+                        return sum;
+                    }
+                });
+            }
+            try {
+                for (int j = 0; j < nthreads; j++) {
+                    results[j] = (float[]) futures[j].get();
+                }
+                sum = results[0];
+                for (int j = 1; j < nthreads; j++) {
+                    sum[0] += results[j][0];
+                    sum[1] += results[j][1];
+                }
+            } catch (ExecutionException ex) {
+                ex.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            for (int k = 0; k < size; k++) {
+                sum = FComplex.plus(sum, getQuick(k));
+            }
+        }
+        return sum;
     }
 
     /**
@@ -1389,7 +1368,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      *         maxCardinality.
      */
     protected int cardinality(int maxCardinality) {
-        int size = size();
+        int size = (int) size();
         int cardinality = 0;
         int i = 0;
         float[] tmp = new float[2];
@@ -1471,7 +1450,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return the sum of products.
      */
     protected float[] zDotProduct(FComplexMatrix1D y, IntArrayList nonZeroIndexes) {
-        return zDotProduct(y, 0, size(), nonZeroIndexes);
+        return zDotProduct(y, 0, (int) size(), nonZeroIndexes);
     }
 
 }

@@ -10,7 +10,6 @@ public class AllDoubleMatrixSolverTests {
 
     public static Test suite() {
         TestSuite suite = new TestSuite("cern.colt.matrix.tdouble.algo.solvers tests");
-        suite.addTestSuite(DoubleHyBRTest.class);
 
         suite.addTestSuite(DoubleCGTest.class);
         suite.addTestSuite(DoubleCGDiagonalTest.class);

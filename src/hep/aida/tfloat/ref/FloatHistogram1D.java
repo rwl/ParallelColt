@@ -17,6 +17,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatIHistogram1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private float[] errors;
 
     private float[] heights;
@@ -82,6 +87,7 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
         this(title, new FloatFixedAxis(bins, min, max));
     }
 
+    @Override
     public int allEntries() // perhaps to be deleted (default
     // impl. in
     // superclass sufficient)
@@ -133,15 +139,17 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
         rms += x * weight * weight;
     }
 
-    public void fill_2D(final float[] data, final int rows, final int columns, final int zero, final int rowStride, final int columnStride) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
+    public void fill_2D(final float[] data, final int rows, final int columns, final int zero, final int rowStride,
+            final int columnStride) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startrow = j * k;
                 final int stoprow;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stoprow = rows;
                 } else {
                     stoprow = startrow + k;
@@ -208,15 +216,17 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
         }
     }
 
-    public void fill_2D(final float[] data, final float[] weights, final int rows, final int columns, final int zero, final int rowStride, final int columnStride) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
+    public void fill_2D(final float[] data, final float[] weights, final int rows, final int columns, final int zero,
+            final int rowStride, final int columnStride) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startrow = j * k;
                 final int stoprow;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stoprow = rows;
                 } else {
                     stoprow = startrow + k;

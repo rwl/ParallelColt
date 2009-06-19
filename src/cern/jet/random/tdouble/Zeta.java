@@ -36,6 +36,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class Zeta extends AbstractDiscreteDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double ro;
 
     protected double pk;
@@ -116,6 +121,7 @@ public class Zeta extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public int nextInt() {
         return (int) generateZeta(ro, pk, randomGenerator);
     }
@@ -141,6 +147,7 @@ public class Zeta extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + ro + "," + pk + ")";
     }

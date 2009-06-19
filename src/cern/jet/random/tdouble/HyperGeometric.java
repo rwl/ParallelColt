@@ -45,6 +45,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class HyperGeometric extends AbstractDiscreteDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected int my_N;
 
     protected int my_s;
@@ -78,7 +83,8 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
     }
 
     private static double fc_lnpk(int k, int N_Mn, int M, int n) {
-        return (DoubleArithmetic.logFactorial(k) + DoubleArithmetic.logFactorial(M - k) + DoubleArithmetic.logFactorial(n - k) + DoubleArithmetic.logFactorial(N_Mn + k));
+        return (DoubleArithmetic.logFactorial(k) + DoubleArithmetic.logFactorial(M - k)
+                + DoubleArithmetic.logFactorial(n - k) + DoubleArithmetic.logFactorial(N_Mn + k));
     }
 
     /**
@@ -94,8 +100,8 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
             M_last = M;
             n_last = n;
 
-            Mp = (double) (M + 1);
-            np = (double) (n + 1);
+            Mp = (M + 1);
+            np = (n + 1);
             N_Mn = N - M - n;
 
             p = Mp / (N + 2.0);
@@ -107,8 +113,11 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
             }
 
             /* mode probability, using the external function flogfak(k) = ln(k!) */
-            fm = Math.exp(DoubleArithmetic.logFactorial(N - M) - DoubleArithmetic.logFactorial(N_Mn + m) - DoubleArithmetic.logFactorial(n - m) + DoubleArithmetic.logFactorial(M) - DoubleArithmetic.logFactorial(M - m) - DoubleArithmetic.logFactorial(m) - DoubleArithmetic.logFactorial(N)
-                    + DoubleArithmetic.logFactorial(N - n) + DoubleArithmetic.logFactorial(n));
+            fm = Math.exp(DoubleArithmetic.logFactorial(N - M) - DoubleArithmetic.logFactorial(N_Mn + m)
+                    - DoubleArithmetic.logFactorial(n - m) + DoubleArithmetic.logFactorial(M)
+                    - DoubleArithmetic.logFactorial(M - m) - DoubleArithmetic.logFactorial(m)
+                    - DoubleArithmetic.logFactorial(N) + DoubleArithmetic.logFactorial(N - n)
+                    + DoubleArithmetic.logFactorial(n));
 
             /* safety bound - guarantees at least 17 significant decimal digits */
             /* b = min(n, (long int)(nu + k*c')) */
@@ -125,19 +134,19 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
             /* down- and upward search from the mode */
             for (I = 1; I <= m; I++) {
                 K = mp - I; /* downward search */
-                c *= (double) K / (np - K) * ((double) (N_Mn + K) / (Mp - K));
+                c *= K / (np - K) * ((N_Mn + K) / (Mp - K));
                 if ((U -= c) <= 0.0)
                     return (K - 1);
 
                 K = m + I; /* upward search */
-                d *= (np - K) / (double) K * ((Mp - K) / (double) (N_Mn + K));
+                d *= (np - K) / K * ((Mp - K) / (N_Mn + K));
                 if ((U -= d) <= 0.0)
                     return (K);
             }
 
             /* upward search from K = 2m + 1 to K = b */
             for (K = mp + m; K <= b; K++) {
-                d *= (np - K) / (double) K * ((Mp - K) / (double) (N_Mn + K));
+                d *= (np - K) / K * ((Mp - K) / (N_Mn + K));
                 if ((U -= d) <= 0.0)
                     return (K);
             }
@@ -156,8 +165,8 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
             M_last = M;
             n_last = n;
 
-            Mp = (double) (M + 1);
-            np = (double) (n + 1);
+            Mp = (M + 1);
+            np = (n + 1);
             N_Mn = N - M - n;
 
             p = Mp / (N + 2.0);
@@ -180,14 +189,14 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
             k5 = k4 + k4 - m; // delta_mr = 1
 
             // range width of the critical left and right centre region
-            dl = (double) (k2 - k1);
-            dr = (double) (k5 - k4);
+            dl = (k2 - k1);
+            dr = (k5 - k4);
 
             // recurrence constants r(k) = p(k)/p(k-1) at k = k1, k2, k4+1, k5+1
-            r1 = (np / (double) k1 - 1.0) * (Mp - k1) / (double) (N_Mn + k1);
-            r2 = (np / (double) k2 - 1.0) * (Mp - k2) / (double) (N_Mn + k2);
-            r4 = (np / (double) (k4 + 1) - 1.0) * (M - k4) / (double) (N_Mn + k4 + 1);
-            r5 = (np / (double) (k5 + 1) - 1.0) * (M - k5) / (double) (N_Mn + k5 + 1);
+            r1 = (np / k1 - 1.0) * (Mp - k1) / (N_Mn + k1);
+            r2 = (np / k2 - 1.0) * (Mp - k2) / (N_Mn + k2);
+            r4 = (np / (k4 + 1) - 1.0) * (M - k4) / (N_Mn + k4 + 1);
+            r5 = (np / (k5 + 1) - 1.0) * (M - k5) / (N_Mn + k5 + 1);
 
             // reciprocal values of the scale parameters of expon. tail
             // envelopes
@@ -304,6 +313,7 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public int nextInt() {
         return nextInt(this.my_N, this.my_s, this.my_n, this.randomGenerator);
     }
@@ -357,9 +367,11 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
         M_le_Nhalf = (M <= Nhalf) ? M : N - M;
 
         if ((n * M / N) < 10) {
-            K = (n_le_Nhalf <= M_le_Nhalf) ? hmdu(N, M_le_Nhalf, n_le_Nhalf, randomGenerator) : hmdu(N, n_le_Nhalf, M_le_Nhalf, randomGenerator);
+            K = (n_le_Nhalf <= M_le_Nhalf) ? hmdu(N, M_le_Nhalf, n_le_Nhalf, randomGenerator) : hmdu(N, n_le_Nhalf,
+                    M_le_Nhalf, randomGenerator);
         } else {
-            K = (n_le_Nhalf <= M_le_Nhalf) ? hprs(N, M_le_Nhalf, n_le_Nhalf, randomGenerator) : hprs(N, n_le_Nhalf, M_le_Nhalf, randomGenerator);
+            K = (n_le_Nhalf <= M_le_Nhalf) ? hprs(N, M_le_Nhalf, n_le_Nhalf, randomGenerator) : hprs(N, n_le_Nhalf,
+                    M_le_Nhalf, randomGenerator);
         }
 
         if (n <= Nhalf) {
@@ -373,7 +385,8 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
      * Returns the probability distribution function.
      */
     public double pdf(int k) {
-        return DoubleArithmetic.binomial(my_s, k) * DoubleArithmetic.binomial(my_N - my_s, my_n - k) / DoubleArithmetic.binomial(my_N, my_n);
+        return DoubleArithmetic.binomial(my_s, k) * DoubleArithmetic.binomial(my_N - my_s, my_n - k)
+                / DoubleArithmetic.binomial(my_N, my_n);
     }
 
     /**
@@ -397,6 +410,7 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + my_N + "," + my_s + "," + my_n + ")";
     }

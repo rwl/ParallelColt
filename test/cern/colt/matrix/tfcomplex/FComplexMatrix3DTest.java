@@ -201,7 +201,7 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     }
 
     public void testAssignFloatArray() {
-        float[] expected = new float[2 * A.size()];
+        float[] expected = new float[2 * (int) A.size()];
         for (int i = 0; i < 2 * A.size(); i++) {
             expected[i] = (float) Math.random();
         }
@@ -337,7 +337,8 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         for (int s = 0; s < NSLICES; s++) {
             for (int r = 0; r < NROWS; r++) {
                 for (int c = 0; c < NCOLUMNS; c++) {
-                    assertEquals(A.getQuick(sliceList.get(idx), rowList.get(idx), colList.get(idx)), valueList.get(idx), TOL);
+                    assertEquals(A.getQuick(sliceList.get(idx), rowList.get(idx), colList.get(idx)),
+                            valueList.get(idx), TOL);
                     idx++;
                 }
             }
@@ -457,7 +458,8 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testViewSelectionIntArrayIntArrayIntArray() {
         int[] sliceIndexes = new int[] { NSLICES / 2, NSLICES / 3 };
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1 };
+        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2,
+                NCOLUMNS - 1 };
         FComplexMatrix3D B = A.viewSelection(sliceIndexes, rowIndexes, colIndexes);
         assertEquals(sliceIndexes.length, B.slices());
         assertEquals(rowIndexes.length, B.rows());

@@ -52,7 +52,7 @@ class TestQR {
         ymatrix.set(6, 0, 6.60);
         ymatrix.set(7, 0, 5.75);
 
-        DoubleAlgebra myAlgebra = new DoubleAlgebra();
+        DenseDoubleAlgebra myAlgebra = new DenseDoubleAlgebra();
         zmatrix = myAlgebra.solve(xmatrix, ymatrix);
         System.err.println(xmatrix);
         System.err.println(ymatrix);

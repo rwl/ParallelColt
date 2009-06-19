@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: lib/junit-4.4.jar lib/arpack-combo-0.1.jar lib/netlib-java-0.9.1.jar
+Class-Path: lib/junit-4.4.jar lib/arpack-combo-0.1.jar lib/netlib-java-0.9.1.jar lib/core-lapack.jar
 Main-Class: cern.colt.AllTests
 

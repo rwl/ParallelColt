@@ -27,6 +27,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class DoubleUniform extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double min;
 
     protected double max;
@@ -82,6 +87,7 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
      * Returns a uniformly distributed random number in the open interval
      * <tt>(min,max)</tt> (excluding <tt>min</tt> and <tt>max</tt>).
      */
+    @Override
     public double nextDouble() {
         return min + (max - min) * randomGenerator.raw();
     }
@@ -108,6 +114,7 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
      * Returns a uniformly distributed random number in the closed interval
      * <tt>[min,max]</tt> (including <tt>min</tt> and <tt>max</tt>).
      */
+    @Override
     public int nextInt() {
         return nextIntFromTo((int) Math.round(min), (int) Math.round(max));
     }
@@ -118,7 +125,7 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
      * conditions: <tt>from &lt;= to</tt>.
      */
     public int nextIntFromTo(int from, int to) {
-        return (int) ((long) from + (long) ((1L + (long) to - (long) from) * randomGenerator.raw()));
+        return (int) (from + (long) ((1L + to - from) * randomGenerator.raw()));
     }
 
     /**
@@ -272,6 +279,7 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + min + "," + max + ")";
     }

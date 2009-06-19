@@ -17,7 +17,7 @@ public class SparseFloatMatrix2DTest extends FloatMatrix2DTest {
         Bt = new SparseFloatMatrix2D(NCOLUMNS, NROWS);
     }
 
-    public void testConvertToRCFloatMatrix2D() {
+    public void testGetRowCompressed() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
@@ -28,7 +28,13 @@ public class SparseFloatMatrix2DTest extends FloatMatrix2DTest {
             values[i] = (float) Math.random();
         }
         SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        RCFloatMatrix2D B = A.convertToRCFloatMatrix2D();
+        SparseRCFloatMatrix2D B = A.getRowCompressed(false);
+        for (int r = 0; r < NROWS; r++) {
+            for (int c = 0; c < NCOLUMNS; c++) {
+                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+            }
+        }
+        B = A.getRowCompressed(true);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
@@ -36,18 +42,18 @@ public class SparseFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    public void testConvertToRCMFloatMatrix2D() {
+    public void testGetRowCompressedModified() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) ((float) Math.random() * NROWS);
-            columnindexes[i] = (int) ((float) Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) (Math.random() * NROWS);
+            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
             values[i] = (float) Math.random();
         }
         SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        RCMFloatMatrix2D B = A.convertToRCMFloatMatrix2D();
+        SparseRCMFloatMatrix2D B = A.getRowCompressedModified();
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
@@ -55,37 +61,44 @@ public class SparseFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    public void testConvertToCCFloatMatrix2D() {
+    public void testGetColumnCompressed() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) ((float) Math.random() * NROWS);
-            columnindexes[i] = (int) ((float) Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) (Math.random() * NROWS);
+            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
             values[i] = (float) Math.random();
         }
         SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        CCFloatMatrix2D B = A.convertToCCFloatMatrix2D();
+        SparseCCFloatMatrix2D B = A.getColumnCompressed(false);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
             }
         }
+        B = A.getColumnCompressed(true);
+        for (int r = 0; r < NROWS; r++) {
+            for (int c = 0; c < NCOLUMNS; c++) {
+                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+            }
+        }
+
     }
 
-    public void testConvertToCCMFloatMatrix2D() {
+    public void testGetColumnCompressedModified() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) ((float) Math.random() * NROWS);
-            columnindexes[i] = (int) ((float) Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) (Math.random() * NROWS);
+            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
             values[i] = (float) Math.random();
         }
         SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        CCMFloatMatrix2D B = A.convertToCCMFloatMatrix2D();
+        SparseCCMFloatMatrix2D B = A.getColumnCompressedModified();
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));

@@ -56,7 +56,8 @@ public class FloatStencil extends Object {
      *            do it only every 2,4 or 8 iterations.)
      * @return the number of iterations actually executed.
      */
-    public static int stencil27(FloatMatrix3D A, cern.colt.function.tfloat.Float27Function function, int maxIterations, FloatMatrix3DProcedure hasConverged, int convergenceIterations) {
+    public static int stencil27(FloatMatrix3D A, cern.colt.function.tfloat.Float27Function function, int maxIterations,
+            FloatMatrix3DProcedure hasConverged, int convergenceIterations) {
         FloatMatrix3D B = A.copy();
         if (convergenceIterations <= 1)
             convergenceIterations = 2;
@@ -99,7 +100,8 @@ public class FloatStencil extends Object {
      *            do it only every 2,4 or 8 iterations.)
      * @return the number of iterations actually executed.
      */
-    public static int stencil9(FloatMatrix2D A, cern.colt.function.tfloat.Float9Function function, int maxIterations, FloatMatrix2DProcedure hasConverged, int convergenceIterations) {
+    public static int stencil9(FloatMatrix2D A, cern.colt.function.tfloat.Float9Function function, int maxIterations,
+            FloatMatrix2DProcedure hasConverged, int convergenceIterations) {
         FloatMatrix2D B = A.copy();
         if (convergenceIterations <= 1)
             convergenceIterations = 2;

@@ -12,9 +12,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix3D;
+import cern.jet.math.tint.IntFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -112,6 +114,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public class IntProperty extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    /**
      * The default Property object;.
      */
     public static final IntProperty DEFAULT = new IntProperty();
@@ -144,7 +150,8 @@ public class IntProperty extends cern.colt.PersistentObject {
      */
     public void checkRectangular(IntMatrix2D A) {
         if (A.rows() < A.columns()) {
-            throw new IllegalArgumentException("Matrix must be rectangular: " + cern.colt.matrix.tint.algo.IntFormatter.shape(A));
+            throw new IllegalArgumentException("Matrix must be rectangular: "
+                    + AbstractFormatter.shape(A));
         }
     }
 
@@ -156,7 +163,8 @@ public class IntProperty extends cern.colt.PersistentObject {
      */
     public void checkSquare(IntMatrix2D A) {
         if (A.rows() != A.columns())
-            throw new IllegalArgumentException("Matrix must be square: " + cern.colt.matrix.tint.algo.IntFormatter.shape(A));
+            throw new IllegalArgumentException("Matrix must be square: "
+                    + AbstractFormatter.shape(A));
     }
 
     /**
@@ -183,17 +191,18 @@ public class IntProperty extends cern.colt.PersistentObject {
     public boolean equals(final IntMatrix1D A, final int value) {
         if (A == null)
             return false;
-        int size = A.size();
+        int size = (int) A.size();
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startsize = j * k;
                 final int stopsize;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stopsize = size;
                 } else {
                     stopsize = startsize + k;
@@ -209,11 +218,11 @@ public class IntProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -250,20 +259,21 @@ public class IntProperty extends cern.colt.PersistentObject {
             return true;
         if (!(A != null && B != null))
             return false;
-        int size = A.size();
+        int size = (int) A.size();
         if (size != B.size())
             return false;
 
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startsize = j * k;
                 final int stopsize;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stopsize = size;
                 } else {
                     stopsize = startsize + k;
@@ -279,11 +289,11 @@ public class IntProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -321,15 +331,16 @@ public class IntProperty extends cern.colt.PersistentObject {
         final int rows = A.rows();
         final int columns = A.columns();
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = A.rows() / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, A.rows());
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = A.rows() / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startrows = j * k;
                 final int stoprows;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stoprows = A.rows();
                 } else {
                     stoprows = startrows + k;
@@ -347,11 +358,11 @@ public class IntProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -396,15 +407,16 @@ public class IntProperty extends cern.colt.PersistentObject {
         if (columns != B.columns() || rows != B.rows())
             return false;
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = A.rows() / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, A.rows());
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = A.rows() / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startrows = j * k;
                 final int stoprows;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stoprows = A.rows();
                 } else {
                     stoprows = startrows + k;
@@ -422,11 +434,11 @@ public class IntProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -467,15 +479,16 @@ public class IntProperty extends cern.colt.PersistentObject {
         final int rows = A.rows();
         final int columns = A.columns();
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startslice = j * k;
                 final int stopslice;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stopslice = slices;
                 } else {
                     stopslice = startslice + k;
@@ -495,11 +508,11 @@ public class IntProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -547,15 +560,16 @@ public class IntProperty extends cern.colt.PersistentObject {
         if (columns != B.columns() || rows != B.rows() || slices != B.slices())
             return false;
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startslice = j * k;
                 final int stopslice;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stopslice = slices;
                 } else {
                     stopslice = startslice + k;
@@ -575,11 +589,11 @@ public class IntProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -619,8 +633,8 @@ public class IntProperty extends cern.colt.PersistentObject {
             A.setQuick(i, i, 0);
         }
         for (int i = min; --i >= 0;) {
-            int rowSum = A.viewRow(i).aggregate(F.plus, F.abs);
-            int colSum = A.viewColumn(i).aggregate(F.plus, F.abs);
+            int rowSum = A.viewRow(i).aggregate(IntFunctions.plus, IntFunctions.abs);
+            int colSum = A.viewColumn(i).aggregate(IntFunctions.plus, IntFunctions.abs);
             A.setQuick(i, i, Math.max(rowSum, colSum) + i + 1);
         }
     }
@@ -663,7 +677,7 @@ public class IntProperty extends cern.colt.PersistentObject {
         for (int i = min; --i >= 0;) {
             int diag = Math.abs(A.getQuick(i, i));
             diag += diag;
-            if (diag <= A.viewColumn(i).aggregate(F.plus, F.abs))
+            if (diag <= A.viewColumn(i).aggregate(IntFunctions.plus, IntFunctions.abs))
                 return false;
         }
         return true;
@@ -684,7 +698,7 @@ public class IntProperty extends cern.colt.PersistentObject {
         for (int i = min; --i >= 0;) {
             int diag = Math.abs(A.getQuick(i, i));
             diag += diag;
-            if (diag <= A.viewRow(i).aggregate(F.plus, F.abs))
+            if (diag <= A.viewRow(i).aggregate(IntFunctions.plus, IntFunctions.abs))
                 return false;
         }
         return true;

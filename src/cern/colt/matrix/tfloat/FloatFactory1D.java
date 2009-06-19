@@ -10,6 +10,7 @@ package cern.colt.matrix.tfloat;
 
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix1D;
+import cern.jet.math.tfloat.FloatFunctions;
 
 /**
  * Factory for convenient construction of 1-d matrices holding <tt>float</tt>
@@ -37,6 +38,8 @@ import cern.colt.matrix.tfloat.impl.SparseFloatMatrix1D;
  * @version 1.0, 09/24/99
  */
 public class FloatFactory1D extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * A factory producing dense matrices.
      */
@@ -60,9 +63,9 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
      */
     public FloatMatrix1D append(FloatMatrix1D A, FloatMatrix1D B) {
         // concatenate
-        FloatMatrix1D matrix = make(A.size() + B.size());
-        matrix.viewPart(0, A.size()).assign(A);
-        matrix.viewPart(A.size(), B.size()).assign(B);
+        FloatMatrix1D matrix = make((int) (A.size() + B.size()));
+        matrix.viewPart(0, (int) A.size()).assign(A);
+        matrix.viewPart((int) A.size(), (int) B.size()).assign(B);
         return matrix;
     }
 
@@ -71,8 +74,7 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
      * purposes. Example: <tt>0 1 2</tt>
      */
     public FloatMatrix1D ascending(int size) {
-        cern.jet.math.tfloat.FloatFunctions F = cern.jet.math.tfloat.FloatFunctions.functions;
-        return descending(size).assign(F.chain(F.neg, F.minus(size)));
+        return descending(size).assign(FloatFunctions.chain(FloatFunctions.neg, FloatFunctions.minus(size)));
     }
 
     /**
@@ -86,6 +88,23 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
             matrix.setQuick(i, v++);
         }
         return matrix;
+    }
+
+    /**
+     * Constructs a matrix from the values of the given list. The values are
+     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+     * matrix, and vice-versa.
+     * 
+     * @param values
+     *            The values to be filled into the new matrix.
+     * @return a new matrix.
+     */
+    public FloatMatrix1D make(cern.colt.list.tfloat.AbstractFloatList values) {
+        int size = values.size();
+        FloatMatrix1D vector = make(size);
+        for (int i = size; --i >= 0;)
+            vector.set(i, values.get(i));
+        return vector;
     }
 
     /**
@@ -118,7 +137,7 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
         FloatMatrix1D vector = make(size);
         size = 0;
         for (int i = 0; i < parts.length; i++) {
-            vector.viewPart(size, parts[i].size()).assign(parts[i]);
+            vector.viewPart(size, (int) parts[i].size()).assign(parts[i]);
             size += parts[i].size();
         }
 
@@ -144,23 +163,6 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a matrix from the values of the given list. The values are
-     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
-     * matrix, and vice-versa.
-     * 
-     * @param values
-     *            The values to be filled into the new matrix.
-     * @return a new matrix.
-     */
-    public FloatMatrix1D make(cern.colt.list.tfloat.AbstractFloatList values) {
-        int size = values.size();
-        FloatMatrix1D vector = make(size);
-        for (int i = size; --i >= 0;)
-            vector.set(i, values.get(i));
-        return vector;
-    }
-
-    /**
      * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
      * (exclusive).
      */
@@ -180,7 +182,7 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
      * </pre>
      */
     public FloatMatrix1D repeat(FloatMatrix1D A, int repeat) {
-        int size = A.size();
+        int size = (int) A.size();
         FloatMatrix1D matrix = make(repeat * size);
         for (int i = repeat; --i >= 0;) {
             matrix.viewPart(size * i, size).assign(A);
@@ -200,7 +202,7 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
      * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
      */
     public FloatMatrix1D sample(int size, float value, float nonZeroFraction) {
-        float epsilon = 1e-08f;
+        float epsilon = 1e-05f;
         if (nonZeroFraction < 0 - epsilon || nonZeroFraction > 1 + epsilon)
             throw new IllegalArgumentException();
         if (nonZeroFraction < 0)
@@ -210,14 +212,15 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
 
         FloatMatrix1D matrix = make(size);
 
-        int n = (int) Math.round(size * nonZeroFraction);
+        int n = Math.round(size * nonZeroFraction);
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant sampler = new cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant(
+                n, size, new cern.jet.random.tfloat.engine.FloatMersenneTwister());
         for (int i = size; --i >= 0;) {
             if (sampler.sampleNextElement()) {
-                matrix.set(i, value);
+                matrix.setQuick(i, value);
             }
         }
 
@@ -234,11 +237,11 @@ public class FloatFactory1D extends cern.colt.PersistentObject {
      * @return a new list.
      */
     public cern.colt.list.tfloat.FloatArrayList toList(FloatMatrix1D values) {
-        int size = values.size();
+        int size = (int) values.size();
         cern.colt.list.tfloat.FloatArrayList list = new cern.colt.list.tfloat.FloatArrayList(size);
         list.setSize(size);
         for (int i = size; --i >= 0;)
-            list.set(i, values.get(i));
+            list.setQuick(i, values.get(i));
         return list;
     }
 }

@@ -49,7 +49,7 @@ public class FloatGivensRotation {
         if (scale != 0) {
             float xs = x / scale;
             float ys = y / scale;
-            float r = (float) (scale * Math.sqrt(xs * xs + ys * ys));
+            float r = scale * (float) Math.sqrt(xs * xs + ys * ys);
             if (roe < 0)
                 r *= -1;
             c = x / r;

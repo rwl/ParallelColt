@@ -60,7 +60,8 @@ public class DoubleBiCG extends AbstractDoubleIterativeSolver {
         rtilde = template.copy();
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         checkSizes(A, b, x);
 
         double rho_1 = 1, rho_2 = 1, alpha = 1, beta = 1;
@@ -74,7 +75,8 @@ public class DoubleBiCG extends AbstractDoubleIterativeSolver {
             rho_1 = z.zDotProduct(rtilde);
 
             if (rho_1 == 0.)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "rho", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "rho", iter);
 
             if (iter.isFirst()) {
                 p.assign(z);

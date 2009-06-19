@@ -60,7 +60,8 @@ public class FloatBiCG extends AbstractFloatIterativeSolver {
         rtilde = template.copy();
     }
 
-    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
+            throws IterativeSolverFloatNotConvergedException {
         checkSizes(A, b, x);
 
         float rho_1 = 1, rho_2 = 1, alpha = 1, beta = 1;
@@ -74,7 +75,8 @@ public class FloatBiCG extends AbstractFloatIterativeSolver {
             rho_1 = z.zDotProduct(rtilde);
 
             if (rho_1 == 0.)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "rho", iter);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Breakdown, "rho",
+                        iter);
 
             if (iter.isFirst()) {
                 p.assign(z);

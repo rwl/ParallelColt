@@ -62,7 +62,8 @@ public class DoubleCGS extends AbstractDoubleIterativeSolver {
         rtilde = template.copy();
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         checkSizes(A, b, x);
 
         double rho_1 = 0, rho_2 = 0, alpha = 0, beta = 0;
@@ -73,7 +74,8 @@ public class DoubleCGS extends AbstractDoubleIterativeSolver {
             rho_1 = rtilde.zDotProduct(r);
 
             if (rho_1 == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "rho", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "rho", iter);
 
             if (iter.isFirst()) {
                 u.assign(r);

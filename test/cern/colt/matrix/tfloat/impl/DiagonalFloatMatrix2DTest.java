@@ -25,10 +25,11 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         A = new DiagonalFloatMatrix2D(NROWS, NCOLUMNS, DINDEX);
         B = new DiagonalFloatMatrix2D(NROWS, NCOLUMNS, DINDEX);
         Bt = new DiagonalFloatMatrix2D(NCOLUMNS, NROWS, -DINDEX);
-        DLENGTH = ((DiagonalFloatMatrix2D) A).dlength();
+        DLENGTH = ((DiagonalFloatMatrix2D) A).diagonalLength();
 
     }
 
+    @Override
     protected void populateMatrices() {
         ConcurrencyUtils.setThreadsBeginN_2D(1);
         if (DINDEX >= 0) {
@@ -59,6 +60,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testAssignFloat() {
         float value = (float) Math.random();
         A.assign(value);
@@ -73,6 +75,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testAssignFloatArrayArray() {
         float[][] expected = new float[NROWS][NCOLUMNS];
         for (int r = 0; r < NROWS; r++) {
@@ -92,6 +95,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testAssignFloatFunction() {
         FloatMatrix2D Acopy = A.copy();
         A.assign(FloatFunctions.acos);
@@ -108,6 +112,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testAssignFloatMatrix2DFloatFloatFunction() {
         FloatMatrix2D Acopy = A.copy();
         A.assign(B, FloatFunctions.div);
@@ -122,6 +127,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testAssignFloatMatrix2DFloatFloatFunctionIntArrayListIntArrayList() {
         IntArrayList rowList = new IntArrayList();
         IntArrayList columnList = new IntArrayList();
@@ -148,49 +154,53 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testCardinality() {
         int card = A.cardinality();
         assertEquals(DLENGTH, card);
     }
 
+    @Override
     public void testMaxLocation() {
         A.assign(0);
         if (DINDEX >= 0) {
             A.setQuick(NROWS / 3, NROWS / 3 + DINDEX, 0.7f);
             A.setQuick(NROWS / 2, NROWS / 2 + DINDEX, 0.1f);
             float[] maxAndLoc = A.getMaxLocation();
-            assertEquals(0.7f, maxAndLoc[0], TOL);
+            assertEquals(0.7, maxAndLoc[0], TOL);
             assertEquals(NROWS / 3, (int) maxAndLoc[1]);
             assertEquals(NROWS / 3 + DINDEX, (int) maxAndLoc[2]);
         } else {
             A.setQuick(NROWS / 3 - DINDEX, NROWS / 3, 0.7f);
             A.setQuick(NROWS / 2 - DINDEX, NROWS / 2, 0.1f);
             float[] maxAndLoc = A.getMaxLocation();
-            assertEquals(0.7f, maxAndLoc[0], TOL);
+            assertEquals(0.7, maxAndLoc[0], TOL);
             assertEquals(NROWS / 3 - DINDEX, (int) maxAndLoc[1]);
             assertEquals(NROWS / 3, (int) maxAndLoc[2]);
         }
     }
 
+    @Override
     public void testMinLocation() {
         A.assign(0);
         if (DINDEX >= 0) {
             A.setQuick(NROWS / 3, NROWS / 3 + DINDEX, -0.7f);
             A.setQuick(NROWS / 2, NROWS / 2 + DINDEX, -0.1f);
             float[] minAndLoc = A.getMinLocation();
-            assertEquals(-0.7f, minAndLoc[0], TOL);
+            assertEquals(-0.7, minAndLoc[0], TOL);
             assertEquals(NROWS / 3, (int) minAndLoc[1]);
             assertEquals(NROWS / 3 + DINDEX, (int) minAndLoc[2]);
         } else {
             A.setQuick(NROWS / 3 - DINDEX, NROWS / 3, -0.7f);
             A.setQuick(NROWS / 2 - DINDEX, NROWS / 2, -0.1f);
             float[] minAndLoc = A.getMinLocation();
-            assertEquals(-0.7f, minAndLoc[0], TOL);
+            assertEquals(-0.7, minAndLoc[0], TOL);
             assertEquals(NROWS / 3 - DINDEX, (int) minAndLoc[1]);
             assertEquals(NROWS / 3, (int) minAndLoc[2]);
         }
     }
 
+    @Override
     public void testGetNegativeValues() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -228,6 +238,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testGetNonZeros() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -265,6 +276,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testGetPositiveValues() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -302,6 +314,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testToArray() {
         float[][] array = A.toArray();
         assertTrue(NROWS == array.length);
@@ -313,6 +326,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testVectorize() {
         FloatMatrix1D Avec = A.vectorize();
         int idx = 0;
@@ -323,6 +337,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewColumn() {
         FloatMatrix1D col = A.viewColumn(NCOLUMNS / 2);
         assertEquals(NROWS, col.size());
@@ -331,6 +346,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewColumnFlip() {
         FloatMatrix2D B = A.viewColumnFlip();
         assertEquals(A.size(), B.size());
@@ -341,6 +357,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewDice() {
         FloatMatrix2D B = A.viewDice();
         assertEquals(NROWS, B.columns());
@@ -352,6 +369,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewPart() {
         FloatMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
         assertEquals(NROWS / 3, B.rows());
@@ -363,6 +381,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewRow() {
         FloatMatrix1D B = A.viewRow(NROWS / 2);
         assertEquals(NCOLUMNS, B.size());
@@ -371,6 +390,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewRowFlip() {
         FloatMatrix2D B = A.viewRowFlip();
         assertEquals(A.size(), B.size());
@@ -381,6 +401,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewSelectionFloatMatrix1DProcedure() {
         final float value = 2;
         A.assign(0);
@@ -417,6 +438,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewSelectionIntArrayIntArray() {
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
         int[] colIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2, NROWS - 1 };
@@ -430,6 +452,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewSorted() {
         FloatMatrix2D B = A.viewSorted(1);
         for (int r = 0; r < NROWS - 1; r++) {
@@ -437,6 +460,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testViewStrides() {
         int rowStride = 3;
         int colStride = 5;
@@ -448,6 +472,7 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
+    @Override
     public void testZMultFloatMatrix2DFloatMatrix2DFloatFloatBooleanBoolean() {
         float alpha = 3;
         float beta = 5;

@@ -219,7 +219,8 @@ public interface DoubleBlas {
      * @throws IllegalArgumentException
      *             if <tt>A == C || B == C</tt>.
      */
-    public void dgemm(boolean transposeA, boolean transposeB, double alpha, DoubleMatrix2D A, DoubleMatrix2D B, double beta, DoubleMatrix2D C);
+    public void dgemm(boolean transposeA, boolean transposeB, double alpha, DoubleMatrix2D A, DoubleMatrix2D B,
+            double beta, DoubleMatrix2D C);
 
     /**
      * Generalized linear algebraic matrix-vector multiply;
@@ -245,7 +246,8 @@ public interface DoubleBlas {
      * @throws IllegalArgumentException
      *             <tt>A.columns() != x.size() || A.rows() != y.size())</tt>..
      */
-    public void dgemv(boolean transposeA, double alpha, DoubleMatrix2D A, DoubleMatrix1D x, double beta, DoubleMatrix1D y);
+    public void dgemv(boolean transposeA, double alpha, DoubleMatrix2D A, DoubleMatrix1D x, double beta,
+            DoubleMatrix1D y);
 
     /**
      * Performs a rank 1 update; <tt>A = A + alpha*x*y'</tt>. Example:
@@ -374,7 +376,8 @@ public interface DoubleBlas {
      * @param y
      *            the second vector holding source and destination.
      */
-    public void dsymv(boolean isUpperTriangular, double alpha, DoubleMatrix2D A, DoubleMatrix1D x, double beta, DoubleMatrix1D y);
+    public void dsymv(boolean isUpperTriangular, double alpha, DoubleMatrix2D A, DoubleMatrix1D x, double beta,
+            DoubleMatrix1D y);
 
     /**
      * Triangular matrix-vector multiplication; <tt>x = A*x</tt> or <tt>x = A'*x</tt>.
@@ -394,7 +397,8 @@ public interface DoubleBlas {
      * @param x
      *            the vector holding source and destination.
      */
-    public void dtrmv(boolean isUpperTriangular, boolean transposeA, boolean isUnitTriangular, DoubleMatrix2D A, DoubleMatrix1D x);
+    public void dtrmv(boolean isUpperTriangular, boolean transposeA, boolean isUnitTriangular, DoubleMatrix2D A,
+            DoubleMatrix1D x);
 
     /**
      * Returns the index of largest absolute value;

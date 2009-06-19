@@ -68,6 +68,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public class DenseObjectMatrix3D extends ObjectMatrix3D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    /**
      * The elements of this matrix. elements are stored in slice major, then row
      * major, then column major, in order of significance, i.e.
      * index==slice*sliceStride+ row*rowStride + column*columnStride i.e.
@@ -97,7 +101,8 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *             .
      */
     public DenseObjectMatrix3D(Object[][][] values) {
-        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
+        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0
+                : values[0].length == 0 ? 0 : values[0][0].length));
         assign(values);
     }
 
@@ -152,7 +157,8 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected DenseObjectMatrix3D(int slices, int rows, int columns, Object[] elements, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
+    protected DenseObjectMatrix3D(int slices, int rows, int columns, Object[] elements, int sliceZero, int rowZero,
+            int columnZero, int sliceStride, int rowStride, int columnStride) {
         setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         this.elements = elements;
         this.isNoView = false;
@@ -178,33 +184,35 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != columns()</tt>
      *             .
      */
+    @Override
     public ObjectMatrix3D assign(final Object[][][] values) {
         if (values.length != slices)
-            throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
-        int np = ConcurrencyUtils.getNumberOfThreads();
+            throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
+                    + slices());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (this.isNoView) {
-            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-                Future<?>[] futures = new Future[np];
-                int k = slices / np;
-                for (int j = 0; j < np; j++) {
-                    final int startslice = j * k;
-                    final int stopslice;
-                    if (j == np - 1) {
-                        stopslice = slices;
-                    } else {
-                        stopslice = startslice + k;
-                    }
+            if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                nthreads = Math.min(nthreads, slices);
+                Future<?>[] futures = new Future[nthreads];
+                int k = slices / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstSlice = j * k;
+                    final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            int i = startslice * sliceStride;
-                            for (int s = startslice; s < stopslice; s++) {
+                            int i = firstSlice * sliceStride;
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 Object[][] currentSlice = values[s];
                                 if (currentSlice.length != rows)
-                                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                                    throw new IllegalArgumentException(
+                                            "Must have same number of rows in every slice: rows=" + currentSlice.length
+                                                    + "rows()=" + rows());
                                 for (int r = 0; r < rows; r++) {
                                     Object[] currentRow = currentSlice[r];
                                     if (currentRow.length != columns)
-                                        throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                                        throw new IllegalArgumentException(
+                                                "Must have same number of columns in every row: columns="
+                                                        + currentRow.length + "columns()=" + columns());
                                     System.arraycopy(currentRow, 0, elements, i, columns);
                                     i += columns;
                                 }
@@ -213,7 +221,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
                     });
                 }
                 try {
-                    for (int j = 0; j < np; j++) {
+                    for (int j = 0; j < nthreads; j++) {
                         futures[j].get();
                     }
                 } catch (ExecutionException ex) {
@@ -226,11 +234,14 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
                 for (int s = 0; s < slices; s++) {
                     Object[][] currentSlice = values[s];
                     if (currentSlice.length != rows)
-                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows="
+                                + currentSlice.length + "rows()=" + rows());
                     for (int r = 0; r < rows; r++) {
                         Object[] currentRow = currentSlice[r];
                         if (currentRow.length != columns)
-                            throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                            throw new IllegalArgumentException(
+                                    "Must have same number of columns in every row: columns=" + currentRow.length
+                                            + "columns()=" + columns());
                         System.arraycopy(currentRow, 0, this.elements, i, columns);
                         i += columns;
                     }
@@ -238,30 +249,31 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
             }
         } else {
             final int zero = (int) index(0, 0, 0);
-            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-                Future<?>[] futures = new Future[np];
-                int k = slices / np;
-                for (int j = 0; j < np; j++) {
-                    final int startslice = j * k;
-                    final int stopslice;
-                    if (j == np - 1) {
-                        stopslice = slices;
-                    } else {
-                        stopslice = startslice + k;
-                    }
+            if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                nthreads = Math.min(nthreads, slices);
+                Future<?>[] futures = new Future[nthreads];
+                int k = slices / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstSlice = j * k;
+                    final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
                             int idx;
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 Object[][] currentSlice = values[s];
                                 if (currentSlice.length != rows)
-                                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                                    throw new IllegalArgumentException(
+                                            "Must have same number of rows in every slice: rows=" + currentSlice.length
+                                                    + "rows()=" + rows());
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     Object[] currentRow = currentSlice[r];
                                     if (currentRow.length != columns)
-                                        throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                                        throw new IllegalArgumentException(
+                                                "Must have same number of columns in every row: columns="
+                                                        + currentRow.length + "columns()=" + columns());
                                     for (int c = 0; c < columns; c++) {
                                         elements[idx] = currentRow[c];
                                         idx += columnStride;
@@ -272,7 +284,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
                     });
                 }
                 try {
-                    for (int j = 0; j < np; j++) {
+                    for (int j = 0; j < nthreads; j++) {
                         futures[j].get();
                     }
                 } catch (ExecutionException ex) {
@@ -286,12 +298,15 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
                 for (int s = 0; s < slices; s++) {
                     Object[][] currentSlice = values[s];
                     if (currentSlice.length != rows)
-                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows="
+                                + currentSlice.length + "rows()=" + rows());
                     for (int r = 0; r < rows; r++) {
                         idx = zero + s * sliceStride + r * rowStride;
                         Object[] currentRow = currentSlice[r];
                         if (currentRow.length != columns)
-                            throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                            throw new IllegalArgumentException(
+                                    "Must have same number of columns in every row: columns=" + currentRow.length
+                                            + "columns()=" + columns());
                         for (int c = 0; c < columns; c++) {
                             elements[idx] = currentRow[c];
                             idx += columnStride;
@@ -319,6 +334,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *             if
      *             <tt>slices() != source.slices() || rows() != source.rows() || columns() != source.columns()</tt>
      */
+    @Override
     public ObjectMatrix3D assign(ObjectMatrix3D source) {
         // overriden for performance only
         if (!(source instanceof DenseObjectMatrix3D)) {
@@ -337,38 +353,10 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
             other = (DenseObjectMatrix3D) c;
         }
 
-        final DenseObjectMatrix3D other_final = (DenseObjectMatrix3D) other;
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        final DenseObjectMatrix3D other_final = other;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (this.isNoView && other.isNoView) { // quickest
-            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-                Future<?>[] futures = new Future[np];
-                int k = size() / np;
-                for (int j = 0; j < np; j++) {
-                    final int startidx = j * k;
-                    final int length;
-                    if (j == np - 1) {
-                        length = size() - startidx;
-                    } else {
-                        length = k;
-                    }
-                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                        public void run() {
-                            System.arraycopy(other_final.elements, startidx, elements, startidx, length);
-                        }
-                    });
-                }
-                try {
-                    for (int j = 0; j < np; j++) {
-                        futures[j].get();
-                    }
-                } catch (ExecutionException ex) {
-                    ex.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                System.arraycopy(other_final.elements, 0, this.elements, 0, this.elements.length);
-            }
+            System.arraycopy(other_final.elements, 0, this.elements, 0, this.elements.length);
             return this;
         } else {
             final int zero = (int) index(0, 0, 0);
@@ -377,23 +365,24 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
             final int rowStrideOther = other_final.rowStride;
             final int columnStrideOther = other_final.columnStride;
             final Object[] elemsOther = other_final.elements;
-            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-                Future<?>[] futures = new Future[np];
-                int k = slices / np;
-                for (int j = 0; j < np; j++) {
-                    final int startslice = j * k;
-                    final int stopslice;
-                    if (j == np - 1) {
-                        stopslice = slices;
+            if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                nthreads = Math.min(nthreads, slices);
+                Future<?>[] futures = new Future[nthreads];
+                int k = slices / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstSlice = j * k;
+                    final int lastSlice;
+                    if (j == nthreads - 1) {
+                        lastSlice = slices;
                     } else {
-                        stopslice = startslice + k;
+                        lastSlice = firstSlice + k;
                     }
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
                             int idx;
                             int idxOther;
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -408,7 +397,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
                     });
                 }
                 try {
-                    for (int j = 0; j < np; j++) {
+                    for (int j = 0; j < nthreads; j++) {
                         futures[j].get();
                     }
                 } catch (ExecutionException ex) {
@@ -435,6 +424,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
         }
     }
 
+    @Override
     public Object[] elements() {
         return elements;
     }
@@ -457,6 +447,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public Object getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -464,7 +455,8 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
         // column:"+column);
         // return elements[index(slice,row,column)];
         // manually inlined:
-        return elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride];
+        return elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
+                * columnStride];
     }
 
     /**
@@ -477,6 +469,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(ObjectMatrix3D other) {
         if (other instanceof SelectedDenseObjectMatrix3D) {
             SelectedDenseObjectMatrix3D otherMatrix = (SelectedDenseObjectMatrix3D) other;
@@ -499,6 +492,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
+    @Override
     public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
@@ -524,6 +518,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public ObjectMatrix3D like(int slices, int rows, int columns) {
         return new DenseObjectMatrix3D(slices, rows, columns);
     }
@@ -552,6 +547,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     protected ObjectMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new DenseObjectMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
@@ -576,6 +572,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int slice, int row, int column, Object value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -597,6 +594,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected ObjectMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseObjectMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

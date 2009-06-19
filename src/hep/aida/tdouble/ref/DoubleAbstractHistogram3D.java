@@ -13,6 +13,10 @@ import hep.aida.tdouble.DoubleIHistogram3D;
  * @version 1.0, 23/03/2000
  */
 abstract class DoubleAbstractHistogram3D extends DoubleHistogram implements DoubleIHistogram3D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected DoubleIAxis xAxis, yAxis, zAxis;
 
     DoubleAbstractHistogram3D(String title) {

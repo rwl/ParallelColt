@@ -23,11 +23,11 @@ import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
-import cern.colt.matrix.tdouble.algo.decomposition.DoubleSingularValueDecompositionDC;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleSingularValueDecompositionDC;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoubleIdentity;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoublePreconditioner;
-import cern.colt.matrix.tdouble.impl.DenseColDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.DenseColumnDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.jet.math.tdouble.DoubleFunctions;
@@ -80,7 +80,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
     private boolean computeRnrm;
 
-    private static final DoubleAlgebra alg = DoubleAlgebra.DEFAULT;
+    private static final DenseDoubleAlgebra alg = DenseDoubleAlgebra.DEFAULT;
 
     private static final double FMIN_TOL = 1.0e-4;
 
@@ -121,10 +121,12 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
      * @param flatTolerance
      *            tolerance for detecting flatness in the GCV curve as a
      *            stopping criteria (must be nonnegative)
-     *@param computeRnorm
+     *@param computeRnrm
      *            if true then the norm of relative residual is computed
      */
-    public DoubleHyBR(HyBRInnerSolver innerSolver, HyBRRegularizationMethod regularizationMethod, double regularizationParameter, double omega, boolean reorthogonalize, int beginRegularization, double flatTolerance, boolean computeRnrm) {
+    public DoubleHyBR(HyBRInnerSolver innerSolver, HyBRRegularizationMethod regularizationMethod,
+            double regularizationParameter, double omega, boolean reorthogonalize, int beginRegularization,
+            double flatTolerance, boolean computeRnrm) {
         this.innerSolver = innerSolver;
         this.regMethod = regularizationMethod;
         if ((regularizationParameter < 0.0) || (regularizationParameter > 1.0)) {
@@ -148,17 +150,21 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         this.iter = new HyBRDoubleIterationMonitor();
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         if (!(iter instanceof HyBRDoubleIterationMonitor)) {
             this.iter = new HyBRDoubleIterationMonitor();
         }
         checkSizes(A, b, x);
+        int rows = A.rows();
         int columns = A.columns();
         boolean bump = false;
         boolean warning = false;
         double rnrm = -1.0;
         int iterationsSave = 0;
-        double alpha, beta;
+        double alpha = 0;
+        double alphaSave = 0;
+        double beta = 0;
         HyBRInnerSolver inSolver = HyBRInnerSolver.NONE;
         DoubleLBD lbd;
         DoubleMatrix1D v;
@@ -169,10 +175,10 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         double[] sv;
         DoubleArrayList omegaList = new DoubleArrayList(new double[begReg - 2]);
         DoubleArrayList GCV = new DoubleArrayList(new double[begReg - 2]);
-        DoubleMatrix2D U = new DenseDoubleMatrix2D(1, b.size());
+        DoubleMatrix2D U = new DenseDoubleMatrix2D(1, (int) b.size());
         DoubleMatrix2D B = null;
         DoubleMatrix2D V = null;
-        DoubleSingularValueDecompositionDC svd;
+        DenseDoubleSingularValueDecompositionDC svd;
         if (computeRnrm) {
             work = b.copy();
             A.zMult(x, work, -1, 1, false);
@@ -183,7 +189,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
             U.viewRow(0).assign(b, DoubleFunctions.multSecond(1.0 / beta));
             lbd = new DoubleSimpleLBD(A, U, reorth);
         } else {
-            work = new DenseDoubleMatrix1D(b.size());
+            work = new DenseDoubleMatrix1D((int) b.size());
             work = M.apply(b, work);
             beta = alg.norm2(work);
             U.viewRow(0).assign(work, DoubleFunctions.multSecond(1.0 / beta));
@@ -192,9 +198,9 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         for (iter.setFirst(); !iter.converged(rnrm, x); iter.next()) {
             lbd.apply();
             U = lbd.getU();
-            B = lbd.getB();
+            B = lbd.getC();
             V = lbd.getV();
-            v = new DenseDoubleMatrix1D(U.rows());
+            v = new DenseDoubleMatrix1D(V.columns() + 1);
             v.setQuick(0, beta);
             int i = iter.iterations();
             if (i >= 1) {
@@ -215,16 +221,18 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                     }
                     f = new DenseDoubleMatrix1D(Vb.rows());
                     alpha = tikhonovSolver(Ub, sv, Vb, v, f);
-                    GCV.add(GCVstopfun(alpha, Ub.viewRow(0), sv, beta, columns));
+                    GCV.add(GCVstopfun(alpha, Ub.viewRow(0), sv, beta, rows, columns));
                     if (i > 1) {
                         if (Math.abs((GCV.getQuick(i - 1) - GCV.getQuick(i - 2))) / GCV.get(begReg - 2) < flatTol) {
                             V.zMult(f, x);
-                            ((HyBRDoubleIterationMonitor) iter).setStoppingCondition(HyBRDoubleIterationMonitor.HyBRStoppingCondition.FLAT_GCV_CURVE);
+                            ((HyBRDoubleIterationMonitor) iter)
+                                    .setStoppingCondition(HyBRDoubleIterationMonitor.HyBRStoppingCondition.FLAT_GCV_CURVE);
                             if (computeRnrm) {
                                 work = b.copy();
                                 A.zMult(x, work, -1, 1, false);
                                 ((HyBRDoubleIterationMonitor) iter).residual = alg.norm2(work);
                             }
+                            System.out.println("alpha = " + alpha);
                             return x;
                         } else if ((warning == true) && (GCV.size() > iterationsSave + 3)) {
                             for (int j = iterationsSave; j < GCV.size(); j++) {
@@ -234,13 +242,15 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                             }
                             if (bump == false) {
                                 x.assign(xSave);
-                                ((HyBRDoubleIterationMonitor) iter).setStoppingCondition(HyBRDoubleIterationMonitor.HyBRStoppingCondition.MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS);
+                                ((HyBRDoubleIterationMonitor) iter)
+                                        .setStoppingCondition(HyBRDoubleIterationMonitor.HyBRStoppingCondition.MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS);
                                 ((HyBRDoubleIterationMonitor) iter).iter = iterationsSave;
                                 if (computeRnrm) {
                                     work = b.copy();
                                     A.zMult(x, work, -1, 1, false);
                                     ((HyBRDoubleIterationMonitor) iter).residual = alg.norm2(work);
                                 }
+                                System.out.println("alpha = " + alphaSave);
                                 return x;
 
                             } else {
@@ -252,6 +262,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                             if (GCV.get(i - 2) < GCV.get(i - 1)) {
                                 warning = true;
                                 xSave = new DenseDoubleMatrix1D(V.rows());
+                                alphaSave = alpha;
                                 V.zMult(f, xSave);
                                 iterationsSave = i;
                             }
@@ -270,12 +281,21 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                 }
             }
         }
+        System.out.println("alpha = " + alpha);
         return x;
 
     }
 
+    @Override
+    protected void checkSizes(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) {
+        if (b.size() != A.rows())
+            throw new IllegalArgumentException("b.size() != A.rows()");
+        if (x.size() != A.columns())
+            throw new IllegalArgumentException("x.size() != A.columns()");
+    }
+
     private double findOmega(DoubleMatrix1D bhat, double[] s) {
-        int m = bhat.size();
+        int m = (int) bhat.size();
         int n = s.length;
         double alpha = s[n - 1];
         double t0 = bhat.viewPart(n, m - n).aggregate(DoubleFunctions.plus, DoubleFunctions.square);
@@ -290,17 +310,17 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         s2.assign(DoubleFunctions.mult(alpha));
         s2.assign(bhat.viewPart(0, n), DoubleFunctions.mult);
         s2.assign(DoubleFunctions.square);
-        DoubleMatrix1D work_vec = tt.copy();
-        work_vec.assign(DoubleFunctions.pow(3));
-        work_vec.assign(DoubleFunctions.abs);
-        double t3 = work_vec.aggregate(s2, DoubleFunctions.plus, DoubleFunctions.mult);
-        work_vec = new DenseDoubleMatrix1D(s);
-        work_vec.assign(tt, DoubleFunctions.mult);
-        double t4 = work_vec.aggregate(DoubleFunctions.plus, DoubleFunctions.square);
-        work_vec = tt.copy();
-        work_vec.assign(bhat.viewPart(0, n), DoubleFunctions.mult);
-        work_vec.assign(DoubleFunctions.mult(alpha2));
-        double t5 = work_vec.aggregate(DoubleFunctions.plus, DoubleFunctions.square);
+        DoubleMatrix1D work = tt.copy();
+        work.assign(DoubleFunctions.pow(3));
+        work.assign(DoubleFunctions.abs);
+        double t3 = work.aggregate(s2, DoubleFunctions.plus, DoubleFunctions.mult);
+        work = new DenseDoubleMatrix1D(s);
+        work.assign(tt, DoubleFunctions.mult);
+        double t4 = work.aggregate(DoubleFunctions.plus, DoubleFunctions.square);
+        work = tt.copy();
+        work.assign(bhat.viewPart(0, n), DoubleFunctions.mult);
+        work.assign(DoubleFunctions.mult(alpha2));
+        double t5 = work.aggregate(DoubleFunctions.plus, DoubleFunctions.square);
         s2 = new DenseDoubleMatrix1D(s);
         s2.assign(bhat.viewPart(0, n), DoubleFunctions.mult);
         s2.assign(DoubleFunctions.square);
@@ -311,22 +331,22 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
     }
 
     private double tikhonovSolver(DoubleMatrix2D U, double[] s, DoubleMatrix2D V, DoubleMatrix1D b, DoubleMatrix1D x) {
-        TikFmin_2D fmin;
+        TikFmin2D fmin;
         DoubleMatrix1D bhat = new DenseDoubleMatrix1D(U.rows());
         U.zMult(b, bhat, 1, 0, true);
         double alpha = 0;
         switch (regMethod) {
         case GCV:
-            fmin = new TikFmin_2D(bhat, s, 1);
-            alpha = DoubleFmin.fmin(0, 1, fmin, FMIN_TOL);
+            fmin = new TikFmin2D(bhat, s, 1);
+            alpha = DoubleFmin.fmin(0, s[0], fmin, FMIN_TOL);
             break;
         case WGCV:
-            fmin = new TikFmin_2D(bhat, s, omega);
-            alpha = DoubleFmin.fmin(0, 1, fmin, FMIN_TOL);
+            fmin = new TikFmin2D(bhat, s, omega);
+            alpha = DoubleFmin.fmin(0, s[0], fmin, FMIN_TOL);
             break;
         case ADAPTWGCV:
-            fmin = new TikFmin_2D(bhat, s, omega);
-            alpha = DoubleFmin.fmin(0, 1, fmin, FMIN_TOL);
+            fmin = new TikFmin2D(bhat, s, omega);
+            alpha = DoubleFmin.fmin(0, s[0], fmin, FMIN_TOL);
             break;
         case NONE: // regularization parameter is given
             alpha = regPar;
@@ -343,34 +363,34 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         return alpha;
     }
 
-    private static class TikFmin_2D implements DoubleFmin_methods {
+    private static class TikFmin2D implements DoubleFmin_methods {
         DoubleMatrix1D bhat;
 
         double[] s;
 
         double omega;
 
-        public TikFmin_2D(DoubleMatrix1D bhat, double[] s, double omega) {
+        public TikFmin2D(DoubleMatrix1D bhat, double[] s, double omega) {
             this.bhat = bhat;
             this.s = s;
             this.omega = omega;
         }
 
         public double f_to_minimize(double alpha) {
-            int m = bhat.size();
+            int m = (int) bhat.size();
             int n = s.length;
             double t0 = bhat.viewPart(n, m - n).aggregate(DoubleFunctions.plus, DoubleFunctions.square);
             DoubleMatrix1D s2 = new DenseDoubleMatrix1D(s);
             s2.assign(DoubleFunctions.square);
             double alpha2 = alpha * alpha;
-            DoubleMatrix1D work_vec = s2.copy();
-            work_vec.assign(DoubleFunctions.plus(alpha2));
-            work_vec.assign(DoubleFunctions.inv);
-            DoubleMatrix1D t1 = work_vec.copy();
+            DoubleMatrix1D work = s2.copy();
+            work.assign(DoubleFunctions.plus(alpha2));
+            work.assign(DoubleFunctions.inv);
+            DoubleMatrix1D t1 = work.copy();
             t1.assign(DoubleFunctions.mult(alpha2));
             DoubleMatrix1D t2 = t1.copy();
             t2.assign(bhat.viewPart(0, n), DoubleFunctions.mult);
-            DoubleMatrix1D t3 = work_vec.copy();
+            DoubleMatrix1D t3 = work.copy();
             t3.assign(s2, DoubleFunctions.mult);
             t3.assign(DoubleFunctions.mult(1 - omega));
             double denom = t3.aggregate(t1, DoubleFunctions.plus, DoubleFunctions.plus) + m - n;
@@ -379,7 +399,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
     }
 
-    private double GCVstopfun(double alpha, DoubleMatrix1D u, double[] s, double beta, int n) {
+    private double GCVstopfun(double alpha, DoubleMatrix1D u, double[] s, double beta, int rows, int columns) {
         int k = s.length;
         double beta2 = beta * beta;
         DoubleMatrix1D s2 = new DenseDoubleMatrix1D(s);
@@ -391,8 +411,10 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         DoubleMatrix1D t2 = t1.copy();
         t2.assign(u.viewPart(0, k), DoubleFunctions.mult);
         t2.assign(DoubleFunctions.mult(alpha2));
-        double num = beta2 * (t2.aggregate(DoubleFunctions.plus, DoubleFunctions.square) + Math.pow(Math.abs(u.getQuick(k)), 2)) / (double) n;
-        double den = (n - t1.aggregate(s2, DoubleFunctions.plus, DoubleFunctions.mult)) / (double) n;
+        double num = beta2
+                * (t2.aggregate(DoubleFunctions.plus, DoubleFunctions.square) + Math.pow(Math.abs(u.getQuick(k)), 2))
+                / columns;
+        double den = (rows - t1.aggregate(s2, DoubleFunctions.plus, DoubleFunctions.mult)) / columns;
         den = den * den;
         return num / den;
     }
@@ -400,7 +422,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
     private interface DoubleLBD {
         public void apply();
 
-        public DoubleMatrix2D getB();
+        public DoubleMatrix2D getC();
 
         public DoubleMatrix2D getU();
 
@@ -408,7 +430,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
     }
 
     private class DoubleSimpleLBD implements DoubleLBD {
-        private final DoubleAlgebra alg = DoubleAlgebra.DEFAULT;
+        private final DenseDoubleAlgebra alg = DenseDoubleAlgebra.DEFAULT;
 
         private final DoubleFactory2D factory = DoubleFactory2D.dense;
 
@@ -416,7 +438,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
         private final DoubleMatrix2D A;
 
-        private DoubleMatrix2D B;
+        private DoubleMatrix2D C;
 
         private DoubleMatrix2D U;
 
@@ -424,64 +446,98 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
         private boolean reorth;
 
+        private int counter = 1;
+
         public DoubleSimpleLBD(DoubleMatrix2D A, DoubleMatrix2D U, boolean reorth) {
             this.A = A;
             this.reorth = reorth;
             this.U = U;
             this.V = null;
-            this.B = null;
+            this.C = null;
         }
 
         public void apply() {
-            int k = U.rows();
-            DoubleMatrix1D u = null;
-            DoubleMatrix1D v = null;
-            DoubleMatrix1D column = null;
-            if (k == 1) {
-                v = A.zMult(U.viewRow(k - 1), v, 1, 0, true);
-            } else {
-                v = A.zMult(U.viewRow(k - 1), v, 1, 0, true);
-                column = V.viewColumn(k - 2).copy();
-                v.assign(column.assign(DoubleFunctions.mult(B.getQuick(k - 1, k - 2))), DoubleFunctions.minus);
-                if (reorth) {
+            if (reorth) {
+                int k = U.rows();
+                DoubleMatrix1D u = null;
+                DoubleMatrix1D v = null;
+                DoubleMatrix1D column = null;
+                if (k == 1) {
+                    v = A.zMult(U.viewRow(k - 1), v, 1, 0, true);
+                } else {
+                    v = A.zMult(U.viewRow(k - 1), v, 1, 0, true);
+                    column = V.viewColumn(k - 2);
+                    v.assign(column, DoubleFunctions.plusMultSecond(-C.getQuick(k - 1, k - 2)));
                     for (int j = 0; j < k - 1; j++) {
-                        column = V.viewColumn(j).copy();
-                        v.assign(column.assign(DoubleFunctions.mult(column.zDotProduct(v))), DoubleFunctions.minus);
+                        column = V.viewColumn(j);
+                        v.assign(column, DoubleFunctions.plusMultSecond(-column.zDotProduct(v)));
                     }
                 }
-            }
-            double alpha = alg.norm2(v);
-            v.assign(DoubleFunctions.div(alpha));
-            u = A.zMult(v, u);
-            column = U.viewRow(k - 1).copy();
-            u.assign(column.assign(DoubleFunctions.mult(alpha)), DoubleFunctions.minus);
-            if (reorth) {
+                double alpha = alg.norm2(v);
+                v.assign(DoubleFunctions.div(alpha));
+                u = A.zMult(v, u);
+                column = U.viewRow(k - 1);
+                u.assign(column, DoubleFunctions.plusMultSecond(-alpha));
                 for (int j = 0; j < k; j++) {
-                    column = U.viewRow(j).copy();
-                    u.assign(column.assign(DoubleFunctions.mult(column.zDotProduct(u))), DoubleFunctions.minus);
+                    column = U.viewRow(j);
+                    u.assign(column, DoubleFunctions.plusMultSecond(-column.zDotProduct(u)));
                 }
-            }
-            double beta = alg.norm2(u);
-            alphaBeta.setQuick(0, 0, alpha);
-            alphaBeta.setQuick(1, 0, beta);
-            u.assign(DoubleFunctions.div(beta));
-            U = factory.appendRow(U, u);
-            if (V == null) {
-                V = new DenseColDoubleMatrix2D(v.size(), 1);
-                V.assign((double[]) v.elements());
+                double beta = alg.norm2(u);
+                alphaBeta.setQuick(0, 0, alpha);
+                alphaBeta.setQuick(1, 0, beta);
+                u.assign(DoubleFunctions.div(beta));
+                U = factory.appendRow(U, u);
+                if (V == null) {
+                    V = new DenseColumnDoubleMatrix2D((int) v.size(), 1);
+                    V.assign((double[]) v.elements());
+                } else {
+                    V = factory.appendColumn(V, v);
+                }
+                if (C == null) {
+                    C = new DenseDoubleMatrix2D(2, 1);
+                    C.assign(alphaBeta);
+                } else {
+                    C = factory.composeBidiagonal(C, alphaBeta);
+                }
             } else {
-                V = factory.appendColumn(V, v);
-            }
-            if (B == null) {
-                B = new DenseDoubleMatrix2D(2, 1);
-                B.assign(alphaBeta);
-            } else {
-                B = factory.composeBidiagonal(B, alphaBeta);
+                DoubleMatrix1D u = null;
+                DoubleMatrix1D v = null;
+                DoubleMatrix1D column = null;
+                if (counter == 1) {
+                    v = A.zMult(U.viewRow(0), v, 1, 0, true);
+                } else {
+                    v = A.zMult(U.viewRow(0), v, 1, 0, true);
+                    column = V.viewColumn(counter - 2);
+                    v.assign(column, DoubleFunctions.plusMultSecond(-C.getQuick(counter - 1, counter - 2)));
+                }
+                double alpha = alg.norm2(v);
+                v.assign(DoubleFunctions.div(alpha));
+                u = A.zMult(v, u);
+                column = U.viewRow(0);
+                u.assign(column, DoubleFunctions.plusMultSecond(-alpha));
+                double beta = alg.norm2(u);
+                alphaBeta.setQuick(0, 0, alpha);
+                alphaBeta.setQuick(1, 0, beta);
+                u.assign(DoubleFunctions.div(beta));
+                U.viewRow(0).assign(u);
+                if (V == null) {
+                    V = new DenseColumnDoubleMatrix2D((int) v.size(), 1);
+                    V.assign((double[]) v.elements());
+                } else {
+                    V = factory.appendColumn(V, v);
+                }
+                if (C == null) {
+                    C = new DenseDoubleMatrix2D(2, 1);
+                    C.assign(alphaBeta);
+                } else {
+                    C = factory.composeBidiagonal(C, alphaBeta);
+                }
+                counter++;
             }
         }
 
-        public DoubleMatrix2D getB() {
-            return B;
+        public DoubleMatrix2D getC() {
+            return C;
         }
 
         public DoubleMatrix2D getU() {
@@ -495,7 +551,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
     private class DoublePLBD implements DoubleLBD {
 
-        private final DoubleAlgebra alg = DoubleAlgebra.DEFAULT;
+        private final DenseDoubleAlgebra alg = DenseDoubleAlgebra.DEFAULT;
 
         private final DoubleFactory2D factory = DoubleFactory2D.dense;
 
@@ -505,7 +561,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
         private final DoubleMatrix2D A;
 
-        private DoubleMatrix2D B;
+        private DoubleMatrix2D C;
 
         private DoubleMatrix2D U;
 
@@ -513,70 +569,108 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
         private boolean reorth;
 
+        private int counter = 1;
+
         public DoublePLBD(DoublePreconditioner M, DoubleMatrix2D A, DoubleMatrix2D U, boolean reorth) {
             this.M = M;
             this.A = A;
             this.reorth = reorth;
             this.U = U;
             this.V = null;
-            this.B = null;
+            this.C = null;
         }
 
         public void apply() {
-            int k = U.rows();
-            DoubleMatrix1D u = null;
-            DoubleMatrix1D v = null;
-            DoubleMatrix1D row = null;
-            if (k == 1) {
-                row = U.viewRow(k - 1).copy();
-                row = M.transApply(row, row);
-                v = A.zMult(row, v, 1, 0, true);
-            } else {
-                row = U.viewRow(k - 1).copy();
-                row = M.transApply(row, row);
-                v = A.zMult(row, v, 1, 0, true);
-                row = V.viewColumn(k - 2).copy();
-                v.assign(row.assign(DoubleFunctions.mult(B.getQuick(k - 1, k - 2))), DoubleFunctions.minus);
-                if (reorth) {
+            if (reorth) {
+                int k = U.rows();
+                DoubleMatrix1D u = null;
+                DoubleMatrix1D v = null;
+                DoubleMatrix1D row = null;
+                if (k == 1) {
+                    row = U.viewRow(k - 1).copy();
+                    row = M.transApply(row, row);
+                    v = A.zMult(row, v, 1, 0, true);
+                } else {
+                    row = U.viewRow(k - 1).copy();
+                    row = M.transApply(row, row);
+                    v = A.zMult(row, v, 1, 0, true);
+                    row = V.viewColumn(k - 2);
+                    v.assign(row, DoubleFunctions.plusMultSecond(-C.getQuick(k - 1, k - 2)));
                     for (int j = 0; j < k - 1; j++) {
-                        row = V.viewColumn(j).copy();
-                        v.assign(row.assign(DoubleFunctions.mult(row.zDotProduct(v))), DoubleFunctions.minus);
+                        row = V.viewColumn(j);
+                        v.assign(row, DoubleFunctions.plusMultSecond(-row.zDotProduct(v)));
                     }
                 }
-            }
-            double alpha = alg.norm2(v);
-            v.assign(DoubleFunctions.div(alpha));
-            row = A.zMult(v, row);
-            u = M.apply(row, u);
-            row = U.viewRow(k - 1).copy();
-            u.assign(row.assign(DoubleFunctions.mult(alpha)), DoubleFunctions.minus);
-            if (reorth) {
+                double alpha = alg.norm2(v);
+                v.assign(DoubleFunctions.div(alpha));
+                row = A.zMult(v, row);
+                u = M.apply(row, u);
+                row = U.viewRow(k - 1);
+                u.assign(row, DoubleFunctions.plusMultSecond(-alpha));
                 for (int j = 0; j < k; j++) {
-                    row = U.viewRow(j).copy();
-                    u.assign(row.assign(DoubleFunctions.mult(row.zDotProduct(u))), DoubleFunctions.minus);
+                    row = U.viewRow(j);
+                    u.assign(row, DoubleFunctions.plusMultSecond(-row.zDotProduct(u)));
                 }
-            }
-            double beta = alg.norm2(u);
-            alphaBeta.setQuick(0, 0, alpha);
-            alphaBeta.setQuick(1, 0, beta);
-            u.assign(DoubleFunctions.div(beta));
-            U = factory.appendRow(U, u);
-            if (V == null) {
-                V = new DenseColDoubleMatrix2D(v.size(), 1);
-                V.assign((double[]) v.elements());
+                double beta = alg.norm2(u);
+                alphaBeta.setQuick(0, 0, alpha);
+                alphaBeta.setQuick(1, 0, beta);
+                u.assign(DoubleFunctions.div(beta));
+                U = factory.appendRow(U, u);
+                if (V == null) {
+                    V = new DenseColumnDoubleMatrix2D((int) v.size(), 1);
+                    V.assign((double[]) v.elements());
+                } else {
+                    V = factory.appendColumn(V, v);
+                }
+                if (C == null) {
+                    C = new DenseDoubleMatrix2D(2, 1);
+                    C.assign(alphaBeta);
+                } else {
+                    C = factory.composeBidiagonal(C, alphaBeta);
+                }
             } else {
-                V = factory.appendColumn(V, v);
-            }
-            if (B == null) {
-                B = new DenseDoubleMatrix2D(2, 1);
-                B.assign(alphaBeta);
-            } else {
-                B = factory.composeBidiagonal(B, alphaBeta);
+                DoubleMatrix1D u = null;
+                DoubleMatrix1D v = null;
+                DoubleMatrix1D row = null;
+                if (counter == 1) {
+                    row = U.viewRow(0).copy();
+                    row = M.transApply(row, row);
+                    v = A.zMult(row, v, 1, 0, true);
+                } else {
+                    row = U.viewRow(0).copy();
+                    row = M.transApply(row, row);
+                    v = A.zMult(row, v, 1, 0, true);
+                    row = V.viewColumn(counter - 2);
+                    v.assign(row, DoubleFunctions.plusMultSecond(-C.getQuick(counter - 1, counter - 2)));
+                }
+                double alpha = alg.norm2(v);
+                v.assign(DoubleFunctions.div(alpha));
+                row = A.zMult(v, row);
+                u = M.apply(row, u);
+                row = U.viewRow(0);
+                u.assign(row, DoubleFunctions.plusMultSecond(-alpha));
+                double beta = alg.norm2(u);
+                alphaBeta.setQuick(0, 0, alpha);
+                alphaBeta.setQuick(1, 0, beta);
+                u.assign(DoubleFunctions.div(beta));
+                U.viewRow(0).assign(u);
+                if (V == null) {
+                    V = new DenseColumnDoubleMatrix2D((int) v.size(), 1);
+                    V.assign((double[]) v.elements());
+                } else {
+                    V = factory.appendColumn(V, v);
+                }
+                if (C == null) {
+                    C = new DenseDoubleMatrix2D(2, 1);
+                    C.assign(alphaBeta);
+                } else {
+                    C = factory.composeBidiagonal(C, alphaBeta);
+                }
             }
         }
 
-        public DoubleMatrix2D getB() {
-            return B;
+        public DoubleMatrix2D getC() {
+            return C;
         }
 
         public DoubleMatrix2D getU() {

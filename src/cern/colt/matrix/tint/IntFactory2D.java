@@ -9,8 +9,9 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tint;
 
 import cern.colt.matrix.tint.impl.DenseIntMatrix2D;
-import cern.colt.matrix.tint.impl.RCIntMatrix2D;
 import cern.colt.matrix.tint.impl.SparseIntMatrix2D;
+import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
+import cern.jet.math.tint.IntFunctions;
 
 /**
  * Factory for convenient construction of 2-d matrices holding <tt>int</tt>
@@ -85,6 +86,11 @@ import cern.colt.matrix.tint.impl.SparseIntMatrix2D;
  */
 public class IntFactory2D extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A factory producing dense matrices.
      */
     public static final IntFactory2D dense = new IntFactory2D();
@@ -149,7 +155,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
         if (b.size() > A.rows())
             b = b.viewPart(0, A.rows());
         else if (b.size() < A.rows())
-            A = A.viewPart(0, 0, b.size(), A.columns());
+            A = A.viewPart(0, 0, (int) b.size(), A.columns());
 
         // concatenate
         int ac = A.columns();
@@ -203,7 +209,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
         if (b.size() > A.columns())
             b = b.viewPart(0, A.columns());
         else if (b.size() < A.columns())
-            A = A.viewPart(0, 0, A.rows(), b.size());
+            A = A.viewPart(0, 0, A.rows(), (int) b.size());
 
         // concatenate
         int ar = A.rows();
@@ -227,7 +233,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      */
     public IntMatrix2D ascending(int rows, int columns) {
         cern.jet.math.tint.IntFunctions F = cern.jet.math.tint.IntFunctions.intFunctions;
-        return descending(rows, columns).assign(F.chain(F.neg, F.minus(columns * rows)));
+        return descending(rows, columns).assign(IntFunctions.chain(IntFunctions.neg, IntFunctions.minus(columns * rows)));
     }
 
     /**
@@ -303,7 +309,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * IntMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 2, 4), null } };
+     * IntMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 2, 4), null } };
      * System.out.println(compose(parts1));
      * </pre>
      * 
@@ -322,7 +329,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * IntMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() }, { identity(3).viewRowFlip(), null } };
+     * IntMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() },
+     *         { identity(3).viewRowFlip(), null } };
      * System.out.println(&quot;\n&quot; + make(parts3));
      * </pre>
      * 
@@ -361,7 +369,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * IntMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 3, 4), null } };
+     * IntMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 3, 4), null } };
      * System.out.println(&quot;\n&quot; + Factory2D.make(parts2));
      * </pre>
      * 
@@ -658,7 +667,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      */
     public void demo1() {
         System.out.println("\n\n");
-        IntMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 2, 4), null } };
+        IntMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+                { null, make(2, 2, 4), null } };
         System.out.println("\n" + compose(parts1));
         // System.out.println("\n"+cern.colt.matrixpattern.Converting.toHTML(make(parts1).toString()));
 
@@ -668,7 +678,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
          * System.out.println("\n"+make(parts2));
          */
 
-        IntMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() }, { identity(3).viewRowFlip(), null } };
+        IntMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() },
+                { identity(3).viewRowFlip(), null } };
         System.out.println("\n" + compose(parts3));
         // System.out.println("\n"+cern.colt.matrixpattern.Converting.toHTML(make(parts3).toString()));
 
@@ -767,7 +778,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * @return a new matrix.
      */
     public IntMatrix2D diagonal(IntMatrix1D vector) {
-        int size = vector.size();
+        int size = (int) vector.size();
         IntMatrix2D diag = make(size, size);
         for (int i = size; --i >= 0;) {
             diag.setQuick(i, i, vector.getQuick(i));
@@ -895,7 +906,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
         if (this == sparse)
             return new SparseIntMatrix2D(rows, columns);
         if (this == rowCompressed)
-            return new RCIntMatrix2D(rows, columns);
+            return new SparseRCIntMatrix2D(rows, columns);
         // if (this==rowCompressedModified) return new
         // RCMIntMatrix2D(rows,columns);
         else
@@ -998,15 +1009,16 @@ public class IntFactory2D extends cern.colt.PersistentObject {
         matrix.assign(0);
 
         int size = rows * columns;
-        int n = (int) Math.round(size * nonZeroFraction);
+        int n = Math.round(size * nonZeroFraction);
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(
+                n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         for (int i = 0; i < size; i++) {
             if (sampler.sampleNextElement()) {
-                int row = (int) (i / columns);
-                int column = (int) (i % columns);
+                int row = (i / columns);
+                int column = (i % columns);
                 matrix.set(row, column, value);
             }
         }

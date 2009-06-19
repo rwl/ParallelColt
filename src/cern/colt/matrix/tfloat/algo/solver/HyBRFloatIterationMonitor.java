@@ -15,11 +15,11 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
 
     /**
      * Constructor for HyBRFloatIterationMonitor. Default is 100 iterations at
-     * most, and a divergence tolerance of 1e+5.
+     * most, and a divergence tolerance of 1e+3.
      */
     public HyBRFloatIterationMonitor() {
         this.maxIter = 100;
-        this.dtol = 1e+5f;
+        this.dtol = 1e+3f;
     }
 
     /**
@@ -34,7 +34,8 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         this.maxIter = maxIter;
         this.dtol = dtol;
     }
-    
+
+    @Override
     public boolean converged(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, x, iter);
@@ -43,6 +44,7 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         return convergedI(r, x);
     }
 
+    @Override
     public boolean converged(float r) throws IterativeSolverFloatNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, iter);
@@ -50,7 +52,6 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         this.residual = r;
         return convergedI(r);
     }
-
 
     @Override
     protected boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException {

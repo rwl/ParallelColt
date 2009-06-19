@@ -32,7 +32,8 @@ public final class Version {
         String vendor = getPackage().getImplementationVendor();
         if (vendor == null)
             vendor = "piotr.wendykier@gmail.com";
-        return "Version " + getMajorVersion() + "." + getMinorVersion() + "." + getMicroVersion() + "." + getBuildVersion() + " (" + getBuildTime() + ")" + "\nPlease report problems to " + vendor;
+        return "Version " + getMajorVersion() + "." + getMinorVersion() + "." + getMicroVersion() + "."
+                + getBuildVersion() + " (" + getBuildTime() + ")" + "\nPlease report problems to " + vendor;
     }
 
     /**

@@ -28,6 +28,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class BreitWignerMeanSquare extends BreitWigner {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected DoubleUniform uniform; // helper
 
     // The uniform random number generated shared by all <b>static</b> methods.
@@ -51,6 +56,7 @@ public class BreitWignerMeanSquare extends BreitWigner {
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         BreitWignerMeanSquare copy = (BreitWignerMeanSquare) super.clone();
         if (this.uniform != null)
@@ -65,6 +71,7 @@ public class BreitWignerMeanSquare extends BreitWigner {
      * @param cut
      *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
+    @Override
     public double nextDouble(double mean, double gamma, double cut) {
         if (gamma == 0.0)
             return mean;

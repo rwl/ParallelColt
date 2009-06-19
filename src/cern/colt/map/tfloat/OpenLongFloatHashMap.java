@@ -30,6 +30,11 @@ import cern.colt.map.PrimeFinder;
  * @see java.util.HashMap
  */
 public class OpenLongFloatHashMap extends AbstractLongFloatMap {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public static int hashCollisions = 0;
     /**
      * The hash table keys.
@@ -113,6 +118,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      *            a function object taking as argument the current association's
      *            value.
      */
+    @Override
     public void assign(cern.colt.function.tfloat.FloatFunction function) {
         // specialization for speed
         if (function instanceof cern.jet.math.tfloat.FloatMult) { // x[i] = mult*x[i]
@@ -142,6 +148,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @param other
      *            the other map to be copied into the receiver.
      */
+    @Override
     public void assign(AbstractLongFloatMap other) {
         if (!(other instanceof OpenLongFloatHashMap)) {
             super.assign(other);
@@ -164,6 +171,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * Removes all (key,value) associations from the receiver. Implicitly calls
      * <tt>trimToSize()</tt>.
      */
+    @Override
     public void clear() {
         new ByteArrayList(this.state).fillFromToWith(0, this.state.length - 1, FREE);
         // new FloatArrayList(values).fillFromToWith(0, state.length-1, 0); //
@@ -184,11 +192,12 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         OpenLongFloatHashMap copy = (OpenLongFloatHashMap) super.clone();
-        copy.table = (long[]) copy.table.clone();
-        copy.values = (float[]) copy.values.clone();
-        copy.state = (byte[]) copy.state.clone();
+        copy.table = copy.table.clone();
+        copy.values = copy.values.clone();
+        copy.state = copy.state.clone();
         return copy;
     }
 
@@ -197,6 +206,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified key.
      */
+    @Override
     public boolean containsKey(long key) {
         return indexOfKey(key) >= 0;
     }
@@ -206,6 +216,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified value.
      */
+    @Override
     public boolean containsValue(float value) {
         return indexOfValue(value) >= 0;
     }
@@ -224,6 +235,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @param minCapacity
      *            the desired minimum capacity.
      */
+    @Override
     public void ensureCapacity(int minCapacity) {
         if (table.length < minCapacity) {
             int newCapacity = nextPrime(minCapacity);
@@ -247,6 +259,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
+    @Override
     public boolean forEachKey(LongProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -267,6 +280,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
+    @Override
     public boolean forEachPair(final LongFloatProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -287,6 +301,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @return the value associated with the specified key; <tt>0</tt> if no
      *         such key is present.
      */
+    @Override
     public float get(long key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -415,6 +430,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
      *         <tt>Longeger.MIN_VALUE</tt> if no such key exists.
      */
+    @Override
     public long keyOf(float value) {
         // returns the first key found; there may be more matching keys,
         // however.
@@ -436,6 +452,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @param list
      *            the list to be filled, can have any size.
      */
+    @Override
     public void keys(LongArrayList list) {
         list.setSize(distinct);
         long[] elements = list.elements();
@@ -475,7 +492,9 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void pairsMatching(final LongFloatProcedure condition, final LongArrayList keyList, final FloatArrayList valueList) {
+    @Override
+    public void pairsMatching(final LongFloatProcedure condition, final LongArrayList keyList,
+            final FloatArrayList valueList) {
         keyList.clear();
         valueList.clear();
 
@@ -499,6 +518,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      *         <tt>false</tt> if the receiver did already contain such a key -
      *         the new value has now replaced the formerly associated value.
      */
+    @Override
     public boolean put(long key, float value) {
         int i = indexOfInsertion(key);
         if (i < 0) { // already contained
@@ -590,6 +610,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @return <tt>true</tt> if the receiver contained the specified key,
      *         <tt>false</tt> otherwise.
      */
+    @Override
     public boolean removeKey(long key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -633,6 +654,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      */
+    @Override
     protected void setUp(int initialCapacity, float minLoadFactor, float maxLoadFactor) {
         int capacity = initialCapacity;
         super.setUp(capacity, minLoadFactor, maxLoadFactor);
@@ -671,6 +693,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * Releases any superfluous internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
+    @Override
     public void trimToSize() {
         // * 1.2 because open addressing's performance exponentially degrades
         // beyond that point
@@ -693,6 +716,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @param list
      *            the list to be filled, can have any size.
      */
+    @Override
     public void values(FloatArrayList list) {
         list.setSize(distinct);
         float[] elements = list.elements();

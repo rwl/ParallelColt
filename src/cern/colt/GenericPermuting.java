@@ -177,7 +177,8 @@ public class GenericPermuting extends Object {
             // Note that this is perhaps not what you want...
             for (int i = N; --i >= 0;)
                 permutation[i] = i;
-            cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) p));
+            cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(
+                    new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) p));
             for (int i = 0; i < N - 1; i++) {
                 int random = gen.nextIntFromTo(i, N - 1);
 
@@ -222,7 +223,7 @@ public class GenericPermuting extends Object {
      * about the Swapper object).
      */
     public static void permute(int[] list, int[] indexes) {
-        int[] copy = (int[]) list.clone();
+        int[] copy = list.clone();
         for (int i = list.length; --i >= 0;)
             list[i] = copy[indexes[i]];
     }
@@ -260,6 +261,7 @@ public class GenericPermuting extends Object {
      *            <tt>work.length >= indexes.length</tt>; set
      *            <tt>work==null</tt> if you don't care about performance.
      */
+    @Deprecated
     public static void permute(int[] indexes, cern.colt.Swapper swapper, int[] work) {
         permute(indexes, swapper, work, null);
     }
@@ -343,7 +345,7 @@ public class GenericPermuting extends Object {
      * (forget about the Swapper object).
      */
     public static void permute(Object[] list, int[] indexes) {
-        Object[] copy = (Object[]) list.clone();
+        Object[] copy = list.clone();
         for (int i = list.length; --i >= 0;)
             list[i] = copy[indexes[i]];
     }

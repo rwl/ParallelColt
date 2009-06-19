@@ -19,6 +19,11 @@ import cern.colt.list.tfloat.FloatArrayList;
  * @version 1.0, 09/24/99
  */
 public class FloatBuffer extends cern.colt.PersistentObject implements FloatBufferConsumer {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected FloatBufferConsumer target;
 
     protected float[] elements;

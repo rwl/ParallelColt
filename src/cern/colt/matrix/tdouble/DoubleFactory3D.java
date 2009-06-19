@@ -10,6 +10,7 @@ package cern.colt.matrix.tdouble;
 
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix3D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix3D;
+import cern.jet.math.tdouble.DoubleFunctions;
 
 /**
  * Factory for convenient construction of 3-d matrices holding <tt>double</tt>
@@ -37,6 +38,8 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix3D;
  * @version 1.0, 09/24/99
  */
 public class DoubleFactory3D extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * A factory producing dense matrices.
      */
@@ -59,8 +62,8 @@ public class DoubleFactory3D extends cern.colt.PersistentObject {
      * purposes.
      */
     public DoubleMatrix3D ascending(int slices, int rows, int columns) {
-        cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-        return descending(slices, rows, columns).assign(F.chain(F.neg, F.minus(slices * rows * columns)));
+        return descending(slices, rows, columns).assign(
+                DoubleFunctions.chain(DoubleFunctions.neg, DoubleFunctions.minus(slices * rows * columns)));
     }
 
     /**

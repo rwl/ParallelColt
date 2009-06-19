@@ -39,10 +39,7 @@ public class QuickBitVector extends Object {
 
     protected final static int BIT_INDEX_MASK = 63; // = BITS_PER_UNIT - 1;
 
-    private static final long[] pows = precomputePows(); // precompute
-
-    // bitmasks for
-    // speed
+    private static final long[] pows = precomputePows(); // precompute bitmasks for speed
 
     /**
      * Makes this class non instantiable, but still inheritable.

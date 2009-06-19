@@ -358,16 +358,16 @@ public abstract class DComplexMatrix1DTest extends TestCase {
         double[] actual = A.zDotProduct(B);
         double[] expected = new double[2];
         for (int i = 0; i < SIZE; i++) {
-            expected = DComplex.plus(expected, DComplex.mult(A.getQuick(i), DComplex.conj(B.getQuick(i))));
+            expected = DComplex.plus(expected, DComplex.mult(DComplex.conj(B.getQuick(i)), A.getQuick(i)));
         }
         assertEquals(expected, actual, TOL);
     }
 
     public void testZDotProductComplexMatrix1DIntInt() {
-        double[] actual = A.zDotProduct(B, 5, B.size() - 10);
+        double[] actual = A.zDotProduct(B, 5, (int) B.size() - 10);
         double[] expected = new double[2];
         for (int i = 5; i < SIZE - 5; i++) {
-            expected = DComplex.plus(expected, DComplex.mult(A.getQuick(i), DComplex.conj(B.getQuick(i))));
+            expected = DComplex.plus(expected, DComplex.mult(DComplex.conj(B.getQuick(i)), A.getQuick(i)));
         }
         assertEquals(expected, actual, TOL);
     }
@@ -376,7 +376,7 @@ public abstract class DComplexMatrix1DTest extends TestCase {
         IntArrayList indexList = new IntArrayList();
         ArrayList<double[]> valueList = new ArrayList<double[]>();
         B.getNonZeros(indexList, valueList);
-        double[] actual = A.zDotProduct(B, 5, B.size() - 10, indexList);
+        double[] actual = A.zDotProduct(B, 5, (int) B.size() - 10, indexList);
         double[] expected = new double[2];
         for (int i = 5; i < SIZE - 5; i++) {
             expected = DComplex.plus(expected, DComplex.mult(A.getQuick(i), DComplex.conj(B.getQuick(i))));

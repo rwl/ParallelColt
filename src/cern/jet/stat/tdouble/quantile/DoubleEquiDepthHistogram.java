@@ -35,6 +35,10 @@ package cern.jet.stat.tdouble.quantile;
  * @version 1.0, 09/24/99
  */
 public class DoubleEquiDepthHistogram extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected double[] binBoundaries;
 
     /**
@@ -138,6 +142,7 @@ public class DoubleEquiDepthHistogram extends cern.colt.PersistentObject {
     /**
      * @deprecated Deprecated. Returns the number of bin boundaries.
      */
+    @Deprecated
     public int size() {
         return binBoundaries.length;
     }

@@ -42,6 +42,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class Empirical extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double[] cdf; // cumulative distribution function
 
     protected int interpolationType;
@@ -94,16 +99,18 @@ public class Empirical extends AbstractContinousDoubleDistribution {
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         Empirical copy = (Empirical) super.clone();
         if (this.cdf != null)
-            copy.cdf = (double[]) this.cdf.clone();
+            copy.cdf = this.cdf.clone();
         return copy;
     }
 
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         double rand = randomGenerator.raw();
         if (this.cdf == null)
@@ -216,6 +223,7 @@ public class Empirical extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         String interpolation = null;
         if (interpolationType == NO_INTERPOLATION)

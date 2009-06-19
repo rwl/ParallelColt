@@ -754,7 +754,8 @@ public class DoubleFunctions extends Object {
      *            a unary function.
      * @return the binary function <tt>f( g(a), h(b) )</tt>.
      */
-    public static DoubleDoubleFunction chain(final DoubleDoubleFunction f, final DoubleFunction g, final DoubleFunction h) {
+    public static DoubleDoubleFunction chain(final DoubleDoubleFunction f, final DoubleFunction g,
+            final DoubleFunction h) {
         return new DoubleDoubleFunction() {
             public final double apply(double a, double b) {
                 return f.apply(g.apply(a), h.apply(b));
@@ -828,7 +829,7 @@ public class DoubleFunctions extends Object {
         double b = 0.2;
         double v = Math.sin(a) + Math.pow(Math.cos(b), 2);
         System.out.println(v);
-        DoubleDoubleFunction f = F.chain(F.plus, F.sin, F.chain(F.square, F.cos));
+        DoubleDoubleFunction f = DoubleFunctions.chain(DoubleFunctions.plus, DoubleFunctions.sin, DoubleFunctions.chain(DoubleFunctions.square, DoubleFunctions.cos));
         // DoubleDoubleFunction f = F.chain(plus,sin,F.chain(square,cos));
         System.out.println(f.apply(a, b));
         DoubleDoubleFunction g = new DoubleDoubleFunction() {
@@ -837,8 +838,8 @@ public class DoubleFunctions extends Object {
             }
         };
         System.out.println(g.apply(a, b));
-        DoubleFunction m = F.plus(3);
-        DoubleFunction n = F.plus(4);
+        DoubleFunction m = DoubleFunctions.plus(3);
+        DoubleFunction n = DoubleFunctions.plus(4);
         System.out.println(m.apply(0));
         System.out.println(n.apply(0));
     }
@@ -857,7 +858,7 @@ public class DoubleFunctions extends Object {
         System.out.println(v);
 
         // DoubleDoubleFunction f = F.chain(F.plus,F.identity,F.identity);
-        DoubleDoubleFunction f = F.chain(F.abs, F.chain(F.plus, F.sin, F.chain(F.square, F.cos)));
+        DoubleDoubleFunction f = DoubleFunctions.chain(DoubleFunctions.abs, DoubleFunctions.chain(DoubleFunctions.plus, DoubleFunctions.sin, DoubleFunctions.chain(DoubleFunctions.square, DoubleFunctions.cos)));
         // DoubleDoubleFunction f =
         // F.chain(F.plus,F.sin,F.chain(F.square,F.cos));
         // DoubleDoubleFunction f = F.plus;

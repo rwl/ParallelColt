@@ -19,21 +19,12 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 
 /**
  * Flexible, well human readable matrix print formatting; By default decimal
- * point aligned. Build on top of the C-like <i>sprintf</i> functionality
- * provided by the {@link corejava.Format} class written by Cay Horstmann.
- * Currenly works on 1-d, 2-d and 3-d matrices. Note that in most cases you will
- * not need to get familiar with this class; just call
+ * point aligned. Currenly works on 1-d, 2-d and 3-d matrices. Note that in most
+ * cases you will not need to get familiar with this class; just call
  * <tt>matrix.toString()</tt> and be happy with the default formatting. This
  * class is for advanced requirements.
  * <p>
- * Can't exactly remember the syntax of printf format strings? See
- * {@link corejava.Format} or <a
- * href="http://www.braju.com/docs/index.html">Henrik Nordberg's
- * documentation</a>, or the <a
- * href="http://www.dinkumware.com/htm_cl/lib_prin.html#Print%20Functions"
- * >Dinkumware's C Library Reference</a>.
  * 
- * <p>
  * <b>Examples:</b>
  * <p>
  * Examples demonstrate usage on 2-d matrices. 1-d and 3-d matrices formatting
@@ -295,6 +286,8 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  * @version 1.2, 11/30/99
  */
 public class DoubleFormatter extends AbstractFormatter {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructs and returns a matrix formatter with format <tt>"%G"</tt>.
      */
@@ -318,7 +311,8 @@ public class DoubleFormatter extends AbstractFormatter {
      */
     public static void demo1() {
         // parameters
-        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 }, { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
+        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 },
+                { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
         String[] formats = { "%G", "%1.10G", "%f", "%1.2f", "%0.2e", null };
 
         // now the processing
@@ -326,29 +320,14 @@ public class DoubleFormatter extends AbstractFormatter {
         DoubleMatrix2D matrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(values);
         String[] strings = new String[size];
         String[] sourceCodes = new String[size];
-        String[] htmlStrings = new String[size];
-        String[] htmlSourceCodes = new String[size];
 
         for (int i = 0; i < size; i++) {
             String format = formats[i];
             strings[i] = new DoubleFormatter(format).toString(matrix);
             sourceCodes[i] = new DoubleFormatter(format).toSourceCode(matrix);
-
-            // may not compile because of packages not included in the
-            // distribution
-            // htmlStrings[i] =
-            // cern.colt.matrixpattern.Converting.toHTML(strings[i]);
-            // htmlSourceCodes[i] =
-            // cern.colt.matrixpattern.Converting.toHTML(sourceCodes[i]);
         }
 
         System.out.println("original:\n" + new DoubleFormatter().toString(matrix));
-
-        // may not compile because of packages not included in the distribution
-        for (int i = 0; i < size; i++) {
-            // System.out.println("\nhtmlString("+formats[i]+"):\n"+htmlStrings[i]);
-            // System.out.println("\nhtmlSourceCode("+formats[i]+"):\n"+htmlSourceCodes[i]);
-        }
 
         for (int i = 0; i < size; i++) {
             System.out.println("\nstring(" + formats[i] + "):\n" + strings[i]);
@@ -363,11 +342,12 @@ public class DoubleFormatter extends AbstractFormatter {
     public static void demo2() {
         // parameters
         double[] values = {
-        // 5, 0.0, -0.0, -Double.NaN, Double.NaN, 0.0/0.0,
+                // 5, 0.0, -0.0, -Double.NaN, Double.NaN, 0.0/0.0,
                 // Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
                 // Double.MIN_VALUE,
                 // Double.MAX_VALUE
-                5, 0.0, -0.0, -Double.NaN, Double.NaN, 0.0 / 0.0, Double.MIN_VALUE, Double.MAX_VALUE, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY
+                5, 0.0, -0.0, -Double.NaN, Double.NaN, 0.0 / 0.0, Double.MIN_VALUE, Double.MAX_VALUE,
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY
         // Double.MIN_VALUE, Double.MAX_VALUE //, Double.NEGATIVE_INFINITY,
         // Double.POSITIVE_INFINITY
         };
@@ -429,13 +409,13 @@ public class DoubleFormatter extends AbstractFormatter {
 
         timer.reset().start();
         s = new DoubleFormatter(null).toString(matrix);
-        // System.out.println(s);
+        System.out.println(s);
         s = null;
         timer.stop().display();
 
         timer.reset().start();
         s = new DoubleFormatter("%G").toString(matrix);
-        // System.out.println(s);
+        System.out.println(s);
         s = null;
         timer.stop().display();
     }
@@ -445,7 +425,8 @@ public class DoubleFormatter extends AbstractFormatter {
      */
     public static void demo4() {
         // parameters
-        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 }, { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
+        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 },
+                { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
         /*
          * double[][] values = { {3, 1, }, {5.1 ,16.37, } };
          */
@@ -457,7 +438,9 @@ public class DoubleFormatter extends AbstractFormatter {
         // String[] rowNames = { "SunJDK1.2.2 classic", "IBMJDK1.1.8"};
 
         DoubleMatrix2D matrix = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(values);
-        System.out.println("\n\n" + new DoubleFormatter("%G").toTitleString(matrix, rowNames, columnNames, "rowAxis", "colAxis", "VM Performance: Provider vs. matrix density"));
+        System.out.println("\n\n"
+                + new DoubleFormatter("%G").toTitleString(matrix, rowNames, columnNames, "rowAxis", "colAxis",
+                        "VM Performance: Provider vs. matrix density"));
     }
 
     /**
@@ -465,7 +448,8 @@ public class DoubleFormatter extends AbstractFormatter {
      */
     public static void demo5() {
         // parameters
-        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 }, { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
+        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 },
+                { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
         /*
          * double[][] values = { {3, 1, }, {5.1 ,16.37, } };
          */
@@ -477,7 +461,8 @@ public class DoubleFormatter extends AbstractFormatter {
         // String[] rowNames = { "SunJDK1.2.2 classic", "IBMJDK1.1.8"};
 
         System.out.println(cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(values));
-        System.out.println(new DoubleFormatter("%G").toTitleString(cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(values), rowNames, columnNames, "vendor", "density", "title"));
+        System.out.println(new DoubleFormatter("%G").toTitleString(cern.colt.matrix.tdouble.DoubleFactory2D.dense
+                .make(values), rowNames, columnNames, "vendor", "density", "title"));
     }
 
     /**
@@ -485,7 +470,8 @@ public class DoubleFormatter extends AbstractFormatter {
      */
     public static void demo6() {
         // parameters
-        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 }, { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
+        double[][] values = { { 3, 0, -3.4, 0 }, { 5.1, 0, +3.0123456789, 0 }, { 16.37, 0.0, 2.5, 0 },
+                { -16.3, 0, -3.012345678E-4, -1 }, { 1236.3456789, 0, 7, -1.2 } };
         /*
          * double[][] values = { {3, 1, }, {5.1 ,16.37, } };
          */
@@ -501,19 +487,14 @@ public class DoubleFormatter extends AbstractFormatter {
         // System.out.println(new
         // Formatter().toSourceCode(cern.colt.matrix.DoubleFactory2D.dense.make(values)));
         System.out.println(new DoubleFormatter().toString(cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(values)));
-        System.out.println(new DoubleFormatter().toTitleString(cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(values), rowNames, columnNames, "vendor", "density", "title"));
+        System.out.println(new DoubleFormatter().toTitleString(cern.colt.matrix.tdouble.DoubleFactory2D.dense
+                .make(values), rowNames, columnNames, "vendor", "density", "title"));
     }
 
     /**
      * Demonstrates how to use this class.
      */
     public static void demo7() {
-        // parameters
-        /*
-         * double[][] values = { {3, 0, -3.4, 0}, {5.1 ,0, +3.0123456789, 0},
-         * {16.37, 0.0, 2.5, 0}, {-16.3, 0, -3.012345678E-4, -1}, {1236.3456789,
-         * 0, 7, -1.2} };
-         */
         double[][] values = { { 5, 10, 20, 40 }, { 7, 8, 6, 7 }, { 12, 10, 20, 19 }, { 3, 1, 5, 6 } };
         String[] columnNames = { "1996", "1997", "1998", "1999" };
         String[] rowNames = { "PowerBar", "Benzol", "Mercedes", "Sparcling" };
@@ -521,26 +502,11 @@ public class DoubleFormatter extends AbstractFormatter {
         String columnAxisName = "Year";
         String title = "CPU performance over time [nops/sec]";
         hep.aida.tdouble.bin.DoubleBinFunctions1D F = hep.aida.tdouble.bin.DoubleBinFunctions1D.functions;
-        hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr = { F.mean, F.rms, F.quantile(0.25), F.median, F.quantile(0.75), F.stdDev, F.min, F.max };
+        hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr = { F.mean, F.rms, F.quantile(0.25), F.median,
+                F.quantile(0.75), F.stdDev, F.min, F.max };
         String format = "%1.2G";
-
-        // String[] columnNames = { "W", "X", "Y", "Z", "mean", "median",
-        // "sum"};
-        // String[] rowNames = { "SunJDK1.2.2 classic", "IBMJDK1.1.8",
-        // "SunJDK1.3 Hotspot", "other1", "other2", "mean", "median", "sum" };
-        // hep.aida.bin.BinFunction1D[] aggr = {F.mean, F.median, F.sum};
-
-        // System.out.println(cern.colt.matrix.DoubleFactory2D.dense.make(values));
-        // System.out.println(new
-        // Formatter().toSourceCode(cern.colt.matrix.DoubleFactory2D.dense.make(values)));
-        // System.out.println(new
-        // Formatter().toString(cern.colt.matrix.DoubleFactory2D.dense.make(values)));
-        // System.out.println(new
-        // Formatter().toTitleString(cern.colt.matrix.DoubleFactory2D.dense.make(values),rowNames,columnNames,rowAxisName,columnAxisName,title));
-        System.out.println(new DoubleFormatter(format).toTitleString(cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(values), rowNames, columnNames, rowAxisName, columnAxisName, title, aggr));
-        // System.out.println(cern.colt.matrixpattern.Converting.toHTML(new
-        // Formatter(format).toTitleString(cern.colt.matrix.DoubleFactory2D.dense.make(values),rowNames,columnNames,rowAxisName,columnAxisName,title,
-        // aggr)));
+        System.out.println(new DoubleFormatter(format).toTitleString(cern.colt.matrix.tdouble.DoubleFactory2D.dense
+                .make(values), rowNames, columnNames, rowAxisName, columnAxisName, title, aggr));
     }
 
     /**
@@ -658,7 +624,7 @@ public class DoubleFormatter extends AbstractFormatter {
      *            the matrix to convert.
      */
     public String toString(DoubleMatrix1D matrix) {
-        DoubleMatrix2D easy = matrix.like2D(1, matrix.size());
+        DoubleMatrix2D easy = matrix.like2D(1, (int) matrix.size());
         easy.viewRow(0).assign(matrix);
         return toString(easy);
     }
@@ -724,7 +690,8 @@ public class DoubleFormatter extends AbstractFormatter {
      *            The overall title of the matrix to be formatted.
      * @return the matrix converted to a string.
      */
-    protected String toTitleString(DoubleMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName, String columnAxisName, String title) {
+    protected String toTitleString(DoubleMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName,
+            String columnAxisName, String title) {
         if (matrix.size() == 0)
             return "Empty matrix";
         String[][] s = format(matrix);
@@ -732,7 +699,9 @@ public class DoubleFormatter extends AbstractFormatter {
         // this.alignment = DECIMAL;
         align(s);
         // this.alignment = oldAlignment;
-        return new cern.colt.matrix.tobject.algo.ObjectFormatter().toTitleString(cern.colt.matrix.tobject.ObjectFactory2D.dense.make(s), rowNames, columnNames, rowAxisName, columnAxisName, title);
+        return new cern.colt.matrix.tobject.algo.ObjectFormatter().toTitleString(
+                cern.colt.matrix.tobject.ObjectFactory2D.dense.make(s), rowNames, columnNames, rowAxisName,
+                columnAxisName, title);
     }
 
     /**
@@ -760,7 +729,8 @@ public class DoubleFormatter extends AbstractFormatter {
      * @see hep.aida.tdouble.bin.DoubleBinFunction1D
      * @see hep.aida.tdouble.bin.DoubleBinFunctions1D
      */
-    public String toTitleString(DoubleMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName, String columnAxisName, String title, hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr) {
+    public String toTitleString(DoubleMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName,
+            String columnAxisName, String title, hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr) {
         if (matrix.size() == 0)
             return "Empty matrix";
         if (aggr == null || aggr.length == 0)
@@ -803,7 +773,9 @@ public class DoubleFormatter extends AbstractFormatter {
 
         // copy strings into a large matrix holding the source matrix and all
         // aggregations
-        cern.colt.matrix.tobject.ObjectMatrix2D allStats = cern.colt.matrix.tobject.ObjectFactory2D.dense.make(matrix.rows() + aggr.length, matrix.columns() + aggr.length + 1);
+        cern.colt.matrix.tobject.ObjectMatrix2D allStats = cern.colt.matrix.tobject.ObjectFactory2D.dense.make(matrix
+                .rows()
+                + aggr.length, matrix.columns() + aggr.length + 1);
         allStats.viewPart(0, 0, matrix.rows() + aggr.length, matrix.columns()).assign(s1);
         allStats.viewColumn(matrix.columns()).assign("|");
         allStats.viewPart(0, matrix.columns() + 1, matrix.rows(), aggr.length).assign(s2);
@@ -833,7 +805,8 @@ public class DoubleFormatter extends AbstractFormatter {
         }
 
         // turn large matrix into string
-        String s = new cern.colt.matrix.tobject.algo.ObjectFormatter().toTitleString(allStats, rowNames, columnNames, rowAxisName, columnAxisName, title);
+        String s = new cern.colt.matrix.tobject.algo.ObjectFormatter().toTitleString(allStats, rowNames, columnNames,
+                rowAxisName, columnAxisName, title);
 
         // insert a horizontal "----------------------" separation line above
         // the column stats
@@ -881,14 +854,17 @@ public class DoubleFormatter extends AbstractFormatter {
      * @see hep.aida.tdouble.bin.DoubleBinFunction1D
      * @see hep.aida.tdouble.bin.DoubleBinFunctions1D
      */
-    public String toTitleString(DoubleMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames, String sliceAxisName, String rowAxisName, String columnAxisName, String title, hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr) {
+    public String toTitleString(DoubleMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames,
+            String sliceAxisName, String rowAxisName, String columnAxisName, String title,
+            hep.aida.tdouble.bin.DoubleBinFunction1D[] aggr) {
         if (matrix.size() == 0)
             return "Empty matrix";
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < matrix.slices(); i++) {
             if (i != 0)
                 buf.append(sliceSeparator);
-            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title + "\n" + sliceAxisName + "=" + sliceNames[i], aggr));
+            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title
+                    + "\n" + sliceAxisName + "=" + sliceNames[i], aggr));
         }
         return buf.toString();
     }
@@ -917,14 +893,16 @@ public class DoubleFormatter extends AbstractFormatter {
      *            The overall title of the matrix to be formatted.
      * @return the matrix converted to a string.
      */
-    private String xtoTitleString(DoubleMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames, String sliceAxisName, String rowAxisName, String columnAxisName, String title) {
+    private String xtoTitleString(DoubleMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames,
+            String sliceAxisName, String rowAxisName, String columnAxisName, String title) {
         if (matrix.size() == 0)
             return "Empty matrix";
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < matrix.slices(); i++) {
             if (i != 0)
                 buf.append(sliceSeparator);
-            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title + "\n" + sliceAxisName + "=" + sliceNames[i]));
+            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title
+                    + "\n" + sliceAxisName + "=" + sliceNames[i]));
         }
         return buf.toString();
     }

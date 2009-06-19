@@ -303,16 +303,9 @@ public class FComplexFunctions {
         public final float[] apply(float[] x) {
             float[] z = new float[2];
             if (x[1] != 0.0) {
-                float scalar;
-                if (Math.abs(x[0]) >= Math.abs(z[1])) {
-                    scalar = (float) (1.0 / (x[0] + x[1] * (x[1] / x[0])));
-                    z[0] = scalar;
-                    z[1] = scalar * (-x[1] / x[0]);
-                } else {
-                    scalar = (float) (1.0 / (x[0] * (x[0] / x[1]) + x[1]));
-                    z[0] = scalar * (x[0] / x[1]);
-                    z[1] = -scalar;
-                }
+                float tmp = (x[0] * x[0]) + (x[1] * x[1]);
+                z[0] = x[0] / tmp;
+                z[1] = -x[1] / tmp;
             } else {
                 z[0] = 1 / x[0];
                 z[1] = 0;
@@ -723,7 +716,8 @@ public class FComplexFunctions {
         };
     }
 
-    public static FComplexFComplexFComplexFunction chain(final FComplexFComplexFComplexFunction f, final FComplexFComplexFunction g, final FComplexFComplexFunction h) {
+    public static FComplexFComplexFComplexFunction chain(final FComplexFComplexFComplexFunction f,
+            final FComplexFComplexFunction g, final FComplexFComplexFunction h) {
         return new FComplexFComplexFComplexFunction() {
             public final float[] apply(float[] x, float[] y) {
                 return f.apply(g.apply(x), h.apply(y));
@@ -731,7 +725,8 @@ public class FComplexFunctions {
         };
     }
 
-    public static FComplexFComplexFComplexFunction chain(final FComplexFComplexFunction g, final FComplexFComplexFComplexFunction h) {
+    public static FComplexFComplexFComplexFunction chain(final FComplexFComplexFunction g,
+            final FComplexFComplexFComplexFunction h) {
         return new FComplexFComplexFComplexFunction() {
             public final float[] apply(float[] x, float[] y) {
                 return g.apply(h.apply(x, y));

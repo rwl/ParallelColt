@@ -108,7 +108,7 @@ public class FloatDescriptive extends Object {
             covariance += (x - mean1) * (y - mean2);
         }
 
-        return covariance / (float) (size - 1);
+        return covariance / (size - 1);
     }
 
     /**
@@ -369,7 +369,8 @@ public class FloatDescriptive extends Object {
      * 
      * 
      */
-    public static void incrementalUpdateSumsOfPowers(FloatArrayList data, int from, int to, int fromSumIndex, int toSumIndex, float[] sumOfPowers) {
+    public static void incrementalUpdateSumsOfPowers(FloatArrayList data, int from, int to, int fromSumIndex,
+            int toSumIndex, float[] sumOfPowers) {
         int size = data.size();
         int lastIndex = toSumIndex - fromSumIndex;
         if (from > size || lastIndex + 1 > sumOfPowers.length)
@@ -504,11 +505,13 @@ public class FloatDescriptive extends Object {
      *            </ul>
      * 
      */
-    public static void incrementalWeightedUpdate(FloatArrayList data, FloatArrayList weights, int from, int to, float[] inOut) {
+    public static void incrementalWeightedUpdate(FloatArrayList data, FloatArrayList weights, int from, int to,
+            float[] inOut) {
         int dataSize = data.size();
         checkRangeFromTo(from, to, dataSize);
         if (dataSize != weights.size())
-            throw new IllegalArgumentException("from=" + from + ", to=" + to + ", data.size()=" + dataSize + ", weights.size()=" + weights.size());
+            throw new IllegalArgumentException("from=" + from + ", to=" + to + ", data.size()=" + dataSize
+                    + ", weights.size()=" + weights.size());
 
         // read current values
         float sum = inOut[0];
@@ -908,7 +911,8 @@ public class FloatDescriptive extends Object {
         int n = size;
         float s2 = sampleVariance; // (y-ymean)^2/(n-1)
         float m4 = moment4 * n; // (y-ymean)^4
-        return (float) (m4 * n * (n + 1) / ((n - 1) * (n - 2) * (n - 3) * s2 * s2) - 3.0 * (n - 1) * (n - 1) / ((n - 2) * (n - 3)));
+        return (float) (m4 * n * (n + 1) / ((n - 1) * (n - 2) * (n - 3) * s2 * s2) - 3.0 * (n - 1) * (n - 1)
+                / ((n - 2) * (n - 3)));
     }
 
     /**
@@ -1229,7 +1233,8 @@ public class FloatDescriptive extends Object {
      * <tt>i = from .. to</tt>; optimized for common parameters like
      * <tt>c == 0.0</tt> and/or <tt>k == -2 .. 5</tt>.
      */
-    public static float sumOfPowerDeviations(final FloatArrayList data, final int k, final float c, final int from, final int to) {
+    public static float sumOfPowerDeviations(final FloatArrayList data, final int k, final float c, final int from,
+            final int to) {
         final float[] elements = data.elements();
         float sum = 0;
         float v;

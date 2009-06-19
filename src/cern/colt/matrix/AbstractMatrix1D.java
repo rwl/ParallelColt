@@ -20,6 +20,8 @@ package cern.colt.matrix;
  * @version 1.0, 09/24/99
  */
 public abstract class AbstractMatrix1D extends AbstractMatrix {
+    private static final long serialVersionUID = 1L;
+
     /** the number of cells this matrix (view) has */
     protected int size;
 
@@ -32,17 +34,6 @@ public abstract class AbstractMatrix1D extends AbstractMatrix {
      */
     protected int stride;
 
-    /**
-     * Indicates non-flipped state (flip==1) or flipped state (flip==-1). see
-     * _setFlip() for further info.
-     */
-    // protected int flip;
-    /**
-     * Indicates non-flipped state or flipped state. see _setFlip() for further
-     * info.
-     */
-    // protected int flipMask;
-    // this.isNoView implies: offset==0, stride==1
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
@@ -72,8 +63,6 @@ public abstract class AbstractMatrix1D extends AbstractMatrix {
      */
     protected int _rank(int rank) {
         return zero + rank * stride;
-        // return zero + ((rank+flipMask)^flipMask);
-        // return zero + rank*flip; // slower
     }
 
     /**
@@ -175,7 +164,8 @@ public abstract class AbstractMatrix1D extends AbstractMatrix {
     /**
      * Returns the number of cells.
      */
-    public int size() {
+    @Override
+    public long size() {
         return size;
     }
 

@@ -23,7 +23,7 @@ package cern.colt.matrix.tfloat.algo.solver.preconditioner;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
-import cern.colt.matrix.tfloat.impl.RCFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
 
 /**
  * ILU(0) preconditioner using a compressed row matrix as internal storage
@@ -33,7 +33,7 @@ public class FloatILU implements FloatPreconditioner {
     /**
      * Factorisation matrix
      */
-    private final RCFloatMatrix2D LU;
+    private SparseRCFloatMatrix2D LU;
 
     /**
      * Temporary vector for solving the factorised system
@@ -42,26 +42,24 @@ public class FloatILU implements FloatPreconditioner {
 
     private int[] diagind;
 
+    private final int n;
+
     /**
      * Sets up the ILU preconditioner
      * 
-     * @param LU
-     *            Matrix to use internally. For best performance, its non-zero
-     *            pattern must conform to that of the system matrix
+     * @param n
+     *            Problem size (number of rows)
      */
-    public FloatILU(RCFloatMatrix2D LU) {
-        if (LU.rows() != LU.columns())
-            throw new IllegalArgumentException("ILU only applies to square matrices");
-
-        this.LU = LU;
-        int n = LU.rows();
+    public FloatILU(int n) {
+        this.n = n;
         y = new DenseFloatMatrix1D(n);
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
+
         // Ly = b, y = L\b
         lowerUnitSolve(b, y);
 
@@ -70,9 +68,10 @@ public class FloatILU implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
+
         // U'y = b, y = U'\b
         upperTransSolve(b, y);
 
@@ -81,21 +80,26 @@ public class FloatILU implements FloatPreconditioner {
     }
 
     public void setMatrix(FloatMatrix2D A) {
+        if (A.rows() != n) {
+            throw new IllegalArgumentException("A.rows() != n");
+        }
+        LU = new SparseRCFloatMatrix2D(n, n);
         LU.assign(A);
-
+        if (!LU.hasColumnIndexesSorted()) {
+            LU.sortColumnIndexes();
+        }
         factor();
     }
 
     private void factor() {
-        int n = LU.rows();
 
         // Internal CRS matrix storage
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        float[] data = LU.getValues().elements();
+        float[] data = LU.getValues();
 
         // Find the indexes to the diagonal entries
-        diagind = findDiagonalindexes(n, colind, rowptr);
+        diagind = findDiagonalIndexes(n, colind, rowptr);
 
         // Go down along the main diagonal
         for (int k = 1; k < n; ++k)
@@ -124,7 +128,7 @@ public class FloatILU implements FloatPreconditioner {
 
     }
 
-    private int[] findDiagonalindexes(int m, int[] colind, int[] rowptr) {
+    private int[] findDiagonalIndexes(int m, int[] colind, int[] rowptr) {
         int[] diagind = new int[m];
 
         for (int k = 0; k < m; ++k) {
@@ -140,9 +144,9 @@ public class FloatILU implements FloatPreconditioner {
     private FloatMatrix1D lowerUnitSolve(FloatMatrix1D b, FloatMatrix1D x) {
         float[] bd = ((DenseFloatMatrix1D) b).elements();
         float[] xd = ((DenseFloatMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        float[] data = LU.getValues().elements();
+        float[] data = LU.getValues();
         int rows = LU.rows();
         for (int i = 0; i < rows; ++i) {
 
@@ -160,9 +164,9 @@ public class FloatILU implements FloatPreconditioner {
     private FloatMatrix1D loverUnitTransSolve(FloatMatrix1D b, FloatMatrix1D x) {
         x.assign(b);
         float[] xd = ((DenseFloatMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        float[] data = LU.getValues().elements();
+        float[] data = LU.getValues();
         int rows = LU.rows();
 
         for (int i = rows - 1; i >= 0; --i)
@@ -178,9 +182,9 @@ public class FloatILU implements FloatPreconditioner {
     private FloatMatrix1D upperSolve(FloatMatrix1D b, FloatMatrix1D x) {
         float[] bd = ((DenseFloatMatrix1D) b).elements();
         float[] xd = ((DenseFloatMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        float[] data = LU.getValues().elements();
+        float[] data = LU.getValues();
         int rows = LU.rows();
         for (int i = rows - 1; i >= 0; --i) {
 
@@ -198,9 +202,9 @@ public class FloatILU implements FloatPreconditioner {
     private FloatMatrix1D upperTransSolve(FloatMatrix1D b, FloatMatrix1D x) {
         x.assign(b);
         float[] xd = ((DenseFloatMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        float[] data = LU.getValues().elements();
+        float[] data = LU.getValues();
         int rows = LU.rows();
 
         for (int i = 0; i < rows; ++i) {

@@ -55,7 +55,7 @@ public class Timer {
         if (baseTime != 0) { // we are started
             elapsed += System.nanoTime() - baseTime;
         }
-        return (double) elapsed / 1000000.0;
+        return elapsed / 1000000.0;
     }
 
     /**
@@ -122,7 +122,7 @@ public class Timer {
      * Returns the elapsed time in seconds; does not stop the timer, if started.
      */
     public double seconds() {
-        return ((double) nanos()) / 1000000000.0;
+        return (nanos()) / 1000000000.0;
     }
 
     /**
@@ -189,6 +189,7 @@ public class Timer {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return "Time=" + String.format("%.4f", this.elapsedTime()) + " secs";
 

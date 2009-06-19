@@ -19,6 +19,11 @@ import cern.colt.list.tint.IntArrayList;
  * @version 1.0, 09/24/99
  */
 public class IntBuffer extends cern.colt.PersistentObject implements IntBufferConsumer {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected IntBufferConsumer target;
 
     protected int[] elements;

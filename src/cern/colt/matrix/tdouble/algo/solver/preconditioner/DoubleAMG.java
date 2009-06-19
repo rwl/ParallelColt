@@ -31,13 +31,13 @@ import java.util.Set;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick;
-import cern.colt.matrix.tdouble.impl.CCDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.CCMDoubleMatrix2D;
+import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecompositionQuick;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.RCDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.RCMDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseCCMDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseRCMDoubleMatrix2D;
 
 /**
  * Algebraic multigrid preconditioner. Uses the smoothed aggregation method
@@ -58,12 +58,12 @@ public class DoubleAMG implements DoublePreconditioner {
     /**
      * System matrix at each level, except at the coarsest
      */
-    private RCDoubleMatrix2D[] A;
+    private SparseRCDoubleMatrix2D[] A;
 
     /**
      * LU factorization at the coarsest level
      */
-    private DoubleLUDecompositionQuick lu;
+    private DenseDoubleLUDecompositionQuick lu;
 
     /**
      * Solution, right-hand side, and residual vectors at each level
@@ -73,7 +73,7 @@ public class DoubleAMG implements DoublePreconditioner {
     /**
      * Interpolation operators going to a finer mesh
      */
-    private CCDoubleMatrix2D[] I;
+    private SparseCCDoubleMatrix2D[] I;
 
     /**
      * Smallest matrix size before terminating the AMG setup phase. Matrices
@@ -141,7 +141,8 @@ public class DoubleAMG implements DoublePreconditioner {
      *            zero, the method reduces to the standard aggregate multigrid
      *            method
      */
-    public DoubleAMG(double omegaPreF, double omegaPreR, double omegaPostF, double omegaPostR, int nu1, int nu2, int gamma, int min, double omega) {
+    public DoubleAMG(double omegaPreF, double omegaPreR, double omegaPostF, double omegaPostR, int nu1, int nu2,
+            int gamma, int min, double omega) {
         this.omegaPreF = omegaPreF;
         this.omegaPreR = omegaPreR;
         this.omegaPostF = omegaPostF;
@@ -207,7 +208,7 @@ public class DoubleAMG implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -221,7 +222,7 @@ public class DoubleAMG implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -235,14 +236,17 @@ public class DoubleAMG implements DoublePreconditioner {
     }
 
     public void setMatrix(DoubleMatrix2D A) {
-        List<RCDoubleMatrix2D> Al = new LinkedList<RCDoubleMatrix2D>();
-        List<CCDoubleMatrix2D> Il = new LinkedList<CCDoubleMatrix2D>();
-
-        Al.add((RCDoubleMatrix2D) (new RCDoubleMatrix2D(A.rows(), A.columns()).assign(A)));
+        List<SparseRCDoubleMatrix2D> Al = new LinkedList<SparseRCDoubleMatrix2D>();
+        List<SparseCCDoubleMatrix2D> Il = new LinkedList<SparseCCDoubleMatrix2D>();
+        SparseRCDoubleMatrix2D Arc = new SparseRCDoubleMatrix2D(A.rows(), A.columns());
+        Arc.assign(A);
+        if (!Arc.hasColumnIndexesSorted())
+            Arc.sortColumnIndexes();
+        Al.add(Arc);
 
         for (int k = 0; Al.get(k).rows() > min; ++k) {
 
-            RCDoubleMatrix2D Af = Al.get(k);
+            SparseRCDoubleMatrix2D Af = Al.get(k);
 
             double eps = 0.08 * Math.pow(0.5, k);
 
@@ -267,8 +271,8 @@ public class DoubleAMG implements DoublePreconditioner {
         if (m == 0)
             throw new RuntimeException("Matrix too small for AMG");
 
-        I = new CCDoubleMatrix2D[m - 1];
-        this.A = new RCDoubleMatrix2D[m - 1];
+        I = new SparseCCDoubleMatrix2D[m - 1];
+        this.A = new SparseRCDoubleMatrix2D[m - 1];
 
         Il.toArray(I);
         for (int i = 0; i < Al.size() - 1; ++i)
@@ -276,7 +280,7 @@ public class DoubleAMG implements DoublePreconditioner {
 
         // Create a LU decomposition of the smallest Galerkin matrix
         DenseDoubleMatrix2D Ac = new DenseDoubleMatrix2D(Al.get(Al.size() - 1).toArray());
-        lu = new DoubleLUDecompositionQuick();
+        lu = new DenseDoubleLUDecompositionQuick();
         lu.decompose(Ac);
 
         // Allocate vectors at each level
@@ -294,7 +298,7 @@ public class DoubleAMG implements DoublePreconditioner {
         preM = new SSOR[m - 1];
         postM = new SSOR[m - 1];
         for (int k = 0; k < m - 1; ++k) {
-            RCDoubleMatrix2D Ak = this.A[k];
+            SparseRCDoubleMatrix2D Ak = this.A[k];
             preM[k] = new SSOR(Ak, reverse, omegaPreF, omegaPreR);
             postM[k] = new SSOR(Ak, reverse, omegaPostF, omegaPostR);
             preM[k].setMatrix(Ak);
@@ -408,7 +412,7 @@ public class DoubleAMG implements DoublePreconditioner {
          *            Tolerance for selecting the strongly coupled node
          *            neighborhoods. Between zero and one.
          */
-        public Aggregator(RCDoubleMatrix2D A, double eps) {
+        public Aggregator(SparseRCDoubleMatrix2D A, double eps) {
 
             diagind = findDiagonalindexes(A);
             N = findNodeNeighborhood(A, diagind, eps);
@@ -467,9 +471,9 @@ public class DoubleAMG implements DoublePreconditioner {
         /**
          * Finds the diagonal indexes of the matrix
          */
-        private int[] findDiagonalindexes(RCDoubleMatrix2D A) {
+        private int[] findDiagonalindexes(SparseRCDoubleMatrix2D A) {
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
+            int[] colind = A.getColumnIndexes();
 
             int[] diagind = new int[A.rows()];
 
@@ -485,13 +489,13 @@ public class DoubleAMG implements DoublePreconditioner {
         /**
          * Finds the strongly coupled node neighborhoods
          */
-        private List<Set<Integer>> findNodeNeighborhood(RCDoubleMatrix2D A, int[] diagind, double eps) {
+        private List<Set<Integer>> findNodeNeighborhood(SparseRCDoubleMatrix2D A, int[] diagind, double eps) {
 
             N = new ArrayList<Set<Integer>>(A.rows());
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            double[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            double[] data = A.getValues();
 
             for (int i = 0; i < A.rows(); ++i) {
                 Set<Integer> Ni = new HashSet<Integer>();
@@ -514,12 +518,12 @@ public class DoubleAMG implements DoublePreconditioner {
         /**
          * Creates the initial R-set by including only the connected nodes
          */
-        private boolean[] createInitialR(RCDoubleMatrix2D A) {
+        private boolean[] createInitialR(SparseRCDoubleMatrix2D A) {
             boolean[] R = new boolean[A.rows()];
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            double[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            double[] data = A.getValues();
 
             for (int i = 0; i < A.rows(); ++i) {
                 boolean hasOffDiagonal = false;
@@ -652,12 +656,12 @@ public class DoubleAMG implements DoublePreconditioner {
         /**
          * The Galerkin coarse-space operator
          */
-        private RCDoubleMatrix2D Ac;
+        private SparseRCDoubleMatrix2D Ac;
 
         /**
          * The interpolation (prolongation) matrix
          */
-        private CCDoubleMatrix2D I;
+        private SparseCCDoubleMatrix2D I;
 
         /**
          * Creates the interpolation (prolongation) and Galerkin operators
@@ -671,7 +675,7 @@ public class DoubleAMG implements DoublePreconditioner {
          *            smoothing is performed, and a faster algorithm for forming
          *            the Galerkin operator will be used.
          */
-        public Interpolator(Aggregator aggregator, RCDoubleMatrix2D A, double omega) {
+        public Interpolator(Aggregator aggregator, SparseRCDoubleMatrix2D A, double omega) {
             List<Set<Integer>> C = aggregator.getAggregates();
             List<Set<Integer>> N = aggregator.getNodeNeighborhoods();
             int[] diagind = aggregator.getDiagonalindexes();
@@ -730,14 +734,14 @@ public class DoubleAMG implements DoublePreconditioner {
          * Creates the Galerkin operator using the assumption of disjoint
          * (non-smoothed) aggregates
          */
-        private RCDoubleMatrix2D createGalerkinFast(RCDoubleMatrix2D A, int[] pt, int c) {
+        private SparseRCDoubleMatrix2D createGalerkinFast(SparseRCDoubleMatrix2D A, int[] pt, int c) {
             int n = pt.length;
 
-            RCMDoubleMatrix2D Ac = new RCMDoubleMatrix2D(c, c);
+            SparseRCMDoubleMatrix2D Ac = new SparseRCMDoubleMatrix2D(c, c);
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            double[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            double[] data = A.getValues();
 
             for (int i = 0; i < n; ++i)
                 if (pt[i] != -1)
@@ -745,14 +749,14 @@ public class DoubleAMG implements DoublePreconditioner {
                         if (pt[colind[j]] != -1)
                             Ac.setQuick(pt[i], pt[colind[j]], data[j]);
 
-            return (RCDoubleMatrix2D) (new RCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (SparseRCDoubleMatrix2D) (new SparseRCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
          * Creates the interpolation (prolongation) matrix based on the smoothed
          * aggregates
          */
-        private CCDoubleMatrix2D createInterpolationMatrix(List<Map<Integer, Double>> P, int n) {
+        private SparseCCDoubleMatrix2D createInterpolationMatrix(List<Map<Integer, Double>> P, int n) {
 
             // Determine the sparsity pattern of I
             int c = P.size();
@@ -767,7 +771,7 @@ public class DoubleAMG implements DoublePreconditioner {
             //                    nz[j][l++] = k;
             //            }
 
-            I = new CCDoubleMatrix2D(n, c);
+            I = new SparseCCDoubleMatrix2D(n, c);
 
             // Populate it with numerical entries
             for (int j = 0; j < c; ++j) {
@@ -785,20 +789,20 @@ public class DoubleAMG implements DoublePreconditioner {
          * Creates the interpolation (prolongation) matrix based on the
          * non-smoothed aggregates
          */
-        private CCDoubleMatrix2D createInterpolationMatrix(int[] pt, int c) {
-            CCMDoubleMatrix2D If = new CCMDoubleMatrix2D(pt.length, c);
+        private SparseCCDoubleMatrix2D createInterpolationMatrix(int[] pt, int c) {
+            SparseCCMDoubleMatrix2D If = new SparseCCMDoubleMatrix2D(pt.length, c);
 
             for (int i = 0; i < pt.length; ++i)
                 if (pt[i] != -1)
                     If.setQuick(i, pt[i], 1);
 
-            return (CCDoubleMatrix2D) (new CCDoubleMatrix2D(If.rows(), If.columns()).assign(If));
+            return (SparseCCDoubleMatrix2D) (new SparseCCDoubleMatrix2D(If.rows(), If.columns()).assign(If));
         }
 
         /**
          * Gets the interpolation (prolongation) operator
          */
-        public CCDoubleMatrix2D getInterpolationOperator() {
+        public SparseCCDoubleMatrix2D getInterpolationOperator() {
             return I;
         }
 
@@ -806,7 +810,8 @@ public class DoubleAMG implements DoublePreconditioner {
          * Creates the smoothes interpolation (prolongation) operator by a
          * single sweep of the damped Jacobi method
          */
-        private List<Map<Integer, Double>> createSmoothedProlongation(List<Set<Integer>> C, List<Set<Integer>> N, RCDoubleMatrix2D A, int[] diagind, double omega, int[] pt) {
+        private List<Map<Integer, Double>> createSmoothedProlongation(List<Set<Integer>> C, List<Set<Integer>> N,
+                SparseRCDoubleMatrix2D A, int[] diagind, double omega, int[] pt) {
 
             int n = A.rows(), c = C.size();
 
@@ -817,8 +822,8 @@ public class DoubleAMG implements DoublePreconditioner {
                 P.add(new HashMap<Integer, Double>());
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            double[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            double[] data = A.getValues();
 
             double[] dot = new double[c];
 
@@ -876,9 +881,9 @@ public class DoubleAMG implements DoublePreconditioner {
          * <code>Ac = I<sup>T</sup> A I</code>. This is a very time-consuming
          * operation
          */
-        private RCDoubleMatrix2D createGalerkinSlow(CCDoubleMatrix2D I, RCDoubleMatrix2D A) {
+        private SparseRCDoubleMatrix2D createGalerkinSlow(SparseCCDoubleMatrix2D I, SparseRCDoubleMatrix2D A) {
             int n = I.rows(), c = I.columns();
-            RCMDoubleMatrix2D Ac = new RCMDoubleMatrix2D(c, c);
+            SparseRCMDoubleMatrix2D Ac = new SparseRCMDoubleMatrix2D(c, c);
 
             double[] aiCol = new double[n];
             double[] iCol = new double[n];
@@ -888,8 +893,8 @@ public class DoubleAMG implements DoublePreconditioner {
             DenseDoubleMatrix1D itaiV = new DenseDoubleMatrix1D(c, itaiCol, 0, 1, false);
 
             int[] colptr = I.getColumnPointers();
-            int[] rowind = I.getRowindexes().elements();
-            double[] Idata = I.getValues().elements();
+            int[] rowind = I.getRowIndexes();
+            double[] Idata = I.getValues();
 
             for (int k = 0; k < c; ++k) {
 
@@ -910,13 +915,13 @@ public class DoubleAMG implements DoublePreconditioner {
                         Ac.setQuick(i, k, itaiCol[i]);
             }
 
-            return (RCDoubleMatrix2D) (new RCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (SparseRCDoubleMatrix2D) (new SparseRCDoubleMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
          * Gets the Galerkin operator
          */
-        public RCDoubleMatrix2D getGalerkinOperator() {
+        public SparseRCDoubleMatrix2D getGalerkinOperator() {
             return Ac;
         }
 
@@ -937,7 +942,7 @@ public class DoubleAMG implements DoublePreconditioner {
         /**
          * Holds a copy of the matrix A in the compressed row format
          */
-        private final RCDoubleMatrix2D F;
+        private final SparseRCDoubleMatrix2D F;
 
         /**
          * indexes to the diagonal entries of the matrix
@@ -972,7 +977,7 @@ public class DoubleAMG implements DoublePreconditioner {
          *            Overrelaxation parameter for the backwards sweep. Between
          *            0 and 2.
          */
-        public SSOR(RCDoubleMatrix2D F, boolean reverse, double omegaF, double omegaR) {
+        public SSOR(SparseRCDoubleMatrix2D F, boolean reverse, double omegaF, double omegaR) {
             if (F.rows() != F.columns())
                 throw new IllegalArgumentException("SSOR only applies to square matrices");
 
@@ -993,7 +998,7 @@ public class DoubleAMG implements DoublePreconditioner {
          *            Matrix to use internally. It will not be modified, thus
          *            the system matrix may be passed
          */
-        public SSOR(RCDoubleMatrix2D F) {
+        public SSOR(SparseRCDoubleMatrix2D F) {
             this(F, true, 1, 1);
         }
 
@@ -1023,7 +1028,7 @@ public class DoubleAMG implements DoublePreconditioner {
             int n = F.rows();
 
             int[] rowptr = F.getRowPointers();
-            int[] colind = F.getColumnindexes().elements();
+            int[] colind = F.getColumnIndexes();
 
             // Find the indexes to the diagonal entries
             for (int k = 0; k < n; ++k) {
@@ -1038,8 +1043,8 @@ public class DoubleAMG implements DoublePreconditioner {
                 throw new IllegalArgumentException("b and x must be a DenseDoubleMatrix1D");
 
             int[] rowptr = F.getRowPointers();
-            int[] colind = F.getColumnindexes().elements();
-            double[] data = F.getValues().elements();
+            int[] colind = F.getColumnIndexes();
+            double[] data = F.getValues();
 
             double[] bd = ((DenseDoubleMatrix1D) b).elements();
             double[] xd = ((DenseDoubleMatrix1D) x).elements();

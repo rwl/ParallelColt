@@ -35,10 +35,9 @@ import cern.colt.matrix.tdcomplex.impl.SparseDComplexMatrix1D;
  * </table>
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 12/10/2007
  */
 public class DComplexFactory1D extends cern.colt.PersistentObject {
-    private static final long serialVersionUID = 438423343000681857L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * A factory producing dense matrices.
@@ -63,9 +62,9 @@ public class DComplexFactory1D extends cern.colt.PersistentObject {
      */
     public DComplexMatrix1D append(DComplexMatrix1D A, DComplexMatrix1D B) {
         // concatenate
-        DComplexMatrix1D matrix = make(A.size() + B.size());
-        matrix.viewPart(0, A.size()).assign(A);
-        matrix.viewPart(A.size(), B.size()).assign(B);
+        DComplexMatrix1D matrix = make((int) (A.size() + B.size()));
+        matrix.viewPart(0, (int) A.size()).assign(A);
+        matrix.viewPart((int) A.size(), (int) B.size()).assign(B);
         return matrix;
     }
 
@@ -99,7 +98,7 @@ public class DComplexFactory1D extends cern.colt.PersistentObject {
         DComplexMatrix1D vector = make(size);
         size = 0;
         for (int i = 0; i < parts.length; i++) {
-            vector.viewPart(size, parts[i].size()).assign(parts[i]);
+            vector.viewPart(size, (int) parts[i].size()).assign(parts[i]);
             size += parts[i].size();
         }
 
@@ -139,7 +138,7 @@ public class DComplexFactory1D extends cern.colt.PersistentObject {
         int size = values.size();
         DComplexMatrix1D vector = make(size);
         for (int i = 0; i < size; i++)
-            vector.set(i, values.get(i));
+            vector.setQuick(i, values.get(i));
         return vector;
     }
 
@@ -156,7 +155,7 @@ public class DComplexFactory1D extends cern.colt.PersistentObject {
      * <tt>repeat</tt> times.
      */
     public DComplexMatrix1D repeat(DComplexMatrix1D A, int repeat) {
-        int size = A.size();
+        int size = (int) A.size();
         DComplexMatrix1D matrix = make(repeat * size);
         for (int i = 0; i < repeat; i++) {
             matrix.viewPart(size * i, size).assign(A);
@@ -190,10 +189,11 @@ public class DComplexFactory1D extends cern.colt.PersistentObject {
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(
+                n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         for (int i = 0; i < size; i++) {
             if (sampler.sampleNextElement()) {
-                matrix.set(i, value);
+                matrix.setQuick(i, value);
             }
         }
 
@@ -210,10 +210,10 @@ public class DComplexFactory1D extends cern.colt.PersistentObject {
      * @return a new list.
      */
     public ArrayList<double[]> toList(DComplexMatrix1D values) {
-        int size = values.size();
+        int size = (int) values.size();
         ArrayList<double[]> list = new ArrayList<double[]>(size);
         for (int i = 0; i < size; i++)
-            list.set(i, values.get(i));
+            list.set(i, values.getQuick(i));
         return list;
     }
 }

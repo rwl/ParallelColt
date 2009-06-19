@@ -9,6 +9,7 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tobject.algo;
 
 import cern.colt.function.tint.IntComparator;
+import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 import cern.colt.matrix.tobject.ObjectMatrix3D;
@@ -44,6 +45,11 @@ import cern.colt.matrix.tobject.ObjectMatrix3D;
  */
 public class ObjectSorting extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A prefabricated quicksort.
      */
     public static final ObjectSorting quickSort = new ObjectSorting(); // already has
@@ -55,12 +61,19 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      * A prefabricated mergesort.
      */
     public static final ObjectSorting mergeSort = new ObjectSorting() { // override
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
         // quicksort with
         // mergesort
+        @Override
         protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
             cern.colt.Sorting.mergeSort(a, fromIndex, toIndex, c);
         }
 
+        @Override
         protected void runSort(int fromIndex, int toIndex, IntComparator c, cern.colt.Swapper swapper) {
             cern.colt.GenericSorting.mergeSort(fromIndex, toIndex, c, swapper);
         }
@@ -108,7 +121,7 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      *         matrix is left unaffected.</b>
      */
     public ObjectMatrix1D sort(final ObjectMatrix1D vector) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -157,7 +170,7 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      *         vector (matrix) is left unaffected.</b>
      */
     public ObjectMatrix1D sort(final ObjectMatrix1D vector, final java.util.Comparator c) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -223,7 +236,7 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      */
     public ObjectMatrix2D sort(ObjectMatrix2D matrix, int column) {
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + ObjectFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] rowIndexes = new int[matrix.rows()]; // row indexes to reorder
         // instead of matrix itself
@@ -338,9 +351,9 @@ public class ObjectSorting extends cern.colt.PersistentObject {
      */
     public ObjectMatrix3D sort(ObjectMatrix3D matrix, int row, int column) {
         if (row < 0 || row >= matrix.rows())
-            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + ObjectFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + AbstractFormatter.shape(matrix));
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + ObjectFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] sliceIndexes = new int[matrix.slices()]; // indexes to reorder
         // instead of matrix

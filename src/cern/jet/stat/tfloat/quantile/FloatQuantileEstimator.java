@@ -19,6 +19,11 @@ import cern.jet.stat.Utils;
 // abstract class ApproximateFloatQuantileFinder extends Object implements
 // FloatQuantileFinder {
 abstract class FloatQuantileEstimator extends cern.colt.PersistentObject implements FloatQuantileFinder {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected FloatBufferSet bufferSet;
 
     protected FloatBuffer currentBufferToFill;
@@ -143,6 +148,7 @@ abstract class FloatQuantileEstimator extends cern.colt.PersistentObject impleme
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         FloatQuantileEstimator copy = (FloatQuantileEstimator) super.clone();
         if (this.bufferSet != null) {
@@ -295,12 +301,14 @@ abstract class FloatQuantileEstimator extends cern.colt.PersistentObject impleme
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         String s = this.getClass().getName();
         s = s.substring(s.lastIndexOf('.') + 1);
         int b = bufferSet.b();
         int k = bufferSet.k();
-        return s + "(mem=" + memory() + ", b=" + b + ", k=" + k + ", size=" + size() + ", totalSize=" + this.bufferSet.totalSize() + ")";
+        return s + "(mem=" + memory() + ", b=" + b + ", k=" + k + ", size=" + size() + ", totalSize="
+                + this.bufferSet.totalSize() + ")";
     }
 
     /**

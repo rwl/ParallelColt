@@ -18,5 +18,6 @@ public interface Float9Function {
      * 
      * @return the result of the function.
      */
-    abstract public float apply(float a00, float a01, float a02, float a10, float a11, float a12, float a20, float a21, float a22);
+    abstract public float apply(float a00, float a01, float a02, float a10, float a11, float a12, float a20, float a21,
+            float a22);
 }

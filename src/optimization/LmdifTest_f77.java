@@ -319,14 +319,18 @@ public class LmdifTest_f77 extends Object implements Lmdif_fcn {
 
                 fnm[ic] = fnorm2;
 
-                System.out.print("\n Initial L2 norm of the residuals: " + fnorm1 + "\n Final L2 norm of the residuals: " + fnorm2 + "\n Number of function evaluations: " + nf[ic] + "\n Number of Jacobian evaluations: " + nj[ic] + "\n Info value: " + info[1] + "\n Final approximate solution: \n\n");
+                System.out.print("\n Initial L2 norm of the residuals: " + fnorm1
+                        + "\n Final L2 norm of the residuals: " + fnorm2 + "\n Number of function evaluations: "
+                        + nf[ic] + "\n Number of Jacobian evaluations: " + nj[ic] + "\n Info value: " + info[1]
+                        + "\n Final approximate solution: \n\n");
 
                 num5 = n / 5;
 
                 for (i = 1; i <= num5; i++) {
 
                     ilow = (i - 1) * 5;
-                    System.out.print(x[ilow + 1] + "  " + x[ilow + 2] + "  " + x[ilow + 3] + "  " + x[ilow + 4] + "  " + x[ilow + 5] + "\n");
+                    System.out.print(x[ilow + 1] + "  " + x[ilow + 2] + "  " + x[ilow + 3] + "  " + x[ilow + 4] + "  "
+                            + x[ilow + 5] + "\n");
 
                 }
 
@@ -355,7 +359,8 @@ public class LmdifTest_f77 extends Object implements Lmdif_fcn {
 
                 case 4:
 
-                    System.out.print(x[ilow + 1] + "  " + x[ilow + 2] + "  " + x[ilow + 3] + "  " + x[ilow + 4] + "\n\n");
+                    System.out.print(x[ilow + 1] + "  " + x[ilow + 2] + "  " + x[ilow + 3] + "  " + x[ilow + 4]
+                            + "\n\n");
 
                     break;
 
@@ -387,7 +392,8 @@ public class LmdifTest_f77 extends Object implements Lmdif_fcn {
 
         for (i = 1; i <= ic; i++) {
 
-            System.out.print(np[i] + "  " + na[i] + "  " + ma[i] + "  " + nf[i] + "  " + nj[i] + "  " + nx[i] + "  " + fnm[i] + "\n");
+            System.out.print(np[i] + "  " + na[i] + "  " + ma[i] + "  " + nf[i] + "  " + nj[i] + "  " + nx[i] + "  "
+                    + fnm[i] + "\n");
 
             //         write (nwrite,100) np[i],na[i],ma[i],nf[i],nj[i],nx[i],fnm[i]
             //  100 format (3i5, 3i6, 1x, d15.7)
@@ -500,20 +506,29 @@ public class LmdifTest_f77 extends Object implements Lmdif_fcn {
         c29 = 29.0;
         c45 = 45.0;
 
-        double v[] = { -9999.0, 4.0e0, 2.0e0, 1.0e0, 5.0e-1, 2.5e-1, 1.67e-1, 1.25e-1, 1.0e-1, 8.33e-2, 7.14e-2, 6.25e-2 };
+        double v[] = { -9999.0, 4.0e0, 2.0e0, 1.0e0, 5.0e-1, 2.5e-1, 1.67e-1, 1.25e-1, 1.0e-1, 8.33e-2, 7.14e-2,
+                6.25e-2 };
 
-        double y1[] = { -9999.0, 1.4e-1, 1.8e-1, 2.2e-1, 2.5e-1, 2.9e-1, 3.2e-1, 3.5e-1, 3.9e-1, 3.7e-1, 5.8e-1, 7.3e-1, 9.6e-1, 1.34e0, 2.1e0, 4.39e0 };
+        double y1[] = { -9999.0, 1.4e-1, 1.8e-1, 2.2e-1, 2.5e-1, 2.9e-1, 3.2e-1, 3.5e-1, 3.9e-1, 3.7e-1, 5.8e-1,
+                7.3e-1, 9.6e-1, 1.34e0, 2.1e0, 4.39e0 };
 
-        double y2[] = { -9999.0, 1.957e-1, 1.947e-1, 1.735e-1, 1.6e-1, 8.44e-2, 6.27e-2, 4.56e-2, 3.42e-2, 3.23e-2, 2.35e-2, 2.46e-2 };
+        double y2[] = { -9999.0, 1.957e-1, 1.947e-1, 1.735e-1, 1.6e-1, 8.44e-2, 6.27e-2, 4.56e-2, 3.42e-2, 3.23e-2,
+                2.35e-2, 2.46e-2 };
 
-        double y3[] = { -9999.0, 3.478e4, 2.861e4, 2.365e4, 1.963e4, 1.637e4, 1.372e4, 1.154e4, 9.744e3, 8.261e3, 7.03e3, 6.005e3, 5.147e3, 4.427e3, 3.82e3, 3.307e3, 2.872e3 };
+        double y3[] = { -9999.0, 3.478e4, 2.861e4, 2.365e4, 1.963e4, 1.637e4, 1.372e4, 1.154e4, 9.744e3, 8.261e3,
+                7.03e3, 6.005e3, 5.147e3, 4.427e3, 3.82e3, 3.307e3, 2.872e3 };
 
-        double y4[] = { -9999.0, 8.44e-1, 9.08e-1, 9.32e-1, 9.36e-1, 9.25e-1, 9.08e-1, 8.81e-1, 8.5e-1, 8.18e-1, 7.84e-1, 7.51e-1, 7.18e-1, 6.85e-1, 6.58e-1, 6.28e-1, 6.03e-1, 5.8e-1, 5.58e-1, 5.38e-1, 5.22e-1, 5.06e-1, 4.9e-1, 4.78e-1, 4.67e-1, 4.57e-1, 4.48e-1, 4.38e-1, 4.31e-1, 4.24e-1, 4.2e-1,
-                4.14e-1, 4.11e-1, 4.06e-1 };
+        double y4[] = { -9999.0, 8.44e-1, 9.08e-1, 9.32e-1, 9.36e-1, 9.25e-1, 9.08e-1, 8.81e-1, 8.5e-1, 8.18e-1,
+                7.84e-1, 7.51e-1, 7.18e-1, 6.85e-1, 6.58e-1, 6.28e-1, 6.03e-1, 5.8e-1, 5.58e-1, 5.38e-1, 5.22e-1,
+                5.06e-1, 4.9e-1, 4.78e-1, 4.67e-1, 4.57e-1, 4.48e-1, 4.38e-1, 4.31e-1, 4.24e-1, 4.2e-1, 4.14e-1,
+                4.11e-1, 4.06e-1 };
 
-        double y5[] = { -9999.0, 1.366e0, 1.191e0, 1.112e0, 1.013e0, 9.91e-1, 8.85e-1, 8.31e-1, 8.47e-1, 7.86e-1, 7.25e-1, 7.46e-1, 6.79e-1, 6.08e-1, 6.55e-1, 6.16e-1, 6.06e-1, 6.02e-1, 6.26e-1, 6.51e-1, 7.24e-1, 6.49e-1, 6.49e-1, 6.94e-1, 6.44e-1, 6.24e-1, 6.61e-1, 6.12e-1, 5.58e-1, 5.33e-1,
-                4.95e-1, 5.0e-1, 4.23e-1, 3.95e-1, 3.75e-1, 3.72e-1, 3.91e-1, 3.96e-1, 4.05e-1, 4.28e-1, 4.29e-1, 5.23e-1, 5.62e-1, 6.07e-1, 6.53e-1, 6.72e-1, 7.08e-1, 6.33e-1, 6.68e-1, 6.45e-1, 6.32e-1, 5.91e-1, 5.59e-1, 5.97e-1, 6.25e-1, 7.39e-1, 7.1e-1, 7.29e-1, 7.2e-1, 6.36e-1, 5.81e-1,
-                4.28e-1, 2.92e-1, 1.62e-1, 9.8e-2, 5.4e-2 };
+        double y5[] = { -9999.0, 1.366e0, 1.191e0, 1.112e0, 1.013e0, 9.91e-1, 8.85e-1, 8.31e-1, 8.47e-1, 7.86e-1,
+                7.25e-1, 7.46e-1, 6.79e-1, 6.08e-1, 6.55e-1, 6.16e-1, 6.06e-1, 6.02e-1, 6.26e-1, 6.51e-1, 7.24e-1,
+                6.49e-1, 6.49e-1, 6.94e-1, 6.44e-1, 6.24e-1, 6.61e-1, 6.12e-1, 5.58e-1, 5.33e-1, 4.95e-1, 5.0e-1,
+                4.23e-1, 3.95e-1, 3.75e-1, 3.72e-1, 3.91e-1, 3.96e-1, 4.05e-1, 4.28e-1, 4.29e-1, 5.23e-1, 5.62e-1,
+                6.07e-1, 6.53e-1, 6.72e-1, 7.08e-1, 6.33e-1, 6.68e-1, 6.45e-1, 6.32e-1, 5.91e-1, 5.59e-1, 5.97e-1,
+                6.25e-1, 7.39e-1, 7.1e-1, 7.29e-1, 7.2e-1, 6.36e-1, 5.81e-1, 4.28e-1, 2.92e-1, 1.62e-1, 9.8e-2, 5.4e-2 };
 
         // Function routine selector.
 

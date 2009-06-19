@@ -91,6 +91,10 @@ import cern.colt.matrix.tfloat.FloatMatrix3D;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class SparseFloatMatrix3D extends FloatMatrix3D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /*
      * The elements of the matrix.
      */
@@ -117,7 +121,8 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
      *             .
      */
     public SparseFloatMatrix3D(float[][][] values) {
-        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
+        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0
+                : values[0].length == 0 ? 0 : values[0][0].length));
         assign(values);
     }
 
@@ -169,7 +174,8 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    public SparseFloatMatrix3D(int slices, int rows, int columns, int initialCapacity, float minLoadFactor, float maxLoadFactor) {
+    public SparseFloatMatrix3D(int slices, int rows, int columns, int initialCapacity, float minLoadFactor,
+            float maxLoadFactor) {
         try {
             setUp(slices, rows, columns);
         } catch (IllegalArgumentException exc) { // we can hold slices*rows*columns>Integer.MAX_VALUE cells !
@@ -210,7 +216,8 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected SparseFloatMatrix3D(int slices, int rows, int columns, AbstractLongFloatMap elements, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
+    protected SparseFloatMatrix3D(int slices, int rows, int columns, AbstractLongFloatMap elements, int sliceZero,
+            int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
         try {
             setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         } catch (IllegalArgumentException exc) { // we can hold slices*rows*columns>Integer.MAX_VALUE cells !
@@ -221,6 +228,7 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
         this.isNoView = false;
     }
 
+    @Override
     public FloatMatrix3D assign(float value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -230,6 +238,7 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
+    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -237,14 +246,17 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
             return super.cardinality();
     }
 
+    @Override
     public AbstractLongFloatMap elements() {
         return elements;
     }
 
+    @Override
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
 
+    @Override
     public float getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -252,9 +264,11 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
         // column:"+column);
         // return elements.get(index(slice,row,column));
         // manually inlined:
-        return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride);
+        return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
+                * columnStride);
     }
 
+    @Override
     public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
@@ -262,10 +276,17 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
+    @Override
     public FloatMatrix3D like(int slices, int rows, int columns) {
         return new SparseFloatMatrix3D(slices, rows, columns);
     }
 
+    @Override
+    public FloatMatrix2D like2D(int rows, int columns) {
+        return new SparseFloatMatrix2D(rows, columns);
+    }
+
+    @Override
     public synchronized void setQuick(int slice, int row, int column, float value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -280,12 +301,14 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
             this.elements.put(index, value);
     }
 
+    @Override
     public void trimToSize() {
         this.elements.trimToSize();
     }
 
+    @Override
     public FloatMatrix1D vectorize() {
-        FloatMatrix1D v = new SparseFloatMatrix1D(size());
+        FloatMatrix1D v = new SparseFloatMatrix1D((int) size());
         int length = rows * columns;
         for (int s = 0; s < slices; s++) {
             v.viewPart(s * length, length).assign(viewSlice(s).vectorize());
@@ -293,6 +316,7 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
         return v;
     }
 
+    @Override
     protected boolean haveSharedCellsRaw(FloatMatrix3D other) {
         if (other instanceof SelectedSparseFloatMatrix3D) {
             SelectedSparseFloatMatrix3D otherMatrix = (SelectedSparseFloatMatrix3D) other;
@@ -304,10 +328,12 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
         return false;
     }
 
+    @Override
     protected FloatMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new SparseFloatMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
 
+    @Override
     protected FloatMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFloatMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

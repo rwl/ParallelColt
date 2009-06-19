@@ -92,7 +92,8 @@ class TestQuantileFinder {
      * @param phis
      *            double[]
      */
-    public static double observedEpsilonAtPhi(double phi, ExactDoubleQuantileFinder exactFinder, DoubleQuantileFinder approxFinder) {
+    public static double observedEpsilonAtPhi(double phi, ExactDoubleQuantileFinder exactFinder,
+            DoubleQuantileFinder approxFinder) {
         int N = (int) exactFinder.size();
 
         int exactRank = (int) Utils.epsilonCeiling(phi * N) - 1;
@@ -132,14 +133,16 @@ class TestQuantileFinder {
      * @param phis
      *            double[]
      */
-    public static DoubleArrayList observedEpsilonsAtPhis(DoubleArrayList phis, ExactDoubleQuantileFinder exactFinder, DoubleQuantileFinder approxFinder, double desiredEpsilon) {
+    public static DoubleArrayList observedEpsilonsAtPhis(DoubleArrayList phis, ExactDoubleQuantileFinder exactFinder,
+            DoubleQuantileFinder approxFinder, double desiredEpsilon) {
         DoubleArrayList epsilons = new DoubleArrayList(phis.size());
 
         for (int i = phis.size(); --i >= 0;) {
             double epsilon = observedEpsilonAtPhi(phis.get(i), exactFinder, approxFinder);
             epsilons.add(epsilon);
             if (epsilon > desiredEpsilon)
-                System.out.println("Real epsilon = " + epsilon + " is larger than desired by " + (epsilon - desiredEpsilon));
+                System.out.println("Real epsilon = " + epsilon + " is larger than desired by "
+                        + (epsilon - desiredEpsilon));
         }
         return epsilons;
     }
@@ -238,7 +241,8 @@ class TestQuantileFinder {
                             else
                                 known_N = false;
 
-                            DoubleQuantileFinder finder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(known_N, N, epsilon, delta, p, null);
+                            DoubleQuantileFinder finder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(known_N,
+                                    N, epsilon, delta, p, null);
                             // System.out.println(finder.getClass().getName());
                             /*
                              * double[] returnSamplingRate = new double[1];
@@ -280,7 +284,8 @@ class TestQuantileFinder {
                             // System.out.print(")=("+b*k/1000.0+","+b+","+k+",
                             // "+b*k*8/1024.0/1024.0+",
                             // "+Math.round(b*k*8/1024.0/1024.0));
-                            System.out.print(")=(" + mem * 8.0 / 1024.0 / 1024.0 + ",  " + mem / 1000.0 + ",  " + Math.round(mem * 8.0 / 1024.0 / 1024.0));
+                            System.out.print(")=(" + mem * 8.0 / 1024.0 / 1024.0 + ",  " + mem / 1000.0 + ",  "
+                                    + Math.round(mem * 8.0 / 1024.0 / 1024.0));
                             // if (known_N)
                             // System.out.print(","+returnSamplingRate[0]);
                             System.out.println(")");
@@ -350,7 +355,8 @@ class TestQuantileFinder {
         Timer timer2 = new Timer();
         DoubleQuantileFinder approxFinder;
 
-        approxFinder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(false, max_N, epsilon, delta, quantiles, null);
+        approxFinder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(false, max_N, epsilon, delta, quantiles,
+                null);
         System.out.println(approxFinder);
         // new UnknownApproximateDoubleQuantileFinder(b,k);
         // approxFinder = new ApproximateDoubleQuantileFinder(b,k);
@@ -364,7 +370,8 @@ class TestQuantileFinder {
          * System.out.println("samplingRate="+returnSamplingRate[0]);
          */
 
-        DoubleQuantileFinder exactFinder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(false, -1, 0.0, delta, quantiles, null);
+        DoubleQuantileFinder exactFinder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(false, -1, 0.0, delta,
+                quantiles, null);
         System.out.println(exactFinder);
 
         DoubleArrayList list = new DoubleArrayList(size);
@@ -374,7 +381,7 @@ class TestQuantileFinder {
             int d = chunk * size;
             timer2.start();
             for (int i = 0; i < size; i++) {
-                list.add((double) (i + d));
+                list.add((i + d));
             }
             timer2.stop();
 
@@ -444,7 +451,8 @@ class TestQuantileFinder {
              * apply(double element) { buffer.add(element); } } );
              */
 
-            DoubleArrayList observedEpsilons = observedEpsilonsAtPhis(new DoubleArrayList(phis), (ExactDoubleQuantileFinder) exactFinder, approxFinder, epsilon);
+            DoubleArrayList observedEpsilons = observedEpsilonsAtPhis(new DoubleArrayList(phis),
+                    (ExactDoubleQuantileFinder) exactFinder, approxFinder, epsilon);
             System.out.println("observedEpsilons=" + observedEpsilons);
 
             double element = 1000.0f;
@@ -452,8 +460,10 @@ class TestQuantileFinder {
             System.out.println("exact phi(" + element + ")=" + exactFinder.phi(element));
             System.out.println("apprx phi(" + element + ")=" + approxFinder.phi(element));
 
-            System.out.println("exact elem(phi(" + element + "))=" + exactFinder.quantileElements(new DoubleArrayList(new double[] { exactFinder.phi(element) })));
-            System.out.println("apprx elem(phi(" + element + "))=" + approxFinder.quantileElements(new DoubleArrayList(new double[] { approxFinder.phi(element) })));
+            System.out.println("exact elem(phi(" + element + "))="
+                    + exactFinder.quantileElements(new DoubleArrayList(new double[] { exactFinder.phi(element) })));
+            System.out.println("apprx elem(phi(" + element + "))="
+                    + approxFinder.quantileElements(new DoubleArrayList(new double[] { approxFinder.phi(element) })));
         }
     }
 

@@ -52,6 +52,11 @@ import cern.colt.matrix.tobject.ObjectMatrix2D;
  */
 class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The elements of this matrix.
      */
     protected Object[] elements;
@@ -108,7 +113,8 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedDenseObjectMatrix2D(int rows, int columns, Object[] elements, int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedDenseObjectMatrix2D(int rows, int columns, Object[] elements, int rowZero, int columnZero,
+            int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -129,6 +135,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -142,10 +149,12 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
 
+    @Override
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -166,12 +175,14 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public Object getQuick(int row, int column) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
         // return elements[index(row,column)];
         // manually inlined:
-        return elements[offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]];
+        return elements[offset + rowOffsets[rowZero + row * rowStride]
+                + columnOffsets[columnZero + column * columnStride]];
     }
 
     /**
@@ -184,6 +195,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(ObjectMatrix2D other) {
         if (other instanceof SelectedDenseObjectMatrix2D) {
             SelectedDenseObjectMatrix2D otherMatrix = (SelectedDenseObjectMatrix2D) other;
@@ -204,6 +216,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
+    @Override
     public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
@@ -226,6 +239,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public ObjectMatrix2D like(int rows, int columns) {
         return new DenseObjectMatrix2D(rows, columns);
     }
@@ -242,6 +256,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public ObjectMatrix1D like1D(int size) {
         return new DenseObjectMatrix1D(size);
     }
@@ -263,6 +278,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     protected ObjectMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -287,6 +303,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int row, int column, Object value) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
@@ -305,6 +322,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>(Object)columns*rows > Integer.MAX_VALUE</tt>.
      */
+    @Override
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -315,6 +333,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
     /**
      * Self modifying version of viewDice().
      */
+    @Override
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -354,6 +373,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *             if <tt>column < 0 || column >= columns()</tt>.
      * @see #viewRow(int)
      */
+    @Override
     public ObjectMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -390,6 +410,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *             if <tt>row < 0 || row >= rows()</tt>.
      * @see #viewColumn(int)
      */
+    @Override
     public ObjectMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -409,6 +430,7 @@ class SelectedDenseObjectMatrix2D extends ObjectMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected ObjectMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseObjectMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }

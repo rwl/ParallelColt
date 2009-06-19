@@ -62,7 +62,8 @@ public class DoubleBiCGstab extends AbstractDoubleIterativeSolver {
         rtilde = template.copy();
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         checkSizes(A, b, x);
 
         double rho_1 = 1, rho_2 = 1, alpha = 1, beta = 1, omega = 1;
@@ -74,10 +75,12 @@ public class DoubleBiCGstab extends AbstractDoubleIterativeSolver {
             rho_1 = rtilde.zDotProduct(r);
 
             if (rho_1 == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "rho", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "rho", iter);
 
             if (omega == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "omega", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "omega", iter);
 
             if (iter.isFirst())
                 p.assign(r);

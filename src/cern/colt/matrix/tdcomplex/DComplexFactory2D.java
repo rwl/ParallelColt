@@ -83,10 +83,9 @@ import cern.colt.matrix.tdcomplex.impl.SparseDComplexMatrix2D;
  * </table>
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 12/10/2007
  */
 public class DComplexFactory2D extends cern.colt.PersistentObject {
-    private static final long serialVersionUID = 5196236412176785039L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * A factory producing dense matrices.
@@ -97,11 +96,6 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      * A factory producing sparse hash matrices.
      */
     public static final DComplexFactory2D sparse = new DComplexFactory2D();
-
-    /**
-     * A factory producing sparse row compressed matrices.
-     */
-    public static final DComplexFactory2D rowCompressed = new DComplexFactory2D();
 
     /**
      * Makes this class non instantiable, but still let's others inherit from
@@ -143,12 +137,28 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
+    /**
+     * C = A||b; Constructs a new matrix which is the column-wise concatenation
+     * of two other matrices.
+     * 
+     * <pre>
+     *   0 1 2
+     *   3 4 5
+     *   appendColumn
+     *   6 
+     *   8 
+     *   --&gt;
+     *   0 1 2 6  
+     *   3 4 5 8
+     * 
+     * </pre>
+     */
     public DComplexMatrix2D appendColumn(DComplexMatrix2D A, DComplexMatrix1D b) {
         // force both to have maximal shared number of rows.
         if (b.size() > A.rows())
             b = b.viewPart(0, A.rows());
         else if (b.size() < A.rows())
-            A = A.viewPart(0, 0, b.size(), A.columns());
+            A = A.viewPart(0, 0, (int) b.size(), A.columns());
 
         // concatenate
         int ac = A.columns();
@@ -182,12 +192,17 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
+    /**
+     * C = A||b; Constructs a new matrix which is the row-wise concatenation of
+     * two other matrices.
+     * 
+     */
     public DComplexMatrix2D appendRow(DComplexMatrix2D A, DComplexMatrix1D b) {
         // force both to have maximal shared number of columns.
         if (b.size() > A.columns())
             b = b.viewPart(0, A.columns());
         else if (b.size() < A.columns())
-            A = A.viewPart(0, 0, A.rows(), b.size());
+            A = A.viewPart(0, 0, A.rows(), (int) b.size());
 
         // concatenate
         int ar = A.rows();
@@ -235,22 +250,6 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
                     throw new IllegalArgumentException("All rows of array must have same number of columns.");
             }
         }
-    }
-
-    public DComplexMatrix2D reshape(DComplexMatrix1D a, int rows, int columns) {
-        if (a.size() != rows * columns) {
-            throw new IllegalArgumentException("a.size() != rows*columns");
-        }
-        DComplexMatrix2D A;
-        if (this == sparse) {
-            A = new SparseDComplexMatrix2D(rows, columns);
-        } else {
-            A = new DenseDComplexMatrix2D(rows, columns);
-        }
-        for (int c = 0; c < columns; c++) {
-            A.viewColumn(c).assign(a.viewPart(c * rows, rows));
-        }
-        return A;
     }
 
     /**
@@ -488,7 +487,9 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      */
     public void demo1() {
         System.out.println("\n\n");
-        DComplexMatrix2D[][] parts1 = { { null, make(2, 2, new double[] { 1, 2 }), null }, { make(4, 4, new double[] { 3, 4 }), null, make(4, 3, new double[] { 5, 6 }) }, { null, make(2, 2, new double[] { 7, 8 }), null } };
+        DComplexMatrix2D[][] parts1 = { { null, make(2, 2, new double[] { 1, 2 }), null },
+                { make(4, 4, new double[] { 3, 4 }), null, make(4, 3, new double[] { 5, 6 }) },
+                { null, make(2, 2, new double[] { 7, 8 }), null } };
         System.out.println("\n" + compose(parts1));
     }
 
@@ -498,7 +499,7 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
     public void demo2() {
         System.out.println("\n\n");
         DComplexMatrix2D matrix;
-        DComplexMatrix2D A, B, C, D, E, F, G;
+        DComplexMatrix2D A, B, C, D;
         DComplexMatrix2D _ = null;
         A = make(2, 2, new double[] { 1, 2 });
         B = make(4, 4, new double[] { 3, 4 });
@@ -527,7 +528,7 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
      * @return a new matrix.
      */
     public DComplexMatrix2D diagonal(DComplexMatrix1D vector) {
-        int size = vector.size();
+        int size = (int) vector.size();
         DComplexMatrix2D diag = make(size, size);
         for (int i = 0; i < size; i++) {
             diag.setQuick(i, i, vector.getQuick(i));
@@ -595,8 +596,6 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
     public DComplexMatrix2D make(int rows, int columns) {
         if (this == sparse)
             return new SparseDComplexMatrix2D(rows, columns);
-        if (this == rowCompressed)
-            throw new IllegalArgumentException("RCComplexMatrix2D is not supported yet");
         else
             return new DenseDComplexMatrix2D(rows, columns);
     }
@@ -690,11 +689,12 @@ public class DComplexFactory2D extends cern.colt.PersistentObject {
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(
+                n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         for (int i = 0; i < size; i++) {
             if (sampler.sampleNextElement()) {
-                int row = (int) (i / columns);
-                int column = (int) (i % columns);
+                int row = (i / columns);
+                int column = (i % columns);
                 matrix.set(row, column, value);
             }
         }

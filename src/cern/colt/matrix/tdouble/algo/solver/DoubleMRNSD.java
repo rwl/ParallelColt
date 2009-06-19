@@ -20,7 +20,7 @@ package cern.colt.matrix.tdouble.algo.solver;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoubleIdentity;
 import cern.jet.math.tdouble.DoubleFunctions;
 
@@ -47,15 +47,16 @@ import cern.jet.math.tdouble.DoubleFunctions;
  */
 public class DoubleMRNSD extends AbstractDoubleIterativeSolver {
 
-    private static final DoubleAlgebra alg = DoubleAlgebra.DEFAULT;
-    public static final double sqrteps = (double) Math.sqrt(Math.pow(2, -52));
+    private static final DenseDoubleAlgebra alg = DenseDoubleAlgebra.DEFAULT;
+    public static final double sqrteps = Math.sqrt(Math.pow(2, -52));
 
     public DoubleMRNSD() {
         iter = new MRNSDDoubleIterationMonitor();
         ((MRNSDDoubleIterationMonitor) iter).setRelativeTolerance(-1);
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         if (!(iter instanceof MRNSDDoubleIterationMonitor)) {
             iter = new MRNSDDoubleIterationMonitor();
             ((MRNSDDoubleIterationMonitor) iter).setRelativeTolerance(-1);
@@ -76,7 +77,8 @@ public class DoubleMRNSD extends AbstractDoubleIterativeSolver {
         }
 
         if (((MRNSDDoubleIterationMonitor) iter).getRelativeTolerance() == -1.0) {
-            ((MRNSDDoubleIterationMonitor) iter).setRelativeTolerance(sqrteps * alg.norm2(A.zMult(b, null, 1, 0, true)));
+            ((MRNSDDoubleIterationMonitor) iter)
+                    .setRelativeTolerance(sqrteps * alg.norm2(A.zMult(b, null, 1, 0, true)));
         }
         r = A.zMult(x, null);
         r.assign(b, DoubleFunctions.plusMultFirst(-1));
@@ -93,7 +95,7 @@ public class DoubleMRNSD extends AbstractDoubleIterativeSolver {
             gamma = x.aggregate(r, DoubleFunctions.plus, DoubleFunctions.multSquare);
             rnrm = Math.sqrt(gamma);
         }
-        indexList = new IntArrayList(b.size());
+        indexList = new IntArrayList((int) b.size());
         for (iter.setFirst(); !iter.converged(rnrm, x); iter.next()) {
             s = x.copy();
             s.assign(r, DoubleFunctions.multNeg);
@@ -109,7 +111,7 @@ public class DoubleMRNSD extends AbstractDoubleIterativeSolver {
             x.assign(s, DoubleFunctions.plusMultSecond(alpha));
             if (!(M instanceof DoubleIdentity)) {
                 w = M.transApply(u, null);
-                w = A.zMult(u, null, 1, 0, true);
+                w = A.zMult(w, null, 1, 0, true);
                 r.assign(w, DoubleFunctions.plusMultSecond(alpha));
                 gamma = x.aggregate(r, DoubleFunctions.plus, DoubleFunctions.multSquare);
                 rnrm = alg.norm2(r);

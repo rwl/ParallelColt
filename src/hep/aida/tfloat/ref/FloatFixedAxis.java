@@ -10,6 +10,11 @@ import hep.aida.tfloat.FloatIHistogram;
  * @version 1.0, 23/03/2000
  */
 public class FloatFixedAxis implements FloatIAxis {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private int bins;
 
     private float min;

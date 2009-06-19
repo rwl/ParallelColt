@@ -9,8 +9,10 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tdouble;
 
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.RCDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
+import cern.jet.math.tdouble.DoubleFunctions;
 
 /**
  * Factory for convenient construction of 2-d matrices holding <tt>double</tt>
@@ -85,8 +87,12 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
+ * 
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class DoubleFactory2D extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * A factory producing dense matrices.
      */
@@ -102,16 +108,87 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      */
     public static final DoubleFactory2D rowCompressed = new DoubleFactory2D();
 
-    /*
-     * A factory producing sparse row compressed modified matrices.
+    /**
+     * A factory producing sparse row compressed matrices.
      */
-    // public static final DoubleFactory2D rowCompressedModified = new
-    // DoubleFactory2D();
+    public static final DoubleFactory2D columnCompressed = new DoubleFactory2D();
+
+    /**
+     * Checks whether the given array is rectangular, that is, whether all rows
+     * have the same number of columns.
+     * 
+     * @throws IllegalArgumentException
+     *             if the array is not rectangular.
+     */
+    protected static void checkRectangularShape(double[][] array) {
+        int columns = -1;
+        for (int row = array.length; --row >= 0;) {
+            if (array[row] != null) {
+                if (columns == -1)
+                    columns = array[row].length;
+                if (array[row].length != columns)
+                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
+            }
+        }
+    }
+
+    /**
+     * Checks whether the given array is rectangular, that is, whether all rows
+     * have the same number of columns.
+     * 
+     * @throws IllegalArgumentException
+     *             if the array is not rectangular.
+     */
+    protected static void checkRectangularShape(DoubleMatrix2D[][] array) {
+        int columns = -1;
+        for (int row = array.length; --row >= 0;) {
+            if (array[row] != null) {
+                if (columns == -1)
+                    columns = array[row].length;
+                if (array[row].length != columns)
+                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
+            }
+        }
+    }
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
     protected DoubleFactory2D() {
+    }
+
+    /**
+     * C = A||b; Constructs a new matrix which is the column-wise concatenation
+     * of two other matrices.
+     * 
+     * <pre>
+     *   0 1 2
+     *   3 4 5
+     *   appendColumn
+     *   6 
+     *   8 
+     *   --&gt;
+     *   0 1 2 6 
+     *   3 4 5 8
+     * 
+     * </pre>
+     */
+    public DoubleMatrix2D appendColumn(DoubleMatrix2D A, DoubleMatrix1D b) {
+        // force both to have maximal shared number of rows.
+        if (b.size() > A.rows())
+            b = b.viewPart(0, A.rows());
+        else if (b.size() < A.rows())
+            A = A.viewPart(0, 0, (int) b.size(), A.columns());
+
+        // concatenate
+        int ac = A.columns();
+        int bc = 1;
+        int r = A.rows();
+        DoubleMatrix2D matrix = make(r, ac + bc);
+        matrix.viewPart(0, 0, r, ac).assign(A);
+        matrix.viewColumn(ac).assign(b);
+        return matrix;
     }
 
     /**
@@ -147,20 +224,38 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
-    public DoubleMatrix2D appendColumn(DoubleMatrix2D A, DoubleMatrix1D b) {
-        // force both to have maximal shared number of rows.
-        if (b.size() > A.rows())
-            b = b.viewPart(0, A.rows());
-        else if (b.size() < A.rows())
-            A = A.viewPart(0, 0, b.size(), A.columns());
+    /**
+     * C = A||b; Constructs a new matrix which is the row-wise concatenation of
+     * two other matrices.
+     * 
+     * <pre>
+     *   0 1 
+     *   2 3 
+     *   4 5
+     *   appendRow
+     *   6 7
+     *   --&gt;
+     *   0 1 
+     *   2 3 
+     *   4 5
+     *   6 7
+     * 
+     * </pre>
+     */
+    public DoubleMatrix2D appendRow(DoubleMatrix2D A, DoubleMatrix1D b) {
+        // force both to have maximal shared number of columns.
+        if (b.size() > A.columns())
+            b = b.viewPart(0, A.columns());
+        else if (b.size() < A.columns())
+            A = A.viewPart(0, 0, A.rows(), (int) b.size());
 
         // concatenate
-        int ac = A.columns();
-        int bc = 1;
-        int r = A.rows();
-        DoubleMatrix2D matrix = make(r, ac + bc);
-        matrix.viewPart(0, 0, r, ac).assign(A);
-        matrix.viewColumn(ac).assign(b);
+        int ar = A.rows();
+        int br = 1;
+        int c = A.columns();
+        DoubleMatrix2D matrix = make(ar + br, c);
+        matrix.viewPart(0, 0, ar, c).assign(A);
+        matrix.viewRow(ar).assign(b);
         return matrix;
     }
 
@@ -201,23 +296,6 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
-    public DoubleMatrix2D appendRow(DoubleMatrix2D A, DoubleMatrix1D b) {
-        // force both to have maximal shared number of columns.
-        if (b.size() > A.columns())
-            b = b.viewPart(0, A.columns());
-        else if (b.size() < A.columns())
-            A = A.viewPart(0, 0, A.rows(), b.size());
-
-        // concatenate
-        int ar = A.rows();
-        int br = 1;
-        int c = A.columns();
-        DoubleMatrix2D matrix = make(ar + br, c);
-        matrix.viewPart(0, 0, ar, c).assign(A);
-        matrix.viewRow(ar).assign(b);
-        return matrix;
-    }
-
     /**
      * Constructs a matrix with cells having ascending values. For debugging
      * purposes. Example:
@@ -229,62 +307,8 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * </pre>
      */
     public DoubleMatrix2D ascending(int rows, int columns) {
-        cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-        return descending(rows, columns).assign(F.chain(F.neg, F.minus(columns * rows)));
-    }
-
-    /**
-     * Checks whether the given array is rectangular, that is, whether all rows
-     * have the same number of columns.
-     * 
-     * @throws IllegalArgumentException
-     *             if the array is not rectangular.
-     */
-    protected static void checkRectangularShape(double[][] array) {
-        int columns = -1;
-        for (int row = array.length; --row >= 0;) {
-            if (array[row] != null) {
-                if (columns == -1)
-                    columns = array[row].length;
-                if (array[row].length != columns)
-                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
-            }
-        }
-    }
-
-    /**
-     * Checks whether the given array is rectangular, that is, whether all rows
-     * have the same number of columns.
-     * 
-     * @throws IllegalArgumentException
-     *             if the array is not rectangular.
-     */
-    protected static void checkRectangularShape(DoubleMatrix2D[][] array) {
-        int columns = -1;
-        for (int row = array.length; --row >= 0;) {
-            if (array[row] != null) {
-                if (columns == -1)
-                    columns = array[row].length;
-                if (array[row].length != columns)
-                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
-            }
-        }
-    }
-
-    public DoubleMatrix2D reshape(DoubleMatrix1D a, int rows, int columns) {
-        if (a.size() != rows * columns) {
-            throw new IllegalArgumentException("a.size() != rows*columns");
-        }
-        DoubleMatrix2D A;
-        if (this == sparse) {
-            A = new SparseDoubleMatrix2D(rows, columns);
-        } else {
-            A = new DenseDoubleMatrix2D(rows, columns);
-        }
-        for (int c = 0; c < columns; c++) {
-            A.viewColumn(c).assign(a.viewPart(c * rows, rows));
-        }
-        return A;
+        return descending(rows, columns).assign(
+                DoubleFunctions.chain(DoubleFunctions.neg, DoubleFunctions.minus(columns * rows)));
     }
 
     /**
@@ -306,7 +330,8 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * DoubleMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 2, 4), null } };
+     * DoubleMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 2, 4), null } };
      * System.out.println(compose(parts1));
      * </pre>
      * 
@@ -325,7 +350,8 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * DoubleMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() }, { identity(3).viewRowFlip(), null } };
+     * DoubleMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() },
+     *         { identity(3).viewRowFlip(), null } };
      * System.out.println(&quot;\n&quot; + make(parts3));
      * </pre>
      * 
@@ -364,7 +390,8 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * DoubleMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 3, 4), null } };
+     * DoubleMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 3, 4), null } };
      * System.out.println(&quot;\n&quot; + Factory2D.make(parts2));
      * </pre>
      * 
@@ -449,6 +476,36 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
+     * Constructs a bidiagonal block matrix from the given parts. The
+     * concatenation has the form
+     * 
+     * <pre>
+     *   A 0 0
+     *   0 B 0
+     *   0 0 C
+     * 
+     * </pre>
+     * 
+     * from the given parts. Cells are copied.
+     * 
+     * @param A
+     *            bidiagonal matrix
+     * @param B
+     *            bidiagonal matrix
+     * @return bidiagonal matrix
+     */
+    public DoubleMatrix2D composeBidiagonal(DoubleMatrix2D A, DoubleMatrix2D B) {
+        int ar = A.rows();
+        int ac = A.columns();
+        int br = B.rows();
+        int bc = B.columns();
+        DoubleMatrix2D sum = make(ar + br - 1, ac + bc);
+        sum.viewPart(0, 0, ar, ac).assign(A);
+        sum.viewPart(ar - 1, ac, br, bc).assign(B);
+        return sum;
+    }
+
+    /**
      * Constructs a diagonal block matrix from the given parts (the <i>direct
      * sum</i> of two matrices). That is the concatenation
      * 
@@ -493,17 +550,6 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
         diag.viewPart(A.rows(), A.columns(), B.rows(), B.columns()).assign(B);
         diag.viewPart(A.rows() + B.rows(), A.columns() + B.columns(), C.rows(), C.columns()).assign(C);
         return diag;
-    }
-
-    public DoubleMatrix2D composeBidiagonal(DoubleMatrix2D A, DoubleMatrix2D B) {
-        int ar = A.rows();
-        int ac = A.columns();
-        int br = B.rows();
-        int bc = B.columns();
-        DoubleMatrix2D sum = make(ar + br - 1, ac + bc);
-        sum.viewPart(0, 0, ar, ac).assign(A);
-        sum.viewPart(ar - 1, ac, br, bc).assign(B);
-        return sum;
     }
 
     /**
@@ -661,7 +707,8 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      */
     public void demo1() {
         System.out.println("\n\n");
-        DoubleMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 2, 4), null } };
+        DoubleMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+                { null, make(2, 2, 4), null } };
         System.out.println("\n" + compose(parts1));
         // System.out.println("\n"+cern.colt.matrixpattern.Converting.toHTML(make(parts1).toString()));
 
@@ -671,7 +718,8 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
          * System.out.println("\n"+make(parts2));
          */
 
-        DoubleMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() }, { identity(3).viewRowFlip(), null } };
+        DoubleMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() },
+                { identity(3).viewRowFlip(), null } };
         System.out.println("\n" + compose(parts3));
         // System.out.println("\n"+cern.colt.matrixpattern.Converting.toHTML(make(parts3).toString()));
 
@@ -691,7 +739,7 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
     public void demo2() {
         System.out.println("\n\n");
         DoubleMatrix2D matrix;
-        DoubleMatrix2D A, B, C, D, E, F, G;
+        DoubleMatrix2D A, B, C, D;
         DoubleMatrix2D _ = null;
         A = make(2, 2, 1);
         B = make(4, 4, 2);
@@ -769,11 +817,11 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * 
      * @return a new matrix.
      */
-    public DoubleMatrix2D diagonal(DoubleMatrix1D vector) {
-        int size = vector.size();
+    public DoubleMatrix2D diagonal(double[] vector) {
+        int size = vector.length;
         DoubleMatrix2D diag = make(size, size);
-        for (int i = size; --i >= 0;) {
-            diag.setQuick(i, i, vector.getQuick(i));
+        for (int i = 0; i < size; i++) {
+            diag.setQuick(i, i, vector[i]);
         }
         return diag;
     }
@@ -793,11 +841,11 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * 
      * @return a new matrix.
      */
-    public DoubleMatrix2D diagonal(double[] vector) {
-        int size = vector.length;
+    public DoubleMatrix2D diagonal(DoubleMatrix1D vector) {
+        int size = (int) vector.size();
         DoubleMatrix2D diag = make(size, size);
-        for (int i = 0; i < size; i++) {
-            diag.setQuick(i, i, vector[i]);
+        for (int i = size; --i >= 0;) {
+            diag.setQuick(i, i, vector.getQuick(i));
         }
         return diag;
     }
@@ -840,28 +888,6 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a matrix with the given cell values. <tt>values</tt> is
-     * required to have the form <tt>values[row][column]</tt> and have exactly
-     * the same number of columns in every row.
-     * <p>
-     * The values are copied. So subsequent changes in <tt>values</tt> are not
-     * reflected in the matrix, and vice-versa.
-     * 
-     * @param values
-     *            The values to be filled into the new matrix.
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
-     *             .
-     */
-    public DoubleMatrix2D make(double[][] values) {
-        if (this == sparse)
-            return new SparseDoubleMatrix2D(values);
-        else
-            return new DenseDoubleMatrix2D(values);
-    }
-
-    /**
      * Construct a matrix from a one-dimensional column-major packed array, ala
      * Fortran. Has the form
      * <tt>matrix.get(row,column) == values[row + column*rows]</tt>. The values
@@ -891,18 +917,41 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
+     * Constructs a matrix with the given cell values. <tt>values</tt> is
+     * required to have the form <tt>values[row][column]</tt> and have exactly
+     * the same number of columns in every row.
+     * <p>
+     * The values are copied. So subsequent changes in <tt>values</tt> are not
+     * reflected in the matrix, and vice-versa.
+     * 
+     * @param values
+     *            The values to be filled into the new matrix.
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
+     */
+    public DoubleMatrix2D make(double[][] values) {
+        if (this == sparse)
+            return new SparseDoubleMatrix2D(values);
+        else
+            return new DenseDoubleMatrix2D(values);
+    }
+
+    /**
      * Constructs a matrix with the given shape, each cell initialized with
      * zero.
      */
     public DoubleMatrix2D make(int rows, int columns) {
-        if (this == sparse)
+        if (this == sparse) {
             return new SparseDoubleMatrix2D(rows, columns);
-        if (this == rowCompressed)
-            return new RCDoubleMatrix2D(rows, columns);
-        // if (this==rowCompressedModified) return new
-        // RCMDoubleMatrix2D(rows,columns);
-        else
+        } else if (this == rowCompressed) {
+            return new SparseRCDoubleMatrix2D(rows, columns);
+        } else if (this == columnCompressed) {
+            return new SparseCCDoubleMatrix2D(rows, columns);
+        } else {
             return new DenseDoubleMatrix2D(rows, columns);
+        }
     }
 
     /**
@@ -913,13 +962,6 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
         if (initialValue == 0)
             return make(rows, columns);
         return make(rows, columns).assign(initialValue);
-    }
-
-    /**
-     * Constructs a 1d matrix of the right dynamic type.
-     */
-    protected DoubleMatrix1D make1D(int size) {
-        return make(0, 0).like1D(size);
     }
 
     /**
@@ -958,24 +1000,6 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a randomly sampled matrix with the given shape. Randomly picks
-     * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
-     * initializes them to <tt>value</tt>, all the rest will be initialized to
-     * zero. Note that this is not the same as setting each cell with
-     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
-     * seed is a constant.
-     * 
-     * @throws IllegalArgumentException
-     *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
-     * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
-     */
-    public DoubleMatrix2D sample(int rows, int columns, double value, double nonZeroFraction) {
-        DoubleMatrix2D matrix = make(rows, columns);
-        sample(matrix, value, nonZeroFraction);
-        return matrix;
-    }
-
-    /**
      * Modifies the given matrix to be a randomly sampled matrix. Randomly picks
      * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
      * initializes them to <tt>value</tt>, all the rest will be initialized to
@@ -1005,15 +1029,41 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(
+                n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         for (int i = 0; i < size; i++) {
             if (sampler.sampleNextElement()) {
-                int row = (int) (i / columns);
-                int column = (int) (i % columns);
-                matrix.set(row, column, value);
+                int row = (i / columns);
+                int column = (i % columns);
+                matrix.setQuick(row, column, value);
             }
         }
 
         return matrix;
+    }
+
+    /**
+     * Constructs a randomly sampled matrix with the given shape. Randomly picks
+     * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
+     * initializes them to <tt>value</tt>, all the rest will be initialized to
+     * zero. Note that this is not the same as setting each cell with
+     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
+     * seed is a constant.
+     * 
+     * @throws IllegalArgumentException
+     *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
+     * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
+     */
+    public DoubleMatrix2D sample(int rows, int columns, double value, double nonZeroFraction) {
+        DoubleMatrix2D matrix = make(rows, columns);
+        sample(matrix, value, nonZeroFraction);
+        return matrix;
+    }
+
+    /**
+     * Constructs a 1d matrix of the right dynamic type.
+     */
+    protected DoubleMatrix1D make1D(int size) {
+        return make(0, 0).like1D(size);
     }
 }

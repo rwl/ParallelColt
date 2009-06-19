@@ -10,6 +10,7 @@ package cern.colt.matrix.tdouble;
 
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix1D;
+import cern.jet.math.tdouble.DoubleFunctions;
 
 /**
  * Factory for convenient construction of 1-d matrices holding <tt>double</tt>
@@ -37,6 +38,8 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix1D;
  * @version 1.0, 09/24/99
  */
 public class DoubleFactory1D extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * A factory producing dense matrices.
      */
@@ -60,9 +63,9 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
      */
     public DoubleMatrix1D append(DoubleMatrix1D A, DoubleMatrix1D B) {
         // concatenate
-        DoubleMatrix1D matrix = make(A.size() + B.size());
-        matrix.viewPart(0, A.size()).assign(A);
-        matrix.viewPart(A.size(), B.size()).assign(B);
+        DoubleMatrix1D matrix = make((int) (A.size() + B.size()));
+        matrix.viewPart(0, (int) A.size()).assign(A);
+        matrix.viewPart((int) A.size(), (int) B.size()).assign(B);
         return matrix;
     }
 
@@ -71,8 +74,7 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
      * purposes. Example: <tt>0 1 2</tt>
      */
     public DoubleMatrix1D ascending(int size) {
-        cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-        return descending(size).assign(F.chain(F.neg, F.minus(size)));
+        return descending(size).assign(DoubleFunctions.chain(DoubleFunctions.neg, DoubleFunctions.minus(size)));
     }
 
     /**
@@ -86,6 +88,23 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
             matrix.setQuick(i, v++);
         }
         return matrix;
+    }
+
+    /**
+     * Constructs a matrix from the values of the given list. The values are
+     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+     * matrix, and vice-versa.
+     * 
+     * @param values
+     *            The values to be filled into the new matrix.
+     * @return a new matrix.
+     */
+    public DoubleMatrix1D make(cern.colt.list.tdouble.AbstractDoubleList values) {
+        int size = values.size();
+        DoubleMatrix1D vector = make(size);
+        for (int i = size; --i >= 0;)
+            vector.set(i, values.get(i));
+        return vector;
     }
 
     /**
@@ -118,7 +137,7 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
         DoubleMatrix1D vector = make(size);
         size = 0;
         for (int i = 0; i < parts.length; i++) {
-            vector.viewPart(size, parts[i].size()).assign(parts[i]);
+            vector.viewPart(size, (int) parts[i].size()).assign(parts[i]);
             size += parts[i].size();
         }
 
@@ -144,23 +163,6 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a matrix from the values of the given list. The values are
-     * copied. So subsequent changes in <tt>values</tt> are not reflected in the
-     * matrix, and vice-versa.
-     * 
-     * @param values
-     *            The values to be filled into the new matrix.
-     * @return a new matrix.
-     */
-    public DoubleMatrix1D make(cern.colt.list.tdouble.AbstractDoubleList values) {
-        int size = values.size();
-        DoubleMatrix1D vector = make(size);
-        for (int i = size; --i >= 0;)
-            vector.set(i, values.get(i));
-        return vector;
-    }
-
-    /**
      * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
      * (exclusive).
      */
@@ -180,7 +182,7 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
      * </pre>
      */
     public DoubleMatrix1D repeat(DoubleMatrix1D A, int repeat) {
-        int size = A.size();
+        int size = (int) A.size();
         DoubleMatrix1D matrix = make(repeat * size);
         for (int i = repeat; --i >= 0;) {
             matrix.viewPart(size * i, size).assign(A);
@@ -214,10 +216,11 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(
+                n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         for (int i = size; --i >= 0;) {
             if (sampler.sampleNextElement()) {
-                matrix.set(i, value);
+                matrix.setQuick(i, value);
             }
         }
 
@@ -234,11 +237,11 @@ public class DoubleFactory1D extends cern.colt.PersistentObject {
      * @return a new list.
      */
     public cern.colt.list.tdouble.DoubleArrayList toList(DoubleMatrix1D values) {
-        int size = values.size();
+        int size = (int) values.size();
         cern.colt.list.tdouble.DoubleArrayList list = new cern.colt.list.tdouble.DoubleArrayList(size);
         list.setSize(size);
         for (int i = size; --i >= 0;)
-            list.set(i, values.get(i));
+            list.setQuick(i, values.get(i));
         return list;
     }
 }

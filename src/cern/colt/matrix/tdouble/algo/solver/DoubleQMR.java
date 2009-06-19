@@ -26,7 +26,7 @@ package cern.colt.matrix.tdouble.algo.solver;
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoublePreconditioner;
 import cern.jet.math.tdouble.DoubleFunctions;
 
@@ -115,7 +115,8 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
         p_tld = template.copy();
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         checkSizes(A, b, x);
 
         double rho = 0, rho_1 = 0, xi = 0, gamma = 1., gamma_1 = 0, theta = 0, theta_1 = 0, eta = -1., delta = 0, ep = 0, beta = 0;
@@ -124,19 +125,21 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
 
         v_tld.assign(r);
         M1.apply(v_tld, y);
-        rho = DoubleAlgebra.DEFAULT.norm(y, Norm.Two);
+        rho = DenseDoubleAlgebra.DEFAULT.norm(y, Norm.Two);
 
         w_tld.assign(r);
         M2.transApply(w_tld, z);
-        xi = DoubleAlgebra.DEFAULT.norm(z, Norm.Two);
+        xi = DenseDoubleAlgebra.DEFAULT.norm(z, Norm.Two);
 
         for (iter.setFirst(); !iter.converged(r, x); iter.next()) {
 
             if (rho == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "rho", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "rho", iter);
 
             if (xi == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "xi", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "xi", iter);
 
             v.assign(v_tld, DoubleFunctions.multSecond(1 / rho));
             y.assign(DoubleFunctions.mult(1 / rho));
@@ -146,7 +149,8 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
             delta = z.zDotProduct(y);
 
             if (delta == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "delta", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "delta", iter);
 
             M2.apply(y, y_tld);
             M1.transApply(z, z_tld);
@@ -164,22 +168,24 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
             ep = q.zDotProduct(p_tld);
 
             if (ep == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "ep", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "ep", iter);
 
             beta = ep / delta;
 
             if (beta == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "beta", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "beta", iter);
 
             v_tld.assign(v, DoubleFunctions.multSecond(-beta)).assign(p_tld, DoubleFunctions.plus);
             M1.apply(v_tld, y);
             rho_1 = rho;
-            rho = DoubleAlgebra.DEFAULT.norm(y, Norm.Two);
+            rho = DenseDoubleAlgebra.DEFAULT.norm(y, Norm.Two);
 
             A.zMult(q, w_tld.assign(w, DoubleFunctions.multSecond(-beta)), 1, 1, true);
 
             M2.transApply(w_tld, z);
-            xi = DoubleAlgebra.DEFAULT.norm(z, Norm.Two);
+            xi = DenseDoubleAlgebra.DEFAULT.norm(z, Norm.Two);
 
             gamma_1 = gamma;
             theta_1 = theta;
@@ -187,7 +193,8 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
             gamma = 1 / Math.sqrt(1 + theta * theta);
 
             if (gamma == 0)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown, "gamma", iter);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Breakdown,
+                        "gamma", iter);
 
             eta = -eta * rho_1 * gamma * gamma / (beta * gamma_1 * gamma_1);
 

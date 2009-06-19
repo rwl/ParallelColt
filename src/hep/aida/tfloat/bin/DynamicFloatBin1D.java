@@ -2,6 +2,7 @@ package hep.aida.tfloat.bin;
 
 import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tint.IntArrayList;
+import cern.jet.random.tfloat.AbstractFloatDistribution;
 import cern.jet.random.tfloat.engine.FloatRandomEngine;
 import cern.jet.stat.tfloat.FloatDescriptive;
 
@@ -41,6 +42,11 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     // elements contained in the receiver!
     // Instead, "this.size" reflects the number of elements incremental stats
     // computation has already processed.
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * The elements contained in this bin.
@@ -95,6 +101,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * @param element
      *            element to be appended.
      */
+    @Override
     public synchronized void add(float element) {
         elements.add(element);
         invalidateAll();
@@ -115,6 +122,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
+    @Override
     public synchronized void addAllOfFromTo(FloatArrayList list, int from, int to) {
         this.elements.addAllOfFromTo(list, from, to);
         this.invalidateAll();
@@ -150,7 +158,8 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * @return the aggregated measure.
      * @see cern.jet.math.tfloat.FloatFunctions
      */
-    public synchronized float aggregate(cern.colt.function.tfloat.FloatFloatFunction aggr, cern.colt.function.tfloat.FloatFunction f) {
+    public synchronized float aggregate(cern.colt.function.tfloat.FloatFloatFunction aggr,
+            cern.colt.function.tfloat.FloatFunction f) {
         int s = size();
         if (s == 0)
             return Float.NaN;
@@ -165,6 +174,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns.
      */
+    @Override
     public synchronized void clear() {
         super.clear();
 
@@ -179,6 +189,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Resets the values of all measures.
      */
+    @Override
     protected void clearAllMeasures() {
         super.clearAllMeasures();
 
@@ -191,6 +202,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public synchronized Object clone() {
         DynamicFloatBin1D clone = (DynamicFloatBin1D) super.clone();
         if (this.elements != null)
@@ -303,6 +315,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * superset of B and B is a superset of A. (Elements must occur the same
      * number of times, order is irrelevant.)
      */
+    @Override
     public synchronized boolean equals(Object object) {
         if (!(object instanceof DynamicFloatBin1D))
             return false;
@@ -398,6 +411,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * @see #hasSumOfPowers(int)
      * @see #sumOfPowers(int)
      */
+    @Override
     public int getMaxOrderForSumOfPowers() {
         return Integer.MAX_VALUE;
     }
@@ -409,6 +423,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * @see #hasSumOfPowers(int)
      * @see #sumOfPowers(int)
      */
+    @Override
     public int getMinOrderForSumOfPowers() {
         return Integer.MIN_VALUE;
     }
@@ -437,6 +452,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * the elements can be obtained via <tt>elements()</tt> methods.
      * 
      */
+    @Override
     public synchronized boolean isRebinnable() {
         return true;
     }
@@ -444,6 +460,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Returns the maximum.
      */
+    @Override
     public synchronized float max() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -453,6 +470,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Returns the minimum.
      */
+    @Override
     public synchronized float min() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -469,6 +487,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * @param c
      *            any number.
      */
+    @Override
     public synchronized float moment(int k, float c) {
         // currently no caching for this parameter
         return FloatDescriptive.moment(this.elements, k, c);
@@ -482,6 +501,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * @param phi
      *            must satisfy <tt>0 &lt; phi &lt; 1</tt>.
      */
+    @Override
     public synchronized float quantile(float phi) {
         return FloatDescriptive.quantile(sortedElements_unsafe(), phi);
     }
@@ -496,6 +516,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * @return the exact percentage <tt>phi</tt> of elements
      *         <tt>&lt;= element</tt> (<tt>0.0 &lt;= phi &lt;= 1.0)</tt>.
      */
+    @Override
     public synchronized float quantileInverse(float element) {
         return FloatDescriptive.quantileInverse(sortedElements_unsafe(), element);
     }
@@ -509,6 +530,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      *            <tt>percentages</tt> must be sorted ascending.
      * @return the exact quantiles.
      */
+    @Override
     public FloatArrayList quantiles(FloatArrayList percentages) {
         return FloatDescriptive.quantiles(sortedElements_unsafe(), percentages);
     }
@@ -558,15 +580,17 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      *             if <tt>!withReplacement && n > size()</tt>.
      * @see cern.jet.random.tfloat.sampling
      */
-    public synchronized void sample(int n, boolean withReplacement, FloatRandomEngine randomGenerator, cern.colt.buffer.tfloat.FloatBuffer buffer) {
+    public synchronized void sample(int n, boolean withReplacement, FloatRandomEngine randomGenerator,
+            cern.colt.buffer.tfloat.FloatBuffer buffer) {
         if (randomGenerator == null)
-            randomGenerator = cern.jet.random.tfloat.FloatUniform.makeDefaultGenerator();
+            randomGenerator = AbstractFloatDistribution.makeDefaultGenerator();
         buffer.clear();
 
         if (!withReplacement) { // without
             if (n > size())
                 throw new IllegalArgumentException("n must be less than or equal to size()");
-            cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant sampler = new cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant(n, size(), randomGenerator);
+            cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant sampler = new cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant(
+                    n, size(), randomGenerator);
             for (int i = n; --i >= 0;) {
                 if (sampler.sampleNextElement())
                     buffer.add(this.elements.getQuick(i));
@@ -738,9 +762,10 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      *         resampling step.
      * @see cern.colt.GenericPermuting#permutation(long,int)
      */
-    public synchronized DynamicFloatBin1D sampleBootstrap(DynamicFloatBin1D other, int resamples, cern.jet.random.tfloat.engine.FloatRandomEngine randomGenerator, FloatBinBinFunction1D function) {
+    public synchronized DynamicFloatBin1D sampleBootstrap(DynamicFloatBin1D other, int resamples,
+            cern.jet.random.tfloat.engine.FloatRandomEngine randomGenerator, FloatBinBinFunction1D function) {
         if (randomGenerator == null)
-            randomGenerator = cern.jet.random.tfloat.FloatUniform.makeDefaultGenerator();
+            randomGenerator = AbstractFloatDistribution.makeDefaultGenerator();
 
         // since "resamples" can be quite large, we care about performance and
         // memory
@@ -801,6 +826,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * 
      * @return the number of elements contained in the receiver.
      */
+    @Override
     public synchronized int size() {
         return elements.size();
         // Never ever use "this.size" as it would be intuitive!
@@ -896,6 +922,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Returns the sum of all elements, which is <tt>Sum( x[i] )</tt>.
      */
+    @Override
     public synchronized float sum() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -905,6 +932,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Returns the sum of inversions, which is <tt>Sum( 1 / x[i] )</tt>.
      */
+    @Override
     public synchronized float sumOfInversions() {
         if (!isSumOfInversionsValid)
             updateSumOfInversions();
@@ -914,6 +942,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Returns the sum of logarithms, which is <tt>Sum( Log(x[i]) )</tt>.
      */
+    @Override
     public synchronized float sumOfLogarithms() {
         if (!isSumOfLogarithmsValid)
             updateSumOfLogarithms();
@@ -928,6 +957,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      *            the order of the powers.
      * @return the sum of powers.
      */
+    @Override
     public synchronized float sumOfPowers(int k) {
         // no chaching for this measure
         if (k >= -1 && k <= 2)
@@ -939,6 +969,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Returns the sum of squares, which is <tt>Sum( x[i] * x[i] )</tt>.
      */
+    @Override
     public synchronized float sumOfSquares() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -948,6 +979,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
         FloatArrayList distinctElements = new FloatArrayList();
@@ -1004,6 +1036,7 @@ public class DynamicFloatBin1D extends QuantileFloatBin1D {
      * operation to minimize the storage of the receiver. Does not affect
      * functionality.
      */
+    @Override
     public synchronized void trimToSize() {
         this.elements.trimToSize();
 

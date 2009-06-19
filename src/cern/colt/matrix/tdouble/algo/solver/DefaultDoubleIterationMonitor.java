@@ -151,16 +151,15 @@ public class DefaultDoubleIterationMonitor extends AbstractDoubleIterationMonito
     public void setDivergenceTolerance(double dtol) {
         this.dtol = dtol;
     }
-    
-    
+
     /**
      * Returns the relative divergence tolerance
+     * 
      * @return relative divergence tolerance (to initial residual)
      */
     public double getDivergenceTolerance() {
         return dtol;
     }
-       
 
     @Override
     protected boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException {

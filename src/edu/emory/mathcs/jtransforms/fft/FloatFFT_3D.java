@@ -97,7 +97,8 @@ public strictfp class FloatFFT_3D {
         if (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D()) {
             this.useThreads = true;
         }
-        if (ConcurrencyUtils.isPowerOf2(slices) && ConcurrencyUtils.isPowerOf2(rows) && ConcurrencyUtils.isPowerOf2(columns)) {
+        if (ConcurrencyUtils.isPowerOf2(slices) && ConcurrencyUtils.isPowerOf2(rows)
+                && ConcurrencyUtils.isPowerOf2(columns)) {
             isPowerOfTwo = true;
             oldNthreads = ConcurrencyUtils.getNumberOfThreads();
             nt = slices;

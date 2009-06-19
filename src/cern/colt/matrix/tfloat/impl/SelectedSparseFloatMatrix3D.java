@@ -54,6 +54,11 @@ import cern.colt.matrix.tfloat.FloatMatrix3D;
  */
 class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The elements of this matrix.
      */
     protected AbstractLongFloatMap elements;
@@ -84,7 +89,8 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @param columnOffsets
      *            The column offsets of the cells that shall be visible.
      */
-    protected SelectedSparseFloatMatrix3D(AbstractLongFloatMap elements, int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedSparseFloatMatrix3D(AbstractLongFloatMap elements, int[] sliceOffsets, int[] rowOffsets,
+            int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         int slices = sliceOffsets.length;
         int rows = rowOffsets.length;
@@ -102,6 +108,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
         this.isNoView = false;
     }
 
+    @Override
     public AbstractLongFloatMap elements() {
         return elements;
     }
@@ -124,6 +131,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public float getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -131,7 +139,8 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
         // column:"+column);
         // return elements.get(index(slice,row,column));
         // manually inlined:
-        return elements.get(offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
+        return elements.get(offset + sliceOffsets[sliceZero + slice * sliceStride]
+                + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
     }
 
     /**
@@ -145,10 +154,12 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
+    @Override
     public long index(int slice, int row, int column) {
         // return this.offset + super.index(slice,row,column);
         // manually inlined:
-        return this.offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        return this.offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
+                + columnOffsets[columnZero + column * columnStride];
     }
 
     /**
@@ -169,8 +180,14 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public FloatMatrix3D like(int slices, int rows, int columns) {
         return new SparseFloatMatrix3D(slices, rows, columns);
+    }
+
+    @Override
+    public FloatMatrix2D like2D(int rows, int columns) {
+        return new SparseFloatMatrix2D(rows, columns);
     }
 
     /**
@@ -193,6 +210,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int slice, int row, int column, float value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -200,7 +218,8 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
         // column:"+column);
         // int index = index(slice,row,column);
         // manually inlined:
-        int index = offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        int index = offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
+                + columnOffsets[columnZero + column * columnStride];
         if (value == 0)
             this.elements.removeKey(index);
         else
@@ -213,6 +232,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * 
      * @return
      */
+    @Override
     public FloatMatrix1D vectorize() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -238,6 +258,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @see #viewSlice(int)
      * @see #viewRow(int)
      */
+    @Override
     public FloatMatrix2D viewColumn(int column) {
         checkColumn(column);
 
@@ -254,7 +275,8 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
         int[] viewRowOffsets = this.sliceOffsets;
         int[] viewColumnOffsets = this.rowOffsets;
 
-        return new SelectedSparseFloatMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero, viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
+        return new SelectedSparseFloatMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero,
+                viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
     }
 
     /**
@@ -278,6 +300,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @see #viewSlice(int)
      * @see #viewColumn(int)
      */
+    @Override
     public FloatMatrix2D viewRow(int row) {
         checkRow(row);
 
@@ -294,7 +317,8 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
         int[] viewRowOffsets = this.sliceOffsets;
         int[] viewColumnOffsets = this.columnOffsets;
 
-        return new SelectedSparseFloatMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero, viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
+        return new SelectedSparseFloatMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero,
+                viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
     }
 
     /**
@@ -318,6 +342,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @see #viewRow(int)
      * @see #viewColumn(int)
      */
+    @Override
     public FloatMatrix2D viewSlice(int slice) {
         checkSlice(slice);
 
@@ -334,7 +359,8 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
         int[] viewRowOffsets = this.rowOffsets;
         int[] viewColumnOffsets = this.columnOffsets;
 
-        return new SelectedSparseFloatMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero, viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
+        return new SelectedSparseFloatMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero,
+                viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
     }
 
     /**
@@ -346,6 +372,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -359,6 +386,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -372,6 +400,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _sliceOffset(int absRank) {
         return sliceOffsets[absRank];
     }
@@ -386,6 +415,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(FloatMatrix3D other) {
         if (other instanceof SelectedSparseFloatMatrix3D) {
             SelectedSparseFloatMatrix3D otherMatrix = (SelectedSparseFloatMatrix3D) other;
@@ -421,6 +451,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     protected FloatMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -439,6 +470,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>(float)rows*slices > Integer.MAX_VALUE</tt>.
      */
+    @Override
     protected void setUp(int slices, int rows, int columns) {
         super.setUp(slices, rows, columns);
         this.sliceStride = 1;
@@ -453,6 +485,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      * @throws IllegalArgumentException
      *             if some of the parameters are equal or not in range 0..2.
      */
+    @Override
     protected AbstractMatrix3D vDice(int axis0, int axis1, int axis2) {
         super.vDice(axis0, axis1, axis2);
 
@@ -480,6 +513,7 @@ class SelectedSparseFloatMatrix3D extends FloatMatrix3D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected FloatMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFloatMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, this.offset);
     }

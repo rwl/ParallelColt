@@ -27,6 +27,11 @@ package cern.jet.random.tdouble.engine;
  * @version 1.0, 09/24/99
  */
 public class RandomSeedGenerator extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected int row;
 
     protected int column;

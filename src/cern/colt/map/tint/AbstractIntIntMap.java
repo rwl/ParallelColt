@@ -30,6 +30,11 @@ import cern.colt.map.tdouble.AbstractDoubleMap;
  * @see java.util.HashMap
  */
 public abstract class AbstractIntIntMap extends AbstractDoubleMap {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public static int hashCollisions = 0; // for debug only
     /**
      * Makes this class non instantiable, but still let's others inherit from
@@ -142,6 +147,7 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -432,6 +438,7 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
+    @Override
     public String toString() {
         IntArrayList theKeys = keys();
         // theKeys.sort();

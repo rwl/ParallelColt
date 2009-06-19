@@ -16,6 +16,11 @@ package cern.jet.random.tfloat;
  */
 public abstract class AbstractContinousFloatDistribution extends AbstractFloatDistribution {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */

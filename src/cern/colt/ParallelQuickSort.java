@@ -260,7 +260,8 @@ public class ParallelQuickSort {
      * @param nThreads
      *            number of threads
      */
-    public static void quickSort(final double[] x, final int off, int len, final DoubleComparator comp, final int nThreads) {
+    public static void quickSort(final double[] x, final int off, int len, final DoubleComparator comp,
+            final int nThreads) {
         // Insertion sort on smallest arrays
         if (len < SMALL) {
             for (int i = off; i < len + off; i++)
@@ -682,7 +683,7 @@ public class ParallelQuickSort {
         // Insertion sort on smallest arrays
         if (len < SMALL) {
             for (int i = off; i < len + off; i++)
-                for (int j = i; j > off && ((Comparable) x[j - 1]).compareTo((Comparable) x[j]) > 0; j--)
+                for (int j = i; j > off && ((Comparable) x[j - 1]).compareTo(x[j]) > 0; j--)
                     swap(x, j, j - 1);
             return;
         }
@@ -1178,9 +1179,9 @@ public class ParallelQuickSort {
      * Returns the index of the median of the three indexed chars.
      */
     private static int med3(Object x[], int a, int b, int c) {
-        int ab = ((Comparable) x[a]).compareTo((Comparable) x[b]);
-        int ac = ((Comparable) x[a]).compareTo((Comparable) x[c]);
-        int bc = ((Comparable) x[b]).compareTo((Comparable) x[c]);
+        int ab = ((Comparable) x[a]).compareTo(x[b]);
+        int ac = ((Comparable) x[a]).compareTo(x[c]);
+        int bc = ((Comparable) x[b]).compareTo(x[c]);
         return (ab < 0 ? (bc < 0 ? b : ac < 0 ? c : a) : (bc > 0 ? b : ac > 0 ? c : a));
     }
 

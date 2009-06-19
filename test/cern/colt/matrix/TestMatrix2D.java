@@ -17,11 +17,11 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.DoubleBlas;
 import cern.colt.matrix.tdouble.algo.DoubleMatrix2DComparator;
 import cern.colt.matrix.tdouble.algo.SmpDoubleBlas;
-import cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick;
+import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecompositionQuick;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
@@ -42,7 +42,7 @@ class TestMatrix2D {
 
     private static final cern.colt.matrix.tdouble.DoubleFactory1D Factory1D = cern.colt.matrix.tdouble.DoubleFactory1D.dense;
 
-    private static final cern.colt.matrix.tdouble.algo.DoubleAlgebra LinearAlgebra = cern.colt.matrix.tdouble.algo.DoubleAlgebra.DEFAULT;
+    private static final cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra LinearAlgebra = cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra.DEFAULT;
 
     private static final cern.colt.matrix.tdouble.algo.DoubleProperty Property = cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT;
 
@@ -263,7 +263,8 @@ class TestMatrix2D {
         System.out.println(matrix);
         System.out.println(otherMatrix1D);
         // Sum(Math.PI * Math.log(otherMatrix1D[i] / matrix[i]))
-        System.out.println(matrix.aggregate(otherMatrix1D, F.plus, F.chain(F.mult(Math.PI), F.chain(F.log, F.swapArgs(F.div)))));
+        System.out.println(matrix.aggregate(otherMatrix1D, F.plus, F.chain(F.mult(Math.PI), F.chain(F.log, F
+                .swapArgs(F.div)))));
         // or, perhaps less error prone and more readable:
         System.out.println(matrix.aggregate(otherMatrix1D, F.plus, new DoubleDoubleFunction() {
             public double apply(double a, double b) {
@@ -284,7 +285,8 @@ class TestMatrix2D {
         // --> 560
 
         System.out.println(matrix.assign(F.random()));
-        System.out.println(matrix.assign(new cern.jet.random.tdouble.Poisson(5, cern.jet.random.tdouble.Poisson.makeDefaultGenerator())));
+        System.out.println(matrix.assign(new cern.jet.random.tdouble.Poisson(5, cern.jet.random.tdouble.Poisson
+                .makeDefaultGenerator())));
 
     }
 
@@ -609,7 +611,8 @@ class TestMatrix2D {
         // System.out.println("\n\nbandwidth="+k+"
         // "+cern.colt.matrixpattern.Converting.toHTML(A.toString()));
 
-        double[][] values2 = { { 1.0000000000000167, -0.3623577544766736, -0.3623577544766736 }, { 0, 0.9320390859672374, -0.3377315902755755 }, { 0, 0, 0.8686968577706282 }, { 0, 0, 0 }, { 0, 0, 0 } };
+        double[][] values2 = { { 1.0000000000000167, -0.3623577544766736, -0.3623577544766736 },
+                { 0, 0.9320390859672374, -0.3377315902755755 }, { 0, 0, 0.8686968577706282 }, { 0, 0, 0 }, { 0, 0, 0 } };
 
         A = Factory2D.make(values2);
 
@@ -617,7 +620,9 @@ class TestMatrix2D {
         // System.out.println("\n\nbandwidth="+k+"
         // "+cern.colt.matrixpattern.Converting.toHTML(A.toString()));
 
-        double[][] values3 = { { 611, 196, -192, 407, -8, -52, -49, 29 }, { 196, 899, 113, -192, -71, -43, -8, -44 }, { -192, 113, 899, 196, 61, 49, 8, 52 }, { 407, -192, 196, 611, 8, 44, 59, -23 }, { -8, -71, 61, 8, 411, -599, 208, 208 }, { -52, -43, 49, 44, -599, 411, 208, 208 },
+        double[][] values3 = { { 611, 196, -192, 407, -8, -52, -49, 29 }, { 196, 899, 113, -192, -71, -43, -8, -44 },
+                { -192, 113, 899, 196, 61, 49, 8, 52 }, { 407, -192, 196, 611, 8, 44, 59, -23 },
+                { -8, -71, 61, 8, 411, -599, 208, 208 }, { -52, -43, 49, 44, -599, 411, 208, 208 },
                 { -49, -8, 8, 59, 208, 208, 99, -911 }, { 29, -44, 52, -23, 208, 208, -911, 99 } };
 
         A = Factory2D.make(values3);
@@ -689,7 +694,8 @@ class TestMatrix2D {
 
         double mean = 5.0;
         double stdDev = 3.0;
-        cern.jet.random.tdouble.Normal random = new cern.jet.random.tdouble.Normal(mean, stdDev, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.Normal random = new cern.jet.random.tdouble.Normal(mean, stdDev,
+                new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
 
         System.out.println("sampling...");
         double value = 2;
@@ -710,7 +716,7 @@ class TestMatrix2D {
         solved = b.like();
         // Inv = Factory2D.make(size,size);
 
-        DoubleLUDecompositionQuick lu = new DoubleLUDecompositionQuick();
+        DenseDoubleLUDecompositionQuick lu = new DenseDoubleLUDecompositionQuick();
 
         System.out.println("benchmarking assignment...");
         cern.colt.Timer timer = new cern.colt.Timer().start();
@@ -759,7 +765,8 @@ class TestMatrix2D {
         A = factory.make(size, size, value);
 
         cern.colt.function.tdouble.Double9Function function = new cern.colt.function.tdouble.Double9Function() {
-            public final double apply(double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22) {
+            public final double apply(double a00, double a01, double a02, double a10, double a11, double a12,
+                    double a20, double a21, double a22) {
                 return alpha * a11 + beta * (a01 + a10 + a12 + a21);
             }
         };
@@ -807,7 +814,7 @@ class TestMatrix2D {
         cern.colt.Timer timer = new cern.colt.Timer().start();
 
         System.out.println(A);
-        System.out.println(DoubleAlgebra.ZERO.inverse(A));
+        System.out.println(DenseDoubleAlgebra.ZERO.inverse(A));
 
         timer.stop().display();
 
@@ -841,7 +848,7 @@ class TestMatrix2D {
         };
 
         System.out.println(A);
-        System.out.println(DoubleAlgebra.ZERO.inverse(A));
+        System.out.println(DenseDoubleAlgebra.ZERO.inverse(A));
 
         timer.stop().display();
 
@@ -882,11 +889,11 @@ class TestMatrix2D {
             }
         }
 
-        transposeMatrix = DoubleAlgebra.DEFAULT.transpose(patternMatrix);
-        QMatrix = DoubleAlgebra.DEFAULT.mult(transposeMatrix, patternMatrix);
-        inverseQMatrix = DoubleAlgebra.DEFAULT.inverse(QMatrix);
-        pseudoInverseMatrix = DoubleAlgebra.DEFAULT.mult(inverseQMatrix, transposeMatrix);
-        weightMatrix = DoubleAlgebra.DEFAULT.mult(patternMatrix, pseudoInverseMatrix);
+        transposeMatrix = DenseDoubleAlgebra.DEFAULT.transpose(patternMatrix);
+        QMatrix = DenseDoubleAlgebra.DEFAULT.mult(transposeMatrix, patternMatrix);
+        inverseQMatrix = DenseDoubleAlgebra.DEFAULT.inverse(QMatrix);
+        pseudoInverseMatrix = DenseDoubleAlgebra.DEFAULT.mult(inverseQMatrix, transposeMatrix);
+        weightMatrix = DenseDoubleAlgebra.DEFAULT.mult(patternMatrix, pseudoInverseMatrix);
         System.out.println("done.");
 
     }
@@ -1204,7 +1211,7 @@ class TestMatrix2D {
 
         DoubleMatrix2D A = new DenseDoubleMatrix2D(data);
         Property.DEFAULT.generateNonSingular(A);
-        DoubleMatrix2D inv = DoubleAlgebra.DEFAULT.inverse(A);
+        DoubleMatrix2D inv = DenseDoubleAlgebra.DEFAULT.inverse(A);
 
         System.out.println("\n\n\n" + A);
         System.out.println("\n" + inv);
@@ -1532,13 +1539,17 @@ class TestMatrix2D {
     /**
      */
     public static void testLU() {
-        double[][] vals = { { -0.074683, 0.321248, -0.014656, 0.286586, 0 }, { -0.344852, -0.16278, 0.173711, 0.00064, 0 }, { -0.181924, -0.092926, 0.184153, 0.177966, 1 }, { -0.166829, -0.10321, 0.582301, 0.142583, 0 }, { 0, -0.112952, -0.04932, -0.700157, 0 }, { 0, 0, 0, 0, 0 } };
+        double[][] vals = { { -0.074683, 0.321248, -0.014656, 0.286586, 0 },
+                { -0.344852, -0.16278, 0.173711, 0.00064, 0 }, { -0.181924, -0.092926, 0.184153, 0.177966, 1 },
+                { -0.166829, -0.10321, 0.582301, 0.142583, 0 }, { 0, -0.112952, -0.04932, -0.700157, 0 },
+                { 0, 0, 0, 0, 0 } };
 
         DoubleMatrix2D H = new DenseDoubleMatrix2D(vals); // see values
         // below...
         System.out.println("\nHplus=" + H.viewDice().zMult(H, null));
 
-        DoubleMatrix2D Hplus = DoubleAlgebra.DEFAULT.inverse(H.viewDice().zMult(H, null)).zMult(H.viewDice(), null);
+        DoubleMatrix2D Hplus = DenseDoubleAlgebra.DEFAULT.inverse(H.viewDice().zMult(H, null))
+                .zMult(H.viewDice(), null);
         Hplus.assign(cern.jet.math.tdouble.DoubleFunctions.round(1.0E-10));
         System.out.println("\nHplus=" + Hplus);
 
@@ -1576,7 +1587,8 @@ class TestMatrix2D {
 
         DenseDoubleMatrix1D d1Double = new DenseDoubleMatrix1D(temp);
 
-        hep.aida.tdouble.bin.DynamicDoubleBin1D d1ynamicBin = cern.colt.matrix.tdouble.algo.DoubleStatistic.bin(d1Double);
+        hep.aida.tdouble.bin.DynamicDoubleBin1D d1ynamicBin = cern.colt.matrix.tdouble.algo.DoubleStatistic
+                .bin(d1Double);
 
         double max = d1ynamicBin.max();
 

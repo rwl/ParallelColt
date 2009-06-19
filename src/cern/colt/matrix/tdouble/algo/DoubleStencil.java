@@ -56,7 +56,8 @@ public class DoubleStencil extends Object {
      *            do it only every 2,4 or 8 iterations.)
      * @return the number of iterations actually executed.
      */
-    public static int stencil27(DoubleMatrix3D A, cern.colt.function.tdouble.Double27Function function, int maxIterations, DoubleMatrix3DProcedure hasConverged, int convergenceIterations) {
+    public static int stencil27(DoubleMatrix3D A, cern.colt.function.tdouble.Double27Function function,
+            int maxIterations, DoubleMatrix3DProcedure hasConverged, int convergenceIterations) {
         DoubleMatrix3D B = A.copy();
         if (convergenceIterations <= 1)
             convergenceIterations = 2;
@@ -99,7 +100,8 @@ public class DoubleStencil extends Object {
      *            do it only every 2,4 or 8 iterations.)
      * @return the number of iterations actually executed.
      */
-    public static int stencil9(DoubleMatrix2D A, cern.colt.function.tdouble.Double9Function function, int maxIterations, DoubleMatrix2DProcedure hasConverged, int convergenceIterations) {
+    public static int stencil9(DoubleMatrix2D A, cern.colt.function.tdouble.Double9Function function,
+            int maxIterations, DoubleMatrix2DProcedure hasConverged, int convergenceIterations) {
         DoubleMatrix2D B = A.copy();
         if (convergenceIterations <= 1)
             convergenceIterations = 2;

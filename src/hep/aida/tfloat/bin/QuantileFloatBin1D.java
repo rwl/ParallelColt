@@ -664,6 +664,10 @@ import cern.jet.stat.tfloat.quantile.FloatQuantileFinderFactory;
  * @version 0.9, 03-Jul-99
  */
 public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected FloatQuantileFinder finder = null;
 
     /**
@@ -680,7 +684,8 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      * .
      */
     public QuantileFloatBin1D(float epsilon) {
-        this(false, Long.MAX_VALUE, epsilon, 0.001f, 10000, new cern.jet.random.tfloat.engine.FRand(new java.util.Date()));
+        this(false, Long.MAX_VALUE, epsilon, 0.001f, 10000, new cern.jet.random.tfloat.engine.FRand(
+                new java.util.Date()));
     }
 
     /**
@@ -688,7 +693,8 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      * <tt>new QuantileBin1D(known_N, N, epsilon, delta, quantiles, randomGenerator, false, false, 2)</tt>
      * .
      */
-    public QuantileFloatBin1D(boolean known_N, long N, float epsilon, float delta, int quantiles, FloatRandomEngine randomGenerator) {
+    public QuantileFloatBin1D(boolean known_N, long N, float epsilon, float delta, int quantiles,
+            FloatRandomEngine randomGenerator) {
         this(known_N, N, epsilon, delta, quantiles, randomGenerator, false, false, 2);
     }
 
@@ -773,9 +779,12 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      *            passed in. Thus, <tt>sumOfPowers(0..2)</tt> always returns
      *            meaningful results.
      */
-    public QuantileFloatBin1D(boolean known_N, long N, float epsilon, float delta, int quantiles, FloatRandomEngine randomGenerator, boolean hasSumOfLogarithms, boolean hasSumOfInversions, int maxOrderForSumOfPowers) {
+    public QuantileFloatBin1D(boolean known_N, long N, float epsilon, float delta, int quantiles,
+            FloatRandomEngine randomGenerator, boolean hasSumOfLogarithms, boolean hasSumOfInversions,
+            int maxOrderForSumOfPowers) {
         super(hasSumOfLogarithms, hasSumOfInversions, maxOrderForSumOfPowers);
-        this.finder = FloatQuantileFinderFactory.newFloatQuantileFinder(known_N, N, epsilon, delta, quantiles, randomGenerator);
+        this.finder = FloatQuantileFinderFactory.newFloatQuantileFinder(known_N, N, epsilon, delta, quantiles,
+                randomGenerator);
         this.clear();
     }
 
@@ -794,6 +803,7 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
+    @Override
     public synchronized void addAllOfFromTo(FloatArrayList list, int from, int to) {
         super.addAllOfFromTo(list, from, to);
         if (this.finder != null)
@@ -804,6 +814,7 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns.
      */
+    @Override
     public synchronized void clear() {
         super.clear();
         if (this.finder != null)
@@ -815,6 +826,7 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public synchronized Object clone() {
         QuantileFloatBin1D clone = (QuantileFloatBin1D) super.clone();
         if (this.finder != null)
@@ -830,12 +842,15 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      *            the other bin to compare with
      * @return a summary of the deviations.
      */
+    @Override
     public String compareWith(AbstractFloatBin1D other) {
         StringBuffer buf = new StringBuffer(super.compareWith(other));
         if (other instanceof QuantileFloatBin1D) {
             QuantileFloatBin1D q = (QuantileFloatBin1D) other;
-            buf.append("25%, 50% and 75% Quantiles: " + relError(quantile(0.25f), q.quantile(0.25f)) + ", " + relError(quantile(0.5f), q.quantile(0.5f)) + ", " + relError(quantile(0.75f), q.quantile(0.75f)));
-            buf.append("\nquantileInverse(mean): " + relError(quantileInverse(mean()), q.quantileInverse(q.mean())) + " %");
+            buf.append("25%, 50% and 75% Quantiles: " + relError(quantile(0.25f), q.quantile(0.25f)) + ", "
+                    + relError(quantile(0.5f), q.quantile(0.5f)) + ", " + relError(quantile(0.75f), q.quantile(0.75f)));
+            buf.append("\nquantileInverse(mean): " + relError(quantileInverse(mean()), q.quantileInverse(q.mean()))
+                    + " %");
             buf.append("\n");
         }
         return buf.toString();
@@ -903,7 +918,7 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
      * @return the number of elements in the range.
      */
     public int sizeOfRange(float minElement, float maxElement) {
-        return (int) Math.round(size() * (quantileInverse(maxElement) - quantileInverse(minElement)));
+        return Math.round(size() * (quantileInverse(maxElement) - quantileInverse(minElement)));
     }
 
     /**
@@ -1144,12 +1159,13 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
             c--;
 
             // example: bin(0) contains (0.2-0.1) == 10% of all elements
-            int binSize = (int) Math.round((percent[i + 1] - percent[i]) * dataSize);
+            int binSize = Math.round((percent[i + 1] - percent[i]) * dataSize);
             float binMax = binMin;
             binMin = safe_min;
 
             // fill statistics
-            splitBins[i] = new MightyStaticFloatBin1D(this.hasSumOfLogarithms, this.hasSumOfInversions, maxOrderForSumOfPowers);
+            splitBins[i] = new MightyStaticFloatBin1D(this.hasSumOfLogarithms, this.hasSumOfInversions,
+                    maxOrderForSumOfPowers);
             if (binSize > 0) {
                 splitBins[i].size = binSize;
                 splitBins[i].min = binMin;
@@ -1205,6 +1221,7 @@ public class QuantileFloatBin1D extends MightyStaticFloatBin1D {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
         buf.append("25%, 50%, 75% Quantiles: " + quantile(0.25f) + ", " + quantile(0.5f) + ", " + quantile(0.75f));

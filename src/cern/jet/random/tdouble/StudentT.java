@@ -45,6 +45,11 @@ import cern.jet.stat.tdouble.Probability;
  * @version 1.0, 09/24/99
  */
 public class StudentT extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double freedom;
 
     protected double TERM; // performance cache for pdf()
@@ -75,6 +80,7 @@ public class StudentT extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(this.freedom);
     }
@@ -151,6 +157,7 @@ public class StudentT extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + freedom + ")";
     }

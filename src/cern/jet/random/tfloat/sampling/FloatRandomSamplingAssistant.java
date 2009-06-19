@@ -27,6 +27,11 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * @version 1.0, 02/05/99
  */
 public class FloatRandomSamplingAssistant extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public class RandomSamplingAssistant extends Object implements
     // java.io.Serializable {
     protected FloatRandomSampler sampler;
@@ -66,6 +71,7 @@ public class FloatRandomSamplingAssistant extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         FloatRandomSamplingAssistant copy = (FloatRandomSamplingAssistant) super.clone();
         copy.sampler = (FloatRandomSampler) this.sampler.clone();

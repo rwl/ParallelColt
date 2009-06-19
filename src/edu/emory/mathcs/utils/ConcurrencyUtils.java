@@ -40,7 +40,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import jcuda.jcublas.JCublas;
 import cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction;
 import cern.colt.function.tdouble.DoubleDoubleFunction;
 import cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction;
@@ -54,11 +53,10 @@ import cern.colt.function.tobject.ObjectObjectFunction;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class ConcurrencyUtils {
-    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool(new CustomThreadFactory(new CustomExceptionHandler()));
+    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool(new CustomThreadFactory(
+            new CustomExceptionHandler()));
 
     private static int NTHREADS = getNumberOfProcessors();
-
-    private static boolean USE_JCUBLAS = checkJCublas();
 
     private static int THREADS_BEGIN_N_1D_FFT_2THREADS = 8192;
 
@@ -138,26 +136,6 @@ public class ConcurrencyUtils {
      */
     public static int getNumberOfProcessors() {
         return Runtime.getRuntime().availableProcessors();
-    }
-
-    /**
-     * Checks if JCublas is available
-     * 
-     * @return true if JCublas is available
-     */
-    public static boolean checkJCublas() {
-        int result;
-        try {
-            result = JCublas.cublasInit(false);
-        } catch (Throwable e) {
-            return false;
-        }
-        if (result == JCublas.CUBLAS_STATUS_SUCCESS) {
-            return true;
-        } else {
-            return false;
-        }
-
     }
 
     /**
@@ -360,24 +338,6 @@ public class ConcurrencyUtils {
             e.printStackTrace();
         }
         return a;
-    }
-
-    /**
-     * Returns true if JCUBLAS is used.
-     * 
-     * @return true if JCUBLAS is used
-     */
-    public static boolean getUseJCublas() {
-        return USE_JCUBLAS;
-    }
-
-    /**
-     * If <code>useJCublas</code> is true then JCUBLAS is used.
-     * 
-     * @param useJCublas
-     */
-    public static void setUseJCublas(boolean useJCublas) {
-        USE_JCUBLAS = useJCublas;
     }
 
     /**

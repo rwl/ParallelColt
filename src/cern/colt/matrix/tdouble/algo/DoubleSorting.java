@@ -9,6 +9,7 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tdouble.algo;
 
 import cern.colt.function.tint.IntComparator;
+import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleFactory3D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
@@ -50,6 +51,11 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
  */
 public class DoubleSorting extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A prefabricated quicksort.
      */
     public static final DoubleSorting quickSort = new DoubleSorting();
@@ -58,10 +64,17 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      * A prefabricated mergesort.
      */
     public static final DoubleSorting mergeSort = new DoubleSorting() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        @Override
         protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
             cern.colt.Sorting.mergeSort(a, fromIndex, toIndex, c);
         }
 
+        @Override
         protected void runSort(int fromIndex, int toIndex, IntComparator c, cern.colt.Swapper swapper) {
             cern.colt.GenericSorting.mergeSort(fromIndex, toIndex, c, swapper);
         }
@@ -122,7 +135,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      *         matrix is left unaffected.</b>
      */
     public DoubleMatrix1D sort(final DoubleMatrix1D vector) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -167,7 +180,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final DoubleMatrix1D vector) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -201,7 +214,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final DoubleMatrix1D vector, IntComparator comp) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -240,7 +253,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      *         vector (matrix) is left unaffected.</b>
      */
     public DoubleMatrix1D sort(final DoubleMatrix1D vector, final cern.colt.function.tdouble.DoubleComparator c) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -269,7 +282,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final DoubleMatrix1D vector, final cern.colt.function.tdouble.DoubleComparator c) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -467,7 +480,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      */
     public DoubleMatrix2D sort(DoubleMatrix2D matrix, int column) {
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + DoubleFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] rowIndexes = new int[matrix.rows()]; // row indexes to reorder
         // instead of matrix itself
@@ -672,9 +685,9 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      */
     public DoubleMatrix3D sort(DoubleMatrix3D matrix, int row, int column) {
         if (row < 0 || row >= matrix.rows())
-            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + DoubleFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + AbstractFormatter.shape(matrix));
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + DoubleFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] sliceIndexes = new int[matrix.slices()]; // indexes to reorder
         // instead of matrix
@@ -891,14 +904,18 @@ public class DoubleSorting extends cern.colt.PersistentObject {
         // so we just show the first 5 rows
         if (print) {
             int r = Math.min(rows, 5);
-            hep.aida.tdouble.bin.DoubleBinFunction1D[] funs = { hep.aida.tdouble.bin.DoubleBinFunctions1D.median, hep.aida.tdouble.bin.DoubleBinFunctions1D.sumLog, hep.aida.tdouble.bin.DoubleBinFunctions1D.geometricMean };
+            hep.aida.tdouble.bin.DoubleBinFunction1D[] funs = { hep.aida.tdouble.bin.DoubleBinFunctions1D.median,
+                    hep.aida.tdouble.bin.DoubleBinFunctions1D.sumLog,
+                    hep.aida.tdouble.bin.DoubleBinFunctions1D.geometricMean };
             String[] rowNames = new String[r];
             String[] columnNames = new String[columns];
             for (int i = columns; --i >= 0;)
                 columnNames[i] = Integer.toString(i);
             for (int i = r; --i >= 0;)
                 rowNames[i] = Integer.toString(i);
-            System.out.println("first part of sorted result = \n" + new cern.colt.matrix.tdouble.algo.DoubleFormatter("%G").toTitleString(A.viewPart(0, 0, r, columns), rowNames, columnNames, null, null, null, funs));
+            System.out.println("first part of sorted result = \n"
+                    + new cern.colt.matrix.tdouble.algo.DoubleFormatter("%G").toTitleString(A
+                            .viewPart(0, 0, r, columns), rowNames, columnNames, null, null, null, funs));
         }
 
         System.out.print("now sorting - slow version... ");
@@ -921,16 +938,10 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      * Demonstrates advanced sorting. Sorts by sum of row.
      */
     public static void zdemo6() {
-        DoubleSorting sort = quickSort;
-        double[][] values = { { 3, 7, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 1, 8, 0 }, { 2, 5, 0 }, { 7, 0, 0 }, { 2, 3, 0 }, { 1, 0, 0 }, { 4, 0, 0 }, { 2, 0, 0 } };
+        double[][] values = { { 3, 7, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 1, 8, 0 }, { 2, 5, 0 }, { 7, 0, 0 },
+                { 2, 3, 0 }, { 1, 0, 0 }, { 4, 0, 0 }, { 2, 0, 0 } };
         DoubleMatrix2D A = DoubleFactory2D.dense.make(values);
         DoubleMatrix2D B, C;
-        /*
-         * DoubleMatrix1DComparator comp = new DoubleMatrix1DComparator() {
-         * public int compare(DoubleMatrix1D a, DoubleMatrix1D b) { double as =
-         * a.zSum(); double bs = b.zSum(); return as < bs ? -1 : as == bs ? 0 :
-         * 1; } };
-         */
         System.out.println("\n\nunsorted:" + A);
         B = quickSort.sort(A, 1);
         C = quickSort.sort(B, 0);
@@ -957,7 +968,6 @@ public class DoubleSorting extends cern.colt.PersistentObject {
         final cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
         DoubleMatrix2D A = cern.colt.matrix.tdouble.DoubleFactory2D.dense.make(rows, columns);
         A.assign(new cern.jet.random.tdouble.engine.DRand()); // initialize randomly
-        DoubleMatrix2D B = A.copy();
 
         double[] v1 = A.viewColumn(0).toArray();
         double[] v2 = A.viewColumn(0).toArray();

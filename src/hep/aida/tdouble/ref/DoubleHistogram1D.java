@@ -17,6 +17,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements DoubleIHistogram1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private double[] errors;
 
     private double[] heights;
@@ -82,6 +87,7 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
         this(title, new DoubleFixedAxis(bins, min, max));
     }
 
+    @Override
     public int allEntries() // perhaps to be deleted (default
     // impl. in
     // superclass sufficient)
@@ -96,7 +102,7 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
 
     public double binError(int index) {
         // return Math.sqrt(errors[xAxis.map(index)]);
-        return (double) Math.sqrt(errors[map(index)]);
+        return Math.sqrt(errors[map(index)]);
     }
 
     public double binHeight(int index) {
@@ -133,15 +139,17 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
         rms += x * weight * weight;
     }
 
-    public void fill_2D(final double[] data, final int rows, final int columns, final int zero, final int rowStride, final int columnStride) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
+    public void fill_2D(final double[] data, final int rows, final int columns, final int zero, final int rowStride,
+            final int columnStride) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startrow = j * k;
                 final int stoprow;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stoprow = rows;
                 } else {
                     stoprow = startrow + k;
@@ -208,15 +216,17 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
         }
     }
 
-    public void fill_2D(final double[] data, final double[] weights, final int rows, final int columns, final int zero, final int rowStride, final int columnStride) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
+    public void fill_2D(final double[] data, final double[] weights, final int rows, final int columns, final int zero,
+            final int rowStride, final int columnStride) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startrow = j * k;
                 final int stoprow;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stoprow = rows;
                 } else {
                     stoprow = startrow + k;
@@ -314,7 +324,7 @@ public class DoubleHistogram1D extends DoubleAbstractHistogram1D implements Doub
     }
 
     public double rms() {
-        return (double) Math.sqrt(rms / sumWeight - mean * mean / sumWeight / sumWeight);
+        return Math.sqrt(rms / sumWeight - mean * mean / sumWeight / sumWeight);
     }
 
     /**

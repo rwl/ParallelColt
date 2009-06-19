@@ -665,6 +665,10 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * @version 0.9, 03-Jul-99
  */
 public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected DoubleQuantileFinder finder = null;
 
     /**
@@ -681,7 +685,8 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      * .
      */
     public QuantileDoubleBin1D(double epsilon) {
-        this(false, Long.MAX_VALUE, epsilon, 0.001, 10000, new cern.jet.random.tdouble.engine.DRand(new java.util.Date()));
+        this(false, Long.MAX_VALUE, epsilon, 0.001, 10000, new cern.jet.random.tdouble.engine.DRand(
+                new java.util.Date()));
     }
 
     /**
@@ -689,7 +694,8 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      * <tt>new QuantileBin1D(known_N, N, epsilon, delta, quantiles, randomGenerator, false, false, 2)</tt>
      * .
      */
-    public QuantileDoubleBin1D(boolean known_N, long N, double epsilon, double delta, int quantiles, DoubleRandomEngine randomGenerator) {
+    public QuantileDoubleBin1D(boolean known_N, long N, double epsilon, double delta, int quantiles,
+            DoubleRandomEngine randomGenerator) {
         this(known_N, N, epsilon, delta, quantiles, randomGenerator, false, false, 2);
     }
 
@@ -774,9 +780,12 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      *            passed in. Thus, <tt>sumOfPowers(0..2)</tt> always returns
      *            meaningful results.
      */
-    public QuantileDoubleBin1D(boolean known_N, long N, double epsilon, double delta, int quantiles, DoubleRandomEngine randomGenerator, boolean hasSumOfLogarithms, boolean hasSumOfInversions, int maxOrderForSumOfPowers) {
+    public QuantileDoubleBin1D(boolean known_N, long N, double epsilon, double delta, int quantiles,
+            DoubleRandomEngine randomGenerator, boolean hasSumOfLogarithms, boolean hasSumOfInversions,
+            int maxOrderForSumOfPowers) {
         super(hasSumOfLogarithms, hasSumOfInversions, maxOrderForSumOfPowers);
-        this.finder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(known_N, N, epsilon, delta, quantiles, randomGenerator);
+        this.finder = DoubleQuantileFinderFactory.newDoubleQuantileFinder(known_N, N, epsilon, delta, quantiles,
+                randomGenerator);
         this.clear();
     }
 
@@ -795,6 +804,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
+    @Override
     public synchronized void addAllOfFromTo(DoubleArrayList list, int from, int to) {
         super.addAllOfFromTo(list, from, to);
         if (this.finder != null)
@@ -805,6 +815,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns.
      */
+    @Override
     public synchronized void clear() {
         super.clear();
         if (this.finder != null)
@@ -816,6 +827,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public synchronized Object clone() {
         QuantileDoubleBin1D clone = (QuantileDoubleBin1D) super.clone();
         if (this.finder != null)
@@ -831,12 +843,15 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      *            the other bin to compare with
      * @return a summary of the deviations.
      */
+    @Override
     public String compareWith(AbstractDoubleBin1D other) {
         StringBuffer buf = new StringBuffer(super.compareWith(other));
         if (other instanceof QuantileDoubleBin1D) {
             QuantileDoubleBin1D q = (QuantileDoubleBin1D) other;
-            buf.append("25%, 50% and 75% Quantiles: " + relError(quantile(0.25), q.quantile(0.25)) + ", " + relError(quantile(0.5), q.quantile(0.5)) + ", " + relError(quantile(0.75), q.quantile(0.75)));
-            buf.append("\nquantileInverse(mean): " + relError(quantileInverse(mean()), q.quantileInverse(q.mean())) + " %");
+            buf.append("25%, 50% and 75% Quantiles: " + relError(quantile(0.25), q.quantile(0.25)) + ", "
+                    + relError(quantile(0.5), q.quantile(0.5)) + ", " + relError(quantile(0.75), q.quantile(0.75)));
+            buf.append("\nquantileInverse(mean): " + relError(quantileInverse(mean()), q.quantileInverse(q.mean()))
+                    + " %");
             buf.append("\n");
         }
         return buf.toString();
@@ -1150,7 +1165,8 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
             binMin = safe_min;
 
             // fill statistics
-            splitBins[i] = new MightyStaticDoubleBin1D(this.hasSumOfLogarithms, this.hasSumOfInversions, maxOrderForSumOfPowers);
+            splitBins[i] = new MightyStaticDoubleBin1D(this.hasSumOfLogarithms, this.hasSumOfInversions,
+                    maxOrderForSumOfPowers);
             if (binSize > 0) {
                 splitBins[i].size = binSize;
                 splitBins[i].min = binMin;
@@ -1206,6 +1222,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
         buf.append("25%, 50%, 75% Quantiles: " + quantile(0.25) + ", " + quantile(0.5) + ", " + quantile(0.75));

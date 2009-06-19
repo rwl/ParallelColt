@@ -26,7 +26,7 @@ package cern.colt.matrix.tdouble.algo.solver;
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.jet.math.tdouble.DoubleFunctions;
@@ -120,15 +120,16 @@ public class DoubleGMRES extends AbstractDoubleIterativeSolver {
 
         v = new DoubleMatrix1D[restart + 1];
         for (int i = 0; i < v.length; ++i)
-            v[i] = new DenseDoubleMatrix1D(r.size());
+            v[i] = new DenseDoubleMatrix1D((int) r.size());
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         checkSizes(A, b, x);
 
         A.zMult(x, u.assign(b), -1, 1, false);
         M.apply(u, r);
-        double normr = DoubleAlgebra.DEFAULT.norm(r, Norm.Two);
+        double normr = DenseDoubleAlgebra.DEFAULT.norm(r, Norm.Two);
         M.apply(b, u);
 
         // Outer iteration
@@ -147,7 +148,7 @@ public class DoubleGMRES extends AbstractDoubleIterativeSolver {
                     H.setQuick(k, i, w.zDotProduct(v[k]));
                     w.assign(v[k], DoubleFunctions.plusMultSecond(-H.getQuick(k, i)));
                 }
-                H.setQuick(i + 1, i, DoubleAlgebra.DEFAULT.norm(w, Norm.Two));
+                H.setQuick(i + 1, i, DenseDoubleAlgebra.DEFAULT.norm(w, Norm.Two));
                 v[i + 1].assign(w, DoubleFunctions.multSecond(1. / H.getQuick(i + 1, i)));
 
                 // QR factorization of H using Givens rotations
@@ -160,13 +161,13 @@ public class DoubleGMRES extends AbstractDoubleIterativeSolver {
             }
 
             // Update solution in current subspace
-            s = DoubleAlgebra.DEFAULT.backwardSolve(H.viewPart(0, 0, i, i), s);
+            s = DenseDoubleAlgebra.DEFAULT.backwardSolve(H.viewPart(0, 0, i, i), s);
             for (int j = 0; j < i; j++)
                 x.assign(v[j], DoubleFunctions.plusMultSecond(s.getQuick(j)));
 
             A.zMult(x, u.assign(b), -1, 1, false);
             M.apply(u, r);
-            normr = DoubleAlgebra.DEFAULT.norm(r, Norm.Two);
+            normr = DenseDoubleAlgebra.DEFAULT.norm(r, Norm.Two);
         }
 
         return x;

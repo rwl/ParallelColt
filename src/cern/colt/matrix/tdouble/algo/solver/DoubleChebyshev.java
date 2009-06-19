@@ -88,7 +88,8 @@ public class DoubleChebyshev extends AbstractDoubleIterativeSolver {
             throw new IllegalArgumentException("eigmin > eigmax");
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         checkSizes(A, b, x);
 
         double alpha = 0, beta = 0, c = 0, d = 0;

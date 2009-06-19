@@ -52,12 +52,14 @@ public interface FloatIHistogram1D extends FloatIHistogram {
     /**
      * Fill histogram with specified data and weight 1.
      */
-    public void fill_2D(final float[] data, final int rows, final int columns, final int zero, final int rowStride, final int columnStride);
+    public void fill_2D(final float[] data, final int rows, final int columns, final int zero, final int rowStride,
+            final int columnStride);
 
     /**
      * Fill histogram with specified data and weights.
      */
-    public void fill_2D(final float[] data, final float[] weights, final int rows, final int columns, final int zero, final int rowStride, final int columnStride);
+    public void fill_2D(final float[] data, final float[] weights, final int rows, final int columns, final int zero,
+            final int rowStride, final int columnStride);
 
     /**
      * Returns the mean of the whole histogram as calculated on filling-time.

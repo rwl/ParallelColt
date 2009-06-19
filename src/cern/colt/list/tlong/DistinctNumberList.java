@@ -69,6 +69,11 @@ package cern.colt.list.tlong;
  * @version 1.0, 09/24/99
  */
 public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected long[] distinctValues;
 
     protected MinMaxNumberList elements;
@@ -94,6 +99,7 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param element
      *            element to be appended to this list.
      */
+    @Override
     public void add(long element) {
         // overridden for performance only.
         elements.add(codeOf(element));
@@ -118,6 +124,7 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param minCapacity
      *            the desired minimum capacity.
      */
+    @Override
     public void ensureCapacity(int minCapacity) {
         elements.ensureCapacity(minCapacity);
     }
@@ -133,6 +140,7 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param index
      *            index of element to return.
      */
+    @Override
     public long getQuick(int index) {
         return distinctValues[(int) (elements.getQuick(index))];
     }
@@ -152,6 +160,7 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void removeFromTo(int from, int to) {
         elements.removeFromTo(from, to);
         size -= to - from + 1;
@@ -170,6 +179,7 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param element
      *            element to be stored at the specified position.
      */
+    @Override
     public void setQuick(int index, long element) {
         elements.setQuick(index, codeOf(element));
     }
@@ -179,6 +189,7 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
      * should not release or allocate new memory but simply set some instance
      * variable like <tt>size</tt>.
      */
+    @Override
     protected void setSizeRaw(int newSize) {
         super.setSizeRaw(newSize);
         elements.setSizeRaw(newSize);
@@ -206,6 +217,7 @@ public class DistinctNumberList extends cern.colt.list.tlong.AbstractLongList {
      * application can use this operation to minimize the storage of the
      * receiver.
      */
+    @Override
     public void trimToSize() {
         elements.trimToSize();
     }

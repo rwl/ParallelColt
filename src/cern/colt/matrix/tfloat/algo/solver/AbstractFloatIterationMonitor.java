@@ -22,7 +22,7 @@ package cern.colt.matrix.tfloat.algo.solver;
 
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
-import cern.colt.matrix.tfloat.algo.FloatAlgebra;
+import cern.colt.matrix.tfloat.algo.DenseFloatAlgebra;
 
 /**
  * Partial implementation of an iteration reporter
@@ -75,7 +75,7 @@ public abstract class AbstractFloatIterationMonitor implements FloatIterationMon
     }
 
     public boolean converged(FloatMatrix1D r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
-        return converged(FloatAlgebra.DEFAULT.norm(r, normType), x);
+        return converged(DenseFloatAlgebra.DEFAULT.norm(r, normType), x);
     }
 
     public boolean converged(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
@@ -95,7 +95,7 @@ public abstract class AbstractFloatIterationMonitor implements FloatIterationMon
     protected abstract boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException;
 
     public boolean converged(FloatMatrix1D r) throws IterativeSolverFloatNotConvergedException {
-        return converged(FloatAlgebra.DEFAULT.norm(r, normType));
+        return converged(DenseFloatAlgebra.DEFAULT.norm(r, normType));
     }
 
     public Norm getNormType() {

@@ -1,7 +1,6 @@
 package cern.colt.matrix.tfloat.algo.solver;
 
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatSSOR;
-import cern.colt.matrix.tfloat.impl.RCFloatMatrix2D;
 
 /**
  * Test of FloatQMR with SSOR
@@ -16,7 +15,7 @@ public class FloatQMRSSORTest extends FloatQMRTest {
     protected void createSolver() throws Exception {
         super.createSolver();
         float omega = (float) Math.random() + 1;
-        M = new FloatSSOR((RCFloatMatrix2D) A.copy(), true, omega, omega);
+        M = new FloatSSOR(A.rows(), true, omega, omega);
     }
 
 }

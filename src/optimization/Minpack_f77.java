@@ -216,7 +216,8 @@ public class Minpack_f77 extends Object {
      * 
      */
 
-    public static void lmder1_f77(Lmder_fcn nlls, int m, int n, double x[], double fvec[], double fjac[][], double tol, int info[], int ipvt[]) {
+    public static void lmder1_f77(Lmder_fcn nlls, int m, int n, double x[], double fvec[], double fjac[][], double tol,
+            int info[], int ipvt[]) {
 
         /*
 
@@ -389,7 +390,8 @@ public class Minpack_f77 extends Object {
             mode = 1;
             nprint = 0;
 
-            Minpack_f77.lmder_f77(nlls, m, n, x, fvec, fjac, ftol, xtol, gtol, maxfev, diag, mode, factor, nprint, info, nfev, njev, ipvt, qtf);
+            Minpack_f77.lmder_f77(nlls, m, n, x, fvec, fjac, ftol, xtol, gtol, maxfev, diag, mode, factor, nprint,
+                    info, nfev, njev, ipvt, qtf);
 
             if (info[1] == 8)
                 info[1] = 4;
@@ -559,7 +561,9 @@ public class Minpack_f77 extends Object {
     is passed as info[].
     */
 
-    public static void lmder_f77(Lmder_fcn nlls, int m, int n, double x[], double fvec[], double fjac[][], double ftol, double xtol, double gtol, int maxfev, double diag[], int mode, double factor, int nprint, int info[], int nfev[], int njev[], int ipvt[], double qtf[]) {
+    public static void lmder_f77(Lmder_fcn nlls, int m, int n, double x[], double fvec[], double fjac[][], double ftol,
+            double xtol, double gtol, int maxfev, double diag[], int mode, double factor, int nprint, int info[],
+            int nfev[], int njev[], int ipvt[], double qtf[]) {
 
         /*
 
@@ -1478,7 +1482,8 @@ public class Minpack_f77 extends Object {
      * 
      */
 
-    public static void qrfac_f77(int m, int n, double a[][], boolean pivot, int ipvt[], double rdiag[], double acnorm[], double wa[]) {
+    public static void qrfac_f77(int m, int n, double a[][], boolean pivot, int ipvt[], double rdiag[],
+            double acnorm[], double wa[]) {
 
         /*
 
@@ -1800,7 +1805,8 @@ public class Minpack_f77 extends Object {
      * 
      */
 
-    public static void qrsolv_f77(int n, double r[][], int ipvt[], double diag[], double qtb[], double x[], double sdiag[], double wa[]) {
+    public static void qrsolv_f77(int n, double r[][], int ipvt[], double diag[], double qtb[], double x[],
+            double sdiag[], double wa[]) {
 
         /*
 
@@ -2136,7 +2142,8 @@ public class Minpack_f77 extends Object {
      * 
      */
 
-    public static void lmpar_f77(int n, double r[][], int ipvt[], double diag[], double qtb[], double delta, double par[], double x[], double sdiag[], double wa1[], double wa2[]) {
+    public static void lmpar_f77(int n, double r[][], int ipvt[], double diag[], double qtb[], double delta,
+            double par[], double x[], double sdiag[], double wa1[], double wa2[]) {
 
         /*
 
@@ -2715,7 +2722,8 @@ public class Minpack_f77 extends Object {
         mode = 1;
         nprint = 0;
 
-        Minpack_f77.lmdif_f77(nlls, m, n, x, fvec, ftol, xtol, gtol, maxfev, epsfcn, diag, mode, factor, nprint, info, nfev, fjac, ipvt, qtf);
+        Minpack_f77.lmdif_f77(nlls, m, n, x, fvec, ftol, xtol, gtol, maxfev, epsfcn, diag, mode, factor, nprint, info,
+                nfev, fjac, ipvt, qtf);
 
         if (info[1] == 8)
             info[1] = 4;
@@ -2871,7 +2879,9 @@ public class Minpack_f77 extends Object {
      * 
      */
 
-    public static void lmdif_f77(Lmdif_fcn nlls, int m, int n, double x[], double fvec[], double ftol, double xtol, double gtol, int maxfev, double epsfcn, double diag[], int mode, double factor, int nprint, int info[], int nfev[], double fjac[][], int ipvt[], double qtf[]) {
+    public static void lmdif_f77(Lmdif_fcn nlls, int m, int n, double x[], double fvec[], double ftol, double xtol,
+            double gtol, int maxfev, double epsfcn, double diag[], int mode, double factor, int nprint, int info[],
+            int nfev[], double fjac[][], int ipvt[], double qtf[]) {
 
         /*
 
@@ -3631,7 +3641,8 @@ public class Minpack_f77 extends Object {
      * 
      */
 
-    public static void fdjac2_f77(Lmdif_fcn nlls, int m, int n, double x[], double fvec[], double fjac[][], int iflag[], double epsfcn, double wa[]) {
+    public static void fdjac2_f77(Lmdif_fcn nlls, int m, int n, double x[], double fvec[], double fjac[][],
+            int iflag[], double epsfcn, double wa[]) {
 
         /*
 

@@ -35,10 +35,9 @@ import cern.colt.matrix.tfcomplex.impl.SparseFComplexMatrix1D;
  * </table>
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 12/10/2007
  */
 public class FComplexFactory1D extends cern.colt.PersistentObject {
-    private static final long serialVersionUID = 438423343000681857L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * A factory producing dense matrices.
@@ -63,9 +62,9 @@ public class FComplexFactory1D extends cern.colt.PersistentObject {
      */
     public FComplexMatrix1D append(FComplexMatrix1D A, FComplexMatrix1D B) {
         // concatenate
-        FComplexMatrix1D matrix = make(A.size() + B.size());
-        matrix.viewPart(0, A.size()).assign(A);
-        matrix.viewPart(A.size(), B.size()).assign(B);
+        FComplexMatrix1D matrix = make((int) (A.size() + B.size()));
+        matrix.viewPart(0, (int) A.size()).assign(A);
+        matrix.viewPart((int) A.size(), (int) B.size()).assign(B);
         return matrix;
     }
 
@@ -99,7 +98,7 @@ public class FComplexFactory1D extends cern.colt.PersistentObject {
         FComplexMatrix1D vector = make(size);
         size = 0;
         for (int i = 0; i < parts.length; i++) {
-            vector.viewPart(size, parts[i].size()).assign(parts[i]);
+            vector.viewPart(size, (int) parts[i].size()).assign(parts[i]);
             size += parts[i].size();
         }
 
@@ -139,7 +138,7 @@ public class FComplexFactory1D extends cern.colt.PersistentObject {
         int size = values.size();
         FComplexMatrix1D vector = make(size);
         for (int i = 0; i < size; i++)
-            vector.set(i, values.get(i));
+            vector.setQuick(i, values.get(i));
         return vector;
     }
 
@@ -156,7 +155,7 @@ public class FComplexFactory1D extends cern.colt.PersistentObject {
      * <tt>repeat</tt> times.
      */
     public FComplexMatrix1D repeat(FComplexMatrix1D A, int repeat) {
-        int size = A.size();
+        int size = (int) A.size();
         FComplexMatrix1D matrix = make(repeat * size);
         for (int i = 0; i < repeat; i++) {
             matrix.viewPart(size * i, size).assign(A);
@@ -173,10 +172,10 @@ public class FComplexFactory1D extends cern.colt.PersistentObject {
      * 
      * @throws IllegalArgumentException
      *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
-     * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
+     * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
      */
     public FComplexMatrix1D sample(int size, float[] value, float nonZeroFraction) {
-        float epsilon = 1e-08f;
+        float epsilon = 1e-05f;
         if (nonZeroFraction < 0 - epsilon || nonZeroFraction > 1 + epsilon)
             throw new IllegalArgumentException();
         if (nonZeroFraction < 0)
@@ -186,14 +185,15 @@ public class FComplexFactory1D extends cern.colt.PersistentObject {
 
         FComplexMatrix1D matrix = make(size);
 
-        int n = (int) Math.round(size * nonZeroFraction);
+        int n = Math.round(size * nonZeroFraction);
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant sampler = new cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant(
+                n, size, new cern.jet.random.tfloat.engine.FloatMersenneTwister());
         for (int i = 0; i < size; i++) {
             if (sampler.sampleNextElement()) {
-                matrix.set(i, value);
+                matrix.setQuick(i, value);
             }
         }
 
@@ -210,10 +210,10 @@ public class FComplexFactory1D extends cern.colt.PersistentObject {
      * @return a new list.
      */
     public ArrayList<float[]> toList(FComplexMatrix1D values) {
-        int size = values.size();
+        int size = (int) values.size();
         ArrayList<float[]> list = new ArrayList<float[]>(size);
         for (int i = 0; i < size; i++)
-            list.set(i, values.get(i));
+            list.set(i, values.getQuick(i));
         return list;
     }
 }

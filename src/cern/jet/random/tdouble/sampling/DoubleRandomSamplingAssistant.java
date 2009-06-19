@@ -27,6 +27,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 02/05/99
  */
 public class DoubleRandomSamplingAssistant extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public class RandomSamplingAssistant extends Object implements
     // java.io.Serializable {
     protected DoubleRandomSampler sampler;
@@ -66,6 +71,7 @@ public class DoubleRandomSamplingAssistant extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         DoubleRandomSamplingAssistant copy = (DoubleRandomSamplingAssistant) super.clone();
         copy.sampler = (DoubleRandomSampler) this.sampler.clone();

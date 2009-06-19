@@ -154,7 +154,8 @@ public class BenchmarkMatrixKernel {
         } else {
             System.out.println("Settings file not found. Default settings will be used.");
             System.out.println("NTHREADS = " + Arrays.toString(NTHREADS));
-            System.out.println("MATRIX_SIZE = " + MATRIX_SIZE_3D[0] + " x " + MATRIX_SIZE_3D[1] + " x " + MATRIX_SIZE_3D[2]);
+            System.out.println("MATRIX_SIZE = " + MATRIX_SIZE_3D[0] + " x " + MATRIX_SIZE_3D[1] + " x "
+                    + MATRIX_SIZE_3D[2]);
             System.out.println("NITERS = " + NITERS);
         }
     }
@@ -197,7 +198,8 @@ public class BenchmarkMatrixKernel {
                 break;
             }
             out.newLine();
-            out.write("--------------------------------------------------------------------------------------------------");
+            out
+                    .write("--------------------------------------------------------------------------------------------------");
             out.newLine();
             out.close();
         } catch (IOException e) {
@@ -214,7 +216,8 @@ public class BenchmarkMatrixKernel {
      * @param noViewTimes
      * @param viewTimes
      */
-    public static void writeMatrixBenchmarkResultsToFile(String filename, String method, int[] threads, double[] noViewTimes, double[] viewTimes) {
+    public static void writeMatrixBenchmarkResultsToFile(String filename, String method, int[] threads,
+            double[] noViewTimes, double[] viewTimes) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename, true));
             out.write("Method = " + method);
@@ -223,9 +226,11 @@ public class BenchmarkMatrixKernel {
             out.newLine();
             for (int i = 0; i < threads.length; i++) {
                 if (threads[i] == 1) {
-                    out.write("\t\t" + threads[i] + " thread  = " + String.format("%.2f", noViewTimes[i]) + " milliseconds");
+                    out.write("\t\t" + threads[i] + " thread  = " + String.format("%.2f", noViewTimes[i])
+                            + " milliseconds");
                 } else {
-                    out.write("\t\t" + threads[i] + " threads = " + String.format("%.2f", noViewTimes[i]) + " milliseconds");
+                    out.write("\t\t" + threads[i] + " threads = " + String.format("%.2f", noViewTimes[i])
+                            + " milliseconds");
                 }
                 out.newLine();
             }
@@ -233,13 +238,16 @@ public class BenchmarkMatrixKernel {
             out.newLine();
             for (int i = 0; i < threads.length; i++) {
                 if (threads[i] == 1) {
-                    out.write("\t\t" + threads[i] + " thread  = " + String.format("%.2f", viewTimes[i]) + " milliseconds");
+                    out.write("\t\t" + threads[i] + " thread  = " + String.format("%.2f", viewTimes[i])
+                            + " milliseconds");
                 } else {
-                    out.write("\t\t" + threads[i] + " threads = " + String.format("%.2f", viewTimes[i]) + " milliseconds");
+                    out.write("\t\t" + threads[i] + " threads = " + String.format("%.2f", viewTimes[i])
+                            + " milliseconds");
                 }
                 out.newLine();
             }
-            out.write("--------------------------------------------------------------------------------------------------");
+            out
+                    .write("--------------------------------------------------------------------------------------------------");
             out.newLine();
             out.close();
         } catch (IOException e) {
@@ -273,7 +281,8 @@ public class BenchmarkMatrixKernel {
             System.out.println("Matrix size = " + size[0] + " x " + size[1] + " x " + size[2]);
             break;
         }
-        System.out.println("--------------------------------------------------------------------------------------------------");
+        System.out
+                .println("--------------------------------------------------------------------------------------------------");
     }
 
     /**
@@ -285,25 +294,31 @@ public class BenchmarkMatrixKernel {
      * @param viewTimes
      * @param append
      */
-    public static void displayMatrixBenchmarkResults(String method, int[] threads, double[] noViewTimes, double[] viewTimes) {
+    public static void displayMatrixBenchmarkResults(String method, int[] threads, double[] noViewTimes,
+            double[] viewTimes) {
         System.out.println("Method = " + method);
         System.out.println("\tNo view execution times:");
         for (int i = 0; i < threads.length; i++) {
             if (threads[i] == 1) {
-                System.out.println("\t\t" + threads[i] + " thread  = " + String.format("%.2f", noViewTimes[i]) + " milliseconds");
+                System.out.println("\t\t" + threads[i] + " thread  = " + String.format("%.2f", noViewTimes[i])
+                        + " milliseconds");
             } else {
-                System.out.println("\t\t" + threads[i] + " threads = " + String.format("%.2f", noViewTimes[i]) + " milliseconds");
+                System.out.println("\t\t" + threads[i] + " threads = " + String.format("%.2f", noViewTimes[i])
+                        + " milliseconds");
             }
         }
         System.out.println("\tView execution times:");
         for (int i = 0; i < threads.length; i++) {
             if (threads[i] == 1) {
-                System.out.println("\t\t" + threads[i] + " thread  = " + String.format("%.2f", viewTimes[i]) + " milliseconds");
+                System.out.println("\t\t" + threads[i] + " thread  = " + String.format("%.2f", viewTimes[i])
+                        + " milliseconds");
             } else {
-                System.out.println("\t\t" + threads[i] + " threads = " + String.format("%.2f", viewTimes[i]) + " milliseconds");
+                System.out.println("\t\t" + threads[i] + " threads = " + String.format("%.2f", viewTimes[i])
+                        + " milliseconds");
             }
         }
-        System.out.println("--------------------------------------------------------------------------------------------------");
+        System.out
+                .println("--------------------------------------------------------------------------------------------------");
     }
 
     /**
@@ -352,7 +367,8 @@ public class BenchmarkMatrixKernel {
      * system, etc.)
      */
     public static String systemInfo() {
-        String[] properties = { "java.vm.vendor", "java.vm.version", "java.vm.name", "os.name", "os.version", "os.arch", "java.version", "java.vendor", "java.vendor.url"
+        String[] properties = { "java.vm.vendor", "java.vm.version", "java.vm.name", "os.name", "os.version",
+                "os.arch", "java.version", "java.vendor", "java.vendor.url"
         /*
          * "java.vm.specification.version", "java.vm.specification.vendor",
          * "java.vm.specification.name", "java.specification.version",
@@ -361,7 +377,8 @@ public class BenchmarkMatrixKernel {
         };
 
         // build string matrix
-        cern.colt.matrix.tobject.ObjectMatrix2D matrix = new cern.colt.matrix.tobject.impl.DenseObjectMatrix2D(properties.length, 2);
+        cern.colt.matrix.tobject.ObjectMatrix2D matrix = new cern.colt.matrix.tobject.impl.DenseObjectMatrix2D(
+                properties.length, 2);
         matrix.viewColumn(0).assign(properties);
 
         // retrieve property values

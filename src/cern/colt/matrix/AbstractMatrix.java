@@ -20,6 +20,8 @@ package cern.colt.matrix;
  * @version 1.0, 09/24/99
  */
 public abstract class AbstractMatrix extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     protected boolean isNoView = true;
 
     // public static boolean debug = true;
@@ -55,7 +57,7 @@ public abstract class AbstractMatrix extends cern.colt.PersistentObject {
     /**
      * Returns the number of cells.
      */
-    public abstract int size();
+    public abstract long size();
 
     /**
      * Releases any superfluous internal memory. An application can use this

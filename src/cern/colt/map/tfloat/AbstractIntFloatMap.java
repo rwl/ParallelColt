@@ -30,6 +30,11 @@ import cern.colt.list.tint.IntArrayList;
  * @see java.util.HashMap
  */
 public abstract class AbstractIntFloatMap extends AbstractFloatMap {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public static int hashCollisions = 0; // for debug only
     /**
      * Makes this class non instantiable, but still let's others inherit from
@@ -142,6 +147,7 @@ public abstract class AbstractIntFloatMap extends AbstractFloatMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -321,7 +327,8 @@ public abstract class AbstractIntFloatMap extends AbstractFloatMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void pairsMatching(final IntFloatProcedure condition, final IntArrayList keyList, final FloatArrayList valueList) {
+    public void pairsMatching(final IntFloatProcedure condition, final IntArrayList keyList,
+            final FloatArrayList valueList) {
         keyList.clear();
         valueList.clear();
 
@@ -432,6 +439,7 @@ public abstract class AbstractIntFloatMap extends AbstractFloatMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
+    @Override
     public String toString() {
         IntArrayList theKeys = keys();
         String tmp = theKeys.toString() + "\n";

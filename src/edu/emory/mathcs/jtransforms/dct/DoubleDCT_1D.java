@@ -393,7 +393,8 @@ public class DoubleDCT_1D {
         if (n > 8) {
             if (n > 32) {
                 cftf1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1)
+                        && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);
@@ -421,7 +422,8 @@ public class DoubleDCT_1D {
         if (n > 8) {
             if (n > 32) {
                 cftb1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1)
+                        && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);

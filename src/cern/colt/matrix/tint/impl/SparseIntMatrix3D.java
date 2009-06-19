@@ -90,6 +90,10 @@ import cern.colt.matrix.tint.IntMatrix3D;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class SparseIntMatrix3D extends IntMatrix3D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /*
      * The elements of the matrix.
      */
@@ -116,7 +120,8 @@ public class SparseIntMatrix3D extends IntMatrix3D {
      *             .
      */
     public SparseIntMatrix3D(int[][][] values) {
-        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
+        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0
+                : values[0].length == 0 ? 0 : values[0][0].length));
         assign(values);
     }
 
@@ -167,7 +172,8 @@ public class SparseIntMatrix3D extends IntMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    public SparseIntMatrix3D(int slices, int rows, int columns, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
+    public SparseIntMatrix3D(int slices, int rows, int columns, int initialCapacity, double minLoadFactor,
+            double maxLoadFactor) {
         setUp(slices, rows, columns);
         this.elements = new OpenIntIntHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
     }
@@ -203,12 +209,14 @@ public class SparseIntMatrix3D extends IntMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected SparseIntMatrix3D(int slices, int rows, int columns, AbstractIntIntMap elements, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
+    protected SparseIntMatrix3D(int slices, int rows, int columns, AbstractIntIntMap elements, int sliceZero,
+            int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
         setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         this.elements = elements;
         this.isNoView = false;
     }
 
+    @Override
     public IntMatrix3D assign(int value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -218,6 +226,7 @@ public class SparseIntMatrix3D extends IntMatrix3D {
         return this;
     }
 
+    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -225,14 +234,17 @@ public class SparseIntMatrix3D extends IntMatrix3D {
             return super.cardinality();
     }
 
+    @Override
     public AbstractIntIntMap elements() {
         return elements;
     }
 
+    @Override
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
 
+    @Override
     public int getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -240,9 +252,11 @@ public class SparseIntMatrix3D extends IntMatrix3D {
         // column:"+column);
         // return elements.get(index(slice,row,column));
         // manually inlined:
-        return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride);
+        return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
+                * columnStride);
     }
 
+    @Override
     public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
@@ -250,10 +264,12 @@ public class SparseIntMatrix3D extends IntMatrix3D {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
+    @Override
     public IntMatrix3D like(int slices, int rows, int columns) {
         return new SparseIntMatrix3D(slices, rows, columns);
     }
 
+    @Override
     public synchronized void setQuick(int slice, int row, int column, int value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -268,14 +284,17 @@ public class SparseIntMatrix3D extends IntMatrix3D {
             this.elements.put(index, value);
     }
 
+    @Override
     public void trimToSize() {
         this.elements.trimToSize();
     }
 
+    @Override
     public IntMatrix1D vectorize() {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
+    @Override
     protected boolean haveSharedCellsRaw(IntMatrix3D other) {
         if (other instanceof SelectedSparseIntMatrix3D) {
             SelectedSparseIntMatrix3D otherMatrix = (SelectedSparseIntMatrix3D) other;
@@ -287,10 +306,12 @@ public class SparseIntMatrix3D extends IntMatrix3D {
         return false;
     }
 
+    @Override
     protected IntMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new SparseIntMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
 
+    @Override
     protected IntMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseIntMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

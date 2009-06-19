@@ -59,9 +59,11 @@ public class BenchmarkDoubleDST {
 
     private static boolean doWarmup = true;
 
-    private static int[] sizes1D = new int[] { 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 10368, 27000, 75600, 165375, 362880, 1562500, 3211264, 6250000 };
+    private static int[] sizes1D = new int[] { 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608,
+            10368, 27000, 75600, 165375, 362880, 1562500, 3211264, 6250000 };
 
-    private static int[] sizes2D = new int[] { 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 260, 520, 1050, 1458, 1960, 2916, 4116, 5832 };
+    private static int[] sizes2D = new int[] { 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 260, 520, 1050, 1458,
+            1960, 2916, 4116, 5832 };
 
     private static int[] sizes3D = new int[] { 8, 16, 32, 64, 128, 256, 512, 1024, 5, 17, 30, 95, 180, 270, 324, 420 };
 
@@ -133,13 +135,15 @@ public class BenchmarkDoubleDST {
                 av_time = av_time + elapsedTime;
             }
             times[i] = (double) av_time / 1000000.0 / (double) niter;
-            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter) + " msec");
+            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter)
+                    + " msec");
             x = null;
             dst = null;
             System.gc();
             ConcurrencyUtils.sleep(5000);
         }
-        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_1D.txt", nthread, niter, doWarmup, doScaling, sizes1D, times);
+        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_1D.txt", nthread, niter, doWarmup, doScaling,
+                sizes1D, times);
     }
 
     public static void benchmarkForward_2D_input_1D() {
@@ -165,13 +169,15 @@ public class BenchmarkDoubleDST {
                 av_time = av_time + elapsedTime;
             }
             times[i] = (double) av_time / 1000000.0 / (double) niter;
-            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter) + " msec");
+            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter)
+                    + " msec");
             x = null;
             dst2 = null;
             System.gc();
             ConcurrencyUtils.sleep(5000);
         }
-        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_2D_input_1D.txt", nthread, niter, doWarmup, doScaling, sizes2D, times);
+        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_2D_input_1D.txt", nthread, niter, doWarmup,
+                doScaling, sizes2D, times);
 
     }
 
@@ -198,13 +204,15 @@ public class BenchmarkDoubleDST {
                 av_time = av_time + elapsedTime;
             }
             times[i] = (double) av_time / 1000000.0 / (double) niter;
-            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter) + " msec");
+            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter)
+                    + " msec");
             x = null;
             dst2 = null;
             System.gc();
             ConcurrencyUtils.sleep(5000);
         }
-        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_2D_input_2D.txt", nthread, niter, doWarmup, doScaling, sizes2D, times);
+        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_2D_input_2D.txt", nthread, niter, doWarmup,
+                doScaling, sizes2D, times);
 
     }
 
@@ -212,7 +220,8 @@ public class BenchmarkDoubleDST {
         double[] times = new double[nsize];
         double[] x;
         for (int i = 0; i < nsize; i++) {
-            System.out.println("Forward DST 3D (input 1D) of size " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i]);
+            System.out.println("Forward DST 3D (input 1D) of size " + sizes3D[i] + " x " + sizes3D[i] + " x "
+                    + sizes3D[i]);
             DoubleDST_3D dst3 = new DoubleDST_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
             x = new double[sizes3D[i] * sizes3D[i] * sizes3D[i]];
             if (doWarmup) { // call the transform twice to warm up
@@ -231,13 +240,15 @@ public class BenchmarkDoubleDST {
                 av_time = av_time + elapsedTime;
             }
             times[i] = (double) av_time / 1000000.0 / (double) niter;
-            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter) + " msec");
+            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter)
+                    + " msec");
             x = null;
             dst3 = null;
             System.gc();
             ConcurrencyUtils.sleep(5000);
         }
-        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_3D_input_1D.txt", nthread, niter, doWarmup, doScaling, sizes3D, times);
+        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_3D_input_1D.txt", nthread, niter, doWarmup,
+                doScaling, sizes3D, times);
 
     }
 
@@ -245,7 +256,8 @@ public class BenchmarkDoubleDST {
         double[] times = new double[nsize];
         double[][][] x;
         for (int i = 0; i < nsize; i++) {
-            System.out.println("Forward DST 3D (input 3D) of size " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i]);
+            System.out.println("Forward DST 3D (input 3D) of size " + sizes3D[i] + " x " + sizes3D[i] + " x "
+                    + sizes3D[i]);
             DoubleDST_3D dst3 = new DoubleDST_3D(sizes3D[i], sizes3D[i], sizes3D[i]);
             x = new double[sizes3D[i]][sizes3D[i]][sizes3D[i]];
             if (doWarmup) { // call the transform twice to warm up
@@ -264,13 +276,15 @@ public class BenchmarkDoubleDST {
                 av_time = av_time + elapsedTime;
             }
             times[i] = (double) av_time / 1000000.0 / (double) niter;
-            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter) + " msec");
+            System.out.println("Average execution time: " + String.format("%.2f", av_time / 1000000.0 / (double) niter)
+                    + " msec");
             x = null;
             dst3 = null;
             System.gc();
             ConcurrencyUtils.sleep(5000);
         }
-        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_3D_input_3D.txt", nthread, niter, doWarmup, doScaling, sizes3D, times);
+        IOUtils.writeFFTBenchmarkResultsToFile("benchmarkDoubleForwardDST_3D_input_3D.txt", nthread, niter, doWarmup,
+                doScaling, sizes3D, times);
     }
 
     public static void main(String[] args) {

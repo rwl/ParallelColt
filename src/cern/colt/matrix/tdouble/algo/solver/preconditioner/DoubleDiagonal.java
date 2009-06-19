@@ -45,7 +45,7 @@ public class DoubleDiagonal implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -62,7 +62,7 @@ public class DoubleDiagonal implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 

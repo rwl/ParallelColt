@@ -25,7 +25,7 @@ package cern.colt.matrix.tfloat.algo.solver;
  */
 public class FloatNotConvergedException extends Exception {
 
-    private static final long serialVersionUID = -2305369220010776320L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Possible reasons for lack of convergence

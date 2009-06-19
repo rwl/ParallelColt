@@ -11,7 +11,7 @@ package cern.colt;
 import cern.colt.function.tint.IntComparator;
 
 /**
- * Demonstrates how to use {@link Sort}.
+ * Demonstrates how to use sorting.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 03-Jul-99
@@ -147,7 +147,8 @@ class TestGenericSorting extends Object {
                 to = gen.nextIntFromTo(Math.min(from, size - 1), size - 1);
             }
 
-            cern.colt.matrix.tdouble.DoubleMatrix2D A1 = new cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D(size, size);
+            cern.colt.matrix.tdouble.DoubleMatrix2D A1 = new cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D(size,
+                    size);
             cern.colt.matrix.tdouble.DoubleMatrix2D P1 = A1.viewPart(from, from, size - to, size - to);
 
             int intervalFrom = gen.nextIntFromTo(size / 2, 2 * size);
@@ -163,8 +164,10 @@ class TestGenericSorting extends Object {
             cern.colt.matrix.tdouble.DoubleMatrix2D P2 = A2.viewPart(from, from, size - to, size - to);
 
             int c = 0;
-            cern.colt.matrix.tdouble.DoubleMatrix2D S1 = cern.colt.matrix.tdouble.algo.DoubleSorting.quickSort.sort(P1, c);
-            cern.colt.matrix.tdouble.DoubleMatrix2D S2 = cern.colt.matrix.tdouble.algo.DoubleSorting.mergeSort.sort(P2, c);
+            cern.colt.matrix.tdouble.DoubleMatrix2D S1 = cern.colt.matrix.tdouble.algo.DoubleSorting.quickSort.sort(P1,
+                    c);
+            cern.colt.matrix.tdouble.DoubleMatrix2D S2 = cern.colt.matrix.tdouble.algo.DoubleSorting.mergeSort.sort(P2,
+                    c);
 
             if (!(S1.viewColumn(c).equals(S2.viewColumn(c))))
                 throw new InternalError();

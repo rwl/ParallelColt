@@ -36,6 +36,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public abstract class IntMatrix1D extends AbstractMatrix1D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
@@ -76,23 +81,18 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
         if (size == 0)
             throw new IllegalArgumentException("size == 0");
         int a = f.apply(getQuick(0));
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
-                        int a = f.apply(getQuick(startsize));
-                        for (int i = startsize + 1; i < stopsize; i++) {
+                        int a = f.apply(getQuick(firstIdx));
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             a = aggr.apply(a, f.apply(getQuick(i)));
                         }
                         return Integer.valueOf(a);
@@ -146,28 +146,24 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      *             if <tt>size() != other.size()</tt>.
      * @see cern.jet.math.tint.IntFunctions
      */
-    public int aggregate(final IntMatrix1D other, final cern.colt.function.tint.IntIntFunction aggr, final cern.colt.function.tint.IntIntFunction f) {
+    public int aggregate(final IntMatrix1D other, final cern.colt.function.tint.IntIntFunction aggr,
+            final cern.colt.function.tint.IntIntFunction f) {
         checkSize(other);
         if (size == 0)
             throw new IllegalArgumentException("size == 0");
         int a = f.apply(getQuick(0), other.getQuick(0));
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
-                        int a = f.apply(getQuick(startsize), other.getQuick(startsize));
-                        for (int i = startsize + 1; i < stopsize; i++) {
+                        int a = f.apply(getQuick(firstIdx), other.getQuick(firstIdx));
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
                         }
                         return Integer.valueOf(a);
@@ -208,22 +204,18 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * @see cern.jet.math.tint.IntFunctions
      */
     public IntMatrix1D assign(final cern.colt.function.tint.IntFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, f.apply(getQuick(i)));
                         }
                     }
@@ -249,24 +241,21 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * @return <tt>this</tt> (for convenience only).
      * @see cern.jet.math.tint.IntFunctions
      */
-    public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond, final cern.colt.function.tint.IntFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+    public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond,
+            final cern.colt.function.tint.IntFunction f) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int elem;
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (cond.apply(elem) == true) {
                                 setQuick(i, f.apply(elem));
@@ -300,23 +289,20 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * 
      */
     public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond, final int value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         int elem;
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (cond.apply(elem) == true) {
                                 setQuick(i, value);
@@ -346,22 +332,19 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * @return <tt>this</tt> (for convenience only).
      */
     public IntMatrix1D assign(final int value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, value);
                         }
                     }
@@ -391,23 +374,21 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      */
     public IntMatrix1D assign(final int[] values) {
         if (values.length != size)
-            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()=" + size());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
+                    + size());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, values[i]);
                         }
                     }
@@ -446,22 +427,23 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
         } else {
             other_loc = other;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx;
+                if (j == nthreads - 1) {
+                    lastIdx = size;
                 } else {
-                    stopsize = startsize + k;
+                    lastIdx = firstIdx + k;
                 }
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, other_loc.getQuick(i));
                         }
                     }
@@ -508,22 +490,19 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      */
     public IntMatrix1D assign(final IntMatrix1D y, final cern.colt.function.tint.IntIntFunction function) {
         checkSize(y);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, function.apply(getQuick(i), y.getQuick(i)));
                         }
                     }
@@ -578,7 +557,8 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      *             if <tt>size() != y.size()</tt>.
      * @see cern.jet.math.tint.IntFunctions
      */
-    public IntMatrix1D assign(IntMatrix1D y, cern.colt.function.tint.IntIntFunction function, cern.colt.list.tint.IntArrayList nonZeroIndexes) {
+    public IntMatrix1D assign(IntMatrix1D y, cern.colt.function.tint.IntIntFunction function,
+            cern.colt.list.tint.IntArrayList nonZeroIndexes) {
         checkSize(y);
         int[] nonZeroElements = nonZeroIndexes.elements();
 
@@ -627,23 +607,19 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      */
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (getQuick(i) != 0)
                                 cardinality++;
                         }
@@ -652,11 +628,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -732,6 +708,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -892,7 +869,6 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     public void getNonZeros(IntArrayList indexList, IntArrayList valueList, int maxCardinality) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
-        int card = cardinality(maxCardinality);
         if (fillIndexList)
             indexList.clear();
         if (fillValueList)
@@ -1038,25 +1014,21 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     public int[] getMaxLocation() {
         int location = 0;
         int maxValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int[][] results = new int[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int[][] results = new int[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<int[]>() {
                     public int[] call() throws Exception {
-                        int location = startsize;
+                        int location = firstIdx;
                         int maxValue = getQuick(location);
                         int elem;
-                        for (int i = startsize + 1; i < stopsize; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (maxValue < elem) {
                                 maxValue = elem;
@@ -1068,15 +1040,15 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (int[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                location = results[0][1];
+                for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        location = (int) results[j][1];
+                        location = results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1106,25 +1078,21 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     public int[] getMinLocation() {
         int location = 0;
         int minValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int[][] results = new int[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int[][] results = new int[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<int[]>() {
                     public int[] call() throws Exception {
-                        int location = startsize;
+                        int location = firstIdx;
                         int minValue = getQuick(location);
                         int elem;
-                        for (int i = startsize + 1; i < stopsize; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (minValue > elem) {
                                 minValue = elem;
@@ -1136,15 +1104,15 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (int[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                location = results[0][1];
+                for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        location = (int) results[j][1];
+                        location = results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1239,21 +1207,17 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      */
     public void swap(final IntMatrix1D other) {
         checkSize(other);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             int tmp = getQuick(i);
                             setQuick(i, other.getQuick(i));
                             other.setQuick(i, tmp);
@@ -1299,21 +1263,17 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     public void toArray(final int[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             values[i] = getQuick(i);
                         }
                     }
@@ -1332,6 +1292,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * 
      * @see cern.colt.matrix.tint.algo.IntFormatter
      */
+    @Override
     public String toString() {
         return new cern.colt.matrix.tint.algo.IntFormatter().toString(this);
     }
@@ -1563,25 +1524,21 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
         length = tail - from;
 
         int sum = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = length / np;
-            for (int j = 0; j < np; j++) {
-                final int startlength = j * k;
-                final int stoplength;
-                if (j == np - 1) {
-                    stoplength = length;
-                } else {
-                    stoplength = startlength + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, length);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = length / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
 
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int sum = 0;
                         int idx;
-                        for (int k = startlength; k < stoplength; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             idx = k + from;
                             sum += getQuick(idx) * y.getQuick(idx);
                         }
@@ -1590,11 +1547,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 sum = results[0].intValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum += results[j].intValue();
                 }
             } catch (ExecutionException ex) {

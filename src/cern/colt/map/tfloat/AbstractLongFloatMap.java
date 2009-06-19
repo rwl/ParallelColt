@@ -33,6 +33,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @see java.util.HashMap
  */
 public abstract class AbstractLongFloatMap extends AbstractFloatMap {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public static int hashCollisions = 0; // for debug only
     /**
      * Makes this class non instantiable, but still let's others inherit from
@@ -145,6 +150,7 @@ public abstract class AbstractLongFloatMap extends AbstractFloatMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -324,7 +330,8 @@ public abstract class AbstractLongFloatMap extends AbstractFloatMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void pairsMatching(final LongFloatProcedure condition, final LongArrayList keyList, final FloatArrayList valueList) {
+    public void pairsMatching(final LongFloatProcedure condition, final LongArrayList keyList,
+            final FloatArrayList valueList) {
         keyList.clear();
         valueList.clear();
 
@@ -362,6 +369,7 @@ public abstract class AbstractLongFloatMap extends AbstractFloatMap {
         final long[] keyListElements = keyList.elements();
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
             Future<?>[] futures = new Future[nthreads];
             int k = size / nthreads;
             for (int j = 0; j < nthreads; j++) {
@@ -456,6 +464,7 @@ public abstract class AbstractLongFloatMap extends AbstractFloatMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
+    @Override
     public String toString() {
         LongArrayList theKeys = keys();
         String tmp = theKeys.toString() + "\n";

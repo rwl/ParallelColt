@@ -262,7 +262,8 @@ public class BenchmarkMatrix {
 
             public void setParameters(DoubleMatrix2D A, DoubleMatrix2D B) {
                 if (k < 0) { // must be nonsingular for inversion
-                    if (!cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByRow(A) || !cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
+                    if (!cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByRow(A)
+                            || !cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
                         cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.generateNonSingular(A);
                     }
                     super.setParameters(A, B);
@@ -273,7 +274,7 @@ public class BenchmarkMatrix {
             }
 
             public void apply(cern.colt.Timer timer) {
-                cern.colt.matrix.tdouble.algo.DoubleAlgebra.DEFAULT.pow(A, k);
+                cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra.DEFAULT.pow(A, k);
             }
 
             public double operations() { // Mflops
@@ -439,7 +440,8 @@ public class BenchmarkMatrix {
             }
 
             public void apply(cern.colt.Timer timer) {
-                cern.colt.matrix.tdouble.algo.DoubleStatistic.correlation(cern.colt.matrix.tdouble.algo.DoubleStatistic.covariance(A));
+                cern.colt.matrix.tdouble.algo.DoubleStatistic.correlation(cern.colt.matrix.tdouble.algo.DoubleStatistic
+                        .covariance(A));
             }
 
             public double operations() { // Mflops
@@ -525,7 +527,8 @@ public class BenchmarkMatrix {
      */
     protected static Double2DProcedure funLUDecompose() {
         return new Double2DProcedure() {
-            cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick lu = new cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick(0);
+            cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecompositionQuick lu = new cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecompositionQuick(
+                    0);
 
             public String toString() {
                 return "LU.decompose(A) [Mflops/sec]";
@@ -551,7 +554,7 @@ public class BenchmarkMatrix {
      */
     protected static Double2DProcedure funLUSolve() {
         return new Double2DProcedure() {
-            cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick lu;
+            cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecompositionQuick lu;
 
             public String toString() {
                 return "LU.solve(A) [Mflops/sec]";
@@ -559,11 +562,12 @@ public class BenchmarkMatrix {
 
             public void setParameters(DoubleMatrix2D A, DoubleMatrix2D B) {
                 lu = null;
-                if (!cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByRow(A) || !cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
+                if (!cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByRow(A)
+                        || !cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.isDiagonallyDominantByColumn(A)) {
                     cern.colt.matrix.tdouble.algo.DoubleProperty.ZERO.generateNonSingular(A);
                 }
                 super.setParameters(A, B);
-                lu = new cern.colt.matrix.tdouble.algo.decomposition.DoubleLUDecompositionQuick(0);
+                lu = new cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecompositionQuick(0);
                 lu.decompose(A);
             }
 
@@ -705,7 +709,8 @@ public class BenchmarkMatrix {
             final double beta = 1 - omega;
 
             cern.colt.function.tdouble.Double9Function function = new cern.colt.function.tdouble.Double9Function() {
-                public final double apply(double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22) {
+                public final double apply(double a00, double a01, double a02, double a10, double a11, double a12,
+                        double a20, double a21, double a22) {
                     return alpha * a11 + beta * (a01 + a10 + a12 + a21);
                 }
             };
@@ -744,7 +749,8 @@ public class BenchmarkMatrix {
             final double beta = 1 - omega;
 
             cern.colt.function.tdouble.Double9Function function = new cern.colt.function.tdouble.Double9Function() {
-                public final double apply(double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22) {
+                public final double apply(double a00, double a01, double a02, double a10, double a11, double a12,
+                        double a20, double a21, double a22) {
                     return alpha * a11 + beta * (a00 + a10 + a20 + a01 + a21 + a02 + a12 + a22);
                 }
             };
@@ -859,7 +865,8 @@ public class BenchmarkMatrix {
                 benchGeneric(fun, params);
             } else {
                 success = false;
-                String s = "Command=" + params[0] + " is illegal or unknown. Should be one of " + commands() + "followed by appropriate parameters.\n" + usage() + "\nIgnoring this line.\n";
+                String s = "Command=" + params[0] + " is illegal or unknown. Should be one of " + commands()
+                        + "followed by appropriate parameters.\n" + usage() + "\nIgnoring this line.\n";
                 System.out.println(s);
             }
         }
@@ -950,7 +957,8 @@ public class BenchmarkMatrix {
                 }
                 reader.close();
 
-                System.out.println("\nCommand file name used: " + args[1] + "\nTo reproduce and compare results, here it's contents:");
+                System.out.println("\nCommand file name used: " + args[1]
+                        + "\nTo reproduce and compare results, here it's contents:");
                 try {
                     reader = new java.io.BufferedReader(new java.io.FileReader(args[1]));
                 } catch (java.io.IOException exc) {
@@ -982,7 +990,8 @@ public class BenchmarkMatrix {
     /**
      * Executes procedure repeatadly until more than minSeconds have elapsed.
      */
-    protected static void run(double minSeconds, String title, Double2DProcedure function, String[] types, int[] sizes, double[] densities) {
+    protected static void run(double minSeconds, String title, Double2DProcedure function, String[] types, int[] sizes,
+            double[] densities) {
         // int[] sizes = {33,500,1000};
         // double[] densities = {0.001,0.01,0.99};
 
@@ -1069,7 +1078,9 @@ public class BenchmarkMatrix {
         rowNames = colNames;
         colNames = tmp2;
         timings = timings.viewDice(0, 2, 1);
-        System.out.println(new cern.colt.matrix.tdouble.algo.DoubleFormatter("%1.3G").toTitleString(timings, sliceNames, rowNames, colNames, sliceAxisName, rowAxisName, colAxisName, "Performance of " + title, aggr));
+        System.out.println(new cern.colt.matrix.tdouble.algo.DoubleFormatter("%1.3G").toTitleString(timings,
+                sliceNames, rowNames, colNames, sliceAxisName, rowAxisName, colAxisName, "Performance of " + title,
+                aggr));
         /*
          * title = "Speedup of dense over sparse"; DoubleMatrix2D speedup =
          * cern.colt.matrix.doublealgo.Transform.div(timings.viewSlice(0).copy(),timings.viewSlice(1));
@@ -1127,7 +1138,8 @@ public class BenchmarkMatrix {
         String rowAxisName = null;
         String colAxisName = null;
         System.out.println("*");
-        System.out.println(new cern.colt.matrix.tdouble.algo.DoubleFormatter("%1.3G").toTitleString(timings, rowNames, colNames, rowAxisName, colAxisName, title, aggr));
+        System.out.println(new cern.colt.matrix.tdouble.algo.DoubleFormatter("%1.3G").toTitleString(timings, rowNames,
+                colNames, rowAxisName, colAxisName, title, aggr));
 
         System.out.println("Run took a total of " + runTime + ". End of run.");
     }
@@ -1136,13 +1148,25 @@ public class BenchmarkMatrix {
      * Overall usage.
      */
     protected static String usage() {
-        String usage = "\nUsage (help): To get this help, type java cern.colt.matrix.bench.BenchmarkMatrix -help\n" + "To get help on a command's args, omit args and type java cern.colt.matrix.bench.BenchmarkMatrix -help <command>\n" + "Available commands: " + commands() + "\n\n" +
+        String usage = "\nUsage (help): To get this help, type java cern.colt.matrix.bench.BenchmarkMatrix -help\n"
+                + "To get help on a command's args, omit args and type java cern.colt.matrix.bench.BenchmarkMatrix -help <command>\n"
+                + "Available commands: "
+                + commands()
+                + "\n\n"
+                +
 
-        "Usage (direct): java cern.colt.matrix.bench.BenchmarkMatrix command {args}\n" + "Example: dgemm dense 2 2.0 0.999 false true 5 10 25 50 100 250 500\n\n" +
+                "Usage (direct): java cern.colt.matrix.bench.BenchmarkMatrix command {args}\n"
+                + "Example: dgemm dense 2 2.0 0.999 false true 5 10 25 50 100 250 500\n\n"
+                +
 
-        "Usage (batch mode): java cern.colt.matrix.bench.BenchmarkMatrix -file <file>\nwhere <file> is a text file with each line holding a command followed by appropriate args (comments and empty lines ignored).\n\n" + "Example file's content:\n"
-                + "dgemm dense 1 2.0 0.999 false true 5 10 25 50 100 250 500\n" + "dgemm dense 2 2.0 0.999 false true 5 10 25 50 100 250 500\n\n" + "/*\n" + "Java like comments in file are ignored\n" + "dgemv dense 1 2.0 0.001 false 5 10 25 50 100 250 500 1000\n"
-                + "dgemv sparse 1 2.0 0.001 false 5 10 25 50 100 250 500 1000\n" + "dgemv rowCompressed 1 2.0 0.001 false 5 10 25 50 100 250 500 1000\n" + "*/\n" + "// more comments ignored\n";
+                "Usage (batch mode): java cern.colt.matrix.bench.BenchmarkMatrix -file <file>\nwhere <file> is a text file with each line holding a command followed by appropriate args (comments and empty lines ignored).\n\n"
+                + "Example file's content:\n" + "dgemm dense 1 2.0 0.999 false true 5 10 25 50 100 250 500\n"
+                + "dgemm dense 2 2.0 0.999 false true 5 10 25 50 100 250 500\n\n" + "/*\n"
+                + "Java like comments in file are ignored\n"
+                + "dgemv dense 1 2.0 0.001 false 5 10 25 50 100 250 500 1000\n"
+                + "dgemv sparse 1 2.0 0.001 false 5 10 25 50 100 250 500 1000\n"
+                + "dgemv rowCompressed 1 2.0 0.001 false 5 10 25 50 100 250 500 1000\n" + "*/\n"
+                + "// more comments ignored\n";
         return usage;
     }
 
@@ -1161,8 +1185,16 @@ public class BenchmarkMatrix {
             usage = usage + " <transposeA> <transposeB>";
         if (cmd.equals("pow"))
             usage = usage + " <exponent>";
-        usage = usage + " {sizes}\n" + "where\n" + "\toperation = the operation to benchmark; in this case: " + cmd + "\n" + "\ttype = matrix type to be used; e.g. dense, sparse or rowCompressed\n" + "\tcpus = #cpus available; e.g. 1 or 2 or ...\n"
-                + "\tminSecs = #seconds each operation shall at least run; e.g. 2.0 is a good number giving realistic timings\n" + "\tdensity = the density of the matrices to be benchmarked; e.g. 0.999 is very dense, 0.001 is very sparse\n";
+        usage = usage
+                + " {sizes}\n"
+                + "where\n"
+                + "\toperation = the operation to benchmark; in this case: "
+                + cmd
+                + "\n"
+                + "\ttype = matrix type to be used; e.g. dense, sparse or rowCompressed\n"
+                + "\tcpus = #cpus available; e.g. 1 or 2 or ...\n"
+                + "\tminSecs = #seconds each operation shall at least run; e.g. 2.0 is a good number giving realistic timings\n"
+                + "\tdensity = the density of the matrices to be benchmarked; e.g. 0.999 is very dense, 0.001 is very sparse\n";
 
         if (cmd.equals("dgemv"))
             usage = usage + "\ttransposeA = false or true\n";
@@ -1170,7 +1202,8 @@ public class BenchmarkMatrix {
             usage = usage + "\ttransposeA = false or true\n\ttransposeB = false or true\n";
         if (cmd.equals("pow"))
             usage = usage + "\texponent = the number of times to multiply; e.g. 1000\n";
-        usage = usage + "\tsizes = a list of problem sizes; e.g. 100 200 benchmarks squared 100x100 and 200x200 matrices";
+        usage = usage
+                + "\tsizes = a list of problem sizes; e.g. 100 200 benchmarks squared 100x100 and 200x200 matrices";
         return usage;
     }
 }

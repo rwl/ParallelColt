@@ -56,7 +56,8 @@ public class FloatCG extends AbstractFloatIterativeSolver {
         r = template.copy();
     }
 
-    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
+            throws IterativeSolverFloatNotConvergedException {
         checkSizes(A, b, x);
 
         float alpha = 0, beta = 0, rho = 0, rho_1 = 0;

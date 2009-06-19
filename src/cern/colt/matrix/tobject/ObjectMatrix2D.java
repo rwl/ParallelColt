@@ -37,6 +37,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public abstract class ObjectMatrix2D extends AbstractMatrix2D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
@@ -75,29 +80,25 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      * @return the aggregated measure.
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr, final cern.colt.function.tobject.ObjectFunction f) {
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f) {
         if (size() == 0)
             return null;
         Object a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Object[] results = new Object[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
 
                     public Object call() throws Exception {
-                        Object a = f.apply(getQuick(startrow, 0));
+                        Object a = f.apply(getQuick(firstRow, 0));
                         int d = 1;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = d; c < columns; c++) {
                                 a = aggr.apply(a, f.apply(getQuick(r, c)));
                             }
@@ -166,30 +167,26 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    public Object aggregate(final ObjectMatrix2D other, final cern.colt.function.tobject.ObjectObjectFunction aggr, final cern.colt.function.tobject.ObjectObjectFunction f) {
+    public Object aggregate(final ObjectMatrix2D other, final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectObjectFunction f) {
         checkShape(other);
         if (size() == 0)
             return null;
         Object a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Object[] results = new Object[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
 
                     public Object call() throws Exception {
-                        Object a = f.apply(getQuick(startrow, 0), other.getQuick(startrow, 0));
+                        Object a = f.apply(getQuick(firstRow, 0), other.getQuick(firstRow, 0));
                         int d = 1;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = d; c < columns; c++) {
                                 a = aggr.apply(a, f.apply(getQuick(r, c), other.getQuick(r, c)));
                             }
@@ -231,26 +228,26 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      */
     public ObjectMatrix2D assign(final Object[][] values) {
         if (values.length != rows)
-            throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()=" + rows());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+            throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
+                    + rows());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             Object[] currentRow = values[r];
                             if (currentRow.length != columns)
-                                throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                                throw new IllegalArgumentException(
+                                        "Must have same number of columns in every row: columns=" + currentRow.length
+                                                + "columns()=" + columns());
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, currentRow[c]);
                             }
@@ -263,7 +260,8 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
             for (int r = 0; r < rows; r++) {
                 Object[] currentRow = values[r];
                 if (currentRow.length != columns)
-                    throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                    throw new IllegalArgumentException("Must have same number of columns in every row: columns="
+                            + currentRow.length + "columns()=" + columns());
                 for (int c = 0; c < columns; c++) {
                     setQuick(r, c, currentRow[c]);
                 }
@@ -301,22 +299,19 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
     public ObjectMatrix2D assign(final cern.colt.function.tobject.ObjectFunction function) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, function.apply(getQuick(r, c)));
                             }
@@ -361,22 +356,19 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
         } else {
             other_loc = other;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, other_loc.getQuick(r, c));
                             }
@@ -436,22 +428,19 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      */
     public ObjectMatrix2D assign(final ObjectMatrix2D y, final cern.colt.function.tobject.ObjectObjectFunction function) {
         checkShape(y);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, function.apply(getQuick(r, c), y.getQuick(r, c)));
                             }
@@ -478,22 +467,19 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      */
     public ObjectMatrix2D assign(final Object value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, value);
                             }
@@ -517,23 +503,20 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      */
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 if (getQuick(r, c) != null)
                                     cardinality++;
@@ -544,11 +527,11 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0].intValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -595,6 +578,7 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
+    @Override
     public boolean equals(Object otherObj) { // delta
         return equals(otherObj, true);
     }
@@ -641,7 +625,8 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
         } else {
             for (int row = rows; --row >= 0;) {
                 for (int column = columns; --column >= 0;) {
-                    if (!(getQuick(row, column) == null ? other.getQuick(row, column) == null : getQuick(row, column).equals(other.getQuick(row, column))))
+                    if (!(getQuick(row, column) == null ? other.getQuick(row, column) == null : getQuick(row, column)
+                            .equals(other.getQuick(row, column))))
                         return false;
                 }
             }
@@ -885,21 +870,18 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      */
     public Object[][] toArray() {
         final Object[][] values = new Object[rows][columns];
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             Object[] currentRow = values[r];
                             for (int c = 0; c < columns; c++) {
                                 currentRow[c] = getQuick(r, c);
@@ -925,6 +907,7 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      * 
      * @see cern.colt.matrix.tobject.algo.ObjectFormatter
      */
+    @Override
     public String toString() {
         return new cern.colt.matrix.tobject.algo.ObjectFormatter().toString(this);
     }

@@ -9,6 +9,7 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tfloat.algo;
 
 import cern.colt.function.tint.IntComparator;
+import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatFactory3D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
@@ -50,6 +51,11 @@ import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
  */
 public class FloatSorting extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A prefabricated quicksort.
      */
     public static final FloatSorting quickSort = new FloatSorting();
@@ -58,10 +64,17 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * A prefabricated mergesort.
      */
     public static final FloatSorting mergeSort = new FloatSorting() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        @Override
         protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
             cern.colt.Sorting.mergeSort(a, fromIndex, toIndex, c);
         }
 
+        @Override
         protected void runSort(int fromIndex, int toIndex, IntComparator c, cern.colt.Swapper swapper) {
             cern.colt.GenericSorting.mergeSort(fromIndex, toIndex, c, swapper);
         }
@@ -122,7 +135,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
      *         matrix is left unaffected.</b>
      */
     public FloatMatrix1D sort(final FloatMatrix1D vector) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -167,7 +180,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final FloatMatrix1D vector) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -201,7 +214,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final FloatMatrix1D vector, IntComparator comp) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -240,7 +253,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
      *         vector (matrix) is left unaffected.</b>
      */
     public FloatMatrix1D sort(final FloatMatrix1D vector, final cern.colt.function.tfloat.FloatComparator c) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -269,7 +282,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final FloatMatrix1D vector, final cern.colt.function.tfloat.FloatComparator c) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -467,7 +480,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
      */
     public FloatMatrix2D sort(FloatMatrix2D matrix, int column) {
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + FloatFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] rowIndexes = new int[matrix.rows()]; // row indexes to reorder
         // instead of matrix itself
@@ -672,9 +685,9 @@ public class FloatSorting extends cern.colt.PersistentObject {
      */
     public FloatMatrix3D sort(FloatMatrix3D matrix, int row, int column) {
         if (row < 0 || row >= matrix.rows())
-            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + FloatFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + AbstractFormatter.shape(matrix));
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + FloatFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] sliceIndexes = new int[matrix.slices()]; // indexes to reorder
         // instead of matrix
@@ -891,14 +904,18 @@ public class FloatSorting extends cern.colt.PersistentObject {
         // so we just show the first 5 rows
         if (print) {
             int r = Math.min(rows, 5);
-            hep.aida.tfloat.bin.FloatBinFunction1D[] funs = { hep.aida.tfloat.bin.FloatBinFunctions1D.median, hep.aida.tfloat.bin.FloatBinFunctions1D.sumLog, hep.aida.tfloat.bin.FloatBinFunctions1D.geometricMean };
+            hep.aida.tfloat.bin.FloatBinFunction1D[] funs = { hep.aida.tfloat.bin.FloatBinFunctions1D.median,
+                    hep.aida.tfloat.bin.FloatBinFunctions1D.sumLog,
+                    hep.aida.tfloat.bin.FloatBinFunctions1D.geometricMean };
             String[] rowNames = new String[r];
             String[] columnNames = new String[columns];
             for (int i = columns; --i >= 0;)
                 columnNames[i] = Integer.toString(i);
             for (int i = r; --i >= 0;)
                 rowNames[i] = Integer.toString(i);
-            System.out.println("first part of sorted result = \n" + new cern.colt.matrix.tfloat.algo.FloatFormatter("%G").toTitleString(A.viewPart(0, 0, r, columns), rowNames, columnNames, null, null, null, funs));
+            System.out.println("first part of sorted result = \n"
+                    + new cern.colt.matrix.tfloat.algo.FloatFormatter("%G").toTitleString(A.viewPart(0, 0, r, columns),
+                            rowNames, columnNames, null, null, null, funs));
         }
 
         System.out.print("now sorting - slow version... ");
@@ -921,16 +938,10 @@ public class FloatSorting extends cern.colt.PersistentObject {
      * Demonstrates advanced sorting. Sorts by sum of row.
      */
     public static void zdemo6() {
-        FloatSorting sort = quickSort;
-        float[][] values = { { 3, 7, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 1, 8, 0 }, { 2, 5, 0 }, { 7, 0, 0 }, { 2, 3, 0 }, { 1, 0, 0 }, { 4, 0, 0 }, { 2, 0, 0 } };
+        float[][] values = { { 3, 7, 0 }, { 2, 1, 0 }, { 2, 2, 0 }, { 1, 8, 0 }, { 2, 5, 0 }, { 7, 0, 0 }, { 2, 3, 0 },
+                { 1, 0, 0 }, { 4, 0, 0 }, { 2, 0, 0 } };
         FloatMatrix2D A = FloatFactory2D.dense.make(values);
         FloatMatrix2D B, C;
-        /*
-         * FloatMatrix1DComparator comp = new FloatMatrix1DComparator() {
-         * public int compare(FloatMatrix1D a, FloatMatrix1D b) { float as =
-         * a.zSum(); float bs = b.zSum(); return as < bs ? -1 : as == bs ? 0 :
-         * 1; } };
-         */
         System.out.println("\n\nunsorted:" + A);
         B = quickSort.sort(A, 1);
         C = quickSort.sort(B, 0);
@@ -957,7 +968,6 @@ public class FloatSorting extends cern.colt.PersistentObject {
         final cern.jet.math.tfloat.FloatFunctions F = cern.jet.math.tfloat.FloatFunctions.functions;
         FloatMatrix2D A = cern.colt.matrix.tfloat.FloatFactory2D.dense.make(rows, columns);
         A.assign(new cern.jet.random.tfloat.engine.FRand()); // initialize randomly
-        FloatMatrix2D B = A.copy();
 
         float[] v1 = A.viewColumn(0).toArray();
         float[] v2 = A.viewColumn(0).toArray();

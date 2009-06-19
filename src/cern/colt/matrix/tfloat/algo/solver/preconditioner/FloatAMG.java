@@ -31,13 +31,13 @@ import java.util.Set;
 
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
-import cern.colt.matrix.tfloat.algo.decomposition.FloatLUDecompositionQuick;
-import cern.colt.matrix.tfloat.impl.CCFloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.CCMFloatMatrix2D;
+import cern.colt.matrix.tfloat.algo.decomposition.DenseFloatLUDecompositionQuick;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.RCFloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.RCMFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseCCFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseCCMFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseRCMFloatMatrix2D;
 
 /**
  * Algebraic multigrid preconditioner. Uses the smoothed aggregation method
@@ -58,12 +58,12 @@ public class FloatAMG implements FloatPreconditioner {
     /**
      * System matrix at each level, except at the coarsest
      */
-    private RCFloatMatrix2D[] A;
+    private SparseRCFloatMatrix2D[] A;
 
     /**
      * LU factorization at the coarsest level
      */
-    private FloatLUDecompositionQuick lu;
+    private DenseFloatLUDecompositionQuick lu;
 
     /**
      * Solution, right-hand side, and residual vectors at each level
@@ -73,7 +73,7 @@ public class FloatAMG implements FloatPreconditioner {
     /**
      * Interpolation operators going to a finer mesh
      */
-    private CCFloatMatrix2D[] I;
+    private SparseCCFloatMatrix2D[] I;
 
     /**
      * Smallest matrix size before terminating the AMG setup phase. Matrices
@@ -141,7 +141,8 @@ public class FloatAMG implements FloatPreconditioner {
      *            zero, the method reduces to the standard aggregate multigrid
      *            method
      */
-    public FloatAMG(float omegaPreF, float omegaPreR, float omegaPostF, float omegaPostR, int nu1, int nu2, int gamma, int min, float omega) {
+    public FloatAMG(float omegaPreF, float omegaPreR, float omegaPostF, float omegaPostR, int nu1, int nu2, int gamma,
+            int min, float omega) {
         this.omegaPreF = omegaPreF;
         this.omegaPreR = omegaPreR;
         this.omegaPostF = omegaPostF;
@@ -203,13 +204,14 @@ public class FloatAMG implements FloatPreconditioner {
      * <code>omega=2/3</code>.
      */
     public FloatAMG() {
-        this(1, 1.85f, 1.85f, 1, 1, 1, 1, 40, (float) (2. / 3));
+        this(1, 1.85f, 1.85f, 1, 1, 1, 1, 40, 2.f / 3);
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
+
         u[0].assign(x);
         f[0].assign(b);
 
@@ -220,9 +222,10 @@ public class FloatAMG implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
+
         u[0].assign(x);
         f[0].assign(b);
 
@@ -233,14 +236,17 @@ public class FloatAMG implements FloatPreconditioner {
     }
 
     public void setMatrix(FloatMatrix2D A) {
-        List<RCFloatMatrix2D> Al = new LinkedList<RCFloatMatrix2D>();
-        List<CCFloatMatrix2D> Il = new LinkedList<CCFloatMatrix2D>();
-
-        Al.add((RCFloatMatrix2D) (new RCFloatMatrix2D(A.rows(), A.columns()).assign(A)));
+        List<SparseRCFloatMatrix2D> Al = new LinkedList<SparseRCFloatMatrix2D>();
+        List<SparseCCFloatMatrix2D> Il = new LinkedList<SparseCCFloatMatrix2D>();
+        SparseRCFloatMatrix2D Arc = new SparseRCFloatMatrix2D(A.rows(), A.columns());
+        Arc.assign(A);
+        if (!Arc.hasColumnIndexesSorted())
+            Arc.sortColumnIndexes();
+        Al.add(Arc);
 
         for (int k = 0; Al.get(k).rows() > min; ++k) {
 
-            RCFloatMatrix2D Af = Al.get(k);
+            SparseRCFloatMatrix2D Af = Al.get(k);
 
             float eps = (float) (0.08 * Math.pow(0.5, k));
 
@@ -265,8 +271,8 @@ public class FloatAMG implements FloatPreconditioner {
         if (m == 0)
             throw new RuntimeException("Matrix too small for AMG");
 
-        I = new CCFloatMatrix2D[m - 1];
-        this.A = new RCFloatMatrix2D[m - 1];
+        I = new SparseCCFloatMatrix2D[m - 1];
+        this.A = new SparseRCFloatMatrix2D[m - 1];
 
         Il.toArray(I);
         for (int i = 0; i < Al.size() - 1; ++i)
@@ -274,7 +280,7 @@ public class FloatAMG implements FloatPreconditioner {
 
         // Create a LU decomposition of the smallest Galerkin matrix
         DenseFloatMatrix2D Ac = new DenseFloatMatrix2D(Al.get(Al.size() - 1).toArray());
-        lu = new FloatLUDecompositionQuick();
+        lu = new DenseFloatLUDecompositionQuick();
         lu.decompose(Ac);
 
         // Allocate vectors at each level
@@ -292,7 +298,7 @@ public class FloatAMG implements FloatPreconditioner {
         preM = new SSOR[m - 1];
         postM = new SSOR[m - 1];
         for (int k = 0; k < m - 1; ++k) {
-            RCFloatMatrix2D Ak = this.A[k];
+            SparseRCFloatMatrix2D Ak = this.A[k];
             preM[k] = new SSOR(Ak, reverse, omegaPreF, omegaPreR);
             postM[k] = new SSOR(Ak, reverse, omegaPostF, omegaPostR);
             preM[k].setMatrix(Ak);
@@ -406,7 +412,7 @@ public class FloatAMG implements FloatPreconditioner {
          *            Tolerance for selecting the strongly coupled node
          *            neighborhoods. Between zero and one.
          */
-        public Aggregator(RCFloatMatrix2D A, float eps) {
+        public Aggregator(SparseRCFloatMatrix2D A, float eps) {
 
             diagind = findDiagonalindexes(A);
             N = findNodeNeighborhood(A, diagind, eps);
@@ -465,9 +471,9 @@ public class FloatAMG implements FloatPreconditioner {
         /**
          * Finds the diagonal indexes of the matrix
          */
-        private int[] findDiagonalindexes(RCFloatMatrix2D A) {
+        private int[] findDiagonalindexes(SparseRCFloatMatrix2D A) {
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
+            int[] colind = A.getColumnIndexes();
 
             int[] diagind = new int[A.rows()];
 
@@ -483,13 +489,13 @@ public class FloatAMG implements FloatPreconditioner {
         /**
          * Finds the strongly coupled node neighborhoods
          */
-        private List<Set<Integer>> findNodeNeighborhood(RCFloatMatrix2D A, int[] diagind, float eps) {
+        private List<Set<Integer>> findNodeNeighborhood(SparseRCFloatMatrix2D A, int[] diagind, float eps) {
 
             N = new ArrayList<Set<Integer>>(A.rows());
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            float[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            float[] data = A.getValues();
 
             for (int i = 0; i < A.rows(); ++i) {
                 Set<Integer> Ni = new HashSet<Integer>();
@@ -499,7 +505,7 @@ public class FloatAMG implements FloatPreconditioner {
                     float aij = data[j];
                     float ajj = data[diagind[colind[j]]];
 
-                    if (Math.abs(aij) >= eps * Math.sqrt(aii * ajj))
+                    if (Math.abs(aij) >= eps * (float) Math.sqrt(aii * ajj))
                         Ni.add(colind[j]);
                 }
 
@@ -512,12 +518,12 @@ public class FloatAMG implements FloatPreconditioner {
         /**
          * Creates the initial R-set by including only the connected nodes
          */
-        private boolean[] createInitialR(RCFloatMatrix2D A) {
+        private boolean[] createInitialR(SparseRCFloatMatrix2D A) {
             boolean[] R = new boolean[A.rows()];
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            float[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            float[] data = A.getValues();
 
             for (int i = 0; i < A.rows(); ++i) {
                 boolean hasOffDiagonal = false;
@@ -650,12 +656,12 @@ public class FloatAMG implements FloatPreconditioner {
         /**
          * The Galerkin coarse-space operator
          */
-        private RCFloatMatrix2D Ac;
+        private SparseRCFloatMatrix2D Ac;
 
         /**
          * The interpolation (prolongation) matrix
          */
-        private CCFloatMatrix2D I;
+        private SparseCCFloatMatrix2D I;
 
         /**
          * Creates the interpolation (prolongation) and Galerkin operators
@@ -669,7 +675,7 @@ public class FloatAMG implements FloatPreconditioner {
          *            smoothing is performed, and a faster algorithm for forming
          *            the Galerkin operator will be used.
          */
-        public Interpolator(Aggregator aggregator, RCFloatMatrix2D A, float omega) {
+        public Interpolator(Aggregator aggregator, SparseRCFloatMatrix2D A, float omega) {
             List<Set<Integer>> C = aggregator.getAggregates();
             List<Set<Integer>> N = aggregator.getNodeNeighborhoods();
             int[] diagind = aggregator.getDiagonalindexes();
@@ -728,14 +734,14 @@ public class FloatAMG implements FloatPreconditioner {
          * Creates the Galerkin operator using the assumption of disjoint
          * (non-smoothed) aggregates
          */
-        private RCFloatMatrix2D createGalerkinFast(RCFloatMatrix2D A, int[] pt, int c) {
+        private SparseRCFloatMatrix2D createGalerkinFast(SparseRCFloatMatrix2D A, int[] pt, int c) {
             int n = pt.length;
 
-            RCMFloatMatrix2D Ac = new RCMFloatMatrix2D(c, c);
+            SparseRCMFloatMatrix2D Ac = new SparseRCMFloatMatrix2D(c, c);
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            float[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            float[] data = A.getValues();
 
             for (int i = 0; i < n; ++i)
                 if (pt[i] != -1)
@@ -743,14 +749,14 @@ public class FloatAMG implements FloatPreconditioner {
                         if (pt[colind[j]] != -1)
                             Ac.setQuick(pt[i], pt[colind[j]], data[j]);
 
-            return (RCFloatMatrix2D) (new RCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (SparseRCFloatMatrix2D) (new SparseRCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
          * Creates the interpolation (prolongation) matrix based on the smoothed
          * aggregates
          */
-        private CCFloatMatrix2D createInterpolationMatrix(List<Map<Integer, Float>> P, int n) {
+        private SparseCCFloatMatrix2D createInterpolationMatrix(List<Map<Integer, Float>> P, int n) {
 
             // Determine the sparsity pattern of I
             int c = P.size();
@@ -765,7 +771,7 @@ public class FloatAMG implements FloatPreconditioner {
             //                    nz[j][l++] = k;
             //            }
 
-            I = new CCFloatMatrix2D(n, c);
+            I = new SparseCCFloatMatrix2D(n, c);
 
             // Populate it with numerical entries
             for (int j = 0; j < c; ++j) {
@@ -783,20 +789,20 @@ public class FloatAMG implements FloatPreconditioner {
          * Creates the interpolation (prolongation) matrix based on the
          * non-smoothed aggregates
          */
-        private CCFloatMatrix2D createInterpolationMatrix(int[] pt, int c) {
-            CCMFloatMatrix2D If = new CCMFloatMatrix2D(pt.length, c);
+        private SparseCCFloatMatrix2D createInterpolationMatrix(int[] pt, int c) {
+            SparseCCMFloatMatrix2D If = new SparseCCMFloatMatrix2D(pt.length, c);
 
             for (int i = 0; i < pt.length; ++i)
                 if (pt[i] != -1)
                     If.setQuick(i, pt[i], 1);
 
-            return (CCFloatMatrix2D) (new CCFloatMatrix2D(If.rows(), If.columns()).assign(If));
+            return (SparseCCFloatMatrix2D) (new SparseCCFloatMatrix2D(If.rows(), If.columns()).assign(If));
         }
 
         /**
          * Gets the interpolation (prolongation) operator
          */
-        public CCFloatMatrix2D getInterpolationOperator() {
+        public SparseCCFloatMatrix2D getInterpolationOperator() {
             return I;
         }
 
@@ -804,7 +810,8 @@ public class FloatAMG implements FloatPreconditioner {
          * Creates the smoothes interpolation (prolongation) operator by a
          * single sweep of the damped Jacobi method
          */
-        private List<Map<Integer, Float>> createSmoothedProlongation(List<Set<Integer>> C, List<Set<Integer>> N, RCFloatMatrix2D A, int[] diagind, float omega, int[] pt) {
+        private List<Map<Integer, Float>> createSmoothedProlongation(List<Set<Integer>> C, List<Set<Integer>> N,
+                SparseRCFloatMatrix2D A, int[] diagind, float omega, int[] pt) {
 
             int n = A.rows(), c = C.size();
 
@@ -815,8 +822,8 @@ public class FloatAMG implements FloatPreconditioner {
                 P.add(new HashMap<Integer, Float>());
 
             int[] rowptr = A.getRowPointers();
-            int[] colind = A.getColumnindexes().elements();
-            float[] data = A.getValues().elements();
+            int[] colind = A.getColumnIndexes();
+            float[] data = A.getValues();
 
             float[] dot = new float[c];
 
@@ -874,9 +881,9 @@ public class FloatAMG implements FloatPreconditioner {
          * <code>Ac = I<sup>T</sup> A I</code>. This is a very time-consuming
          * operation
          */
-        private RCFloatMatrix2D createGalerkinSlow(CCFloatMatrix2D I, RCFloatMatrix2D A) {
+        private SparseRCFloatMatrix2D createGalerkinSlow(SparseCCFloatMatrix2D I, SparseRCFloatMatrix2D A) {
             int n = I.rows(), c = I.columns();
-            RCMFloatMatrix2D Ac = new RCMFloatMatrix2D(c, c);
+            SparseRCMFloatMatrix2D Ac = new SparseRCMFloatMatrix2D(c, c);
 
             float[] aiCol = new float[n];
             float[] iCol = new float[n];
@@ -886,8 +893,8 @@ public class FloatAMG implements FloatPreconditioner {
             DenseFloatMatrix1D itaiV = new DenseFloatMatrix1D(c, itaiCol, 0, 1, false);
 
             int[] colptr = I.getColumnPointers();
-            int[] rowind = I.getRowindexes().elements();
-            float[] Idata = I.getValues().elements();
+            int[] rowind = I.getRowIndexes();
+            float[] Idata = I.getValues();
 
             for (int k = 0; k < c; ++k) {
 
@@ -908,13 +915,13 @@ public class FloatAMG implements FloatPreconditioner {
                         Ac.setQuick(i, k, itaiCol[i]);
             }
 
-            return (RCFloatMatrix2D) (new RCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
+            return (SparseRCFloatMatrix2D) (new SparseRCFloatMatrix2D(Ac.rows(), Ac.columns()).assign(Ac));
         }
 
         /**
          * Gets the Galerkin operator
          */
-        public RCFloatMatrix2D getGalerkinOperator() {
+        public SparseRCFloatMatrix2D getGalerkinOperator() {
             return Ac;
         }
 
@@ -935,7 +942,7 @@ public class FloatAMG implements FloatPreconditioner {
         /**
          * Holds a copy of the matrix A in the compressed row format
          */
-        private final RCFloatMatrix2D F;
+        private final SparseRCFloatMatrix2D F;
 
         /**
          * indexes to the diagonal entries of the matrix
@@ -970,7 +977,7 @@ public class FloatAMG implements FloatPreconditioner {
          *            Overrelaxation parameter for the backwards sweep. Between
          *            0 and 2.
          */
-        public SSOR(RCFloatMatrix2D F, boolean reverse, float omegaF, float omegaR) {
+        public SSOR(SparseRCFloatMatrix2D F, boolean reverse, float omegaF, float omegaR) {
             if (F.rows() != F.columns())
                 throw new IllegalArgumentException("SSOR only applies to square matrices");
 
@@ -991,7 +998,7 @@ public class FloatAMG implements FloatPreconditioner {
          *            Matrix to use internally. It will not be modified, thus
          *            the system matrix may be passed
          */
-        public SSOR(RCFloatMatrix2D F) {
+        public SSOR(SparseRCFloatMatrix2D F) {
             this(F, true, 1, 1);
         }
 
@@ -1021,7 +1028,7 @@ public class FloatAMG implements FloatPreconditioner {
             int n = F.rows();
 
             int[] rowptr = F.getRowPointers();
-            int[] colind = F.getColumnindexes().elements();
+            int[] colind = F.getColumnIndexes();
 
             // Find the indexes to the diagonal entries
             for (int k = 0; k < n; ++k) {
@@ -1036,8 +1043,8 @@ public class FloatAMG implements FloatPreconditioner {
                 throw new IllegalArgumentException("b and x must be a DenseFloatMatrix1D");
 
             int[] rowptr = F.getRowPointers();
-            int[] colind = F.getColumnindexes().elements();
-            float[] data = F.getValues().elements();
+            int[] colind = F.getColumnIndexes();
+            float[] data = F.getValues();
 
             float[] bd = ((DenseFloatMatrix1D) b).elements();
             float[] xd = ((DenseFloatMatrix1D) x).elements();

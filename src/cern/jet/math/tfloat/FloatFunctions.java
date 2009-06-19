@@ -640,8 +640,7 @@ public class FloatFunctions extends Object {
             return a * b;
         }
     };
-    
-   
+
     /**
      * Function that returns <tt>-(a * b)</tt>.
      */
@@ -828,7 +827,7 @@ public class FloatFunctions extends Object {
         float b = 0.2f;
         float v = (float) (Math.sin(a) + Math.pow(Math.cos(b), 2));
         System.out.println(v);
-        FloatFloatFunction f = F.chain(F.plus, F.sin, F.chain(F.square, F.cos));
+        FloatFloatFunction f = FloatFunctions.chain(FloatFunctions.plus, FloatFunctions.sin, FloatFunctions.chain(FloatFunctions.square, FloatFunctions.cos));
         // FloatFloatFunction f = F.chain(plus,sin,F.chain(square,cos));
         System.out.println(f.apply(a, b));
         FloatFloatFunction g = new FloatFloatFunction() {
@@ -837,8 +836,8 @@ public class FloatFunctions extends Object {
             }
         };
         System.out.println(g.apply(a, b));
-        FloatFunction m = F.plus(3);
-        FloatFunction n = F.plus(4);
+        FloatFunction m = FloatFunctions.plus(3);
+        FloatFunction n = FloatFunctions.plus(4);
         System.out.println(m.apply(0));
         System.out.println(n.apply(0));
     }
@@ -857,7 +856,7 @@ public class FloatFunctions extends Object {
         System.out.println(v);
 
         // FloatFloatFunction f = F.chain(F.plus,F.identity,F.identity);
-        FloatFloatFunction f = F.chain(F.abs, F.chain(F.plus, F.sin, F.chain(F.square, F.cos)));
+        FloatFloatFunction f = FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.chain(FloatFunctions.plus, FloatFunctions.sin, FloatFunctions.chain(FloatFunctions.square, FloatFunctions.cos)));
         // FloatFloatFunction f =
         // F.chain(F.plus,F.sin,F.chain(F.square,F.cos));
         // FloatFloatFunction f = F.plus;

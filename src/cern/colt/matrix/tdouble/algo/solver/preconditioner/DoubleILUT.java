@@ -27,10 +27,11 @@ import java.util.List;
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.DoubleProperty;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.tdouble.impl.RCMDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix1D;
+import cern.colt.matrix.tdouble.impl.SparseRCMDoubleMatrix2D;
 
 /**
  * ILU preconditioner with fill-in. Uses the dual threshold approach of Saad.
@@ -40,7 +41,7 @@ public class DoubleILUT implements DoublePreconditioner {
     /**
      * Factorisation matrix
      */
-    private final RCMDoubleMatrix2D LU;
+    private SparseRCMDoubleMatrix2D LU;
 
     /**
      * Temporary vector for solving the factorised system
@@ -66,12 +67,13 @@ public class DoubleILUT implements DoublePreconditioner {
      */
     private final int p;
 
+    private final int n;
+
     /**
-     * Sets up the preconditioner for the given matrix
+     * Sets up the preconditioner for the problem size
      * 
-     * @param LU
-     *            Matrix to use internally. For best performance, its non-zero
-     *            pattern should conform to that of the system matrix
+     * @param n
+     *            Problem size (number of rows)
      * @param tau
      *            Drop tolerance
      * @param p
@@ -79,35 +81,31 @@ public class DoubleILUT implements DoublePreconditioner {
      *            matrix. This is in addition to the entries of the original
      *            matrix
      */
-    public DoubleILUT(RCMDoubleMatrix2D LU, double tau, int p) {
-        if (LU.rows() != LU.columns())
-            throw new IllegalArgumentException("ILUT only applies to square matrices");
-
-        this.LU = LU;
+    public DoubleILUT(int n, double tau, int p) {
+        this.n = n;
         this.tau = tau;
         this.p = p;
 
-        int n = LU.rows();
         lower = new ArrayList<IntDoubleEntry>(n);
         upper = new ArrayList<IntDoubleEntry>(n);
         y = new DenseDoubleMatrix1D(n);
     }
 
     /**
-     * Sets up the preconditioner for the given matrix. Uses a drop-tolerance of
-     * 10<sup>-6</sup>, and keeps 25 entries on each row, including the main
-     * diagonal and any previous entries in the matrix structure
+     * Sets up the preconditioner for the given problem size. Uses a
+     * drop-tolerance of 10<sup>-6</sup>, and keeps 25 entries on each row,
+     * including the main diagonal and any previous entries in the matrix
+     * structure
      * 
-     * @param LU
-     *            Matrix to use internally. For best performance, its non-zero
-     *            pattern should conform to that of the system matrix
+     * @param n
+     *            Problem size (number of rows)
      */
-    public DoubleILUT(RCMDoubleMatrix2D LU) {
-        this(LU, 1e-6, 25);
+    public DoubleILUT(int n) {
+        this(n, 1e-6, 25);
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -119,7 +117,7 @@ public class DoubleILUT implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -130,6 +128,11 @@ public class DoubleILUT implements DoublePreconditioner {
     }
 
     public void setMatrix(DoubleMatrix2D A) {
+        DoubleProperty.DEFAULT.isSquare(A);
+        if (A.rows() != n) {
+            throw new IllegalArgumentException("A.rows() != n");
+        }
+        LU = new SparseRCMDoubleMatrix2D(n, n);
         LU.assign(A);
         LU.trimToSize();
 
@@ -145,7 +148,7 @@ public class DoubleILUT implements DoublePreconditioner {
             SparseDoubleMatrix1D rowi = LU.viewRow(i);
 
             // Drop tolerance on current row
-            double taui = DoubleAlgebra.DEFAULT.norm(rowi, Norm.Two) * tau;
+            double taui = DenseDoubleAlgebra.DEFAULT.norm(rowi, Norm.Two) * tau;
 
             for (int k = 0; k < i; ++k) {
 
@@ -162,7 +165,7 @@ public class DoubleILUT implements DoublePreconditioner {
                     continue;
 
                 // Traverse the sparse row k, reducing row i
-                int rowUsed = rowk.size();
+                int rowUsed = (int) rowk.size();
                 for (int j = k + 1; j < rowUsed; ++j)
                     rowi.setQuick(j, rowi.getQuick(j) - LUik * rowk.getQuick(j));
 
@@ -306,7 +309,7 @@ public class DoubleILUT implements DoublePreconditioner {
 
             // Get row i
             SparseDoubleMatrix1D row = LU.viewRow(i);
-            int used = row.size();
+            int used = (int) row.size();
 
             // xi = (bi - sum[j>i] Uij * xj) / Uii
             double sum = 0;
@@ -328,7 +331,7 @@ public class DoubleILUT implements DoublePreconditioner {
 
             // Get row i
             SparseDoubleMatrix1D row = LU.viewRow(i);
-            int used = row.size();
+            int used = (int) row.size();
 
             // Solve for the current entry
             xd[i] /= row.getQuick(i);

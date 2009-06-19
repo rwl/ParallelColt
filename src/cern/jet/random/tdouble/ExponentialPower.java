@@ -34,6 +34,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class ExponentialPower extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double tau;
 
     // cached vars for method nextDouble(tau) (for performance only)
@@ -56,6 +61,7 @@ public class ExponentialPower extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(this.tau);
     }
@@ -130,6 +136,7 @@ public class ExponentialPower extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + tau + ")";
     }

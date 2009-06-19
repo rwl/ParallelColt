@@ -593,9 +593,9 @@ public class Sorting extends Object {
      * Returns the index of the median of the three indexed chars.
      */
     private static int med3(Object x[], int a, int b, int c) {
-        int ab = ((Comparable) x[a]).compareTo((Comparable) x[b]);
-        int ac = ((Comparable) x[a]).compareTo((Comparable) x[c]);
-        int bc = ((Comparable) x[b]).compareTo((Comparable) x[c]);
+        int ab = ((Comparable) x[a]).compareTo(x[b]);
+        int ac = ((Comparable) x[a]).compareTo(x[c]);
+        int bc = ((Comparable) x[b]).compareTo(x[c]);
         return (ab < 0 ? (bc < 0 ? b : ac < 0 ? c : a) : (bc > 0 ? b : ac > 0 ? c : a));
     }
 
@@ -646,7 +646,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(byte[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
-        byte aux[] = (byte[]) a.clone();
+        byte aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex);
     }
 
@@ -687,7 +687,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(byte[] a, int fromIndex, int toIndex, ByteComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        byte aux[] = (byte[]) a.clone();
+        byte aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex, c);
     }
 
@@ -718,7 +718,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(char[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
-        char aux[] = (char[]) a.clone();
+        char aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex);
     }
 
@@ -759,7 +759,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(char[] a, int fromIndex, int toIndex, CharComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        char aux[] = (char[]) a.clone();
+        char aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex, c);
     }
 
@@ -829,7 +829,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(double[] a, int fromIndex, int toIndex, DoubleComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        double aux[] = (double[]) a.clone();
+        double aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex, c);
     }
 
@@ -899,7 +899,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(float[] a, int fromIndex, int toIndex, FloatComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        float aux[] = (float[]) a.clone();
+        float aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex, c);
     }
 
@@ -930,7 +930,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(int[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
-        int aux[] = (int[]) a.clone();
+        int aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex);
     }
 
@@ -971,7 +971,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        int aux[] = (int[]) a.clone();
+        int aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex, c);
     }
 
@@ -1002,7 +1002,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(long[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
-        long aux[] = (long[]) a.clone();
+        long aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex);
     }
 
@@ -1043,7 +1043,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(long[] a, int fromIndex, int toIndex, LongComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        long aux[] = (long[]) a.clone();
+        long aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex, c);
     }
 
@@ -1074,7 +1074,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(short[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
-        short aux[] = (short[]) a.clone();
+        short aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex);
     }
 
@@ -1115,7 +1115,7 @@ public class Sorting extends Object {
      */
     public static void mergeSort(short[] a, int fromIndex, int toIndex, ShortComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
-        short aux[] = (short[]) a.clone();
+        short aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, toIndex, c);
     }
 
@@ -1595,7 +1595,7 @@ public class Sorting extends Object {
         }
 
         // Main sort phase: mergesort everything but the NaN's
-        double aux[] = (double[]) a.clone();
+        double aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, n);
 
         // Postprocessing phase: change 0.0's to -0.0's as required
@@ -1642,7 +1642,7 @@ public class Sorting extends Object {
         }
 
         // Main sort phase: mergesort everything but the NaN's
-        float aux[] = (float[]) a.clone();
+        float aux[] = a.clone();
         mergeSort1(aux, a, fromIndex, n);
 
         // Postprocessing phase: change 0.0's to -0.0's as required
@@ -1741,7 +1741,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(byte[] a, int fromIndex, int toIndex, ByteComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1771,7 +1772,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(char[] a, int fromIndex, int toIndex, CharComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1801,7 +1803,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(double[] a, int fromIndex, int toIndex, DoubleComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1831,7 +1834,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(float[] a, int fromIndex, int toIndex, FloatComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1861,7 +1865,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1891,7 +1896,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(long[] a, int fromIndex, int toIndex, LongComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -1905,7 +1911,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(Object[] a) {
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, 0, a.length, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, 0, a.length, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils
+                    .getNumberOfThreads()));
         } else {
             quickSort1(a, 0, a.length);
         }
@@ -1930,7 +1937,8 @@ public class Sorting extends Object {
      */
     public static void parallelQuickSort(Object[] a, Comparator c) {
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, 0, a.length, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, 0, a.length, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils
+                    .getNumberOfThreads()));
         } else {
             quickSort1(a, 0, a.length, c);
         }
@@ -1954,7 +1962,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(Object[] a, int fromIndex, int toIndex) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex);
         }
@@ -1984,7 +1993,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(Object[] a, int fromIndex, int toIndex, Comparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -2014,7 +2024,8 @@ public class Sorting extends Object {
     public static void parallelQuickSort(short[] a, int fromIndex, int toIndex, ShortComparator c) {
         rangeCheck(a.length, fromIndex, toIndex);
         if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (a.length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils.prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
+            ParallelQuickSort.quickSort(a, fromIndex, toIndex - fromIndex, c, ConcurrencyUtils
+                    .prevPow2(2 * ConcurrencyUtils.getNumberOfThreads()));
         } else {
             quickSort1(a, fromIndex, toIndex - fromIndex, c);
         }
@@ -2766,7 +2777,7 @@ public class Sorting extends Object {
         // Insertion sort on smallest arrays
         if (len < SMALL) {
             for (int i = off; i < len + off; i++)
-                for (int j = i; j > off && ((Comparable) x[j - 1]).compareTo((Comparable) x[j]) > 0; j--)
+                for (int j = i; j > off && ((Comparable) x[j - 1]).compareTo(x[j]) > 0; j--)
                     swap(x, j, j - 1);
             return;
         }

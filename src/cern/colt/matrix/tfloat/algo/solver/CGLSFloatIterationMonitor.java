@@ -2,8 +2,8 @@ package cern.colt.matrix.tfloat.algo.solver;
 
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 
-public class CGLSFloatIterationMonitor extends DefaultFloatIterationMonitor {  
-    
+public class CGLSFloatIterationMonitor extends DefaultFloatIterationMonitor {
+
     @Override
     protected boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException {
         // Store initial residual
@@ -24,7 +24,7 @@ public class CGLSFloatIterationMonitor extends DefaultFloatIterationMonitor {
         // Neither convergence nor divergence
         return false;
     }
-    
+
     @Override
     protected boolean convergedI(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         return convergedI(r);

@@ -30,6 +30,11 @@ import cern.jet.stat.tfloat.FloatDescriptive;
  */
 public class StaticFloatBin1D extends AbstractFloatBin1D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The number of elements consumed by incremental parameter maintainance.
      */
     protected int size = 0;
@@ -73,6 +78,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
      * @param element
      *            element to be appended.
      */
+    @Override
     public synchronized void add(float element) {
         // prototyping implementation; inefficient; TODO
         this.addAllOf(new FloatArrayList(new float[] { element }));
@@ -103,6 +109,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
+    @Override
     public synchronized void addAllOfFromTo(FloatArrayList list, int from, int to) {
         // if (this.arguments == null) setUpCache();
         synchronized (arguments) {
@@ -128,6 +135,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns.
      */
+    @Override
     public synchronized void clear() {
         clearAllMeasures();
         this.size = 0;
@@ -150,6 +158,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
      * the elements can be obtained via <tt>elements()</tt> methods.
      * 
      */
+    @Override
     public synchronized boolean isRebinnable() {
         return false;
     }
@@ -157,6 +166,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
     /**
      * Returns the maximum.
      */
+    @Override
     public synchronized float max() {
         return this.max;
     }
@@ -164,6 +174,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
     /**
      * Returns the minimum.
      */
+    @Override
     public synchronized float min() {
         return this.min;
     }
@@ -173,6 +184,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
      * 
      * @return the number of elements contained in the receiver.
      */
+    @Override
     public synchronized int size() {
         return this.size;
     }
@@ -180,6 +192,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
     /**
      * Returns the sum of all elements, which is <tt>Sum( x[i] )</tt>.
      */
+    @Override
     public synchronized float sum() {
         return this.sum;
     }
@@ -187,6 +200,7 @@ public class StaticFloatBin1D extends AbstractFloatBin1D {
     /**
      * Returns the sum of squares, which is <tt>Sum( x[i] * x[i] )</tt>.
      */
+    @Override
     public synchronized float sumOfSquares() {
         return this.sum_xx;
     }

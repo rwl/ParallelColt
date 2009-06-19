@@ -17,6 +17,10 @@ import cern.colt.function.tfloat.FloatProcedure;
  */
 public class FloatArrayList extends AbstractFloatList {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    /**
      * The array buffer into which the elements of the list are stored. The
      * capacity of the list is the length of this array buffer.
      * 
@@ -65,6 +69,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @param element
      *            element to be appended to this list.
      */
+    @Override
     public void add(float element) {
         // overridden for performance only.
         if (size == elements.length)
@@ -86,6 +91,7 @@ public class FloatArrayList extends AbstractFloatList {
      *                index is out of range (
      *                <tt>index &lt; 0 || index &gt; size()</tt>).
      */
+    @Override
     public void beforeInsert(int index, float element) {
         // overridden for performance only.
         if (index > size || index < 0)
@@ -121,6 +127,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @see cern.colt.Sorting
      * @see java.util.Arrays
      */
+    @Override
     public int binarySearchFromTo(float key, int from, int to) {
         return cern.colt.Sorting.binarySearchFromTo(this.elements, key, from, to);
     }
@@ -130,9 +137,10 @@ public class FloatArrayList extends AbstractFloatList {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         // overridden for performance only.
-        FloatArrayList clone = new FloatArrayList((float[]) elements.clone());
+        FloatArrayList clone = new FloatArrayList(elements.clone());
         clone.setSizeRaw(size);
         return clone;
     }
@@ -158,6 +166,7 @@ public class FloatArrayList extends AbstractFloatList {
      * 
      * @return the elements currently stored.
      */
+    @Override
     public float[] elements() {
         return elements;
     }
@@ -176,6 +185,7 @@ public class FloatArrayList extends AbstractFloatList {
      *            the new elements to be stored.
      * @return the receiver itself.
      */
+    @Override
     public AbstractFloatList elements(float[] elements) {
         this.elements = elements;
         this.size = elements.length;
@@ -190,6 +200,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @param minCapacity
      *            the desired minimum capacity.
      */
+    @Override
     public void ensureCapacity(int minCapacity) {
         elements = cern.colt.Arrays.ensureCapacity(elements, minCapacity);
     }
@@ -205,6 +216,7 @@ public class FloatArrayList extends AbstractFloatList {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
+    @Override
     public boolean equals(Object otherObj) { // delta
         // overridden for performance only.
         if (!(otherObj instanceof FloatArrayList))
@@ -236,6 +248,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @return <tt>false</tt> if the procedure stopped before all elements where
      *         iterated over, <tt>true</tt> otherwise.
      */
+    @Override
     public boolean forEach(FloatProcedure procedure) {
         // overridden for performance only.
         float[] theElements = elements;
@@ -256,6 +269,7 @@ public class FloatArrayList extends AbstractFloatList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
+    @Override
     public float get(int index) {
         // overridden for performance only.
         if (index >= size || index < 0)
@@ -274,6 +288,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @param index
      *            index of element to return.
      */
+    @Override
     public float getQuick(int index) {
         return elements[index];
     }
@@ -297,6 +312,7 @@ public class FloatArrayList extends AbstractFloatList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public int indexOfFromTo(float element, int from, int to) {
         // overridden for performance only.
         if (size == 0)
@@ -331,6 +347,7 @@ public class FloatArrayList extends AbstractFloatList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public int lastIndexOfFromTo(float element, int from, int to) {
         // overridden for performance only.
         if (size == 0)
@@ -360,6 +377,7 @@ public class FloatArrayList extends AbstractFloatList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public AbstractFloatList partFromTo(int from, int to) {
         if (size == 0)
             return new FloatArrayList(0);
@@ -380,6 +398,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @return <code>true</code> if the receiver changed as a result of the
      *         call.
      */
+    @Override
     public boolean removeAll(AbstractFloatList other) {
         // overridden for performance only.
         if (!(other instanceof FloatArrayList))
@@ -403,8 +422,8 @@ public class FloatArrayList extends AbstractFloatList {
         float[] theElements = elements;
         int mySize = size();
 
-        float N = (float) other.size();
-        float M = (float) mySize;
+        float N = other.size();
+        float M = mySize;
         if ((N + M) * cern.jet.math.tfloat.FloatArithmetic.log2(N) < M * N) {
             // it is faster to sort other before searching in it
             FloatArrayList sortedList = (FloatArrayList) other.clone();
@@ -445,6 +464,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @param otherFrom
      *            position of first element within other list to be copied.
      */
+    @Override
     public void replaceFromToWithFrom(int from, int to, AbstractFloatList other, int otherFrom) {
         // overridden for performance only.
         if (!(other instanceof FloatArrayList)) {
@@ -470,6 +490,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @return <code>true</code> if the receiver changed as a result of the
      *         call.
      */
+    @Override
     public boolean retainAll(AbstractFloatList other) {
         // overridden for performance only.
         if (!(other instanceof FloatArrayList))
@@ -490,8 +511,8 @@ public class FloatArrayList extends AbstractFloatList {
         float[] theElements = elements;
         int mySize = size();
 
-        float N = (float) other.size();
-        float M = (float) mySize;
+        float N = other.size();
+        float M = mySize;
         if ((N + M) * cern.jet.math.tfloat.FloatArithmetic.log2(N) < M * N) {
             // it is faster to sort other before searching in it
             FloatArrayList sortedList = (FloatArrayList) other.clone();
@@ -518,6 +539,7 @@ public class FloatArrayList extends AbstractFloatList {
      * Reverses the elements of the receiver. Last becomes first, second last
      * becomes second first, and so on.
      */
+    @Override
     public void reverse() {
         // overridden for performance only.
         float tmp;
@@ -544,6 +566,7 @@ public class FloatArrayList extends AbstractFloatList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
+    @Override
     public void set(int index, float element) {
         // overridden for performance only.
         if (index >= size || index < 0)
@@ -551,10 +574,11 @@ public class FloatArrayList extends AbstractFloatList {
         elements[index] = element;
     }
 
+    @Override
     public void setSizeRaw(int size) {
         this.size = size;
     }
-    
+
     /**
      * Replaces the element at the specified position in the receiver with the
      * specified element; <b>WARNING:</b> Does not check preconditions. Provided
@@ -568,6 +592,7 @@ public class FloatArrayList extends AbstractFloatList {
      * @param element
      *            element to be stored at the specified position.
      */
+    @Override
     public void setQuick(int index, float element) {
         elements[index] = element;
     }
@@ -585,6 +610,7 @@ public class FloatArrayList extends AbstractFloatList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void shuffleFromTo(int from, int to) {
         // overridden for performance only.
         if (size == 0) {
@@ -592,7 +618,8 @@ public class FloatArrayList extends AbstractFloatList {
         }
         checkRangeFromTo(from, to, size);
 
-        cern.jet.random.tfloat.FloatUniform gen = new cern.jet.random.tfloat.FloatUniform(new cern.jet.random.tfloat.engine.FRand(new java.util.Date()));
+        cern.jet.random.tfloat.FloatUniform gen = new cern.jet.random.tfloat.FloatUniform(
+                new cern.jet.random.tfloat.engine.FRand(new java.util.Date()));
         float tmpElement;
         float[] theElements = elements;
         int random;
@@ -611,6 +638,7 @@ public class FloatArrayList extends AbstractFloatList {
      * Releases any superfluos internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
+    @Override
     public void trimToSize() {
         elements = cern.colt.Arrays.trimToCapacity(elements, size());
     }

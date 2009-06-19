@@ -61,6 +61,7 @@ public abstract class DoubleIterativeSolverBenchmark extends TestCase {
         super(arg0);
     }
 
+    @Override
     protected void setUp() throws Exception {
         readIterativeSolverBenchmarkSettings();
 
@@ -78,6 +79,7 @@ public abstract class DoubleIterativeSolverBenchmark extends TestCase {
         x = new DenseDoubleMatrix1D(n);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         b = x = null;
         solver = null;
@@ -86,7 +88,8 @@ public abstract class DoubleIterativeSolverBenchmark extends TestCase {
     protected abstract void createSolver() throws Exception;
 
     public void testBenchmark() {
-        System.out.println("Benchmarking " + solver.getClass().getName() + " with preconditioner " + solver.getPreconditioner().getClass().getName());
+        System.out.println("Benchmarking " + solver.getClass().getName() + " with preconditioner "
+                + solver.getPreconditioner().getClass().getName());
         for (int k = 0; k < nthreads.length; k++) {
             System.out.println("\tNumber of threads = " + nthreads[k]);
             ConcurrencyUtils.setNumberOfThreads(nthreads[k]);
@@ -127,7 +130,7 @@ public abstract class DoubleIterativeSolverBenchmark extends TestCase {
                 String matrixPath = line;
                 MatrixVectorReader reader = new MatrixVectorReader(new BufferedReader(new FileReader(matrixPath)));
                 SparseDoubleMatrix2D Aco = new SparseDoubleMatrix2D(reader);
-                A = Aco.convertToRCDoubleMatrix2D();
+                A = Aco.getRowCompressed(true);
                 line = input.readLine();
                 repeat = Integer.parseInt(line.trim());
                 line = input.readLine();

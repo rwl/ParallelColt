@@ -20,6 +20,10 @@ import cern.colt.list.AbstractList;
  */
 public abstract class AbstractLongList extends AbstractList {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    /**
      * The size of the list. This is a READ_ONLY variable for all methods but
      * setSizeRaw(int newSize) !!! If you violate this principle in subclasses,
      * you should exactly know what you are doing.
@@ -124,6 +128,7 @@ public abstract class AbstractLongList extends AbstractList {
      * @throws IndexOutOfBoundsException
      *             if <tt>index &lt; 0 || index &gt; size()</tt>.
      */
+    @Override
     protected void beforeInsertDummies(int index, int length) {
         if (index > size || index < 0)
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
@@ -204,6 +209,7 @@ public abstract class AbstractLongList extends AbstractList {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         return partFromTo(0, size - 1);
     }
@@ -288,6 +294,7 @@ public abstract class AbstractLongList extends AbstractList {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
+    @Override
     public boolean equals(Object otherObj) { // delta
         if (!(otherObj instanceof AbstractLongList)) {
             return false;
@@ -485,6 +492,7 @@ public abstract class AbstractLongList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void mergeSortFromTo(int from, int to) {
         int mySize = size();
         checkRangeFromTo(from, to, mySize);
@@ -588,6 +596,7 @@ public abstract class AbstractLongList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void quickSortFromTo(int from, int to) {
         int mySize = size();
         checkRangeFromTo(from, to, mySize);
@@ -686,6 +695,7 @@ public abstract class AbstractLongList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void removeFromTo(int from, int to) {
         checkRangeFromTo(from, to, size);
         int numMoved = size - to - 1;
@@ -836,6 +846,7 @@ public abstract class AbstractLongList extends AbstractList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
+    @Override
     public void replaceFromWith(int from, java.util.Collection other) {
         checkRange(from, size());
         java.util.Iterator e = other.iterator();
@@ -879,6 +890,7 @@ public abstract class AbstractLongList extends AbstractList {
      * Reverses the elements of the receiver. Last becomes first, second last
      * becomes second first, and so on.
      */
+    @Override
     public void reverse() {
         long tmp;
         int limit = size() / 2;
@@ -957,10 +969,12 @@ public abstract class AbstractLongList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void shuffleFromTo(int from, int to) {
         checkRangeFromTo(from, to, size());
 
-        cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(new cern.jet.random.tdouble.engine.DRand(new java.util.Date()));
+        cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(
+                new cern.jet.random.tdouble.engine.DRand(new java.util.Date()));
         for (int i = from; i < to; i++) {
             int random = gen.nextIntFromTo(i, to);
 
@@ -976,6 +990,7 @@ public abstract class AbstractLongList extends AbstractList {
      * 
      * @return the number of elements contained in the receiver.
      */
+    @Override
     public int size() {
         return size;
     }
@@ -999,6 +1014,7 @@ public abstract class AbstractLongList extends AbstractList {
      * Returns a <code>java.util.ArrayList</code> containing all the elements in
      * the receiver.
      */
+    @Override
     public java.util.ArrayList toList() {
         int mySize = size();
         java.util.ArrayList list = new java.util.ArrayList(mySize);
@@ -1011,6 +1027,7 @@ public abstract class AbstractLongList extends AbstractList {
      * Returns a string representation of the receiver, containing the String
      * representation of each element.
      */
+    @Override
     public String toString() {
         return cern.colt.Arrays.toString(partFromTo(0, size() - 1).elements());
     }

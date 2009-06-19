@@ -51,6 +51,11 @@ import cern.colt.matrix.tfloat.FloatMatrix3D;
  * @version 1.0, 09/24/99
  */
 class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /*
      * The elements of the matrix.
      */
@@ -94,7 +99,8 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseFloatMatrix1D(int size, AbstractLongFloatMap elements, int zero, int stride, int[] offsets, int offset) {
+    protected SelectedSparseFloatMatrix1D(int size, AbstractLongFloatMap elements, int zero, int stride, int[] offsets,
+            int offset) {
         setUp(size, zero, stride);
 
         this.elements = elements;
@@ -103,6 +109,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
         this.isNoView = false;
     }
 
+    @Override
     public AbstractLongFloatMap elements() {
         return elements;
     }
@@ -120,6 +127,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
+    @Override
     public float getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements.get(index(index));
@@ -135,6 +143,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param rank
      *            the rank of the element.
      */
+    @Override
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
@@ -154,6 +163,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public FloatMatrix1D like(int size) {
         return new SparseFloatMatrix1D(size);
     }
@@ -172,10 +182,12 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public FloatMatrix2D like2D(int rows, int columns) {
         return new SparseFloatMatrix2D(rows, columns);
     }
 
+    @Override
     public FloatMatrix2D reshape(int rows, int cols) {
         if (rows * cols != size) {
             throw new IllegalArgumentException("rows*cols != size");
@@ -190,6 +202,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
         return M;
     }
 
+    @Override
     public FloatMatrix3D reshape(int slices, int rows, int cols) {
         if (slices * rows * cols != size) {
             throw new IllegalArgumentException("slices*rows*cols != size");
@@ -220,6 +233,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int index, float value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
@@ -240,6 +254,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
@@ -247,6 +262,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
+    @Override
     protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
         if (other instanceof SelectedSparseFloatMatrix1D) {
             SelectedSparseFloatMatrix1D otherMatrix = (SelectedSparseFloatMatrix1D) other;
@@ -264,6 +280,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
+    @Override
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -277,6 +294,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected FloatMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseFloatMatrix1D(this.elements, offsets);
     }

@@ -63,11 +63,13 @@ public class SmpFloatBlas implements FloatBlas {
         return x.zDotProduct(y);
     }
 
-    public void dgemm(final boolean transposeA, final boolean transposeB, final float alpha, final FloatMatrix2D A, final FloatMatrix2D B, final float beta, final FloatMatrix2D C) {
+    public void dgemm(final boolean transposeA, final boolean transposeB, final float alpha, final FloatMatrix2D A,
+            final FloatMatrix2D B, final float beta, final FloatMatrix2D C) {
         A.zMult(B, C, alpha, beta, transposeA, transposeB);
     }
 
-    public void dgemv(final boolean transposeA, final float alpha, FloatMatrix2D A, final FloatMatrix1D x, final float beta, FloatMatrix1D y) {
+    public void dgemv(final boolean transposeA, final float alpha, FloatMatrix2D A, final FloatMatrix1D x,
+            final float beta, FloatMatrix1D y) {
         A.zMult(x, y, alpha, beta, transposeA);
     }
 
@@ -81,7 +83,7 @@ public class SmpFloatBlas implements FloatBlas {
     }
 
     public float dnrm2(FloatMatrix1D x) {
-        return FloatAlgebra.DEFAULT.norm2(x);
+        return DenseFloatAlgebra.DEFAULT.norm2(x);
     }
 
     public void drot(FloatMatrix1D x, FloatMatrix1D y, float c, float s) {
@@ -109,7 +111,7 @@ public class SmpFloatBlas implements FloatBlas {
 
             ra = a / scale;
             rb = b / scale;
-            r = (float) (scale * Math.sqrt(ra * ra + rb * rb));
+            r = scale * (float) Math.sqrt(ra * ra + rb * rb);
             r = sign(1.0f, roe) * r;
             c = a / r;
             s = b / r;
@@ -117,7 +119,7 @@ public class SmpFloatBlas implements FloatBlas {
             if (Math.abs(a) > Math.abs(b))
                 z = s;
             if ((Math.abs(b) >= Math.abs(a)) && (c != 0.0))
-                z = (float) (1.0 / c);
+                z = 1.0f / c;
 
         } else {
 
@@ -156,7 +158,8 @@ public class SmpFloatBlas implements FloatBlas {
             A.viewRow(i).swap(B.viewRow(i));
     }
 
-    public void dsymv(boolean isUpperTriangular, final float alpha, FloatMatrix2D A, final FloatMatrix1D x, final float beta, final FloatMatrix1D y) {
+    public void dsymv(boolean isUpperTriangular, final float alpha, FloatMatrix2D A, final FloatMatrix1D x,
+            final float beta, final FloatMatrix1D y) {
         final FloatMatrix2D A_loc;
         if (isUpperTriangular) {
             A_loc = A.viewDice();
@@ -166,30 +169,27 @@ public class SmpFloatBlas implements FloatBlas {
         FloatProperty.DEFAULT.checkSquare(A_loc);
         int size = A_loc.rows();
         if (size != x.size() || size != y.size()) {
-            throw new IllegalArgumentException(A_loc.toStringShort() + ", " + x.toStringShort() + ", " + y.toStringShort());
+            throw new IllegalArgumentException(A_loc.toStringShort() + ", " + x.toStringShort() + ", "
+                    + y.toStringShort());
         }
         final FloatMatrix1D tmp = x.like();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             float sum = 0;
                             for (int j = 0; j <= i; j++) {
                                 sum += A_loc.getQuick(i, j) * x.getQuick(j);
                             }
-                            for (int j = i + 1; j < stopsize; j++) {
+                            for (int j = i + 1; j < lastIdx; j++) {
                                 sum += A_loc.getQuick(j, i) * x.getQuick(j);
                             }
                             tmp.setQuick(i, alpha * sum + beta * y.getQuick(i));
@@ -213,7 +213,8 @@ public class SmpFloatBlas implements FloatBlas {
         y.assign(tmp);
     }
 
-    public void dtrmv(boolean isUpperTriangular, final boolean transposeA, final boolean isUnitTriangular, FloatMatrix2D A, final FloatMatrix1D x) {
+    public void dtrmv(boolean isUpperTriangular, final boolean transposeA, final boolean isUnitTriangular,
+            FloatMatrix2D A, final FloatMatrix1D x) {
         final FloatMatrix2D A_loc;
         final boolean isUpperTriangular_loc;
         if (transposeA) {
@@ -239,22 +240,18 @@ public class SmpFloatBlas implements FloatBlas {
                 y.setQuick(i, A_loc.getQuick(i, i));
             }
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             float sum = 0;
                             if (!isUpperTriangular_loc) {
                                 for (int j = 0; j < i; j++) {
@@ -263,7 +260,7 @@ public class SmpFloatBlas implements FloatBlas {
                                 sum += y.getQuick(i) * x.getQuick(i);
                             } else {
                                 sum += y.getQuick(i) * x.getQuick(i);
-                                for (int j = i + 1; j < stopsize; j++) {
+                                for (int j = i + 1; j < lastIdx; j++) {
                                     sum += A_loc.getQuick(i, j) * x.getQuick(j);
                                 }
                             }

@@ -9,9 +9,10 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix;
 
 /**
- * Formats a double into a string (like sprintf in C).
+ * Formats a double or complex (double[]) into a string (like sprintf in C).
  * 
  * @author wolfgang.hoschek@cern.ch
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * @version 1.0, 21/07/00
  * @see java.util.Comparator
  * @see cern.colt
@@ -28,4 +29,16 @@ public interface Former {
      *                if bad argument
      */
     String form(double value);
+
+    /**
+     * Formats a complex (double[]) into a string (like sprintf in C).
+     * 
+     * @param value
+     *            the number to format
+     * @return the formatted string
+     * @exception IllegalArgumentException
+     *                if bad argument
+     */
+    String form(double[] value);
+
 }

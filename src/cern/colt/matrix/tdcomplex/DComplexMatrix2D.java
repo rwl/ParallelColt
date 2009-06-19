@@ -15,8 +15,6 @@ import java.util.concurrent.Future;
 
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix2D;
-import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
-import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -38,6 +36,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  */
 public abstract class DComplexMatrix2D extends AbstractMatrix2D {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
@@ -57,7 +57,8 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @return the aggregated measure.
      * @see cern.jet.math.tdcomplex.DComplexFunctions
      */
-    public double[] aggregate(final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr, final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
+    public double[] aggregate(final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr,
+            final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
         double[] b = new double[2];
         if (size() == 0) {
             b[0] = Double.NaN;
@@ -65,24 +66,19 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
             return b;
         }
         double[] a = null;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            double[][] results = new double[np][2];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
-                        double[] a = f.apply(getQuick(startrow, 0));
+                        double[] a = f.apply(getQuick(firstRow, 0));
                         int d = 1;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = d; c < columns; c++) {
                                 a = aggr.apply(a, f.apply(getQuick(r, c)));
                             }
@@ -122,7 +118,9 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
      * @see cern.jet.math.tdcomplex.DComplexFunctions
      */
-    public double[] aggregate(final DComplexMatrix2D other, final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr, final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction f) {
+    public double[] aggregate(final DComplexMatrix2D other,
+            final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr,
+            final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction f) {
         checkShape(other);
         double[] b = new double[2];
         if (size() == 0) {
@@ -131,25 +129,20 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
             return b;
         }
         double[] a = null;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            double[][] results = new double[np][2];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 
                     public double[] call() throws Exception {
-                        double[] a = f.apply(getQuick(startrow, 0), other.getQuick(startrow, 0));
+                        double[] a = f.apply(getQuick(firstRow, 0), other.getQuick(firstRow, 0));
                         int d = 1;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = d; c < columns; c++) {
                                 a = aggr.apply(a, f.apply(getQuick(r, c), other.getQuick(r, c)));
                             }
@@ -182,21 +175,17 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @see cern.jet.math.tdcomplex.DComplexFunctions
      */
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, f.apply(getQuick(r, c)));
                             }
@@ -227,24 +216,20 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      * @see cern.jet.math.tdcomplex.DComplexFunctions
      */
-    public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+    public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond,
+            final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
-
                     public void run() {
                         double[] elem;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 elem = getQuick(r, c);
                                 if (cond.apply(elem) == true) {
@@ -282,23 +267,18 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * 
      */
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final double[] value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
-
                     public void run() {
                         double[] elem;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 elem = getQuick(r, c);
                                 if (cond.apply(elem) == true) {
@@ -334,21 +314,17 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @see cern.jet.math.tdcomplex.DComplexFunctions
      */
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexRealFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 double re = f.apply(getQuick(r, c));
                                 setQuick(r, c, re, 0);
@@ -395,22 +371,17 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
         } else {
             otherLoc = other;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                ;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, otherLoc.getQuick(r, c));
                             }
@@ -444,23 +415,20 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
      * @see cern.jet.math.tdcomplex.DComplexFunctions
      */
-    public DComplexMatrix2D assign(final DComplexMatrix2D y, final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction f) {
+    public DComplexMatrix2D assign(final DComplexMatrix2D y,
+            final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction f) {
         checkShape(y);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, f.apply(getQuick(r, c), y.getQuick(r, c)));
                             }
@@ -490,21 +458,17 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      */
     public DComplexMatrix2D assign(final double re, final double im) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, re, im);
                             }
@@ -540,25 +504,20 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      */
     public DComplexMatrix2D assign(final double[] values) {
         if (values.length != rows * 2 * columns)
-            throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()=" + rows() * 2 * columns());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                final int glob_idx = j * k * 2 * columns;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+            throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()="
+                    + rows() * 2 * columns());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
-
                     public void run() {
-                        int idx = glob_idx;
-                        for (int r = startrow; r < stoprow; r++) {
+                        int idx = firstRow * columns * 2;
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, values[idx], values[idx + 1]);
                                 idx += 2;
@@ -600,26 +559,25 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      *             .
      */
     public DComplexMatrix2D assign(final double[][] values) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (values.length != rows)
-            throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()=" + rows());
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+            throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
+                    + rows());
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             double[] currentRow = values[r];
                             if (currentRow.length != 2 * columns)
-                                throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + 2 * columns());
+                                throw new IllegalArgumentException(
+                                        "Must have same number of columns in every row: columns=" + currentRow.length
+                                                + "2*columns()=" + 2 * columns());
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
                             }
@@ -632,7 +590,8 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
             for (int r = 0; r < rows; r++) {
                 double[] currentRow = values[r];
                 if (currentRow.length != 2 * columns)
-                    throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + 2 * columns());
+                    throw new IllegalArgumentException("Must have same number of columns in every row: columns="
+                            + currentRow.length + "2*columns()=" + 2 * columns());
                 for (int c = 0; c < columns; c++) {
                     setQuick(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
                 }
@@ -658,25 +617,21 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      */
     public DComplexMatrix2D assign(final float[] values) {
         if (values.length != rows * 2 * columns)
-            throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()=" + rows() * 2 * columns());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                final int glob_idx = j * k * 2 * columns;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+            throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()="
+                    + rows() * 2 * columns());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = glob_idx;
-                        for (int r = startrow; r < stoprow; r++) {
+                        int idx = firstRow * columns * 2;
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 setQuick(r, c, values[idx], values[idx + 1]);
                                 idx += 2;
@@ -713,22 +668,17 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      */
     public DComplexMatrix2D assignImaginary(final DoubleMatrix2D other) {
         checkShape(other);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                ;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 double re = getQuick(r, c)[0];
                                 double im = other.getQuick(r, c);
@@ -764,22 +714,17 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      */
     public DComplexMatrix2D assignReal(final DoubleMatrix2D other) {
         checkShape(other);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                ;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 double re = other.getQuick(r, c);
                                 double im = getQuick(r, c)[1];
@@ -809,24 +754,20 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      */
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
                         double[] tmp = new double[2];
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 tmp = getQuick(r, c);
                                 if ((tmp[0] != 0.0) || (tmp[1] != 0.0))
@@ -838,11 +779,11 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0].intValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j].intValue();
                 }
             } catch (ExecutionException ex) {
@@ -885,7 +826,7 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      *         <tt>false</tt> otherwise.
      */
     public boolean equals(double[] value) {
-        return cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.equals(this, value);
+        return cern.colt.matrix.tdcomplex.algo.DComplexProperty.DEFAULT.equals(this, value);
     }
 
     /**
@@ -900,6 +841,7 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -908,7 +850,7 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
         if (!(obj instanceof DComplexMatrix2D))
             return false;
 
-        return cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.equals(this, (DComplexMatrix2D) obj);
+        return cern.colt.matrix.tdcomplex.algo.DComplexProperty.DEFAULT.equals(this, (DComplexMatrix2D) obj);
     }
 
     /**
@@ -926,21 +868,17 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      */
     public DComplexMatrix2D forEachNonZero(final cern.colt.function.tdcomplex.IntIntDComplexFunction function) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 double[] value = getQuick(r, c);
                                 if (value[0] != 0 || value[1] != 0) {
@@ -995,22 +933,18 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      */
     public DComplexMatrix2D getConjugateTranspose() {
         final DComplexMatrix2D transpose = this.viewDice().copy();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = columns / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = columns;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, columns);
+            Future<?>[] futures = new Future[nthreads];
+            int k = columns / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? columns : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] tmp = new double[2];
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < rows; c++) {
                                 tmp = transpose.getQuick(r, c);
                                 tmp[1] = -tmp[1];
@@ -1067,7 +1001,8 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void getNonZeros(final IntArrayList rowList, final IntArrayList columnList, final ArrayList<double[]> valueList) {
+    public void getNonZeros(final IntArrayList rowList, final IntArrayList columnList,
+            final ArrayList<double[]> valueList) {
         rowList.clear();
         columnList.clear();
         valueList.clear();
@@ -1175,6 +1110,30 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
      * value.
      * 
+     * @param row
+     *            the index of the row-coordinate.
+     * @param column
+     *            the index of the column-coordinate.
+     * @param re
+     *            the real part of the value to be filled into the specified
+     *            cell.
+     * @param im
+     *            the imaginary part of the value to be filled into the
+     *            specified cell.
+     * @throws IndexOutOfBoundsException
+     *             if
+     *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
+     */
+    public void set(int row, int column, double re, double im) {
+        if (column < 0 || column >= columns || row < 0 || row >= rows)
+            throw new IndexOutOfBoundsException("row:" + row + ", column:" + column);
+        setQuick(row, column, re, im);
+    }
+
+    /**
+     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+     * value.
+     * 
      * <p>
      * Provided with invalid parameters this method may access illegal indexes
      * without throwing any exception. <b>You should only use this method when
@@ -1229,22 +1188,18 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      */
     public double[][] toArray() {
         final double[][] values = new double[rows][2 * columns];
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        double[] tmp = new double[2];
-                        for (int r = startrow; r < stoprow; r++) {
+                        double[] tmp;
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 tmp = getQuick(r, c);
                                 values[r][2 * c] = tmp[0];
@@ -1256,7 +1211,7 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
             }
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            double[] tmp = new double[2];
+            double[] tmp;
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < columns; c++) {
                     tmp = getQuick(r, c);
@@ -1273,6 +1228,7 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * 
      * @return a string representation of the matrix.
      */
+    @Override
     public String toString() {
         return toString("%.4f");
     }
@@ -1578,40 +1534,37 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
      */
-    public DComplexMatrix1D zMult(final DComplexMatrix1D y, DComplexMatrix1D z, final double[] alpha, final double[] beta, boolean transposeA) {
+    public DComplexMatrix1D zMult(final DComplexMatrix1D y, DComplexMatrix1D z, final double[] alpha,
+            final double[] beta, boolean transposeA) {
         if (transposeA)
             return getConjugateTranspose().zMult(y, z, alpha, beta, false);
-        final DComplexMatrix1D zLoc;
+        final DComplexMatrix1D zz;
         if (z == null) {
-            zLoc = new DenseDComplexMatrix1D(this.rows);
+            zz = y.like(this.rows);
         } else {
-            zLoc = z;
+            zz = z;
         }
-        if (columns != y.size() || rows > zLoc.size())
-            throw new IllegalArgumentException("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zLoc.toStringShort());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = rows / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+        if (columns != y.size() || rows > zz.size())
+            throw new IllegalArgumentException("Incompatible args: " + toStringShort() + ", " + y.toStringShort()
+                    + ", " + zz.toStringShort());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    double[] s = new double[2];
-
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        double[] s = new double[2];
+                        for (int r = firstRow; r < lastRow; r++) {
                             s[0] = 0;
                             s[1] = 0;
                             for (int c = 0; c < columns; c++) {
                                 s = DComplex.plus(s, DComplex.mult(getQuick(r, c), y.getQuick(c)));
                             }
-                            zLoc.setQuick(r, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(zLoc.getQuick(r), beta)));
+                            zz.setQuick(r, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(zz.getQuick(r), beta)));
                         }
                     }
                 });
@@ -1625,11 +1578,10 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
                 for (int c = 0; c < columns; c++) {
                     s = DComplex.plus(s, DComplex.mult(getQuick(r, c), y.getQuick(c)));
                 }
-                zLoc.setQuick(r, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(zLoc.getQuick(r), beta)));
+                zz.setQuick(r, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(zz.getQuick(r), beta)));
             }
         }
-        z = zLoc;
-        return z;
+        return zz;
     }
 
     /**
@@ -1645,7 +1597,8 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @return C (for convenience only).
      */
     public DComplexMatrix2D zMult(DComplexMatrix2D B, DComplexMatrix2D C) {
-        return zMult(B, C, new double[] { 1, 0 }, (C == null ? new double[] { 1, 0 } : new double[] { 0, 0 }), false, false);
+        return zMult(B, C, new double[] { 1, 0 }, (C == null ? new double[] { 1, 0 } : new double[] { 0, 0 }), false,
+                false);
     }
 
     /**
@@ -1671,7 +1624,8 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>A == C || B == C</tt>.
      */
-    public DComplexMatrix2D zMult(final DComplexMatrix2D B, DComplexMatrix2D C, final double[] alpha, final double[] beta, boolean transposeA, boolean transposeB) {
+    public DComplexMatrix2D zMult(final DComplexMatrix2D B, DComplexMatrix2D C, final double[] alpha,
+            final double[] beta, boolean transposeA, boolean transposeB) {
         if (transposeA)
             return getConjugateTranspose().zMult(B, C, alpha, beta, false, transposeB);
         if (transposeB)
@@ -1679,42 +1633,40 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
         final int m = rows;
         final int n = columns;
         final int p = B.columns;
-        final DComplexMatrix2D C_loc;
+        final DComplexMatrix2D CC;
         if (C == null) {
-            C_loc = new DenseDComplexMatrix2D(m, p);
+            CC = like(m, p);
         } else {
-            C_loc = C;
+            CC = C;
         }
         if (B.rows != n)
-            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
-        if (C_loc.rows != m || C_loc.columns != p)
-            throw new IllegalArgumentException("Incompatibe result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C_loc.toStringShort());
-        if (this == C_loc || B == C_loc)
+            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
+                    + B.toStringShort());
+        if (CC.rows != m || CC.columns != p)
+            throw new IllegalArgumentException("Incompatibe result matrix: " + toStringShort() + ", "
+                    + B.toStringShort() + ", " + CC.toStringShort());
+        if (this == CC || B == CC)
             throw new IllegalArgumentException("Matrices must not be identical");
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = p / np;
-            for (int j = 0; j < np; j++) {
-                final int starta = j * k;
-                final int stopa;
-                if (j == np - 1) {
-                    stopa = p;
-                } else {
-                    stopa = starta + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, p);
+            Future<?>[] futures = new Future[nthreads];
+            int k = p / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? p : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    double[] s = new double[2];
-
                     public void run() {
-                        for (int a = starta; a < stopa; a++) {
+                        double[] s = new double[2];
+                        for (int a = firstIdx; a < lastIdx; a++) {
                             for (int b = 0; b < m; b++) {
                                 s[0] = 0;
                                 s[1] = 0;
                                 for (int c = 0; c < n; c++) {
                                     s = DComplex.plus(s, DComplex.mult(getQuick(b, c), B.getQuick(c, a)));
                                 }
-                                C_loc.setQuick(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(C_loc.getQuick(b, a), beta)));
+                                CC.setQuick(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(CC
+                                        .getQuick(b, a), beta)));
                             }
                         }
                     }
@@ -1730,12 +1682,11 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
                     for (int c = 0; c < n; c++) {
                         s = DComplex.plus(s, DComplex.mult(getQuick(b, c), B.getQuick(c, a)));
                     }
-                    C_loc.setQuick(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(C_loc.getQuick(b, a), beta)));
+                    CC.setQuick(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(CC.getQuick(b, a), beta)));
                 }
             }
         }
-        C = C_loc;
-        return C;
+        return CC;
     }
 
     /**
@@ -1746,7 +1697,8 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
     public double[] zSum() {
         if (size() == 0)
             return new double[] { 0, 0 };
-        return aggregate(cern.jet.math.tdcomplex.DComplexFunctions.plus, cern.jet.math.tdcomplex.DComplexFunctions.identity);
+        return aggregate(cern.jet.math.tdcomplex.DComplexFunctions.plus,
+                cern.jet.math.tdcomplex.DComplexFunctions.identity);
     }
 
     /**

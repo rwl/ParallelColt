@@ -16,6 +16,11 @@ package cern.jet.random.tdouble;
  */
 public abstract class AbstractDiscreteDistribution extends AbstractDoubleDistribution {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
@@ -26,12 +31,14 @@ public abstract class AbstractDiscreteDistribution extends AbstractDoubleDistrib
      * Returns a random number from the distribution; returns
      * <tt>(double) nextInt()</tt>.
      */
+    @Override
     public double nextDouble() {
-        return (double) nextInt();
+        return nextInt();
     }
 
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public abstract int nextInt();
 }

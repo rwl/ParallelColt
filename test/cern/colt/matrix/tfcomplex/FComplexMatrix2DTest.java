@@ -188,7 +188,7 @@ public abstract class FComplexMatrix2DTest extends TestCase {
     }
 
     public void testAssignFloatArray() {
-        float[] expected = new float[2 * A.size()];
+        float[] expected = new float[2 * (int) A.size()];
         for (int i = 0; i < 2 * A.size(); i++) {
             expected[i] = (float) Math.random();
         }
@@ -432,7 +432,8 @@ public abstract class FComplexMatrix2DTest extends TestCase {
 
     public void testViewSelectionIntArrayIntArray() {
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1 };
+        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2,
+                NCOLUMNS - 1 };
         FComplexMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
         assertEquals(rowIndexes.length, B.rows());
         assertEquals(colIndexes.length, B.columns());
@@ -592,7 +593,8 @@ public abstract class FComplexMatrix2DTest extends TestCase {
             for (int i = 0; i < NCOLUMNS; i++) {
                 float[] s = new float[2];
                 for (int k = 0; k < NROWS; k++) {
-                    s = FComplex.plus(s, FComplex.mult(FComplex.conj(A.getQuick(k, i)), FComplex.conj(Bt.getQuick(j, k))));
+                    s = FComplex.plus(s, FComplex.mult(FComplex.conj(A.getQuick(k, i)), FComplex
+                            .conj(Bt.getQuick(j, k))));
                 }
                 tmp[0] = expected[i][2 * j];
                 tmp[1] = expected[i][2 * j + 1];

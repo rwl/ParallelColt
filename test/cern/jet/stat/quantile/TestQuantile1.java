@@ -40,7 +40,7 @@ public class TestQuantile1 {
             if (argv[1].equals("L")) {
                 N = Long.MAX_VALUE;
             } else if (argv[1].equals("I")) {
-                N = (long) Integer.MAX_VALUE;
+                N = Integer.MAX_VALUE;
             } else {
                 N = Long.parseLong(argv[1]);
             }
@@ -78,9 +78,10 @@ public class TestQuantile1 {
         // int step = 1;
         int step = 10;
         for (int i = 1; i < 100;) {
-            double percent = ((double) i) * 0.01;
+            double percent = (i) * 0.01;
             double quantile = qAccum.quantile(percent);
-            System.out.println(fmt.format(percent) + "  " + quantile + ",  " + dbin.quantile(percent) + ",  " + (dbin.quantile(percent) - quantile));
+            System.out.println(fmt.format(percent) + "  " + quantile + ",  " + dbin.quantile(percent) + ",  "
+                    + (dbin.quantile(percent) - quantile));
             i = i + step;
         }
     }

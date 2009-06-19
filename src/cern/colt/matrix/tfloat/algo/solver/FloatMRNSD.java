@@ -20,7 +20,7 @@ package cern.colt.matrix.tfloat.algo.solver;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
-import cern.colt.matrix.tfloat.algo.FloatAlgebra;
+import cern.colt.matrix.tfloat.algo.DenseFloatAlgebra;
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatIdentity;
 import cern.jet.math.tfloat.FloatFunctions;
 
@@ -47,15 +47,16 @@ import cern.jet.math.tfloat.FloatFunctions;
  */
 public class FloatMRNSD extends AbstractFloatIterativeSolver {
 
-    private static final FloatAlgebra alg = FloatAlgebra.DEFAULT;
-    public static final float sqrteps = (float) Math.sqrt(Math.pow(2, -23));
+    private static final DenseFloatAlgebra alg = DenseFloatAlgebra.DEFAULT;
+    public static final float sqrteps = (float) Math.sqrt(Math.pow(2, -52));
 
     public FloatMRNSD() {
         iter = new MRNSDFloatIterationMonitor();
         ((MRNSDFloatIterationMonitor) iter).setRelativeTolerance(-1);
     }
 
-    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
+            throws IterativeSolverFloatNotConvergedException {
         if (!(iter instanceof MRNSDFloatIterationMonitor)) {
             iter = new MRNSDFloatIterationMonitor();
             ((MRNSDFloatIterationMonitor) iter).setRelativeTolerance(-1);
@@ -91,9 +92,9 @@ public class FloatMRNSD extends AbstractFloatIterativeSolver {
             r = A.zMult(r, null, 1, 0, true);
             r.assign(FloatFunctions.neg);
             gamma = x.aggregate(r, FloatFunctions.plus, FloatFunctions.multSquare);
-            rnrm = (float)Math.sqrt(gamma);
+            rnrm = (float) Math.sqrt(gamma);
         }
-        indexList = new IntArrayList(b.size());
+        indexList = new IntArrayList((int) b.size());
         for (iter.setFirst(); !iter.converged(rnrm, x); iter.next()) {
             s = x.copy();
             s.assign(r, FloatFunctions.multNeg);
@@ -109,7 +110,7 @@ public class FloatMRNSD extends AbstractFloatIterativeSolver {
             x.assign(s, FloatFunctions.plusMultSecond(alpha));
             if (!(M instanceof FloatIdentity)) {
                 w = M.transApply(u, null);
-                w = A.zMult(u, null, 1, 0, true);
+                w = A.zMult(w, null, 1, 0, true);
                 r.assign(w, FloatFunctions.plusMultSecond(alpha));
                 gamma = x.aggregate(r, FloatFunctions.plus, FloatFunctions.multSquare);
                 rnrm = alg.norm2(r);
@@ -117,7 +118,7 @@ public class FloatMRNSD extends AbstractFloatIterativeSolver {
                 w = A.zMult(u, null, 1, 0, true);
                 r.assign(w, FloatFunctions.plusMultSecond(alpha));
                 gamma = x.aggregate(r, FloatFunctions.plus, FloatFunctions.multSquare);
-                rnrm = (float)Math.sqrt(gamma);
+                rnrm = (float) Math.sqrt(gamma);
             }
         }
         return x;

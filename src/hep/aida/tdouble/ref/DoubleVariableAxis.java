@@ -10,6 +10,11 @@ import hep.aida.tdouble.DoubleIHistogram;
  * @version 1.0, 23/03/2000
  */
 public class DoubleVariableAxis implements DoubleIAxis {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double min;
 
     protected int bins;
@@ -35,13 +40,14 @@ public class DoubleVariableAxis implements DoubleIAxis {
         // check if really sorted and has no multiple identical elements
         for (int i = 0; i < edges.length - 1; i++) {
             if (edges[i + 1] <= edges[i]) {
-                throw new IllegalArgumentException("edges must be sorted ascending and must not contain multiple identical values");
+                throw new IllegalArgumentException(
+                        "edges must be sorted ascending and must not contain multiple identical values");
             }
         }
 
         this.min = edges[0];
         this.bins = edges.length - 1;
-        this.edges = (double[]) edges.clone();
+        this.edges = edges.clone();
     }
 
     public double binCentre(int index) {

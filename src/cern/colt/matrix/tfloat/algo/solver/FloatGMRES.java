@@ -26,7 +26,7 @@ package cern.colt.matrix.tfloat.algo.solver;
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
-import cern.colt.matrix.tfloat.algo.FloatAlgebra;
+import cern.colt.matrix.tfloat.algo.DenseFloatAlgebra;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;
@@ -120,15 +120,16 @@ public class FloatGMRES extends AbstractFloatIterativeSolver {
 
         v = new FloatMatrix1D[restart + 1];
         for (int i = 0; i < v.length; ++i)
-            v[i] = new DenseFloatMatrix1D(r.size());
+            v[i] = new DenseFloatMatrix1D((int) r.size());
     }
 
-    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
+    public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
+            throws IterativeSolverFloatNotConvergedException {
         checkSizes(A, b, x);
 
         A.zMult(x, u.assign(b), -1, 1, false);
         M.apply(u, r);
-        float normr = FloatAlgebra.DEFAULT.norm(r, Norm.Two);
+        float normr = DenseFloatAlgebra.DEFAULT.norm(r, Norm.Two);
         M.apply(b, u);
 
         // Outer iteration
@@ -147,8 +148,8 @@ public class FloatGMRES extends AbstractFloatIterativeSolver {
                     H.setQuick(k, i, w.zDotProduct(v[k]));
                     w.assign(v[k], FloatFunctions.plusMultSecond(-H.getQuick(k, i)));
                 }
-                H.setQuick(i + 1, i, FloatAlgebra.DEFAULT.norm(w, Norm.Two));
-                v[i + 1].assign(w, FloatFunctions.multSecond((float) (1.0 / H.getQuick(i + 1, i))));
+                H.setQuick(i + 1, i, DenseFloatAlgebra.DEFAULT.norm(w, Norm.Two));
+                v[i + 1].assign(w, FloatFunctions.multSecond(1.f / H.getQuick(i + 1, i)));
 
                 // QR factorization of H using Givens rotations
                 for (int k = 0; k < i; ++k)
@@ -160,13 +161,13 @@ public class FloatGMRES extends AbstractFloatIterativeSolver {
             }
 
             // Update solution in current subspace
-            s = FloatAlgebra.DEFAULT.backwardSolve(H.viewPart(0, 0, i, i), s);
+            s = DenseFloatAlgebra.DEFAULT.backwardSolve(H.viewPart(0, 0, i, i), s);
             for (int j = 0; j < i; j++)
                 x.assign(v[j], FloatFunctions.plusMultSecond(s.getQuick(j)));
 
             A.zMult(x, u.assign(b), -1, 1, false);
             M.apply(u, r);
-            normr = FloatAlgebra.DEFAULT.norm(r, Norm.Two);
+            normr = DenseFloatAlgebra.DEFAULT.norm(r, Norm.Two);
         }
 
         return x;

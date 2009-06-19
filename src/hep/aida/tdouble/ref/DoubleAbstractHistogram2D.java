@@ -13,6 +13,10 @@ import hep.aida.tdouble.DoubleIHistogram2D;
  * @version 1.0, 23/03/2000
  */
 abstract class DoubleAbstractHistogram2D extends DoubleHistogram implements DoubleIHistogram2D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected DoubleIAxis xAxis, yAxis;
 
     DoubleAbstractHistogram2D(String title) {

@@ -82,10 +82,9 @@ import cern.colt.matrix.tfcomplex.impl.SparseFComplexMatrix2D;
  * </table>
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 12/10/2007
  */
 public class FComplexFactory2D extends cern.colt.PersistentObject {
-    private static final long serialVersionUID = 5196236412176785039L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * A factory producing dense matrices.
@@ -96,11 +95,6 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
      * A factory producing sparse hash matrices.
      */
     public static final FComplexFactory2D sparse = new FComplexFactory2D();
-
-    /**
-     * A factory producing sparse row compressed matrices.
-     */
-    public static final FComplexFactory2D rowCompressed = new FComplexFactory2D();
 
     /**
      * Makes this class non instantiable, but still let's others inherit from
@@ -142,12 +136,28 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
+    /**
+     * C = A||b; Constructs a new matrix which is the column-wise concatenation
+     * of two other matrices.
+     * 
+     * <pre>
+     *   0 1 2
+     *   3 4 5
+     *   appendColumn
+     *   6 
+     *   8 
+     *   --&gt;
+     *   0 1 2 6  
+     *   3 4 5 8
+     * 
+     * </pre>
+     */
     public FComplexMatrix2D appendColumn(FComplexMatrix2D A, FComplexMatrix1D b) {
         // force both to have maximal shared number of rows.
         if (b.size() > A.rows())
             b = b.viewPart(0, A.rows());
         else if (b.size() < A.rows())
-            A = A.viewPart(0, 0, b.size(), A.columns());
+            A = A.viewPart(0, 0, (int) b.size(), A.columns());
 
         // concatenate
         int ac = A.columns();
@@ -181,12 +191,17 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
+    /**
+     * C = A||b; Constructs a new matrix which is the row-wise concatenation of
+     * two other matrices.
+     * 
+     */
     public FComplexMatrix2D appendRow(FComplexMatrix2D A, FComplexMatrix1D b) {
         // force both to have maximal shared number of columns.
         if (b.size() > A.columns())
             b = b.viewPart(0, A.columns());
         else if (b.size() < A.columns())
-            A = A.viewPart(0, 0, A.rows(), b.size());
+            A = A.viewPart(0, 0, A.rows(), (int) b.size());
 
         // concatenate
         int ar = A.rows();
@@ -234,22 +249,6 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
                     throw new IllegalArgumentException("All rows of array must have same number of columns.");
             }
         }
-    }
-
-    public FComplexMatrix2D reshape(FComplexMatrix1D a, int rows, int columns) {
-        if (a.size() != rows * columns) {
-            throw new IllegalArgumentException("a.size() != rows*columns");
-        }
-        FComplexMatrix2D A;
-        if (this == sparse) {
-            A = new SparseFComplexMatrix2D(rows, columns);
-        } else {
-            A = new DenseFComplexMatrix2D(rows, columns);
-        }
-        for (int c = 0; c < columns; c++) {
-            A.viewColumn(c).assign(a.viewPart(c * rows, rows));
-        }
-        return A;
     }
 
     /**
@@ -487,7 +486,9 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
      */
     public void demo1() {
         System.out.println("\n\n");
-        FComplexMatrix2D[][] parts1 = { { null, make(2, 2, new float[] { 1, 2 }), null }, { make(4, 4, new float[] { 3, 4 }), null, make(4, 3, new float[] { 5, 6 }) }, { null, make(2, 2, new float[] { 7, 8 }), null } };
+        FComplexMatrix2D[][] parts1 = { { null, make(2, 2, new float[] { 1, 2 }), null },
+                { make(4, 4, new float[] { 3, 4 }), null, make(4, 3, new float[] { 5, 6 }) },
+                { null, make(2, 2, new float[] { 7, 8 }), null } };
         System.out.println("\n" + compose(parts1));
     }
 
@@ -497,7 +498,7 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
     public void demo2() {
         System.out.println("\n\n");
         FComplexMatrix2D matrix;
-        FComplexMatrix2D A, B, C, D, E, F, G;
+        FComplexMatrix2D A, B, C, D;
         FComplexMatrix2D _ = null;
         A = make(2, 2, new float[] { 1, 2 });
         B = make(4, 4, new float[] { 3, 4 });
@@ -526,7 +527,7 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
      * @return a new matrix.
      */
     public FComplexMatrix2D diagonal(FComplexMatrix1D vector) {
-        int size = vector.size();
+        int size = (int) vector.size();
         FComplexMatrix2D diag = make(size, size);
         for (int i = 0; i < size; i++) {
             diag.setQuick(i, i, vector.getQuick(i));
@@ -594,8 +595,6 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
     public FComplexMatrix2D make(int rows, int columns) {
         if (this == sparse)
             return new SparseFComplexMatrix2D(rows, columns);
-        if (this == rowCompressed)
-            throw new IllegalArgumentException("RCComplexMatrix2D is not supported yet");
         else
             return new DenseFComplexMatrix2D(rows, columns);
     }
@@ -651,7 +650,7 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
      * 
      * @throws IllegalArgumentException
      *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
-     * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
+     * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
      */
     public FComplexMatrix2D sample(int rows, int columns, float[] value, float nonZeroFraction) {
         FComplexMatrix2D matrix = make(rows, columns);
@@ -669,12 +668,12 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
      * 
      * @throws IllegalArgumentException
      *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
-     * @see cern.jet.random.tdouble.sampling.DoubleRandomSampler
+     * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
      */
     public FComplexMatrix2D sample(FComplexMatrix2D matrix, float[] value, float nonZeroFraction) {
         int rows = matrix.rows();
         int columns = matrix.columns();
-        float epsilon = 1e-08f;
+        float epsilon = 1e-05f;
         if (nonZeroFraction < 0 - epsilon || nonZeroFraction > 1 + epsilon)
             throw new IllegalArgumentException();
         if (nonZeroFraction < 0)
@@ -685,15 +684,16 @@ public class FComplexFactory2D extends cern.colt.PersistentObject {
         matrix.assign(0, 0);
 
         int size = rows * columns;
-        int n = (int) Math.round(size * nonZeroFraction);
+        int n = Math.round(size * nonZeroFraction);
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant sampler = new cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant(
+                n, size, new cern.jet.random.tfloat.engine.FloatMersenneTwister());
         for (int i = 0; i < size; i++) {
             if (sampler.sampleNextElement()) {
-                int row = (int) (i / columns);
-                int column = (int) (i % columns);
+                int row = (i / columns);
+                int column = (i % columns);
                 matrix.set(row, column, value);
             }
         }

@@ -13,6 +13,11 @@ package cern.jet.stat;
  * quantiles.
  */
 public abstract class Buffer extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public int weight;
 
     public int level;

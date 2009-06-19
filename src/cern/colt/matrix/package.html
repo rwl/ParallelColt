@@ -317,7 +317,7 @@ Note that d-dimensional and <tt>int</tt> based matrices are not yet provided.
         matrix </tt><tt>= new DenseDoubleMatrix2D(3,4);<br>
         </tt><tt>//matrix </tt><tt>= new SparseDoubleMatrix2D(3,4);</tt><tt> </tt><tt>// 
         has same interface<br>
-        </tt><tt>//matrix </tt><tt>= new RCDoubleMatrix2D(3,4);</tt><tt> </tt><tt> 
+        </tt><tt>//matrix </tt><tt>= new SparseRCDoubleMatrix2D(3,4);</tt><tt> </tt><tt> 
         // has same interface<br>
         </tt><tt></tt><tt>System.out.println(matrix); </tt></p>
     </td>
@@ -536,7 +536,7 @@ System.out.println(sum);
 <p>The common interface for matrices is defined in abstract base classes (e.g. 
   {@link cern.colt.matrix.tdouble.DoubleMatrix2D}). Note that looking at the documentation 
   of some concrete instantiable class (e.g. {@link cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D}, 
-  {@link cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D}, {@link cern.colt.matrix.tdouble.impl.RCDoubleMatrix2D}<img src="../doc-files/new.gif" width="32" height="22" align="top">) 
+  {@link cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D}, {@link cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D}<img src="../doc-files/new.gif" width="32" height="22" align="top">) 
   will not reveal more information than can be obtained by looking at the abstract 
   base classes. The convention is that concrete classes <i>do no subsetting or 
   supersetting</i>. They override methods to implement behaviour dictated by abstract 

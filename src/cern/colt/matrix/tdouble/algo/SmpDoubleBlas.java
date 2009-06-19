@@ -35,7 +35,8 @@ public class SmpDoubleBlas implements DoubleBlas {
         A.assign(function);
     }
 
-    public void assign(DoubleMatrix2D A, DoubleMatrix2D B, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
+    public void assign(DoubleMatrix2D A, DoubleMatrix2D B,
+            final cern.colt.function.tdouble.DoubleDoubleFunction function) {
         A.assign(B, function);
     }
 
@@ -63,11 +64,13 @@ public class SmpDoubleBlas implements DoubleBlas {
         return x.zDotProduct(y);
     }
 
-    public void dgemm(final boolean transposeA, final boolean transposeB, final double alpha, final DoubleMatrix2D A, final DoubleMatrix2D B, final double beta, final DoubleMatrix2D C) {
+    public void dgemm(final boolean transposeA, final boolean transposeB, final double alpha, final DoubleMatrix2D A,
+            final DoubleMatrix2D B, final double beta, final DoubleMatrix2D C) {
         A.zMult(B, C, alpha, beta, transposeA, transposeB);
     }
 
-    public void dgemv(final boolean transposeA, final double alpha, DoubleMatrix2D A, final DoubleMatrix1D x, final double beta, DoubleMatrix1D y) {
+    public void dgemv(final boolean transposeA, final double alpha, DoubleMatrix2D A, final DoubleMatrix1D x,
+            final double beta, DoubleMatrix1D y) {
         A.zMult(x, y, alpha, beta, transposeA);
     }
 
@@ -81,7 +84,7 @@ public class SmpDoubleBlas implements DoubleBlas {
     }
 
     public double dnrm2(DoubleMatrix1D x) {
-        return DoubleAlgebra.DEFAULT.norm2(x);
+        return DenseDoubleAlgebra.DEFAULT.norm2(x);
     }
 
     public void drot(DoubleMatrix1D x, DoubleMatrix1D y, double c, double s) {
@@ -156,7 +159,8 @@ public class SmpDoubleBlas implements DoubleBlas {
             A.viewRow(i).swap(B.viewRow(i));
     }
 
-    public void dsymv(boolean isUpperTriangular, final double alpha, DoubleMatrix2D A, final DoubleMatrix1D x, final double beta, final DoubleMatrix1D y) {
+    public void dsymv(boolean isUpperTriangular, final double alpha, DoubleMatrix2D A, final DoubleMatrix1D x,
+            final double beta, final DoubleMatrix1D y) {
         final DoubleMatrix2D A_loc;
         if (isUpperTriangular) {
             A_loc = A.viewDice();
@@ -166,30 +170,27 @@ public class SmpDoubleBlas implements DoubleBlas {
         DoubleProperty.DEFAULT.checkSquare(A_loc);
         int size = A_loc.rows();
         if (size != x.size() || size != y.size()) {
-            throw new IllegalArgumentException(A_loc.toStringShort() + ", " + x.toStringShort() + ", " + y.toStringShort());
+            throw new IllegalArgumentException(A_loc.toStringShort() + ", " + x.toStringShort() + ", "
+                    + y.toStringShort());
         }
         final DoubleMatrix1D tmp = x.like();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             double sum = 0;
                             for (int j = 0; j <= i; j++) {
                                 sum += A_loc.getQuick(i, j) * x.getQuick(j);
                             }
-                            for (int j = i + 1; j < stopsize; j++) {
+                            for (int j = i + 1; j < lastIdx; j++) {
                                 sum += A_loc.getQuick(j, i) * x.getQuick(j);
                             }
                             tmp.setQuick(i, alpha * sum + beta * y.getQuick(i));
@@ -213,7 +214,8 @@ public class SmpDoubleBlas implements DoubleBlas {
         y.assign(tmp);
     }
 
-    public void dtrmv(boolean isUpperTriangular, final boolean transposeA, final boolean isUnitTriangular, DoubleMatrix2D A, final DoubleMatrix1D x) {
+    public void dtrmv(boolean isUpperTriangular, final boolean transposeA, final boolean isUnitTriangular,
+            DoubleMatrix2D A, final DoubleMatrix1D x) {
         final DoubleMatrix2D A_loc;
         final boolean isUpperTriangular_loc;
         if (transposeA) {
@@ -239,22 +241,18 @@ public class SmpDoubleBlas implements DoubleBlas {
                 y.setQuick(i, A_loc.getQuick(i, i));
             }
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             double sum = 0;
                             if (!isUpperTriangular_loc) {
                                 for (int j = 0; j < i; j++) {
@@ -263,7 +261,7 @@ public class SmpDoubleBlas implements DoubleBlas {
                                 sum += y.getQuick(i) * x.getQuick(i);
                             } else {
                                 sum += y.getQuick(i) * x.getQuick(i);
-                                for (int j = i + 1; j < stopsize; j++) {
+                                for (int j = i + 1; j < lastIdx; j++) {
                                     sum += A_loc.getQuick(i, j) * x.getQuick(j);
                                 }
                             }

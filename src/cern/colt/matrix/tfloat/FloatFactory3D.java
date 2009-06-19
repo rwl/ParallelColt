@@ -10,6 +10,7 @@ package cern.colt.matrix.tfloat;
 
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix3D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix3D;
+import cern.jet.math.tfloat.FloatFunctions;
 
 /**
  * Factory for convenient construction of 3-d matrices holding <tt>float</tt>
@@ -37,6 +38,8 @@ import cern.colt.matrix.tfloat.impl.SparseFloatMatrix3D;
  * @version 1.0, 09/24/99
  */
 public class FloatFactory3D extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * A factory producing dense matrices.
      */
@@ -59,8 +62,8 @@ public class FloatFactory3D extends cern.colt.PersistentObject {
      * purposes.
      */
     public FloatMatrix3D ascending(int slices, int rows, int columns) {
-        cern.jet.math.tfloat.FloatFunctions F = cern.jet.math.tfloat.FloatFunctions.functions;
-        return descending(slices, rows, columns).assign(F.chain(F.neg, F.minus(slices * rows * columns)));
+        return descending(slices, rows, columns).assign(
+                FloatFunctions.chain(FloatFunctions.neg, FloatFunctions.minus(slices * rows * columns)));
     }
 
     /**

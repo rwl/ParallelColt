@@ -54,6 +54,11 @@ import cern.jet.stat.Utils;
  * @see KnownApproximateDoubleQuantileFinder
  */
 class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected int currentTreeHeight;
 
     final protected int treeHeightStartingSampling;
@@ -89,6 +94,7 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
+    @Override
     protected DoubleBuffer[] buffersToCollapse() {
         DoubleBuffer[] fullBuffers = bufferSet._getFullOrPartialBuffers();
 
@@ -108,6 +114,7 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns, and its memory requirements will be close to zero.
      */
+    @Override
     public synchronized void clear() {
         super.clear();
         this.currentTreeHeight = 1;
@@ -119,6 +126,7 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         UnknownDoubleQuantileEstimator copy = (UnknownDoubleQuantileEstimator) super.clone();
         if (this.sampler != null)
@@ -129,6 +137,7 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
+    @Override
     protected void newBuffer() {
         currentBufferToFill = bufferSet._getFirstEmptyBuffer();
         if (currentBufferToFill == null)
@@ -141,6 +150,7 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
+    @Override
     protected void postCollapse(DoubleBuffer[] toCollapse) {
         if (toCollapse.length == bufferSet.b()) { // delta for unknown finder
             currentTreeHeight++;
@@ -160,6 +170,7 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
      *            sorted ascending.
      * @return the approximate quantile elements.
      */
+    @Override
     public DoubleArrayList quantileElements(DoubleArrayList phis) {
         if (precomputeEpsilon <= 0.0)
             return super.quantileElements(phis);
@@ -190,6 +201,7 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
+    @Override
     protected boolean sampleNextElement() {
         return sampler.sampleNextElement();
     }
@@ -210,9 +222,11 @@ class UnknownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
         buf.setLength(buf.length() - 1);
-        return buf + ", h=" + currentTreeHeight + ", hStartSampling=" + treeHeightStartingSampling + ", precomputeEpsilon=" + precomputeEpsilon + ")";
+        return buf + ", h=" + currentTreeHeight + ", hStartSampling=" + treeHeightStartingSampling
+                + ", precomputeEpsilon=" + precomputeEpsilon + ")";
     }
 }

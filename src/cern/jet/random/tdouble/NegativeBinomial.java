@@ -32,6 +32,11 @@ import cern.jet.stat.tdouble.Probability;
  * @version 1.0, 09/24/99
  */
 public class NegativeBinomial extends AbstractDiscreteDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected int n;
 
     protected double p;
@@ -74,6 +79,7 @@ public class NegativeBinomial extends AbstractDiscreteDistribution {
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         NegativeBinomial copy = (NegativeBinomial) super.clone();
         if (this.poisson != null)
@@ -88,6 +94,7 @@ public class NegativeBinomial extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public int nextInt() {
         return nextInt(n, p);
     }
@@ -159,6 +166,7 @@ public class NegativeBinomial extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + n + "," + p + ")";
     }

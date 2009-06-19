@@ -18,7 +18,8 @@ import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
-import cern.jet.random.tdouble.engine.DoubleRandomEngine;
+import cern.jet.math.tfloat.FloatFunctions;
+import cern.jet.random.tfloat.engine.FloatRandomEngine;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -71,7 +72,7 @@ public class FloatStatistic extends Object {
      */
     public static final VectorVectorFunction EUCLID = new VectorVectorFunction() {
         public final float apply(FloatMatrix1D a, FloatMatrix1D b) {
-            return (float) Math.sqrt(a.aggregate(b, F.plus, F.chain(F.square, F.minus)));
+            return (float) Math.sqrt(a.aggregate(b, FloatFunctions.plus, FloatFunctions.chain(FloatFunctions.square, FloatFunctions.minus)));
         }
     };
 
@@ -81,7 +82,7 @@ public class FloatStatistic extends Object {
      */
     public static final VectorVectorFunction BRAY_CURTIS = new VectorVectorFunction() {
         public final float apply(FloatMatrix1D a, FloatMatrix1D b) {
-            return a.aggregate(b, F.plus, F.chain(F.abs, F.minus)) / a.aggregate(b, F.plus, F.plus);
+            return a.aggregate(b, FloatFunctions.plus, FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.minus)) / a.aggregate(b, FloatFunctions.plus, FloatFunctions.plus);
         }
     };
 
@@ -97,7 +98,7 @@ public class FloatStatistic extends Object {
         };
 
         public final float apply(FloatMatrix1D a, FloatMatrix1D b) {
-            return a.aggregate(b, F.plus, fun);
+            return a.aggregate(b, FloatFunctions.plus, fun);
         }
     };
 
@@ -106,7 +107,7 @@ public class FloatStatistic extends Object {
      */
     public static final VectorVectorFunction MAXIMUM = new VectorVectorFunction() {
         public final float apply(FloatMatrix1D a, FloatMatrix1D b) {
-            return a.aggregate(b, F.max, F.chain(F.abs, F.minus));
+            return a.aggregate(b, FloatFunctions.max, FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.minus));
         }
     };
 
@@ -115,7 +116,7 @@ public class FloatStatistic extends Object {
      */
     public static final VectorVectorFunction MANHATTAN = new VectorVectorFunction() {
         public final float apply(FloatMatrix1D a, FloatMatrix1D b) {
-            return a.aggregate(b, F.plus, F.chain(F.abs, F.minus));
+            return a.aggregate(b, FloatFunctions.plus, FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.minus));
         }
     };
 
@@ -161,7 +162,8 @@ public class FloatStatistic extends Object {
      * @see hep.aida.tfloat.bin.FloatBinFunction1D
      * @see hep.aida.tfloat.bin.FloatBinFunctions1D
      */
-    public static FloatMatrix2D aggregate(FloatMatrix2D matrix, hep.aida.tfloat.bin.FloatBinFunction1D[] aggr, FloatMatrix2D result) {
+    public static FloatMatrix2D aggregate(FloatMatrix2D matrix, hep.aida.tfloat.bin.FloatBinFunction1D[] aggr,
+            FloatMatrix2D result) {
         DynamicFloatBin1D bin = new DynamicFloatBin1D();
         float[] elements = new float[matrix.rows()];
         cern.colt.list.tfloat.FloatArrayList values = new cern.colt.list.tfloat.FloatArrayList(elements);
@@ -372,7 +374,7 @@ public class FloatStatistic extends Object {
 
         float epsilon = 1.0E-5f;
         cern.colt.list.tfloat.FloatArrayList distinct = new cern.colt.list.tfloat.FloatArrayList();
-        float[] vals = new float[x.size()];
+        float[] vals = new float[(int) x.size()];
         cern.colt.list.tfloat.FloatArrayList sorted = new cern.colt.list.tfloat.FloatArrayList(vals);
 
         // compute distinct values of x
@@ -417,13 +419,14 @@ public class FloatStatistic extends Object {
      *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>
      *             .
      */
-    public static hep.aida.tfloat.FloatIHistogram3D cube(FloatMatrix1D x, FloatMatrix1D y, FloatMatrix1D z, FloatMatrix1D weights) {
+    public static hep.aida.tfloat.FloatIHistogram3D cube(FloatMatrix1D x, FloatMatrix1D y, FloatMatrix1D z,
+            FloatMatrix1D weights) {
         if (x.size() != y.size() || x.size() != z.size() || x.size() != weights.size())
             throw new IllegalArgumentException("vectors must have same size");
 
         float epsilon = 1.0E-5f;
         cern.colt.list.tfloat.FloatArrayList distinct = new cern.colt.list.tfloat.FloatArrayList();
-        float[] vals = new float[x.size()];
+        float[] vals = new float[(int) x.size()];
         cern.colt.list.tfloat.FloatArrayList sorted = new cern.colt.list.tfloat.FloatArrayList(vals);
 
         // compute distinct values of x
@@ -509,7 +512,8 @@ public class FloatStatistic extends Object {
      * Demonstrates usage of this class.
      */
     public static void demo3(VectorVectorFunction norm) {
-        float[][] values = { { -0.9611052f, -0.25421095f }, { 0.4308269f, -0.69932648f }, { -1.2071029f, 0.62030596f }, { 1.5345166f, 0.02135884f }, { -1.1341542f, 0.20388430f } };
+        float[][] values = { { -0.9611052f, -0.25421095f }, { 0.4308269f, -0.69932648f }, { -1.2071029f, 0.62030596f },
+                { 1.5345166f, 0.02135884f }, { -1.1341542f, 0.20388430f } };
 
         System.out.println("\n\ninitializing...");
         FloatFactory2D factory = FloatFactory2D.dense;
@@ -561,8 +565,9 @@ public class FloatStatistic extends Object {
      * 
      * @return <tt>histo</tt> (for convenience only).
      */
-    public static hep.aida.tfloat.FloatIHistogram1D histogram(hep.aida.tfloat.FloatIHistogram1D histo, FloatMatrix1D vector) {
-        for (int i = vector.size(); --i >= 0;) {
+    public static hep.aida.tfloat.FloatIHistogram1D histogram(hep.aida.tfloat.FloatIHistogram1D histo,
+            FloatMatrix1D vector) {
+        for (int i = (int) vector.size(); --i >= 0;) {
             histo.fill(vector.getQuick(i));
         }
         return histo;
@@ -573,8 +578,10 @@ public class FloatStatistic extends Object {
      * 
      * @return <tt>histo</tt> (for convenience only).
      */
-    public static hep.aida.tfloat.FloatIHistogram1D histogram(final hep.aida.tfloat.FloatIHistogram1D histo, final FloatMatrix2D matrix) {
-        histo.fill_2D((float[]) matrix.elements(), matrix.rows(), matrix.columns(), (int) matrix.index(0, 0), matrix.rowStride(), matrix.columnStride());
+    public static hep.aida.tfloat.FloatIHistogram1D histogram(final hep.aida.tfloat.FloatIHistogram1D histo,
+            final FloatMatrix2D matrix) {
+        histo.fill_2D((float[]) matrix.elements(), matrix.rows(), matrix.columns(), (int) matrix.index(0, 0), matrix
+                .rowStride(), matrix.columnStride());
         return histo;
     }
 
@@ -584,7 +591,8 @@ public class FloatStatistic extends Object {
      * 
      * @return <tt>histo</tt> (for convenience only).
      */
-    public static hep.aida.tfloat.FloatIHistogram1D[][] histogram(final hep.aida.tfloat.FloatIHistogram1D[][] histo, final FloatMatrix2D matrix, final int m, final int n) {
+    public static hep.aida.tfloat.FloatIHistogram1D[][] histogram(final hep.aida.tfloat.FloatIHistogram1D[][] histo,
+            final FloatMatrix2D matrix, final int m, final int n) {
         int rows = matrix.rows();
         int cols = matrix.columns();
         if (m >= rows) {
@@ -606,26 +614,23 @@ public class FloatStatistic extends Object {
         }
         width[n - 1] = cols - (n - 1) * col_size;
 
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = m / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = m;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, m);
+            Future<?>[] futures = new Future[nthreads];
+            int k = m / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? m : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         FloatMatrix2D view = null;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < n; c++) {
                                 view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                                histo[r][c].fill_2D((float[]) view.elements(), view.rows(), view.columns(), (int) view.index(0, 0), view.rowStride(), view.columnStride());
+                                histo[r][c].fill_2D((float[]) view.elements(), view.rows(), view.columns(), (int) view
+                                        .index(0, 0), view.rowStride(), view.columnStride());
                             }
                         }
                     }
@@ -637,11 +642,8 @@ public class FloatStatistic extends Object {
             for (int r = 0; r < m; r++) {
                 for (int c = 0; c < n; c++) {
                     view = matrix.viewPart(r * row_size, c * col_size, height[r], width[c]);
-                    histo[r][c].fill_2D((float[]) view.elements(), view.rows(), view.columns(), (int) view.index(0, 0), view.rowStride(), view.columnStride());
-                    // if ((c == n - 1) && (r == m - 1)) {
-                    // IOUtils.writeToFileReal_2D(view.rows(), view.columns(),
-                    // (float[]) view.copy().elements(), "lastTile");
-                    // }
+                    histo[r][c].fill_2D((float[]) view.elements(), view.rows(), view.columns(), (int) view.index(0, 0),
+                            view.rowStride(), view.columnStride());
                 }
             }
         }
@@ -655,10 +657,11 @@ public class FloatStatistic extends Object {
      * @throws IllegalArgumentException
      *             if <tt>x.size() != y.size()</tt>.
      */
-    public static hep.aida.tfloat.FloatIHistogram2D histogram(hep.aida.tfloat.FloatIHistogram2D histo, FloatMatrix1D x, FloatMatrix1D y) {
+    public static hep.aida.tfloat.FloatIHistogram2D histogram(hep.aida.tfloat.FloatIHistogram2D histo, FloatMatrix1D x,
+            FloatMatrix1D y) {
         if (x.size() != y.size())
             throw new IllegalArgumentException("vectors must have same size");
-        for (int i = x.size(); --i >= 0;) {
+        for (int i = (int) x.size(); --i >= 0;) {
             histo.fill(x.getQuick(i), y.getQuick(i));
         }
         return histo;
@@ -672,10 +675,11 @@ public class FloatStatistic extends Object {
      *             if
      *             <tt>x.size() != y.size() || y.size() != weights.size()</tt>.
      */
-    public static hep.aida.tfloat.FloatIHistogram2D histogram(hep.aida.tfloat.FloatIHistogram2D histo, FloatMatrix1D x, FloatMatrix1D y, FloatMatrix1D weights) {
+    public static hep.aida.tfloat.FloatIHistogram2D histogram(hep.aida.tfloat.FloatIHistogram2D histo, FloatMatrix1D x,
+            FloatMatrix1D y, FloatMatrix1D weights) {
         if (x.size() != y.size() || y.size() != weights.size())
             throw new IllegalArgumentException("vectors must have same size");
-        for (int i = x.size(); --i >= 0;) {
+        for (int i = (int) x.size(); --i >= 0;) {
             histo.fill(x.getQuick(i), y.getQuick(i), weights.getQuick(i));
         }
         return histo;
@@ -690,10 +694,11 @@ public class FloatStatistic extends Object {
      *             <tt>x.size() != y.size() || x.size() != z.size() || x.size() != weights.size()</tt>
      *             .
      */
-    public static hep.aida.tfloat.FloatIHistogram3D histogram(hep.aida.tfloat.FloatIHistogram3D histo, FloatMatrix1D x, FloatMatrix1D y, FloatMatrix1D z, FloatMatrix1D weights) {
+    public static hep.aida.tfloat.FloatIHistogram3D histogram(hep.aida.tfloat.FloatIHistogram3D histo, FloatMatrix1D x,
+            FloatMatrix1D y, FloatMatrix1D z, FloatMatrix1D weights) {
         if (x.size() != y.size() || x.size() != z.size() || x.size() != weights.size())
             throw new IllegalArgumentException("vectors must have same size");
-        for (int i = x.size(); --i >= 0;) {
+        for (int i = (int) x.size(); --i >= 0;) {
             histo.fill(x.getQuick(i), y.getQuick(i), z.getQuick(i), weights.getQuick(i));
         }
         return histo;
@@ -729,7 +734,7 @@ public class FloatStatistic extends Object {
      *             .
      * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
      */
-    public static FloatMatrix1D viewSample(FloatMatrix1D matrix, float fraction, DoubleRandomEngine randomGenerator) {
+    public static FloatMatrix1D viewSample(FloatMatrix1D matrix, float fraction, FloatRandomEngine randomGenerator) {
         // check preconditions and allow for a little tolerance
         float epsilon = 1e-05f;
         if (fraction < 0 - epsilon || fraction > 1 + epsilon)
@@ -741,17 +746,17 @@ public class FloatStatistic extends Object {
 
         // random generator seeded with current time
         if (randomGenerator == null)
-            randomGenerator = new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) System.currentTimeMillis());
+            randomGenerator = new cern.jet.random.tfloat.engine.FloatMersenneTwister((int) System.currentTimeMillis());
 
-        int ncols = (int) Math.round(matrix.size() * fraction);
+        int ncols = Math.round(matrix.size() * fraction);
         int max = ncols;
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
 
         // sample
         int n = ncols;
-        int N = matrix.size();
-        cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
+        int N = (int) matrix.size();
+        cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
         for (int i = 0; i < n; i++)
             selectedCols[i] = (int) selected[i];
@@ -826,7 +831,8 @@ public class FloatStatistic extends Object {
      *             .
      * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
      */
-    public static FloatMatrix2D viewSample(FloatMatrix2D matrix, float rowFraction, float columnFraction, DoubleRandomEngine randomGenerator) {
+    public static FloatMatrix2D viewSample(FloatMatrix2D matrix, float rowFraction, float columnFraction,
+            FloatRandomEngine randomGenerator) {
         // check preconditions and allow for a little tolerance
         float epsilon = 1e-05f;
         if (rowFraction < 0 - epsilon || rowFraction > 1 + epsilon)
@@ -845,10 +851,10 @@ public class FloatStatistic extends Object {
 
         // random generator seeded with current time
         if (randomGenerator == null)
-            randomGenerator = new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) System.currentTimeMillis());
+            randomGenerator = new cern.jet.random.tfloat.engine.FloatMersenneTwister((int) System.currentTimeMillis());
 
-        int nrows = (int) Math.round(matrix.rows() * rowFraction);
-        int ncols = (int) Math.round(matrix.columns() * columnFraction);
+        int nrows = Math.round(matrix.rows() * rowFraction);
+        int ncols = Math.round(matrix.columns() * columnFraction);
         int max = Math.max(nrows, ncols);
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
@@ -856,7 +862,7 @@ public class FloatStatistic extends Object {
         // sample rows
         int n = nrows;
         int N = matrix.rows();
-        cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
+        cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedRows = new int[n];
         for (int i = 0; i < n; i++)
             selectedRows[i] = (int) selected[i];
@@ -864,7 +870,7 @@ public class FloatStatistic extends Object {
         // sample columns
         n = ncols;
         N = matrix.columns();
-        cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
+        cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
         for (int i = 0; i < n; i++)
             selectedCols[i] = (int) selected[i];
@@ -899,7 +905,8 @@ public class FloatStatistic extends Object {
      *             .
      * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
      */
-    public static FloatMatrix3D viewSample(FloatMatrix3D matrix, float sliceFraction, float rowFraction, float columnFraction, DoubleRandomEngine randomGenerator) {
+    public static FloatMatrix3D viewSample(FloatMatrix3D matrix, float sliceFraction, float rowFraction,
+            float columnFraction, FloatRandomEngine randomGenerator) {
         // check preconditions and allow for a little tolerance
         float epsilon = 1e-05f;
         if (sliceFraction < 0 - epsilon || sliceFraction > 1 + epsilon)
@@ -925,11 +932,11 @@ public class FloatStatistic extends Object {
 
         // random generator seeded with current time
         if (randomGenerator == null)
-            randomGenerator = new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) System.currentTimeMillis());
+            randomGenerator = new cern.jet.random.tfloat.engine.FloatMersenneTwister((int) System.currentTimeMillis());
 
-        int nslices = (int) Math.round(matrix.slices() * sliceFraction);
-        int nrows = (int) Math.round(matrix.rows() * rowFraction);
-        int ncols = (int) Math.round(matrix.columns() * columnFraction);
+        int nslices = Math.round(matrix.slices() * sliceFraction);
+        int nrows = Math.round(matrix.rows() * rowFraction);
+        int ncols = Math.round(matrix.columns() * columnFraction);
         int max = Math.max(nslices, Math.max(nrows, ncols));
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
@@ -937,7 +944,7 @@ public class FloatStatistic extends Object {
         // sample slices
         int n = nslices;
         int N = matrix.slices();
-        cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
+        cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedSlices = new int[n];
         for (int i = 0; i < n; i++)
             selectedSlices[i] = (int) selected[i];
@@ -945,7 +952,7 @@ public class FloatStatistic extends Object {
         // sample rows
         n = nrows;
         N = matrix.rows();
-        cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
+        cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedRows = new int[n];
         for (int i = 0; i < n; i++)
             selectedRows[i] = (int) selected[i];
@@ -953,101 +960,11 @@ public class FloatStatistic extends Object {
         // sample columns
         n = ncols;
         N = matrix.columns();
-        cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
+        cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
         for (int i = 0; i < n; i++)
             selectedCols[i] = (int) selected[i];
 
         return matrix.viewSelection(selectedSlices, selectedRows, selectedCols);
-    }
-
-    /**
-     * Constructs and returns the distance matrix of the given matrix. The
-     * distance matrix is a square, symmetric matrix consisting of nothing but
-     * distance coefficients. The rows and the columns represent the variables,
-     * the cells represent distance coefficients. The diagonal cells (i.e. the
-     * distance between a variable and itself) will be zero. Compares two column
-     * vectors at a time. Use dice views to compare two row vectors at a time.
-     * 
-     * @param matrix
-     *            any matrix; a column holds the values of a given variable
-     *            (vector).
-     * @param norm
-     *            the kind of norm to be used (EUCLID, CANBERRA, ...).
-     * @return the distance matrix (<tt>n x n, n=matrix.columns</tt>).
-     */
-    private static FloatMatrix2D xdistanceOld(FloatMatrix2D matrix, int norm) {
-        /*
-         * int rows = matrix.rows(); int columns = matrix.columns();
-         * FloatMatrix2D distance = new
-         * cern.colt.matrix.impl.DenseFloatMatrix2D(columns,columns); // cache
-         * views FloatMatrix1D[] cols = new FloatMatrix1D[columns]; for (int
-         * i=columns; --i >= 0; ) { cols[i] = matrix.viewColumn(i); } // setup
-         * distance function cern.jet.math.Functions F =
-         * cern.jet.math.Functions.functions; FloatFloatFunction function =
-         * null; //FloatFloatFunction function2 = null; if (norm==EUCLID)
-         * function = F.chain(F.square,F.minus); else if (norm==BRAY_CURTIS)
-         * function = F.chain(F.abs,F.minus); else if (norm==CANBERRA) function =
-         * new FloatFloatFunction() { public final float apply(float a, float b) {
-         * return Math.abs(a-b) / Math.abs(a+b);} }; else if (norm==MAXIMUM)
-         * function = F.chain(F.abs,F.minus); else if (norm==MANHATTAN) function =
-         * F.chain(F.abs,F.minus); else throw new
-         * IllegalArgumentException("Unknown norm"); // work out all
-         * permutations for (int i=columns; --i >= 0; ) { for (int j=i; --j >=
-         * 0; ) { float d = 0; if (norm==EUCLID) d =
-         * Math.sqrt(cols[i].aggregate(cols[j], F.plus, function)); else if
-         * (norm==BRAY_CURTIS) d = cols[i].aggregate(cols[j], F.plus, function) /
-         * cols[i].aggregate(cols[j], F.plus, F.plus); else if (norm==CANBERRA)
-         * d = cols[i].aggregate(cols[j], F.plus, function); else if
-         * (norm==MAXIMUM) d = cols[i].aggregate(cols[j], F.max, function); else
-         * if (norm==MANHATTAN) d = cols[i].aggregate(cols[j], F.plus,
-         * function); distance.setQuick(i,j,d); distance.setQuick(j,i,d); //
-         * symmetric } } return distance;
-         */
-        return null;
-    }
-
-    /**
-     * Constructs and returns the distance matrix of the given matrix. The
-     * distance matrix is a square, symmetric matrix consisting of nothing but
-     * distance coefficients. The rows and the columns represent the variables,
-     * the cells represent distance coefficients. The diagonal cells (i.e. the
-     * distance between a variable and itself) will be zero. Compares two column
-     * vectors at a time. Use dice views to compare two row vectors at a time.
-     * 
-     * @param matrix
-     *            any matrix; a column holds the values of a given variable
-     *            (vector).
-     * @param norm
-     *            the kind of norm to be used (EUCLID, CANBERRA, ...).
-     * @return the distance matrix (<tt>n x n, n=matrix.columns</tt>).
-     */
-    private static FloatMatrix2D xdistanceOld2(FloatMatrix2D matrix, int norm) {
-        /*
-         * // setup distance function final cern.jet.math.Functions F =
-         * cern.jet.math.Functions.functions; VectorVectorFunction function; if
-         * (norm==EUCLID) function = new VectorVectorFunction() { public final
-         * float apply(FloatMatrix1D a, FloatMatrix1D b) { return
-         * Math.sqrt(a.aggregate(b, F.plus, F.chain(F.square,F.minus))); } };
-         * else if (norm==BRAY_CURTIS) function = new VectorVectorFunction() {
-         * public final float apply(FloatMatrix1D a, FloatMatrix1D b) { return
-         * a.aggregate(b, F.plus, F.chain(F.abs,F.minus)) / a.aggregate(b,
-         * F.plus, F.plus); } }; else if (norm==CANBERRA) function = new
-         * VectorVectorFunction() { FloatFloatFunction fun = new
-         * FloatFloatFunction() { public final float apply(float a, float b) {
-         * return Math.abs(a-b) / Math.abs(a+b); } }; public final float
-         * apply(FloatMatrix1D a, FloatMatrix1D b) { return a.aggregate(b,
-         * F.plus, fun); } }; else if (norm==MAXIMUM) function = new
-         * VectorVectorFunction() { public final float apply(FloatMatrix1D a,
-         * FloatMatrix1D b) { return a.aggregate(b, F.max,
-         * F.chain(F.abs,F.minus)); } }; else if (norm==MANHATTAN) function =
-         * new VectorVectorFunction() { public final float apply(FloatMatrix1D
-         * a, FloatMatrix1D b) { return a.aggregate(b, F.plus,
-         * F.chain(F.abs,F.minus)); } }; else throw new
-         * IllegalArgumentException("Unknown norm");
-         * 
-         * return distance(matrix,function);
-         */
-        return null;
     }
 }

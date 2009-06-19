@@ -23,7 +23,7 @@ package cern.colt.matrix.tfloat.algo.solver.preconditioner;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
-import cern.colt.matrix.tfloat.impl.RCFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
 
 /**
  * SSOR preconditioner. Uses symmetrical sucessive overrelaxation as a
@@ -45,7 +45,7 @@ public class FloatSSOR implements FloatPreconditioner {
     /**
      * Holds a copy of the matrix A in the compressed row format
      */
-    private final RCFloatMatrix2D F;
+    private SparseRCFloatMatrix2D F;
 
     /**
      * indexes to the diagonal entries of the matrix
@@ -63,12 +63,13 @@ public class FloatSSOR implements FloatPreconditioner {
      */
     private final boolean reverse;
 
+    private final int n;
+
     /**
      * Constructor for SSOR
      * 
-     * @param F
-     *            Matrix to use internally. It will not be modified, thus the
-     *            system matrix may be passed
+     * @param n
+     *            Problem size (number of rows)
      * @param reverse
      *            True to perform a reverse sweep as well as the forward sweep.
      *            If false, this preconditioner becomes the SOR method instead
@@ -79,15 +80,10 @@ public class FloatSSOR implements FloatPreconditioner {
      *            Overrelaxation parameter for the backwards sweep. Between 0
      *            and 2.
      */
-    public FloatSSOR(RCFloatMatrix2D F, boolean reverse, float omegaF, float omegaR) {
-        if (F.rows() != F.columns())
-            throw new IllegalArgumentException("SSOR only applies to square matrices");
-
-        this.F = F;
+    public FloatSSOR(int n, boolean reverse, float omegaF, float omegaR) {
+        this.n = n;
         this.reverse = reverse;
         setOmega(omegaF, omegaR);
-
-        int n = F.rows();
         diagind = new int[n];
         xx = new float[n];
     }
@@ -95,12 +91,11 @@ public class FloatSSOR implements FloatPreconditioner {
     /**
      * Constructor for SSOR. Uses <code>omega=1</code> with a backwards sweep
      * 
-     * @param F
-     *            Matrix to use internally. It will not be modified, thus the
-     *            system matrix may be passed
+     * @param n
+     *            Problem size (number of rows)
      */
-    public FloatSSOR(RCFloatMatrix2D F) {
-        this(F, true, 1, 1);
+    public FloatSSOR(int n) {
+        this(n, true, 1, 1);
     }
 
     /**
@@ -124,12 +119,17 @@ public class FloatSSOR implements FloatPreconditioner {
     }
 
     public void setMatrix(FloatMatrix2D A) {
+        if (A.rows() != n) {
+            throw new IllegalArgumentException("A.rows() != n");
+        }
+        F = new SparseRCFloatMatrix2D(n, n);
         F.assign(A);
-
-        int n = F.rows();
+        if (!F.hasColumnIndexesSorted()) {
+            F.sortColumnIndexes();
+        }
 
         int[] rowptr = F.getRowPointers();
-        int[] colind = F.getColumnindexes().elements();
+        int[] colind = F.getColumnIndexes();
 
         // Find the indexes to the diagonal entries
         for (int k = 0; k < n; ++k) {
@@ -140,7 +140,7 @@ public class FloatSSOR implements FloatPreconditioner {
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -148,12 +148,12 @@ public class FloatSSOR implements FloatPreconditioner {
             throw new IllegalArgumentException("b and x must be a DenseFloatMatrix1D");
 
         int[] rowptr = F.getRowPointers();
-        int[] colind = F.getColumnindexes().elements();
-        float[] data = F.getValues().elements();
+        int[] colind = F.getColumnIndexes();
+        float[] data = F.getValues();
 
         float[] bd = ((DenseFloatMatrix1D) b).elements();
         //        float[] xd = ((DenseFloatMatrix1D) x).elements();
-        float[] xd = new float[x.size()];
+        float[] xd = new float[(int) x.size()];
 
         int n = F.rows();
         System.arraycopy(xd, 0, xx, 0, n);
@@ -199,7 +199,7 @@ public class FloatSSOR implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 

@@ -24,8 +24,9 @@ import java.util.Arrays;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.algo.DoubleProperty;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.tdouble.impl.RCDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
 /**
  * Incomplete Cholesky preconditioner without fill-in using a compressed row
@@ -36,7 +37,7 @@ public class DoubleICC implements DoublePreconditioner {
     /**
      * Factorisation matrix
      */
-    private final RCDoubleMatrix2D R;
+    private SparseRCDoubleMatrix2D R;
 
     /**
      * Temporary vector for solving the factorised system
@@ -45,24 +46,21 @@ public class DoubleICC implements DoublePreconditioner {
 
     private int[] diagind;
 
+    private final int n;
+
     /**
      * Sets up the ICC preconditioner
      * 
-     * @param R
-     *            Matrix to use internally. For best performance, its non-zero
-     *            pattern must conform to that of the system matrix
+     * @param n
+     *            Problem size (number of rows)
      */
-    public DoubleICC(RCDoubleMatrix2D R) {
-        if (R.rows() != R.columns())
-            throw new IllegalArgumentException("ICC only applies to square matrices");
-
-        this.R = R;
-        int n = R.rows();
+    public DoubleICC(int n) {
+        this.n = n;
         y = new DenseDoubleMatrix1D(n);
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -74,7 +72,7 @@ public class DoubleICC implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -82,8 +80,15 @@ public class DoubleICC implements DoublePreconditioner {
     }
 
     public void setMatrix(DoubleMatrix2D A) {
+        DoubleProperty.DEFAULT.isSquare(A);
+        if (A.rows() != n) {
+            throw new IllegalArgumentException("A.rows() != n");
+        }
+        R = new SparseRCDoubleMatrix2D(n, n);
         R.assign(A);
-
+        if (!R.hasColumnIndexesSorted()) {
+            R.sortColumnIndexes();
+        }
         factor();
     }
 
@@ -91,15 +96,15 @@ public class DoubleICC implements DoublePreconditioner {
         int n = R.rows();
 
         // Internal CRS matrix storage
-        int[] colind = R.getColumnindexes().elements();
+        int[] colind = R.getColumnIndexes();
         int[] rowptr = R.getRowPointers();
-        double[] data = R.getValues().elements();
+        double[] data = R.getValues();
 
         // Temporary storage of a dense row
         double[] Rk = new double[n];
 
         // Find the indexes to the diagonal entries
-        diagind = findDiagonalindexes(n, colind, rowptr);
+        diagind = findDiagonalIndexes(n, colind, rowptr);
 
         // Go down along the main diagonal
         for (int k = 0; k < n; ++k) {
@@ -138,7 +143,7 @@ public class DoubleICC implements DoublePreconditioner {
         }
     }
 
-    private int[] findDiagonalindexes(int m, int[] colind, int[] rowptr) {
+    private int[] findDiagonalIndexes(int m, int[] colind, int[] rowptr) {
         int[] diagind = new int[m];
 
         for (int k = 0; k < m; ++k) {
@@ -154,9 +159,9 @@ public class DoubleICC implements DoublePreconditioner {
     private DoubleMatrix1D upperSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         double[] bd = ((DenseDoubleMatrix1D) b).elements();
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
-        int[] colind = R.getColumnindexes().elements();
+        int[] colind = R.getColumnIndexes();
         int[] rowptr = R.getRowPointers();
-        double[] data = R.getValues().elements();
+        double[] data = R.getValues();
         int rows = R.rows();
 
         for (int i = rows - 1; i >= 0; --i) {
@@ -176,9 +181,9 @@ public class DoubleICC implements DoublePreconditioner {
         x.assign(b);
 
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
-        int[] colind = R.getColumnindexes().elements();
+        int[] colind = R.getColumnIndexes();
         int[] rowptr = R.getRowPointers();
-        double[] data = R.getValues().elements();
+        double[] data = R.getValues();
         int rows = R.rows();
 
         for (int i = 0; i < rows; ++i) {

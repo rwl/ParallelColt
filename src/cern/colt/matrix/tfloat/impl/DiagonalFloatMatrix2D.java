@@ -25,6 +25,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
+    private static final long serialVersionUID = 1L;
+
     /*
      * The non zero elements of the matrix.
      */
@@ -119,6 +121,7 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         elements = new float[dlength];
     }
 
+    @Override
     public FloatMatrix2D assign(final cern.colt.function.tfloat.FloatFunction function) {
         if (function instanceof cern.jet.math.tfloat.FloatMult) { // x[i] = mult*x[i]
             final float alpha = ((cern.jet.math.tfloat.FloatMult) function).multiplicator;
@@ -139,44 +142,26 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    /**
-     * Sets all cells to the state specified by <tt>value</tt>.
-     * 
-     * @param value
-     *            the value to be filled into the cells.
-     * @return <tt>this</tt> (for convenience only).
-     */
+    @Override
     public FloatMatrix2D assign(float value) {
         for (int i = dlength; --i >= 0;)
             elements[i] = value;
         return this;
     }
 
-    /**
-     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-     * is required to have length equal to the length of the diagonal defined in
-     * the constructor.
-     * <p>
-     * The values are copied. So subsequent changes in <tt>values</tt> are not
-     * reflected in the matrix, and vice-versa.
-     * 
-     * @param values
-     *            the values to be filled into the cells.
-     * @return <tt>this</tt> (for convenience only).
-     * @throws IllegalArgumentException
-     *             if <tt>values.length != rows()</tt>.
-     */
+    @Override
     public FloatMatrix2D assign(final float[] values) {
         if (values.length != dlength)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " dlength=" + dlength);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = dlength / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, dlength);
+            Future<?>[] futures = new Future[nthreads];
+            int k = dlength / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int startrow = j * k;
                 final int stoprow;
-                if (j == np - 1) {
+                if (j == nthreads - 1) {
                     stoprow = dlength;
                 } else {
                     stoprow = startrow + k;
@@ -199,26 +184,11 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    /**
-     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-     * is required to have the form <tt>values[row][column]</tt> and have
-     * exactly the same number of rows and columns as the receiver. Only the
-     * values on the diagonal specified in the constructor are used.
-     * <p>
-     * The values are copied. So subsequent changes in <tt>values</tt> are not
-     * reflected in the matrix, and vice-versa.
-     * 
-     * @param values
-     *            the values to be filled into the cells.
-     * @return <tt>this</tt> (for convenience only).
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
-     *             .
-     */
+    @Override
     public FloatMatrix2D assign(final float[][] values) {
         if (values.length != rows)
-            throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()=" + rows());
+            throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
+                    + rows());
         int r, c;
         if (dindex >= 0) {
             r = 0;
@@ -229,26 +199,15 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
         for (int i = 0; i < dlength; i++) {
             if (values[i].length != columns) {
-                throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + values[r].length + "columns()=" + columns());
+                throw new IllegalArgumentException("Must have same number of columns in every row: columns="
+                        + values[r].length + "columns()=" + columns());
             }
             elements[i] = values[r++][c++];
         }
         return this;
     }
 
-    /**
-     * Replaces all cell values of the receiver with the values of another
-     * matrix. Both matrices must have the same number of rows and columns. and
-     * the source matrix has to be an instance of DiagonalFloatMatrix2D.
-     * 
-     * @param source
-     *            the source matrix to copy from (has to be an instance of
-     *            DiagonalFloatMatrix2D).
-     * @return <tt>this</tt> (for convenience only).
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>columns() != source.columns() || rows() != source.rows()</tt>
-     */
+    @Override
     public FloatMatrix2D assign(FloatMatrix2D source) {
         // overriden for performance only
         if (source == this)
@@ -268,6 +227,7 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
+    @Override
     public FloatMatrix2D assign(final FloatMatrix2D y, final cern.colt.function.tfloat.FloatFloatFunction function) {
         checkShape(y);
         if (y instanceof DiagonalFloatMatrix2D) {
@@ -282,14 +242,15 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
                 }
             }
             final float[] otherElements = other.elements;
-            int np = ConcurrencyUtils.getNumberOfThreads();
-            if ((np > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future<?>[] futures = new Future[np];
-                int k = dlength / np;
-                for (int j = 0; j < np; j++) {
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = Math.min(nthreads, dlength);
+                Future<?>[] futures = new Future[nthreads];
+                int k = dlength / nthreads;
+                for (int j = 0; j < nthreads; j++) {
                     final int startrow = j * k;
                     final int stoprow;
-                    if (j == np - 1) {
+                    if (j == nthreads - 1) {
                         stoprow = dlength;
                     } else {
                         stoprow = startrow + k;
@@ -357,25 +318,22 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
+    @Override
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = dlength / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = dlength;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, dlength);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = dlength / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? dlength : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             if (elements[r] != 0)
                                 cardinality++;
                         }
@@ -384,11 +342,11 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -405,10 +363,12 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return cardinality;
     }
 
+    @Override
     public float[] elements() {
         return elements;
     }
 
+    @Override
     public boolean equals(float value) {
         float epsilon = cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.tolerance();
         for (int r = 0; r < dlength; r++) {
@@ -423,6 +383,7 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return true;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof DiagonalFloatMatrix2D) {
             DiagonalFloatMatrix2D other = (DiagonalFloatMatrix2D) obj;
@@ -455,6 +416,7 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
+    @Override
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
         for (int j = dlength; --j >= 0;) {
             float value = elements[j];
@@ -465,36 +427,43 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    public int dlength() {
+    /**
+     * Returns the length of the diagonal
+     * 
+     * @return the length of the diagonal
+     */
+    public int diagonalLength() {
         return dlength;
     }
 
-    public int dindex() {
+    /**
+     * Returns the index of the diagonal
+     * 
+     * @return the index of the diagonal
+     */
+    public int diagonalIndex() {
         return dindex;
     }
 
+    @Override
     public float[] getMaxLocation() {
         int location = 0;
         float maxValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = dlength / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = dlength;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, dlength);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = dlength / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? dlength : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
-                        int location = startrow;
+                        int location = firstRow;
                         float maxValue = elements[location];
                         float elem;
-                        for (int r = startrow + 1; r < stoprow; r++) {
+                        for (int r = firstRow + 1; r < lastRow; r++) {
                             elem = elements[r];
                             if (maxValue < elem) {
                                 maxValue = elem;
@@ -506,12 +475,12 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (float[]) futures[j].get();
                 }
                 maxValue = results[0][0];
                 location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
                         location = (int) results[j][1];
@@ -548,28 +517,25 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return new float[] { maxValue, rowLocation, columnLocation };
     }
 
+    @Override
     public float[] getMinLocation() {
         int location = 0;
         float minValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = dlength / np;
-            for (int j = 0; j < np; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == np - 1) {
-                    stoprow = dlength;
-                } else {
-                    stoprow = startrow + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, dlength);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = dlength / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? dlength : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
-                        int location = startrow;
+                        int location = firstRow;
                         float minValue = elements[location];
                         float elem;
-                        for (int r = startrow + 1; r < stoprow; r++) {
+                        for (int r = firstRow + 1; r < lastRow; r++) {
                             elem = elements[r];
                             if (minValue > elem) {
                                 minValue = elem;
@@ -581,12 +547,12 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (float[]) futures[j].get();
                 }
                 minValue = results[0][0];
                 location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
                         location = (int) results[j][1];
@@ -623,22 +589,7 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return new float[] { minValue, rowLocation, columnLocation };
     }
 
-    /**
-     * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may return invalid objects
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @return the value at the specified coordinate.
-     */
+    @Override
     public float getQuick(int row, int column) {
         if (dindex >= 0) {
             if (column < dindex) {
@@ -663,60 +614,17 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
-    /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseFloatMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseFloatMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix2D</tt>, etc. In general, the new matrix should have
-     * internal parametrization as similar as possible.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @return a new empty matrix of the same dynamic type.
-     */
+    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new SparseFloatMatrix2D(rows, columns);
     }
 
-    /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseFloatMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix2D</tt> the new matrix must be of
-     * type <tt>SparseFloatMatrix1D</tt>, etc.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     public FloatMatrix1D like1D(int size) {
         return new SparseFloatMatrix1D(size);
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-     * value. The value is assigned only if row == column;
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param value
-     *            the value to be filled into the specified cell.
-     */
+    @Override
     public void setQuick(int row, int column, float value) {
         if (dindex >= 0) {
             if (column < dindex) {
@@ -741,58 +649,61 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
+    @Override
     public FloatMatrix1D zMult(FloatMatrix1D y, FloatMatrix1D z, float alpha, float beta, final boolean transposeA) {
-        int m = rows;
-        int n = columns;
+        int rowsA = rows;
+        int columnsA = columns;
         if (transposeA) {
-            m = columns;
-            n = rows;
+            rowsA = columns;
+            columnsA = rows;
         }
 
         boolean ignore = (z == null);
         if (z == null)
-            z = new DenseFloatMatrix1D(m);
+            z = new DenseFloatMatrix1D(rowsA);
 
         if (!(this.isNoView && y instanceof DenseFloatMatrix1D && z instanceof DenseFloatMatrix1D)) {
             return super.zMult(y, z, alpha, beta, transposeA);
         }
 
-        if (n != y.size() || m > z.size())
-            throw new IllegalArgumentException("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+        if (columnsA != y.size() || rowsA > z.size())
+            throw new IllegalArgumentException("Incompatible args: "
+                    + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", "
+                    + z.toStringShort());
 
         if ((!ignore) && ((beta / alpha) != 1))
             z.assign(cern.jet.math.tfloat.FloatFunctions.mult(beta / alpha));
 
         DenseFloatMatrix1D zz = (DenseFloatMatrix1D) z;
-        final float[] zElements = zz.elements;
-        final int zStride = zz.stride();
-        final int zi = (int) z.index(0);
+        final float[] elementsZ = zz.elements;
+        final int strideZ = zz.stride();
+        final int zeroZ = (int) z.index(0);
 
         DenseFloatMatrix1D yy = (DenseFloatMatrix1D) y;
-        final float[] yElements = yy.elements;
-        final int yStride = yy.stride();
-        final int yi = (int) y.index(0);
+        final float[] elementsY = yy.elements;
+        final int strideY = yy.stride();
+        final int zeroY = (int) y.index(0);
 
-        if (yElements == null || zElements == null)
+        if (elementsY == null || elementsZ == null)
             throw new InternalError();
         if (!transposeA) {
             if (dindex >= 0) {
                 for (int i = dlength; --i >= 0;) {
-                    zElements[zi + zStride * i] += elements[i] * yElements[dindex + yi + yStride * i];
+                    elementsZ[zeroZ + strideZ * i] += elements[i] * elementsY[dindex + zeroY + strideY * i];
                 }
             } else {
                 for (int i = dlength; --i >= 0;) {
-                    zElements[-dindex + zi + zStride * i] += elements[i] * yElements[yi + yStride * i];
+                    elementsZ[-dindex + zeroZ + strideZ * i] += elements[i] * elementsY[zeroY + strideY * i];
                 }
             }
         } else {
             if (dindex >= 0) {
                 for (int i = dlength; --i >= 0;) {
-                    zElements[dindex + zi + zStride * i] += elements[i] * yElements[yi + yStride * i];
+                    elementsZ[dindex + zeroZ + strideZ * i] += elements[i] * elementsY[zeroY + strideY * i];
                 }
             } else {
                 for (int i = dlength; --i >= 0;) {
-                    zElements[zi + zStride * i] += elements[i] * yElements[-dindex + yi + yStride * i];
+                    elementsZ[zeroZ + strideZ * i] += elements[i] * elementsY[-dindex + zeroY + strideY * i];
                 }
             }
 
@@ -802,10 +713,7 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return z;
     }
 
-    /**
-     * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
-     * otherwise. Override this method in wrappers.
-     */
+    @Override
     protected FloatMatrix2D getContent() {
         return this;
     }

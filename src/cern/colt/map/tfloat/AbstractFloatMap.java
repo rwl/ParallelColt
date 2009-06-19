@@ -26,6 +26,11 @@ public abstract class AbstractFloatMap extends cern.colt.PersistentObject {
     // public static boolean debug = false; // debug only
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The number of distinct associations in the map; its "size()".
      */
     protected int distinct;
@@ -194,7 +199,8 @@ public abstract class AbstractFloatMap extends cern.colt.PersistentObject {
         if (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0)
             throw new IllegalArgumentException("Illegal maxLoadFactor: " + maxLoadFactor);
         if (minLoadFactor >= maxLoadFactor)
-            throw new IllegalArgumentException("Illegal minLoadFactor: " + minLoadFactor + " and maxLoadFactor: " + maxLoadFactor);
+            throw new IllegalArgumentException("Illegal minLoadFactor: " + minLoadFactor + " and maxLoadFactor: "
+                    + maxLoadFactor);
     }
 
     /**

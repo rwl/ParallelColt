@@ -153,8 +153,11 @@ public class FloatConverter {
         cern.colt.matrix.Former f = new cern.colt.matrix.FormerFactory().create(format);
         String sep = System.getProperty("line.separator");
         int[] minMaxBins = h.minMaxBins();
-        String title = h.title() + ":" + sep + "   Entries=" + form(f, h.entries()) + ", ExtraEntries=" + form(f, h.extraEntries()) + sep + "   Mean=" + form(f, h.mean()) + ", Rms=" + form(f, h.rms()) + sep + "   MinBinHeight=" + form(f, h.binHeight(minMaxBins[0])) + ", MaxBinHeight="
-                + form(f, h.binHeight(minMaxBins[1])) + sep + "   Axis: " + "Bins=" + form(f, h.xAxis().bins()) + ", Min=" + form(f, h.xAxis().lowerEdge()) + ", Max=" + form(f, h.xAxis().upperEdge());
+        String title = h.title() + ":" + sep + "   Entries=" + form(f, h.entries()) + ", ExtraEntries="
+                + form(f, h.extraEntries()) + sep + "   Mean=" + form(f, h.mean()) + ", Rms=" + form(f, h.rms()) + sep
+                + "   MinBinHeight=" + form(f, h.binHeight(minMaxBins[0])) + ", MaxBinHeight="
+                + form(f, h.binHeight(minMaxBins[1])) + sep + "   Axis: " + "Bins=" + form(f, h.xAxis().bins())
+                + ", Min=" + form(f, h.xAxis().lowerEdge()) + ", Max=" + form(f, h.xAxis().upperEdge());
 
         String[] xEdges = new String[h.xAxis().bins()];
         for (int i = 0; i < h.xAxis().bins(); i++)
@@ -162,13 +165,19 @@ public class FloatConverter {
 
         String[] yEdges = null;
 
-        cern.colt.matrix.tfloat.FloatMatrix2D heights = new cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D(1, h.xAxis().bins());
+        cern.colt.matrix.tfloat.FloatMatrix2D heights = new cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D(1, h
+                .xAxis().bins());
         heights.viewRow(0).assign(toArrayHeights(h));
         // cern.colt.matrix.FloatMatrix2D errors = new
         // cern.colt.matrix.impl.DenseFloatMatrix2D(1,h.xAxis().bins());
         // errors.viewRow(0).assign(toArrayErrors(h));
 
-        return title + sep + "Heights:" + sep + new cern.colt.matrix.tfloat.algo.FloatFormatter().toTitleString(heights, yEdges, xEdges, rowAxisName, columnAxisName, null, aggr);
+        return title
+                + sep
+                + "Heights:"
+                + sep
+                + new cern.colt.matrix.tfloat.algo.FloatFormatter().toTitleString(heights, yEdges, xEdges, rowAxisName,
+                        columnAxisName, null, aggr);
         /*
          * + sep + "Errors:" + sep + new
          * cern.colt.matrix.floatalgo.Formatter().toTitleString(
@@ -189,12 +198,17 @@ public class FloatConverter {
         cern.colt.matrix.Former f = new cern.colt.matrix.FormerFactory().create(format);
         String sep = System.getProperty("line.separator");
         int[] minMaxBins = h.minMaxBins();
-        String title = h.title() + ":" + sep + "   Entries=" + form(f, h.entries()) + ", ExtraEntries=" + form(f, h.extraEntries()) + sep + "   MeanX=" + form(f, h.meanX()) + ", RmsX=" + form(f, h.rmsX()) + sep + "   MeanY=" + form(f, h.meanY()) + ", RmsY=" + form(f, h.rmsX()) + sep
-                + "   MinBinHeight=" + form(f, h.binHeight(minMaxBins[0], minMaxBins[1])) + ", MaxBinHeight=" + form(f, h.binHeight(minMaxBins[2], minMaxBins[3])) + sep +
+        String title = h.title() + ":" + sep + "   Entries=" + form(f, h.entries()) + ", ExtraEntries="
+                + form(f, h.extraEntries()) + sep + "   MeanX=" + form(f, h.meanX()) + ", RmsX=" + form(f, h.rmsX())
+                + sep + "   MeanY=" + form(f, h.meanY()) + ", RmsY=" + form(f, h.rmsX()) + sep + "   MinBinHeight="
+                + form(f, h.binHeight(minMaxBins[0], minMaxBins[1])) + ", MaxBinHeight="
+                + form(f, h.binHeight(minMaxBins[2], minMaxBins[3])) + sep +
 
-                "   xAxis: " + "Bins=" + form(f, h.xAxis().bins()) + ", Min=" + form(f, h.xAxis().lowerEdge()) + ", Max=" + form(f, h.xAxis().upperEdge()) + sep +
+                "   xAxis: " + "Bins=" + form(f, h.xAxis().bins()) + ", Min=" + form(f, h.xAxis().lowerEdge())
+                + ", Max=" + form(f, h.xAxis().upperEdge()) + sep +
 
-                "   yAxis: " + "Bins=" + form(f, h.yAxis().bins()) + ", Min=" + form(f, h.yAxis().lowerEdge()) + ", Max=" + form(f, h.yAxis().upperEdge());
+                "   yAxis: " + "Bins=" + form(f, h.yAxis().bins()) + ", Min=" + form(f, h.yAxis().lowerEdge())
+                + ", Max=" + form(f, h.yAxis().upperEdge());
 
         String[] xEdges = new String[h.xAxis().bins()];
         for (int i = 0; i < h.xAxis().bins(); i++)
@@ -206,7 +220,8 @@ public class FloatConverter {
         new cern.colt.list.tobject.ObjectArrayList(yEdges).reverse(); // keep coord.
         // system
 
-        cern.colt.matrix.tfloat.FloatMatrix2D heights = new cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D(toArrayHeights(h));
+        cern.colt.matrix.tfloat.FloatMatrix2D heights = new cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D(
+                toArrayHeights(h));
         heights = heights.viewDice().viewRowFlip(); // keep the histo coord.
         // system
         // heights = heights.viewPart(1,1,heights.rows()-2,heights.columns()-2);
@@ -219,7 +234,12 @@ public class FloatConverter {
         // //errors = errors.viewPart(1,1,errors.rows()-2,errors.columns()-2);
         // // ignore under&overflows
 
-        return title + sep + "Heights:" + sep + new cern.colt.matrix.tfloat.algo.FloatFormatter().toTitleString(heights, yEdges, xEdges, rowAxisName, columnAxisName, null, aggr);
+        return title
+                + sep
+                + "Heights:"
+                + sep
+                + new cern.colt.matrix.tfloat.algo.FloatFormatter().toTitleString(heights, yEdges, xEdges, rowAxisName,
+                        columnAxisName, null, aggr);
         /*
          * + sep + "Errors:" + sep + new
          * cern.colt.matrix.floatalgo.Formatter().toTitleString(
@@ -241,14 +261,21 @@ public class FloatConverter {
         cern.colt.matrix.Former f = new cern.colt.matrix.FormerFactory().create(format);
         String sep = System.getProperty("line.separator");
         int[] minMaxBins = h.minMaxBins();
-        String title = h.title() + ":" + sep + "   Entries=" + form(f, h.entries()) + ", ExtraEntries=" + form(f, h.extraEntries()) + sep + "   MeanX=" + form(f, h.meanX()) + ", RmsX=" + form(f, h.rmsX()) + sep + "   MeanY=" + form(f, h.meanY()) + ", RmsY=" + form(f, h.rmsX()) + sep + "   MeanZ="
-                + form(f, h.meanZ()) + ", RmsZ=" + form(f, h.rmsZ()) + sep + "   MinBinHeight=" + form(f, h.binHeight(minMaxBins[0], minMaxBins[1], minMaxBins[2])) + ", MaxBinHeight=" + form(f, h.binHeight(minMaxBins[3], minMaxBins[4], minMaxBins[5])) + sep +
+        String title = h.title() + ":" + sep + "   Entries=" + form(f, h.entries()) + ", ExtraEntries="
+                + form(f, h.extraEntries()) + sep + "   MeanX=" + form(f, h.meanX()) + ", RmsX=" + form(f, h.rmsX())
+                + sep + "   MeanY=" + form(f, h.meanY()) + ", RmsY=" + form(f, h.rmsX()) + sep + "   MeanZ="
+                + form(f, h.meanZ()) + ", RmsZ=" + form(f, h.rmsZ()) + sep + "   MinBinHeight="
+                + form(f, h.binHeight(minMaxBins[0], minMaxBins[1], minMaxBins[2])) + ", MaxBinHeight="
+                + form(f, h.binHeight(minMaxBins[3], minMaxBins[4], minMaxBins[5])) + sep +
 
-                "   xAxis: " + "Bins=" + form(f, h.xAxis().bins()) + ", Min=" + form(f, h.xAxis().lowerEdge()) + ", Max=" + form(f, h.xAxis().upperEdge()) + sep +
+                "   xAxis: " + "Bins=" + form(f, h.xAxis().bins()) + ", Min=" + form(f, h.xAxis().lowerEdge())
+                + ", Max=" + form(f, h.xAxis().upperEdge()) + sep +
 
-                "   yAxis: " + "Bins=" + form(f, h.yAxis().bins()) + ", Min=" + form(f, h.yAxis().lowerEdge()) + ", Max=" + form(f, h.yAxis().upperEdge()) + sep +
+                "   yAxis: " + "Bins=" + form(f, h.yAxis().bins()) + ", Min=" + form(f, h.yAxis().lowerEdge())
+                + ", Max=" + form(f, h.yAxis().upperEdge()) + sep +
 
-                "   zAxis: " + "Bins=" + form(f, h.zAxis().bins()) + ", Min=" + form(f, h.zAxis().lowerEdge()) + ", Max=" + form(f, h.zAxis().upperEdge());
+                "   zAxis: " + "Bins=" + form(f, h.zAxis().bins()) + ", Min=" + form(f, h.zAxis().lowerEdge())
+                + ", Max=" + form(f, h.zAxis().upperEdge());
 
         String[] xEdges = new String[h.xAxis().bins()];
         for (int i = 0; i < h.xAxis().bins(); i++)
@@ -266,7 +293,8 @@ public class FloatConverter {
         new cern.colt.list.tobject.ObjectArrayList(zEdges).reverse(); // keep coord.
         // system
 
-        cern.colt.matrix.tfloat.FloatMatrix3D heights = new cern.colt.matrix.tfloat.impl.DenseFloatMatrix3D(toArrayHeights(h));
+        cern.colt.matrix.tfloat.FloatMatrix3D heights = new cern.colt.matrix.tfloat.impl.DenseFloatMatrix3D(
+                toArrayHeights(h));
         heights = heights.viewDice(2, 1, 0).viewSliceFlip().viewRowFlip(); // keep
         // the
         // histo
@@ -282,7 +310,12 @@ public class FloatConverter {
         // //errors = errors.viewPart(1,1,errors.rows()-2,errors.columns()-2);
         // // ignore under&overflows
 
-        return title + sep + "Heights:" + sep + new cern.colt.matrix.tfloat.algo.FloatFormatter().toTitleString(heights, zEdges, yEdges, xEdges, sliceAxisName, rowAxisName, columnAxisName, "", aggr);
+        return title
+                + sep
+                + "Heights:"
+                + sep
+                + new cern.colt.matrix.tfloat.algo.FloatFormatter().toTitleString(heights, zEdges, yEdges, xEdges,
+                        sliceAxisName, rowAxisName, columnAxisName, "", aggr);
         /*
          * + sep + "Errors:" + sep + new
          * cern.colt.matrix.floatalgo.Formatter().toTitleString(
@@ -369,7 +402,8 @@ public class FloatConverter {
         out.append(sep);
         out.append("<data2d type=\"xxx\">");
         out.append(sep);
-        out.append("<bins2d title=\"" + h.title() + "\" xSize=\"" + h.xAxis().bins() + "\" ySize=\"" + h.yAxis().bins() + "\">");
+        out.append("<bins2d title=\"" + h.title() + "\" xSize=\"" + h.xAxis().bins() + "\" ySize=\"" + h.yAxis().bins()
+                + "\">");
         out.append(sep);
         for (int i = 0; i < h.xAxis().bins(); i++)
             for (int j = 0; j < h.yAxis().bins(); j++) {

@@ -1,5 +1,7 @@
 package cern.colt.matrix.tdouble;
 
+import java.util.Random;
+
 import junit.framework.TestCase;
 import cern.colt.function.tdouble.DoubleProcedure;
 import cern.colt.function.tdouble.IntIntDoubleFunction;
@@ -31,6 +33,8 @@ public abstract class DoubleMatrix2DTest extends TestCase {
 
     protected double TOL = 1e-10;
 
+    protected static final Random random = new Random(0);
+
     /**
      * Constructor for DoubleMatrix2DTest
      */
@@ -50,19 +54,19 @@ public abstract class DoubleMatrix2DTest extends TestCase {
         ConcurrencyUtils.setThreadsBeginN_2D(1);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                A.setQuick(r, c, Math.random());
+                A.setQuick(r, c, random.nextDouble());
             }
         }
 
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                B.setQuick(r, c, Math.random());
+                B.setQuick(r, c, random.nextDouble());
             }
         }
 
         for (int r = 0; r < NCOLUMNS; r++) {
             for (int c = 0; c < NROWS; c++) {
-                Bt.setQuick(r, c, Math.random());
+                Bt.setQuick(r, c, random.nextDouble());
             }
         }
     }
@@ -71,6 +75,10 @@ public abstract class DoubleMatrix2DTest extends TestCase {
     protected void tearDown() throws Exception {
         A = B = Bt = null;
     }
+
+    //    public void testToString() {
+    //        System.out.println(A.toString());
+    //    }
 
     public void testAggregateDoubleDoubleFunctionDoubleFunction() {
         double expected = 0;
@@ -471,7 +479,8 @@ public abstract class DoubleMatrix2DTest extends TestCase {
 
     public void testViewSelectionIntArrayIntArray() {
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1 };
+        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2,
+                NCOLUMNS - 1 };
         DoubleMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
         assertEquals(rowIndexes.length, B.rows());
         assertEquals(colIndexes.length, B.columns());

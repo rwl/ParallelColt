@@ -12,13 +12,17 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
-import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
-import cern.colt.matrix.tfcomplex.FComplexMatrix3D;
+import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
-import cern.jet.math.tfcomplex.FComplex;
+import cern.colt.matrix.tfloat.impl.DenseColumnFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
+import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseCCFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseFloatMatrix1D;
+import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
+import cern.jet.math.tfloat.FloatFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -29,18 +33,18 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * (<tt>==</tt>) allow for numerical instability, to a degree specified upon
  * instance construction and returned by method {@link #tolerance()}. The public
  * static final variable <tt>DEFAULT</tt> represents a default Property object
- * with a tolerance of <tt>1.0E-9</tt>. The public static final variable
+ * with a tolerance of <tt>1.0E-5</tt>. The public static final variable
  * <tt>ZERO</tt> represents a Property object with a tolerance of <tt>0.0</tt>.
- * The public static final variable <tt>TWELVE</tt> represents a Property object
- * with a tolerance of <tt>1.0E-12</tt>. As long as you are happy with these
+ * The public static final variable <tt>SEVEN</tt> represents a Property object
+ * with a tolerance of <tt>1.0E-7</tt>. As long as you are happy with these
  * tolerances, there is no need to construct Property objects. Simply use idioms
  * like <tt>Property.DEFAULT.equals(A,B)</tt>,
- * <tt>Property.ZERO.equals(A,B)</tt>, <tt>Property.TWELVE.equals(A,B)</tt>.
+ * <tt>Property.ZERO.equals(A,B)</tt>, <tt>Property.SEVEN.equals(A,B)</tt>.
  * <p>
- * To work with a different tolerance (e.g. <tt>1.0E-15</tt> or <tt>1.0E-5</tt>)
- * use the constructor and/or method {@link #setTolerance(float)}. Note that the
- * public static final Property objects are immutable: Is is not possible to
- * alter their tolerance. Any attempt to do so will throw an Exception.
+ * To work with a different tolerance (e.g. <tt>1.0E-2</tt>) use the constructor
+ * and/or method {@link #setTolerance(float)}. Note that the public static final
+ * Property objects are immutable: Is is not possible to alter their tolerance.
+ * Any attempt to do so will throw an Exception.
  * <p>
  * Note that this implementation is not synchronized.
  * <p>
@@ -149,12 +153,16 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.1, 28/May/2000 (fixed strange bugs involving NaN, -inf, inf)
+ * 
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class FloatProperty extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
-     * The default Property object; currently has <tt>tolerance()==1.0E-6</tt>.
+     * The default Property object; currently has <tt>tolerance()==1.0E-5</tt>.
      */
-    public static final FloatProperty DEFAULT = new FloatProperty(1.0E-6f);
+    public static final FloatProperty DEFAULT = new FloatProperty(1.0E-5f);
 
     /**
      * A Property object with <tt>tolerance()==0.0</tt>.
@@ -172,7 +180,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
      * Not instantiable by no-arg constructor.
      */
     private FloatProperty() {
-        this(1.0E-6f); // just to be on the safe side
+        this(1.0E-5f); // just to be on the safe side
     }
 
     /**
@@ -204,7 +212,8 @@ public class FloatProperty extends cern.colt.PersistentObject {
      */
     public void checkRectangular(FloatMatrix2D A) {
         if (A.rows() < A.columns()) {
-            throw new IllegalArgumentException("Matrix must be rectangular: " + cern.colt.matrix.tfloat.algo.FloatFormatter.shape(A));
+            throw new IllegalArgumentException("Matrix must be rectangular: "
+                    + AbstractFormatter.shape(A));
         }
     }
 
@@ -216,7 +225,30 @@ public class FloatProperty extends cern.colt.PersistentObject {
      */
     public void checkSquare(FloatMatrix2D A) {
         if (A.rows() != A.columns())
-            throw new IllegalArgumentException("Matrix must be square: " + cern.colt.matrix.tfloat.algo.FloatFormatter.shape(A));
+            throw new IllegalArgumentException("Matrix must be square: "
+                    + AbstractFormatter.shape(A));
+    }
+
+    public void checkDense(FloatMatrix2D A) {
+        if (!(A instanceof DenseFloatMatrix2D) && !(A instanceof DenseColumnFloatMatrix2D))
+            throw new IllegalArgumentException("Matrix must be dense");
+    }
+
+    public void checkDense(FloatMatrix1D A) {
+        if (!(A instanceof DenseFloatMatrix1D))
+            throw new IllegalArgumentException("Matrix must be dense");
+    }
+
+    public void checkSparse(FloatMatrix1D A) {
+        if (!(A instanceof SparseFloatMatrix1D))
+            throw new IllegalArgumentException("Matrix must be sparse");
+    }
+
+    public void checkSparse(FloatMatrix2D A) {
+        //        if (!(A instanceof SparseFloatMatrix2D) && !(A instanceof RCFloatMatrix2D) && !(A instanceof RCMFloatMatrix2D)
+        //                && !(A instanceof CCFloatMatrix2D) && !(A instanceof CCMFloatMatrix2D))
+        if (!(A instanceof SparseCCFloatMatrix2D) && !(A instanceof SparseRCFloatMatrix2D))
+            throw new IllegalArgumentException("Matrix must be sparse");
     }
 
     /**
@@ -243,25 +275,21 @@ public class FloatProperty extends cern.colt.PersistentObject {
     public boolean equals(final FloatMatrix1D A, final float value) {
         if (A == null)
             return false;
-        int size = A.size();
+        int size = (int) A.size();
         final float epsilon = tolerance();
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             float x = A.getQuick(i);
                             float diff = Math.abs(value - x);
                             if ((diff != diff) && ((value != value && x != x) || value == x))
@@ -275,11 +303,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -295,87 +323,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 if ((diff != diff) && ((value != value && x != x) || value == x))
                     diff = 0;
                 if (!(diff <= epsilon)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Returns whether all cells of the given matrix <tt>A</tt> are equal to the
-     * given value.
-     * 
-     * @param A
-     *            the first matrix to compare.
-     * @param value
-     *            the value to compare against.
-     * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
-     *         otherwise.
-     */
-    public boolean equals(final FComplexMatrix1D A, final float[] value) {
-        if (A == null)
-            return false;
-        final float epsilon = tolerance();
-        boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        int size = A.size();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
-                    public Boolean call() throws Exception {
-                        float[] diff = new float[2];
-                        for (int i = startsize; i < stopsize; i++) {
-                            float[] x = A.getQuick(i);
-                            diff[0] = Math.abs(value[0] - x[0]);
-                            diff[1] = Math.abs(value[1] - x[1]);
-                            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                                diff[0] = 0;
-                                diff[1] = 0;
-                            }
-                            if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Boolean) futures[j].get();
-                }
-                result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
-                    result = result && results[j].booleanValue();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return result;
-        } else {
-            float[] diff = new float[2];
-            for (int i = 0; i < A.size(); i++) {
-                float[] x = A.getQuick(i);
-                diff[0] = Math.abs(value[0] - x[0]);
-                diff[1] = Math.abs(value[1] - x[1]);
-                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                    diff[0] = 0;
-                    diff[1] = 0;
-                }
-                if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
                     return false;
                 }
             }
@@ -402,28 +349,24 @@ public class FloatProperty extends cern.colt.PersistentObject {
             return true;
         if (!(A != null && B != null))
             return false;
-        int size = A.size();
+        int size = (int) A.size();
         if (size != B.size())
             return false;
 
         final float epsilon = tolerance();
         boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             float x = A.getQuick(i);
                             float value = B.getQuick(i);
                             float diff = Math.abs(value - x);
@@ -438,11 +381,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -459,93 +402,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 if ((diff != diff) && ((value != value && x != x) || value == x))
                     diff = 0;
                 if (!(diff <= epsilon)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Returns whether both given matrices <tt>A</tt> and <tt>B</tt> are equal.
-     * 
-     * @param A
-     *            the first matrix to compare.
-     * @param B
-     *            the second matrix to compare.
-     * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
-     *         otherwise.
-     */
-    public boolean equals(final FComplexMatrix1D A, final FComplexMatrix1D B) {
-        if (A == B)
-            return true;
-        if (!(A != null && B != null))
-            return false;
-        int size = A.size();
-        if (size != B.size())
-            return false;
-
-        final float epsilon = tolerance();
-        boolean result = false;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
-                    public Boolean call() throws Exception {
-                        float[] diff = new float[2];
-                        for (int i = startsize; i < stopsize; i++) {
-                            float[] x = A.getQuick(i);
-                            float[] value = B.getQuick(i);
-                            diff[0] = Math.abs(value[0] - x[0]);
-                            diff[1] = Math.abs(value[1] - x[1]);
-                            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                                diff[0] = 0;
-                                diff[1] = 0;
-                            }
-                            if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Boolean) futures[j].get();
-                }
-                result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
-                    result = result && results[j].booleanValue();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return result;
-        } else {
-            float[] diff = new float[2];
-            for (int i = 0; i < size; i++) {
-                float[] x = A.getQuick(i);
-                float[] value = B.getQuick(i);
-                diff[0] = Math.abs(value[0] - x[0]);
-                diff[1] = Math.abs(value[1] - x[1]);
-                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                    diff[0] = 0;
-                    diff[1] = 0;
-                }
-                if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
                     return false;
                 }
             }
@@ -574,22 +430,18 @@ public class FloatProperty extends cern.colt.PersistentObject {
         final int columns = A.columns();
         boolean result = false;
         final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = A.rows() / np;
-            for (int j = 0; j < np; j++) {
-                final int startrows = j * k;
-                final int stoprows;
-                if (j == np - 1) {
-                    stoprows = A.rows();
-                } else {
-                    stoprows = startrows + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, A.rows());
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = A.rows() / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? A.rows() : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int r = startrows; r < stoprows; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 float x = A.getQuick(r, c);
                                 float diff = Math.abs(value - x);
@@ -605,11 +457,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -626,92 +478,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
                     if ((diff != diff) && ((value != value && x != x) || value == x))
                         diff = 0;
                     if (!(diff <= epsilon)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Returns whether all cells of the given matrix <tt>A</tt> are equal to the
-     * given value.
-     * 
-     * @param A
-     *            the first matrix to compare.
-     * @param value
-     *            the value to compare against.
-     * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
-     *         otherwise.
-     */
-    public boolean equals(final FComplexMatrix2D A, final float[] value) {
-        if (A == null)
-            return false;
-        int rows = A.rows();
-        int columns = A.columns();
-        boolean result = false;
-        final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = A.rows() / np;
-            for (int j = 0; j < np; j++) {
-                final int startrows = j * k;
-                final int stoprows;
-                if (j == np - 1) {
-                    stoprows = A.rows();
-                } else {
-                    stoprows = startrows + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
-                    public Boolean call() throws Exception {
-                        float[] diff = new float[2];
-                        for (int r = startrows; r < stoprows; r++) {
-                            for (int c = 0; c < A.columns(); c++) {
-                                float[] x = A.getQuick(r, c);
-                                diff[0] = Math.abs(value[0] - x[0]);
-                                diff[1] = Math.abs(value[1] - x[1]);
-                                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                                    diff[0] = 0;
-                                    diff[1] = 0;
-                                }
-                                if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-                                    return false;
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Boolean) futures[j].get();
-                }
-                result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
-                    result = result && results[j].booleanValue();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return result;
-        } else {
-            float[] diff = new float[2];
-            for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < columns; c++) {
-                    float[] x = A.getQuick(r, c);
-                    diff[0] = Math.abs(value[0] - x[0]);
-                    diff[1] = Math.abs(value[1] - x[1]);
-                    if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                        diff[0] = 0;
-                        diff[1] = 0;
-                    }
-                    if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
                         return false;
                     }
                 }
@@ -746,22 +512,18 @@ public class FloatProperty extends cern.colt.PersistentObject {
             return false;
         boolean result = false;
         final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = A.rows() / np;
-            for (int j = 0; j < np; j++) {
-                final int startrows = j * k;
-                final int stoprows;
-                if (j == np - 1) {
-                    stoprows = A.rows();
-                } else {
-                    stoprows = startrows + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, A.rows());
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = A.rows() / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? A.rows() : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int r = startrows; r < stoprows; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 float x = A.getQuick(r, c);
                                 float value = B.getQuick(r, c);
@@ -778,11 +540,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -800,98 +562,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
                     if ((diff != diff) && ((value != value && x != x) || value == x))
                         diff = 0;
                     if (!(diff <= epsilon)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Returns whether both given matrices <tt>A</tt> and <tt>B</tt> are equal.
-     * 
-     * @param A
-     *            the first matrix to compare.
-     * @param B
-     *            the second matrix to compare.
-     * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
-     *         otherwise.
-     */
-    public boolean equals(final FComplexMatrix2D A, final FComplexMatrix2D B) {
-        if (A == B)
-            return true;
-        if (!(A != null && B != null))
-            return false;
-        int rows = A.rows();
-        int columns = A.columns();
-        if (columns != B.columns() || rows != B.rows())
-            return false;
-        boolean result = false;
-        final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = A.rows() / np;
-            for (int j = 0; j < np; j++) {
-                final int startrows = j * k;
-                final int stoprows;
-                if (j == np - 1) {
-                    stoprows = A.rows();
-                } else {
-                    stoprows = startrows + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
-                    public Boolean call() throws Exception {
-                        float[] diff = new float[2];
-                        for (int r = startrows; r < stoprows; r++) {
-                            for (int c = 0; c < A.columns(); c++) {
-                                float[] x = A.getQuick(r, c);
-                                float[] value = B.getQuick(r, c);
-                                diff[0] = Math.abs(value[0] - x[0]);
-                                diff[1] = Math.abs(value[1] - x[1]);
-                                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                                    diff[0] = 0;
-                                    diff[1] = 0;
-                                }
-                                if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-                                    return false;
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Boolean) futures[j].get();
-                }
-                result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
-                    result = result && results[j].booleanValue();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return result;
-        } else {
-
-            float[] diff = new float[2];
-            for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < columns; c++) {
-                    float[] x = A.getQuick(r, c);
-                    float[] value = B.getQuick(r, c);
-                    diff[0] = Math.abs(value[0] - x[0]);
-                    diff[1] = Math.abs(value[1] - x[1]);
-                    if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                        diff[0] = 0;
-                        diff[1] = 0;
-                    }
-                    if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
                         return false;
                     }
                 }
@@ -922,22 +592,18 @@ public class FloatProperty extends cern.colt.PersistentObject {
         final int columns = A.columns();
         boolean result = false;
         final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
                                     float x = A.getQuick(s, r, c);
@@ -955,11 +621,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -977,97 +643,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
                         if ((diff != diff) && ((value != value && x != x) || value == x))
                             diff = 0;
                         if (!(diff <= epsilon)) {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Returns whether all cells of the given matrix <tt>A</tt> are equal to the
-     * given value.
-     * 
-     * @param A
-     *            the first matrix to compare.
-     * @param value
-     *            the value to compare against.
-     * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
-     *         otherwise.
-     */
-    public boolean equals(final FComplexMatrix3D A, final float[] value) {
-        if (A == null)
-            return false;
-        final int slices = A.slices();
-        final int rows = A.rows();
-        final int columns = A.columns();
-        boolean result = false;
-        final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
-                    public Boolean call() throws Exception {
-                        float[] diff = new float[2];
-                        for (int s = startslice; s < stopslice; s++) {
-                            for (int r = 0; r < rows; r++) {
-                                for (int c = 0; c < columns; c++) {
-                                    float[] x = A.getQuick(s, r, c);
-                                    diff[0] = Math.abs(value[0] - x[0]);
-                                    diff[1] = Math.abs(value[1] - x[1]);
-                                    if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                                        diff[0] = 0;
-                                        diff[1] = 0;
-                                    }
-                                    if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Boolean) futures[j].get();
-                }
-                result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
-                    result = result && results[j].booleanValue();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return result;
-        } else {
-            float[] diff = new float[2];
-            for (int s = 0; s < slices; s++) {
-                for (int r = 0; r < rows; r++) {
-                    for (int c = 0; c < columns; c++) {
-                        float[] x = A.getQuick(s, r, c);
-                        diff[0] = Math.abs(value[0] - x[0]);
-                        diff[1] = Math.abs(value[1] - x[1]);
-                        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                            diff[0] = 0;
-                            diff[1] = 0;
-                        }
-                        if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
                             return false;
                         }
                     }
@@ -1104,22 +679,18 @@ public class FloatProperty extends cern.colt.PersistentObject {
             return false;
         boolean result = false;
         final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            Boolean[] results = new Boolean[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
                                     float x = A.getQuick(s, r, c);
@@ -1138,11 +709,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Boolean) futures[j].get();
                 }
                 result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     result = result && results[j].booleanValue();
                 }
             } catch (ExecutionException ex) {
@@ -1171,102 +742,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
     }
 
     /**
-     * Returns whether both given matrices <tt>A</tt> and <tt>B</tt> are equal.
-     * 
-     * @param A
-     *            the first matrix to compare.
-     * @param B
-     *            the second matrix to compare.
-     * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
-     *         otherwise.
-     */
-    public boolean equals(final FComplexMatrix3D A, final FComplexMatrix3D B) {
-        if (A == B)
-            return true;
-        if (!(A != null && B != null))
-            return false;
-        boolean result = false;
-        final int slices = A.slices();
-        final int rows = A.rows();
-        final int columns = A.columns();
-        if (columns != B.columns() || rows != B.rows() || slices != B.slices())
-            return false;
-        final float epsilon = tolerance();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (A.size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Boolean[] results = new Boolean[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
-                    public Boolean call() throws Exception {
-                        float[] diff = new float[2];
-                        for (int s = startslice; s < stopslice; s++) {
-                            for (int r = 0; r < rows; r++) {
-                                for (int c = 0; c < columns; c++) {
-                                    float[] x = A.getQuick(s, r, c);
-                                    float[] value = B.getQuick(s, r, c);
-                                    diff[0] = Math.abs(value[0] - x[0]);
-                                    diff[1] = Math.abs(value[1] - x[1]);
-                                    if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                                        diff[0] = 0;
-                                        diff[1] = 0;
-                                    }
-                                    if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (Boolean) futures[j].get();
-                }
-                result = results[0].booleanValue();
-                for (int j = 1; j < np; j++) {
-                    result = result && results[j].booleanValue();
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return result;
-        } else {
-            float[] diff = new float[2];
-            for (int s = 0; s < slices; s++) {
-                for (int r = 0; r < rows; r++) {
-                    for (int c = 0; c < columns; c++) {
-                        float[] x = A.getQuick(s, r, c);
-                        float[] value = B.getQuick(s, r, c);
-                        diff[0] = Math.abs(value[0] - x[0]);
-                        diff[1] = Math.abs(value[1] - x[1]);
-                        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (FComplex.isEqual(value, x, epsilon))) {
-                            diff[0] = 0;
-                            diff[1] = 0;
-                        }
-                        if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
      * Modifies the given matrix square matrix <tt>A</tt> such that it is
      * diagonally dominant by row and column, hence non-singular, hence
      * invertible. For testing purposes only.
@@ -1284,8 +759,8 @@ public class FloatProperty extends cern.colt.PersistentObject {
             A.setQuick(i, i, 0);
         }
         for (int i = min; --i >= 0;) {
-            float rowSum = A.viewRow(i).aggregate(F.plus, F.abs);
-            float colSum = A.viewColumn(i).aggregate(F.plus, F.abs);
+            float rowSum = A.viewRow(i).aggregate(FloatFunctions.plus, FloatFunctions.abs);
+            float colSum = A.viewColumn(i).aggregate(FloatFunctions.plus, FloatFunctions.abs);
             A.setQuick(i, i, Math.max(rowSum, colSum) + i + 1);
         }
     }
@@ -1306,7 +781,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         int columns = A.columns();
         for (int row = rows; --row >= 0;) {
             for (int column = columns; --column >= 0;) {
-                // if (row!=column && A.getQuick(row,column) != 0) return false;
                 if (row != column && !(Math.abs(A.getQuick(row, column)) <= epsilon))
                     return false;
             }
@@ -1326,12 +800,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
      */
     public boolean isDiagonallyDominantByColumn(FloatMatrix2D A) {
         cern.jet.math.tfloat.FloatFunctions F = cern.jet.math.tfloat.FloatFunctions.functions;
-        float epsilon = tolerance();
         int min = Math.min(A.rows(), A.columns());
         for (int i = min; --i >= 0;) {
             float diag = Math.abs(A.getQuick(i, i));
             diag += diag;
-            if (diag <= A.viewColumn(i).aggregate(F.plus, F.abs))
+            if (diag <= A.viewColumn(i).aggregate(FloatFunctions.plus, FloatFunctions.abs))
                 return false;
         }
         return true;
@@ -1348,12 +821,11 @@ public class FloatProperty extends cern.colt.PersistentObject {
      */
     public boolean isDiagonallyDominantByRow(FloatMatrix2D A) {
         cern.jet.math.tfloat.FloatFunctions F = cern.jet.math.tfloat.FloatFunctions.functions;
-        float epsilon = tolerance();
         int min = Math.min(A.rows(), A.columns());
         for (int i = min; --i >= 0;) {
             float diag = Math.abs(A.getQuick(i, i));
             diag += diag;
-            if (diag <= A.viewRow(i).aggregate(F.plus, F.abs))
+            if (diag <= A.viewRow(i).aggregate(FloatFunctions.plus, FloatFunctions.abs))
                 return false;
         }
         return true;
@@ -1391,7 +863,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         for (int row = rows; --row >= 0;) {
             for (int column = columns; --column >= 0;) {
                 if (!(row == column || row == column + 1)) {
-                    // if (A.getQuick(row,column) != 0) return false;
                     if (!(Math.abs(A.getQuick(row, column)) <= epsilon))
                         return false;
                 }
@@ -1410,7 +881,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         int columns = A.columns();
         for (int column = columns; --column >= 0;) {
             for (int row = Math.min(column, rows); --row >= 0;) {
-                // if (A.getQuick(row,column) != 0) return false;
                 if (!(Math.abs(A.getQuick(row, column)) <= epsilon))
                     return false;
             }
@@ -1445,7 +915,8 @@ public class FloatProperty extends cern.colt.PersistentObject {
      */
     public boolean isOrthogonal(FloatMatrix2D A) {
         checkSquare(A);
-        return equals(A.zMult(A, null, 1, 0, false, true), cern.colt.matrix.tfloat.FloatFactory2D.dense.identity(A.rows()));
+        return equals(A.zMult(A, null, 1, 0, false, true), cern.colt.matrix.tfloat.FloatFactory2D.dense.identity(A
+                .rows()));
     }
 
     /**
@@ -1471,7 +942,7 @@ public class FloatProperty extends cern.colt.PersistentObject {
      * <tt>det(A)==0</tt>.
      */
     public boolean isSingular(FloatMatrix2D A) {
-        return !(Math.abs(FloatAlgebra.DEFAULT.det(A)) >= tolerance());
+        return !(Math.abs(DenseFloatAlgebra.DEFAULT.det(A)) >= tolerance());
     }
 
     /**
@@ -1485,11 +956,8 @@ public class FloatProperty extends cern.colt.PersistentObject {
         checkSquare(A);
         float epsilon = tolerance();
         int rows = A.rows();
-        int columns = A.columns();
         for (int row = rows; --row >= 0;) {
             for (int column = rows; --column >= 0;) {
-                // if (A.getQuick(row,column) != -A.getQuick(column,row)) return
-                // false;
                 if (!(Math.abs(A.getQuick(row, column) + A.getQuick(column, row)) <= epsilon))
                     return false;
             }
@@ -1516,7 +984,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         int columns = A.columns();
         for (int column = columns; --column >= 0;) {
             for (int row = Math.min(rows, column + 1); --row >= 0;) {
-                // if (A.getQuick(row,column) != 0) return false;
                 if (!(Math.abs(A.getQuick(row, column)) <= epsilon))
                     return false;
             }
@@ -1534,7 +1001,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
 
         float epsilon = tolerance();
         for (int i = Math.min(A.rows(), A.columns()); --i >= 0;) {
-            // if (A.getQuick(i,i) != 0) return false;
             if (!(Math.abs(A.getQuick(i, i)) <= epsilon))
                 return false;
         }
@@ -1552,7 +1018,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         int columns = A.columns();
         for (int column = columns; --column >= 0;) {
             for (int row = rows; --row >= column;) {
-                // if (A.getQuick(row,column) != 0) return false;
                 if (!(Math.abs(A.getQuick(row, column)) <= epsilon))
                     return false;
             }
@@ -1591,7 +1056,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         for (int row = rows; --row >= 0;) {
             for (int column = columns; --column >= 0;) {
                 if (Math.abs(row - column) > 1) {
-                    // if (A.getQuick(row,column) != 0) return false;
                     if (!(Math.abs(A.getQuick(row, column)) <= epsilon))
                         return false;
                 }
@@ -1610,7 +1074,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
 
         float epsilon = tolerance();
         for (int i = Math.min(A.rows(), A.columns()); --i >= 0;) {
-            // if (A.getQuick(i,i) != 1) return false;
             if (!(Math.abs(1 - A.getQuick(i, i)) <= epsilon))
                 return false;
         }
@@ -1628,7 +1091,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         for (int row = rows; --row >= 0;) {
             for (int column = columns; --column >= 0;) {
                 if (!(row == column || row == column - 1)) {
-                    // if (A.getQuick(row,column) != 0) return false;
                     if (!(Math.abs(A.getQuick(row, column)) <= epsilon))
                         return false;
                 }
@@ -1647,7 +1109,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         int columns = A.columns();
         for (int column = columns; --column >= 0;) {
             for (int row = rows; --row > column;) {
-                // if (A.getQuick(row,column) != 0) return false;
                 if (!(Math.abs(A.getQuick(row, column)) <= epsilon))
                     return false;
             }
@@ -1684,7 +1145,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         for (int k = rows; --k >= 0;) {
             for (int i = rows - k; --i >= 0;) {
                 int j = i + k;
-                // if (A.getQuick(j,i) != 0) return k;
                 if (!(Math.abs(A.getQuick(j, i)) <= epsilon))
                     return k;
             }
@@ -1809,8 +1269,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         for (int k = rows; --k >= 0;) {
             for (int i = rows - k; --i >= 0;) {
                 int j = i + k;
-                // if (A.getQuick(j,i) != 0) return k+1;
-                // if (A.getQuick(i,j) != 0) return k+1;
                 if (!(Math.abs(A.getQuick(j, i)) <= epsilon))
                     return k + 1;
                 if (!(Math.abs(A.getQuick(i, j)) <= epsilon))
@@ -1829,8 +1287,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
     public void setTolerance(float newTolerance) {
         if (this == DEFAULT || this == ZERO || this == SEVEN) {
             throw new IllegalArgumentException("Attempted to modify immutable object.");
-            // throw new UnsupportedOperationException("Attempted to modify
-            // object."); // since JDK1.2
         }
         tolerance = Math.abs(newTolerance);
     }
@@ -2131,7 +1587,6 @@ public class FloatProperty extends cern.colt.PersistentObject {
         for (int k = rows; --k >= 0;) {
             for (int i = rows - k; --i >= 0;) {
                 int j = i + k;
-                // if (A.getQuick(i,j) != 0) return k;
                 if (!(Math.abs(A.getQuick(i, j)) <= epsilon))
                     return k;
             }

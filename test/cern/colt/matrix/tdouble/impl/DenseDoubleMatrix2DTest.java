@@ -19,7 +19,7 @@ public class DenseDoubleMatrix2DTest extends DoubleMatrix2DTest {
     }
 
     public void testAssignDoubleArray() {
-        double[] expected = new double[A.size()];
+        double[] expected = new double[(int) A.size()];
         for (int i = 0; i < A.size(); i++) {
             expected[i] = Math.random();
         }
@@ -146,6 +146,16 @@ public class DenseDoubleMatrix2DTest extends DoubleMatrix2DTest {
         ((DenseDoubleMatrix2D) A).ifft2(true);
         for (int r = 0; r < nrows; r++) {
             for (int c = 0; c < ncolumns; c++) {
+                assertEquals(Acopy.getQuick(r, c), A.getQuick(r, c), TOL);
+            }
+        }
+
+        A = A.viewDice();
+        Acopy = A.copy();
+        ((DenseDoubleMatrix2D) A).fft2();
+        ((DenseDoubleMatrix2D) A).ifft2(true);
+        for (int r = 0; r < ncolumns; r++) {
+            for (int c = 0; c < nrows; c++) {
                 assertEquals(Acopy.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }

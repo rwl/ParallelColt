@@ -9,24 +9,25 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tfcomplex.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix3D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix3D;
+import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
- * Sparse hashed 3-d matrix holding <tt>complex</tt> elements. Note that this
+ * Sparse hashed 3-d matrix holding <tt>complex</tt> elements. This
  * implementation uses ConcurrentHashMap
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 12/10/2007
  * 
  */
 
 public class SparseFComplexMatrix3D extends FComplexMatrix3D {
-    private static final long serialVersionUID = -3505231436029104977L;
+    private static final long serialVersionUID = 1L;
 
     /*
      * The elements of the matrix.
@@ -54,7 +55,8 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      *             .
      */
     public SparseFComplexMatrix3D(float[][][] values) {
-        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length));
+        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0
+                : values[0].length == 0 ? 0 : values[0][0].length));
         assign(values);
     }
 
@@ -109,19 +111,14 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected SparseFComplexMatrix3D(int slices, int rows, int columns, ConcurrentHashMap<Integer, float[]> elements, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
+    protected SparseFComplexMatrix3D(int slices, int rows, int columns, ConcurrentHashMap<Integer, float[]> elements,
+            int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
         setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         this.elements = elements;
         this.isNoView = false;
     }
 
-    /**
-     * Sets all cells to the state specified by <tt>value</tt>.
-     * 
-     * @param value
-     *            the value to be filled into the cells.
-     * @return <tt>this</tt> (for convenience only).
-     */
+    @Override
     public FComplexMatrix3D assign(float[] value) {
         // overriden for performance only
         if (this.isNoView && value[0] == 0 && value[1] == 0)
@@ -131,9 +128,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    /**
-     * Returns the number of cells having non-zero values.
-     */
+    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -141,26 +136,10 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
             return super.cardinality();
     }
 
-    /**
-     * Returns the matrix cell value at coordinate <tt>[slice,row,column]</tt>.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may return invalid objects
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>slice&lt;0 || slice&gt;=slices() || row&lt;0 || row&gt;=rows() || column&lt;0 || column&gt;=column()</tt>.
-     * 
-     * @param slice
-     *            the index of the slice-coordinate.
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @return the value at the specified coordinate.
-     */
+    @Override
     public float[] getQuick(int slice, int row, int column) {
-        float[] elem = elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride);
+        float[] elem = elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
+                * columnStride);
         if (elem != null) {
             return new float[] { elem[0], elem[1] };
         } else {
@@ -168,11 +147,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         }
     }
 
-    /**
-     * Returns the elements of this matrix.
-     * 
-     * @return the elements
-     */
+    @Override
     public ConcurrentHashMap<Integer, float[]> elements() {
         return elements;
     }
@@ -180,6 +155,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
+    @Override
     protected boolean haveSharedCellsRaw(FComplexMatrix3D other) {
         if (other instanceof SelectedSparseFComplexMatrix3D) {
             SelectedSparseFComplexMatrix3D otherMatrix = (SelectedSparseFComplexMatrix3D) other;
@@ -191,91 +167,28 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         return false;
     }
 
-    /**
-     * Returns the position of the given coordinate within the (virtual or
-     * non-virtual) internal 1-dimensional array.
-     * 
-     * @param slice
-     *            the index of the slice-coordinate.
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the third-coordinate.
-     */
+    @Override
     public long index(int slice, int row, int column) {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the specified number of slices, rows and columns.
-     * For example, if the receiver is an instance of type
-     * <tt>DenseComplexMatrix3D</tt> the new matrix must also be of type
-     * <tt>DenseComplexMatrix3D</tt>, if the receiver is an instance of type
-     * <tt>SparseComplexMatrix3D</tt> the new matrix must also be of type
-     * <tt>SparseComplexMatrix3D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
-     * 
-     * @param slices
-     *            the number of slices the matrix shall have.
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @return a new empty matrix of the same dynamic type.
-     */
+    @Override
     public FComplexMatrix3D like(int slices, int rows, int columns) {
         return new SparseFComplexMatrix3D(slices, rows, columns);
     }
 
-    /**
-     * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
-     * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseComplexMatrix3D</tt> the new matrix must also
-     * be of type <tt>DenseComplexMatrix2D</tt>, if the receiver is an instance
-     * of type <tt>SparseComplexMatrix3D</tt> the new matrix must also be of
-     * type <tt>SparseComplexMatrix2D</tt>, etc.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @param rowZero
-     *            the position of the first element.
-     * @param columnZero
-     *            the position of the first element.
-     * @param rowStride
-     *            the number of elements between two rows, i.e.
-     *            <tt>index(i+1,j)-index(i,j)</tt>.
-     * @param columnStride
-     *            the number of elements between two columns, i.e.
-     *            <tt>index(i,j+1)-index(i,j)</tt>.
-     * @return a new matrix of the corresponding dynamic type.
-     */
-    protected FComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
+    @Override
+    public FComplexMatrix2D like2D(int rows, int columns) {
+        return new SparseFComplexMatrix2D(rows, columns);
+    }
+
+    @Override
+    protected FComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
+            int columnStride) {
         return new SparseFComplexMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>[slice,row,column]</tt> to the
-     * specified value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>slice&lt;0 || slice&gt;=slices() || row&lt;0 || row&gt;=rows() || column&lt;0 || column&gt;=column()</tt>.
-     * 
-     * @param slice
-     *            the index of the slice-coordinate.
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param value
-     *            the value to be filled into the specified cell.
-     */
+    @Override
     public void setQuick(int slice, int row, int column, float[] value) {
         int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         if (value[0] == 0 && value[1] == 0)
@@ -284,30 +197,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
             this.elements.put(index, value);
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>[slice,row,column]</tt> to the
-     * specified value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>slice&lt;0 || slice&gt;=slices() || row&lt;0 || row&gt;=rows() || column&lt;0 || column&gt;=column()</tt>.
-     * 
-     * @param slice
-     *            the index of the slice-coordinate.
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param re
-     *            the real part of the value to be filled into the specified
-     *            cell.
-     * @param im
-     *            the imaginary part of the value to be filled into the
-     *            specified cell.
-     */
+    @Override
     public void setQuick(int slice, int row, int column, float re, float im) {
         int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         if (re == 0 && im == 0)
@@ -316,30 +206,14 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
             this.elements.put(index, new float[] { re, im });
     }
 
-    /**
-     * Construct and returns a new selection view.
-     * 
-     * @param sliceOffsets
-     *            the offsets of the visible elements.
-     * @param rowOffsets
-     *            the offsets of the visible elements.
-     * @param columnOffsets
-     *            the offsets of the visible elements.
-     * @return a new view.
-     */
+    @Override
     protected FComplexMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFComplexMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }
 
-    /**
-     * Returns a vector obtained by stacking the columns of each slice of the
-     * matrix on top of one another.
-     * 
-     * @return a vector obtained by stacking the columns of each slice of the
-     *         matrix on top of one another
-     */
+    @Override
     public FComplexMatrix1D vectorize() {
-        FComplexMatrix1D v = new SparseFComplexMatrix1D(size());
+        FComplexMatrix1D v = new SparseFComplexMatrix1D((int) size());
         int length = rows * columns;
         for (int s = 0; s < slices; s++) {
             v.viewPart(s * length, length).assign(viewSlice(s).vectorize());
@@ -347,41 +221,75 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         return v;
     }
 
-    /**
-     * Returns the imaginary part of this matrix
-     * 
-     * @return the imaginary part
-     */
+    @Override
     public FloatMatrix3D getImaginaryPart() {
-        FloatMatrix3D Im = new SparseFloatMatrix3D(slices, rows, columns);
-        float[] tmp;
-        for (int s = 0; s < slices; s++) {
-            for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < columns; c++) {
-                    tmp = getQuick(s, r, c);
-                    Im.setQuick(s, r, c, tmp[1]);
+        final FloatMatrix3D Im = new SparseFloatMatrix3D(slices, rows, columns);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    Im.setQuick(s, r, c, getQuick(s, r, c)[1]);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        Im.setQuick(s, r, c, getQuick(s, r, c)[1]);
+                    }
                 }
             }
         }
         return Im;
     }
 
-    /**
-     * Returns the real part of this matrix
-     * 
-     * @return the real part
-     */
+    @Override
     public FloatMatrix3D getRealPart() {
-        FloatMatrix3D R = new SparseFloatMatrix3D(slices, rows, columns);
-        float[] tmp;
-        for (int s = 0; s < slices; s++) {
-            for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < columns; c++) {
-                    tmp = getQuick(s, r, c);
-                    R.setQuick(s, r, c, tmp[0]);
+        final FloatMatrix3D Re = new SparseFloatMatrix3D(slices, rows, columns);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    Re.setQuick(s, r, c, getQuick(s, r, c)[0]);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        Re.setQuick(s, r, c, getQuick(s, r, c)[0]);
+                    }
                 }
             }
         }
-        return R;
+        return Re;
     }
 }

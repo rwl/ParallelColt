@@ -41,7 +41,8 @@ public class BenchmarkMap extends Object {
         }
         Runtime.getRuntime().gc();
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread();
+            Thread.sleep(1000);
         } catch (InterruptedException exc) {
         }
         ;
@@ -101,7 +102,8 @@ public class BenchmarkMap extends Object {
     /**
      */
     public static void test2(int length) {
-        cern.jet.random.tdouble.DoubleUniform uniform = new cern.jet.random.tdouble.DoubleUniform(new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.DoubleUniform uniform = new cern.jet.random.tdouble.DoubleUniform(
+                new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         // using a map
         // int[] keys = {0 , 3 , 277+3, 277*2+3, 100000, 9 };
         // double[] values = {100.0, 1000.0, 277+3, 277*2+3, 70.0 , 71.0 ,};
@@ -112,14 +114,14 @@ public class BenchmarkMap extends Object {
         for (int i = 0; i < length; i++) {
             keys[i] = uniform.nextIntFromTo(0, to);
         }
-        int[] values = (int[]) keys.clone();
+        int[] values = keys.clone();
 
         int size = keys.length;
         // AbstractIntIntMap map = new OpenIntIntHashMap(size*2, 0.2, 0.5);
         AbstractIntIntMap map = new OpenIntIntHashMap();
 
         for (int i = 0; i < keys.length; i++) {
-            map.put(keys[i], (int) values[i]);
+            map.put(keys[i], values[i]);
             // System.out.println(map);
         }
 

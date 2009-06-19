@@ -33,6 +33,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class VonMises extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double my_k;
 
     // cached vars for method nextDouble(a) (for performance only)
@@ -57,6 +62,7 @@ public class VonMises extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(this.my_k);
     }
@@ -134,6 +140,7 @@ public class VonMises extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + my_k + ")";
     }

@@ -49,6 +49,11 @@ import cern.jet.stat.tdouble.Probability;
  * @version 1.0, 09/24/99
  */
 public class Normal extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double mean;
 
     protected double variance;
@@ -83,6 +88,7 @@ public class Normal extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(this.mean, this.standardDeviation);
     }
@@ -123,6 +129,7 @@ public class Normal extends AbstractContinousDoubleDistribution {
     /**
      * Sets the uniform random generator internally used.
      */
+    @Override
     protected void setRandomGenerator(DoubleRandomEngine randomGenerator) {
         super.setRandomGenerator(randomGenerator);
         this.cacheFilled = false;
@@ -155,6 +162,7 @@ public class Normal extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + mean + "," + standardDeviation + ")";
     }

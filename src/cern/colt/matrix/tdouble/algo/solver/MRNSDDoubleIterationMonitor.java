@@ -2,8 +2,8 @@ package cern.colt.matrix.tdouble.algo.solver;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
-public class MRNSDDoubleIterationMonitor extends DefaultDoubleIterationMonitor {  
-    
+public class MRNSDDoubleIterationMonitor extends DefaultDoubleIterationMonitor {
+
     @Override
     protected boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException {
         // Store initial residual
@@ -24,7 +24,7 @@ public class MRNSDDoubleIterationMonitor extends DefaultDoubleIterationMonitor {
         // Neither convergence nor divergence
         return false;
     }
-    
+
     @Override
     protected boolean convergedI(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
         return convergedI(r);

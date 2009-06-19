@@ -160,7 +160,8 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void optif0_f77(int n, double x[], Uncmin_methods minclass, double xpls[], double fpls[], double gpls[], int itrmcd[], double a[][], double udiag[]) {
+    public static void optif0_f77(int n, double x[], Uncmin_methods minclass, double xpls[], double fpls[],
+            double gpls[], int itrmcd[], double a[][], double udiag[]) {
 
         /*
 
@@ -223,9 +224,11 @@ public class Uncmin_f77 extends Object {
         double gradtl[] = new double[2];
         double steptl[] = new double[2];
 
-        Uncmin_f77.dfault_f77(n, x, typsiz, fscale, method, iexp, msg, ndigit, itnlim, iagflg, iahflg, dlt, gradtl, stepmx, steptl);
+        Uncmin_f77.dfault_f77(n, x, typsiz, fscale, method, iexp, msg, ndigit, itnlim, iagflg, iahflg, dlt, gradtl,
+                stepmx, steptl);
 
-        Uncmin_f77.optdrv_f77(n, x, minclass, typsiz, fscale, method, iexp, msg, ndigit, itnlim, iagflg, iahflg, dlt, gradtl, stepmx, steptl, xpls, fpls, gpls, itrmcd, a, udiag, g, p, sx, wrk0, wrk1, wrk2, wrk3);
+        Uncmin_f77.optdrv_f77(n, x, minclass, typsiz, fscale, method, iexp, msg, ndigit, itnlim, iagflg, iahflg, dlt,
+                gradtl, stepmx, steptl, xpls, fpls, gpls, itrmcd, a, udiag, g, p, sx, wrk0, wrk1, wrk2, wrk3);
 
         if (itrmcd[1] == 1) {
 
@@ -349,8 +352,10 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void optif9_f77(int n, double x[], Uncmin_methods minclass, double typsiz[], double fscale[], int method[], int iexp[], int msg[], int ndigit[], int itnlim[], int iagflg[], int iahflg[], double dlt[], double gradtl[], double stepmx[], double steptl[], double xpls[], double fpls[],
-            double gpls[], int itrmcd[], double a[][], double udiag[]) {
+    public static void optif9_f77(int n, double x[], Uncmin_methods minclass, double typsiz[], double fscale[],
+            int method[], int iexp[], int msg[], int ndigit[], int itnlim[], int iagflg[], int iahflg[], double dlt[],
+            double gradtl[], double stepmx[], double steptl[], double xpls[], double fpls[], double gpls[],
+            int itrmcd[], double a[][], double udiag[]) {
 
         /*
 
@@ -426,7 +431,8 @@ public class Uncmin_f77 extends Object {
 
         // MINIMIZE FUNCTION
 
-        Uncmin_f77.optdrv_f77(n, x, minclass, typsiz, fscale, method, iexp, msg, ndigit, itnlim, iagflg, iahflg, dlt, gradtl, stepmx, steptl, xpls, fpls, gpls, itrmcd, a, udiag, g, p, sx, wrk0, wrk1, wrk2, wrk3);
+        Uncmin_f77.optdrv_f77(n, x, minclass, typsiz, fscale, method, iexp, msg, ndigit, itnlim, iagflg, iahflg, dlt,
+                gradtl, stepmx, steptl, xpls, fpls, gpls, itrmcd, a, udiag, g, p, sx, wrk0, wrk1, wrk2, wrk3);
 
         if (itrmcd[1] == 1) {
 
@@ -1020,7 +1026,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void dfault_f77(int n, double x[], double typsiz[], double fscale[], int method[], int iexp[], int msg[], int ndigit[], int itnlim[], int iagflg[], int iahflg[], double dlt[], double gradtl[], double stepmx[], double steptl[]) {
+    public static void dfault_f77(int n, double x[], double typsiz[], double fscale[], int method[], int iexp[],
+            int msg[], int ndigit[], int itnlim[], int iagflg[], int iahflg[], double dlt[], double gradtl[],
+            double stepmx[], double steptl[]) {
 
         /*
 
@@ -1174,8 +1182,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void dogdrv_f77(int n, double x[], double f[], double g[], double a[][], double p[], double xpls[], double fpls[], Uncmin_methods minclass, double sx[], double stepmx[], double steptl[], double dlt[], int iretcd[], boolean mxtake[], double sc[], double wrk1[], double wrk2[],
-            double wrk3[]) {
+    public static void dogdrv_f77(int n, double x[], double f[], double g[], double a[][], double p[], double xpls[],
+            double fpls[], Uncmin_methods minclass, double sx[], double stepmx[], double steptl[], double dlt[],
+            int iretcd[], boolean mxtake[], double sc[], double wrk1[], double wrk2[], double wrk3[]) {
 
         /*
 
@@ -1250,7 +1259,8 @@ public class Uncmin_f77 extends Object {
 
             // CHECK NEW POINT AND UPDATE TRUST REGION
 
-            Uncmin_f77.tregup_f77(n, x, f, g, a, minclass, sc, sx, nwtake, stepmx, steptl, dlt, iretcd, wrk3, fplsp, xpls, fpls, mxtake, 2, wrk1);
+            Uncmin_f77.tregup_f77(n, x, f, g, a, minclass, sc, sx, nwtake, stepmx, steptl, dlt, iretcd, wrk3, fplsp,
+                    xpls, fpls, mxtake, 2, wrk1);
 
         }
 
@@ -1301,7 +1311,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void dogstp_f77(int n, double g[], double a[][], double p[], double sx[], double rnwtln, double dlt[], boolean nwtake[], boolean fstdog[], double ssd[], double v[], double cln[], double eta[], double sc[], double stepmx[]) {
+    public static void dogstp_f77(int n, double g[], double a[][], double p[], double sx[], double rnwtln,
+            double dlt[], boolean nwtake[], boolean fstdog[], double ssd[], double v[], double cln[], double eta[],
+            double sc[], double stepmx[]) {
 
         /*
 
@@ -1696,7 +1708,8 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void fstofd_f77(int n, double xpls[], Uncmin_methods minclass, double fpls[], double a[][], double sx[], double rnoise, double fhat[]) {
+    public static void fstofd_f77(int n, double xpls[], Uncmin_methods minclass, double fpls[], double a[][],
+            double sx[], double rnoise, double fhat[]) {
 
         /*
 
@@ -1848,7 +1861,8 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void fstofd_f77(int n, double xpls[], Uncmin_methods minclass, double fpls[], double g[], double sx[], double rnoise) {
+    public static void fstofd_f77(int n, double xpls[], Uncmin_methods minclass, double fpls[], double g[],
+            double sx[], double rnoise) {
 
         /*
 
@@ -1992,7 +2006,8 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void grdchk_f77(int n, double x[], Uncmin_methods minclass, double f[], double g[], double typsiz[], double sx[], double fscale[], double rnf, double analtl, double gest[]) {
+    public static void grdchk_f77(int n, double x[], Uncmin_methods minclass, double f[], double g[], double typsiz[],
+            double sx[], double fscale[], double rnf, double analtl, double gest[]) {
 
         /*
 
@@ -2126,7 +2141,9 @@ public class Uncmin_f77 extends Object {
      *            Workspace
      */
 
-    public static void heschk_f77(int n, double x[], Uncmin_methods minclass, double f[], double g[], double a[][], double typsiz[], double sx[], double rnf, double analtl, int iagflg[], double udiag[], double wrk1[], double wrk2[]) {
+    public static void heschk_f77(int n, double x[], Uncmin_methods minclass, double f[], double g[], double a[][],
+            double typsiz[], double sx[], double rnf, double analtl, int iagflg[], double udiag[], double wrk1[],
+            double wrk2[]) {
 
         /*
 
@@ -2334,8 +2351,10 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void hookdr_f77(int n, double x[], double f[], double g[], double a[][], double udiag[], double p[], double xpls[], double fpls[], Uncmin_methods minclass, double sx[], double stepmx[], double steptl[], double dlt[], int iretcd[], boolean mxtake[], double amu[], double dltp[],
-            double phi[], double phip0[], double sc[], double xplsp[], double wrk0[], double epsm, int itncnt[]) {
+    public static void hookdr_f77(int n, double x[], double f[], double g[], double a[][], double udiag[], double p[],
+            double xpls[], double fpls[], Uncmin_methods minclass, double sx[], double stepmx[], double steptl[],
+            double dlt[], int iretcd[], boolean mxtake[], double amu[], double dltp[], double phi[], double phip0[],
+            double sc[], double xplsp[], double wrk0[], double epsm, int itncnt[]) {
 
         /*
 
@@ -2453,13 +2472,15 @@ public class Uncmin_f77 extends Object {
 
             // FIND NEW STEP BY MORE-HEBDON ALGORITHM
 
-            Uncmin_f77.hookst_f77(n, g, a, udiag, p, sx, rnwtln, dlt, amu, dltp, phi, phip0, fstime, sc, nwtake, wrk0, epsm);
+            Uncmin_f77.hookst_f77(n, g, a, udiag, p, sx, rnwtln, dlt, amu, dltp, phi, phip0, fstime, sc, nwtake, wrk0,
+                    epsm);
 
             dltp[1] = dlt[1];
 
             // CHECK NEW POINT AND UPDATE TRUST REGION
 
-            Uncmin_f77.tregup_f77(n, x, f, g, a, minclass, sc, sx, nwtake, stepmx, steptl, dlt, iretcd, xplsp, fplsp, xpls, fpls, mxtake, 3, udiag);
+            Uncmin_f77.tregup_f77(n, x, f, g, a, minclass, sc, sx, nwtake, stepmx, steptl, dlt, iretcd, xplsp, fplsp,
+                    xpls, fpls, mxtake, 3, udiag);
 
         }
 
@@ -2515,7 +2536,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void hookst_f77(int n, double g[], double a[][], double udiag[], double p[], double sx[], double rnwtln, double dlt[], double amu[], double dltp[], double phi[], double phip0[], boolean fstime[], double sc[], boolean nwtake[], double wrk0[], double epsm) {
+    public static void hookst_f77(int n, double g[], double a[][], double udiag[], double p[], double sx[],
+            double rnwtln, double dlt[], double amu[], double dltp[], double phi[], double phip0[], boolean fstime[],
+            double sc[], boolean nwtake[], double wrk0[], double epsm) {
 
         /*
 
@@ -2917,7 +2940,8 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void lnsrch_f77(int n, double x[], double f[], double g[], double p[], double xpls[], double fpls[], Uncmin_methods minclass, boolean mxtake[], int iretcd[], double stepmx[], double steptl[], double sx[]) {
+    public static void lnsrch_f77(int n, double x[], double f[], double g[], double p[], double xpls[], double fpls[],
+            Uncmin_methods minclass, boolean mxtake[], int iretcd[], double stepmx[], double steptl[], double sx[]) {
 
         /*
 
@@ -3350,7 +3374,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void optchk_f77(int n, double x[], double typsiz[], double sx[], double fscale[], double gradtl[], int itnlim[], int ndigit[], double epsm, double dlt[], int method[], int iexp[], int iagflg[], int iahflg[], double stepmx[], int msg[]) {
+    public static void optchk_f77(int n, double x[], double typsiz[], double sx[], double fscale[], double gradtl[],
+            int itnlim[], int ndigit[], double epsm, double dlt[], int method[], int iexp[], int iagflg[],
+            int iahflg[], double stepmx[], int msg[]) {
 
         /*
 
@@ -3634,8 +3660,11 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void optdrv_f77(int n, double x[], Uncmin_methods minclass, double typsiz[], double fscale[], int method[], int iexp[], int msg[], int ndigit[], int itnlim[], int iagflg[], int iahflg[], double dlt[], double gradtl[], double stepmx[], double steptl[], double xpls[], double fpls[],
-            double gpls[], int itrmcd[], double a[][], double udiag[], double g[], double p[], double sx[], double wrk0[], double wrk1[], double wrk2[], double wrk3[]) {
+    public static void optdrv_f77(int n, double x[], Uncmin_methods minclass, double typsiz[], double fscale[],
+            int method[], int iexp[], int msg[], int ndigit[], int itnlim[], int iagflg[], int iahflg[], double dlt[],
+            double gradtl[], double stepmx[], double steptl[], double xpls[], double fpls[], double gpls[],
+            int itrmcd[], double a[][], double udiag[], double g[], double p[], double sx[], double wrk0[],
+            double wrk1[], double wrk2[], double wrk3[]) {
 
         /*
 
@@ -3752,7 +3781,8 @@ public class Uncmin_f77 extends Object {
 
         epsm = 1.12e-16;
 
-        Uncmin_f77.optchk_f77(n, x, typsiz, sx, fscale, gradtl, itnlim, ndigit, epsm, dlt, method, iexp, iagflg, iahflg, stepmx, msg);
+        Uncmin_f77.optchk_f77(n, x, typsiz, sx, fscale, gradtl, itnlim, ndigit, epsm, dlt, method, iexp, iagflg,
+                iahflg, stepmx, msg);
 
         //   removed because don't want to stop if msg = -2
         //   and other negative messages are now handled where they are generated
@@ -3889,7 +3919,8 @@ public class Uncmin_f77 extends Object {
 
         }
 
-        Uncmin_f77.optstp_f77(n, x, f, g, wrk1, itncnt, icscmx, itrmcd, gradtl, steptl, sx, fscale, itnlim, iretcd, mxtake, msg);
+        Uncmin_f77.optstp_f77(n, x, f, g, wrk1, itncnt, icscmx, itrmcd, gradtl, steptl, sx, fscale, itnlim, iretcd,
+                mxtake, msg);
 
         if (itrmcd[1] != 0) {
 
@@ -3937,7 +3968,8 @@ public class Uncmin_f77 extends Object {
 
                     } else {
 
-                        Uncmin_f77.heschk_f77(n, x, minclass, f, g, a, typsiz, sx, rnf, analtl, iagflg, udiag, wrk1, wrk2);
+                        Uncmin_f77.heschk_f77(n, x, minclass, f, g, a, typsiz, sx, rnf, analtl, iagflg, udiag, wrk1,
+                                wrk2);
 
                         // HESCHK EVALUATES minclass.hessian AND CHECKS IT AGAINST THE FINITE
                         // DIFFERENCE HESSIAN WHICH IT CALCULATES BY CALLING FSTOFD
@@ -4003,11 +4035,13 @@ public class Uncmin_f77 extends Object {
 
                 } else if (method[1] == 2) {
 
-                    Uncmin_f77.dogdrv_f77(n, x, f, g, a, p, xpls, fpls, minclass, sx, stepmx, steptl, dlt, iretcd, mxtake, wrk0, wrk1, wrk2, wrk3);
+                    Uncmin_f77.dogdrv_f77(n, x, f, g, a, p, xpls, fpls, minclass, sx, stepmx, steptl, dlt, iretcd,
+                            mxtake, wrk0, wrk1, wrk2, wrk3);
 
                 } else {
 
-                    Uncmin_f77.hookdr_f77(n, x, f, g, a, udiag, p, xpls, fpls, minclass, sx, stepmx, steptl, dlt, iretcd, mxtake, amu, dltp, phi, phip0, wrk0, wrk1, wrk2, epsm, itncnt);
+                    Uncmin_f77.hookdr_f77(n, x, f, g, a, udiag, p, xpls, fpls, minclass, sx, stepmx, steptl, dlt,
+                            iretcd, mxtake, amu, dltp, phi, phip0, wrk0, wrk1, wrk2, epsm, itncnt);
 
                 }
 
@@ -4056,7 +4090,8 @@ public class Uncmin_f77 extends Object {
 
                             Uncmin_f77.lltslv_f77(n, a, p, wrk1);
 
-                            Uncmin_f77.dogdrv_f77(n, x, f, g, a, p, xpls, fpls, minclass, sx, stepmx, steptl, dlt, iretcd, mxtake, wrk0, wrk1, wrk2, wrk3);
+                            Uncmin_f77.dogdrv_f77(n, x, f, g, a, p, xpls, fpls, minclass, sx, stepmx, steptl, dlt,
+                                    iretcd, mxtake, wrk0, wrk1, wrk2, wrk3);
 
                         } else {
 
@@ -4077,7 +4112,8 @@ public class Uncmin_f77 extends Object {
 
                             Uncmin_f77.lltslv_f77(n, a, p, wrk1);
 
-                            Uncmin_f77.hookdr_f77(n, x, f, g, a, udiag, p, xpls, fpls, minclass, sx, stepmx, steptl, dlt, iretcd, mxtake, amu, dltp, phi, phip0, wrk0, wrk1, wrk2, epsm, itncnt);
+                            Uncmin_f77.hookdr_f77(n, x, f, g, a, udiag, p, xpls, fpls, minclass, sx, stepmx, steptl,
+                                    dlt, iretcd, mxtake, amu, dltp, phi, phip0, wrk0, wrk1, wrk2, epsm, itncnt);
 
                         }
 
@@ -4117,7 +4153,8 @@ public class Uncmin_f77 extends Object {
 
                 // CHECK WHETHER STOPPING CRITERIA SATISFIED
 
-                Uncmin_f77.optstp_f77(n, xpls, fpls, gpls, x, itncnt, icscmx, itrmcd, gradtl, steptl, sx, fscale, itnlim, iretcd, mxtake, msg);
+                Uncmin_f77.optstp_f77(n, xpls, fpls, gpls, x, itncnt, icscmx, itrmcd, gradtl, steptl, sx, fscale,
+                        itnlim, iretcd, mxtake, msg);
 
                 if (itrmcd[1] == 0) {
 
@@ -4127,11 +4164,13 @@ public class Uncmin_f77 extends Object {
 
                         if (method[1] == 3) {
 
-                            Uncmin_f77.secunf_f77(n, x, g, a, udiag, xpls, gpls, epsm, itncnt, rnf, iagflg, noupdt, wrk1, wrk2, wrk3);
+                            Uncmin_f77.secunf_f77(n, x, g, a, udiag, xpls, gpls, epsm, itncnt, rnf, iagflg, noupdt,
+                                    wrk1, wrk2, wrk3);
 
                         } else {
 
-                            Uncmin_f77.secfac_f77(n, x, g, a, xpls, gpls, epsm, itncnt, rnf, iagflg, noupdt, wrk0, wrk1, wrk2, wrk3);
+                            Uncmin_f77.secfac_f77(n, x, g, a, xpls, gpls, epsm, itncnt, rnf, iagflg, noupdt, wrk0,
+                                    wrk1, wrk2, wrk3);
 
                         }
 
@@ -4259,7 +4298,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void optstp_f77(int n, double xpls[], double fpls[], double gpls[], double x[], int itncnt[], int icscmx[], int itrmcd[], double gradtl[], double steptl[], double sx[], double fscale[], int itnlim[], int iretcd[], boolean mxtake[], int msg[]) {
+    public static void optstp_f77(int n, double xpls[], double fpls[], double gpls[], double x[], int itncnt[],
+            int icscmx[], int itrmcd[], double gradtl[], double steptl[], double sx[], double fscale[], int itnlim[],
+            int iretcd[], boolean mxtake[], int msg[]) {
         /*
 
         Here is a copy of the optstp FORTRAN documentation:
@@ -4723,7 +4764,8 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void result_f77(int n, double x[], double f[], double g[], double a[][], double p[], int itncnt[], int iflg) {
+    public static void result_f77(int n, double x[], double f[], double g[], double a[][], double p[], int itncnt[],
+            int iflg) {
 
         /*
 
@@ -5031,7 +5073,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void secfac_f77(int n, double x[], double g[], double a[][], double xpls[], double gpls[], double epsm, int itncnt[], double rnf, int iagflg[], boolean noupdt[], double s[], double y[], double u[], double w[]) {
+    public static void secfac_f77(int n, double x[], double g[], double a[][], double xpls[], double gpls[],
+            double epsm, int itncnt[], double rnf, int iagflg[], boolean noupdt[], double s[], double y[], double u[],
+            double w[]) {
 
         /*
 
@@ -5259,7 +5303,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void secunf_f77(int n, double x[], double g[], double a[][], double udiag[], double xpls[], double gpls[], double epsm, int itncnt[], double rnf, int iagflg[], boolean noupdt[], double s[], double y[], double t[]) {
+    public static void secunf_f77(int n, double x[], double g[], double a[][], double udiag[], double xpls[],
+            double gpls[], double epsm, int itncnt[], double rnf, int iagflg[], boolean noupdt[], double s[],
+            double y[], double t[]) {
 
         /*
 
@@ -5462,7 +5508,8 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void sndofd_f77(int n, double xpls[], Uncmin_methods minclass, double fpls[], double a[][], double sx[], double rnoise, double stepsz[], double anbr[]) {
+    public static void sndofd_f77(int n, double xpls[], Uncmin_methods minclass, double fpls[], double a[][],
+            double sx[], double rnoise, double stepsz[], double anbr[]) {
 
         /*
 
@@ -5641,8 +5688,9 @@ public class Uncmin_f77 extends Object {
      * 
      */
 
-    public static void tregup_f77(int n, double x[], double f[], double g[], double a[][], Uncmin_methods minclass, double sc[], double sx[], boolean nwtake[], double stepmx[], double steptl[], double dlt[], int iretcd[], double xplsp[], double fplsp[], double xpls[], double fpls[],
-            boolean mxtake[], int method, double udiag[]) {
+    public static void tregup_f77(int n, double x[], double f[], double g[], double a[][], Uncmin_methods minclass,
+            double sc[], double sx[], boolean nwtake[], double stepmx[], double steptl[], double dlt[], int iretcd[],
+            double xplsp[], double fplsp[], double xpls[], double fpls[], boolean mxtake[], int method, double udiag[]) {
 
         /*
 
@@ -5820,7 +5868,8 @@ public class Uncmin_f77 extends Object {
 
                 dltfp = slp + dltfp / 2.0;
 
-                if ((iretcd[1] != 2) && (Math.abs(dltfp - dltf) <= .1 * Math.abs(dltf)) && (!nwtake[1]) && (dlt[1] <= .99 * stepmx[1])) {
+                if ((iretcd[1] != 2) && (Math.abs(dltfp - dltf) <= .1 * Math.abs(dltf)) && (!nwtake[1])
+                        && (dlt[1] <= .99 * stepmx[1])) {
 
                     // DOUBLE TRUST REGION AND CONTINUE GLOBAL STEP
 

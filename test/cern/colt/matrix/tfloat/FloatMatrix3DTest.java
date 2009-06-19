@@ -158,7 +158,7 @@ public abstract class FloatMatrix3DTest extends TestCase {
     }
 
     public void testAssignFloatArray() {
-        float[] expected = new float[A.size()];
+        float[] expected = new float[(int) A.size()];
         for (int i = 0; i < A.size(); i++) {
             expected[i] = (float) Math.random();
         }
@@ -533,7 +533,8 @@ public abstract class FloatMatrix3DTest extends TestCase {
     public void testViewSelectionIntArrayIntArrayIntArray() {
         int[] sliceIndexes = new int[] { NSLICES / 2, NSLICES / 3 };
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2, NCOLUMNS - 1 };
+        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2,
+                NCOLUMNS - 1 };
         FloatMatrix3D B = A.viewSelection(sliceIndexes, rowIndexes, colIndexes);
         assertEquals(sliceIndexes.length, B.slices());
         assertEquals(rowIndexes.length, B.rows());

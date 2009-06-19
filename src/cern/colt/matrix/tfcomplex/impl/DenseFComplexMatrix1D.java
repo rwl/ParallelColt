@@ -19,35 +19,25 @@ import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix3D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
+import cern.jet.math.tfcomplex.FComplex;
+import cern.jet.math.tfcomplex.FComplexFunctions;
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  * Dense 1-d matrix (aka <i>vector</i>) holding <tt>complex</tt> elements.
- * <b>Implementation:</b>
  * <p>
  * Internally holds one single contiguous one-dimensional array. Complex data is
  * represented by 2 float values in sequence, i.e. elements[zero + 2 * k *
  * stride] constitute real part and elements[zero + 2 * k * stride + 1]
  * constitute imaginary part (k=0,...,size()-1).
- * <p>
- * <b>Memory requirements:</b>
- * <p>
- * <tt>memory [bytes] = 8*2*size()</tt>. Thus, a 1000000 matrix uses 16 MB.
- * <p>
- * <b>Time complexity:</b>
- * <p>
- * <tt>O(1)</tt> (i.e. constant time) for the basic operations <tt>get</tt>,
- * <tt>getQuick</tt>, <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt>,
- * <p>
- * 
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 
  */
 public class DenseFComplexMatrix1D extends FComplexMatrix1D {
 
-    private static final long serialVersionUID = 7295427570770814934L;
+    private static final long serialVersionUID = 1L;
 
     private FloatFFT_1D fft;
 
@@ -85,7 +75,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
      *             if <tt>size<0</tt>.
      */
     public DenseFComplexMatrix1D(FloatMatrix1D realPart) {
-        this(realPart.size());
+        this((int) realPart.size());
         assignReal(realPart);
     }
 
@@ -105,7 +95,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
     }
 
     /**
-     * Constructs a matrix view with the given parameters.
+     * Constructs a matrix with the given parameters.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -116,16 +106,20 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
      * @param stride
      *            the number of indexes between any two elements, i.e.
      *            <tt>index(i+1)-index(i)</tt>.
+     * @param isNoView
+     *            if false then the view is constructed
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    public DenseFComplexMatrix1D(int size, float[] elements, int zero, int stride) {
+    public DenseFComplexMatrix1D(int size, float[] elements, int zero, int stride, boolean isNoView) {
         setUp(size, zero, stride);
         this.elements = elements;
-        this.isNoView = false;
+        this.isNoView = isNoView;
     }
 
-    public float[] aggregate(final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr, final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
+    @Override
+    public float[] aggregate(final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
+            final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
         float[] b = new float[2];
         if (size == 0) {
             b[0] = Float.NaN;
@@ -133,24 +127,20 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             return b;
         }
         float[] a = null;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
+
                     public float[] call() throws Exception {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         float[] a = f.apply(new float[] { elements[idx], elements[idx + 1] });
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             a = aggr.apply(a, f.apply(new float[] { elements[idx], elements[idx + 1] }));
                         }
@@ -170,7 +160,10 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return a;
     }
 
-    public float[] aggregate(final FComplexMatrix1D other, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
+    @Override
+    public float[] aggregate(final FComplexMatrix1D other,
+            final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
+            final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
         if (!(other instanceof DenseFComplexMatrix1D)) {
             return super.aggregate(other, aggr, f);
         }
@@ -185,28 +178,25 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         final int strideOther = other.stride();
         final float[] elemsOther = (float[]) other.elements();
         float[] a = null;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        float[] a = f.apply(new float[] { elements[idx], elements[idx + 1] }, new float[] { elemsOther[idxOther], elemsOther[idxOther + 1] });
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        float[] a = f.apply(new float[] { elements[idx], elements[idx + 1] }, new float[] {
+                                elemsOther[idxOther], elemsOther[idxOther + 1] });
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             idxOther += strideOther;
-                            a = aggr.apply(a, f.apply(new float[] { elements[idx], elements[idx + 1] }, new float[] { elemsOther[idxOther], elemsOther[idxOther + 1] }));
+                            a = aggr.apply(a, f.apply(new float[] { elements[idx], elements[idx + 1] }, new float[] {
+                                    elemsOther[idxOther], elemsOther[idxOther + 1] }));
                         }
                         return a;
                     }
@@ -216,47 +206,56 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         } else {
             int idx = zero;
             int idxOther = zeroOther;
-            a = f.apply(new float[] { elements[zero], elements[zero + 1] }, new float[] { elemsOther[zeroOther], elemsOther[zeroOther + 1] });
+            a = f.apply(new float[] { elements[zero], elements[zero + 1] }, new float[] { elemsOther[zeroOther],
+                    elemsOther[zeroOther + 1] });
             for (int i = 1; i < size; i++) {
                 idx += stride;
                 idxOther += strideOther;
-                a = aggr.apply(a, f.apply(new float[] { elements[idx], elements[idx + 1] }, new float[] { elemsOther[idxOther], elemsOther[idxOther + 1] }));
+                a = aggr.apply(a, f.apply(new float[] { elements[idx], elements[idx + 1] }, new float[] {
+                        elemsOther[idxOther], elemsOther[idxOther + 1] }));
             }
         }
         return a;
     }
 
+    @Override
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
         if (this.elements == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            if (function instanceof cern.jet.math.tfcomplex.FComplexMult) {
-                float[] multiplicator = ((cern.jet.math.tfcomplex.FComplexMult) function).multiplicator;
-                if (multiplicator[0] == 1 && multiplicator[1] == 0)
-                    return this;
-            }
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        if (function instanceof cern.jet.math.tfcomplex.FComplexMult) {
+            float[] multiplicator = ((cern.jet.math.tfcomplex.FComplexMult) function).multiplicator;
+            if (multiplicator[0] == 1 && multiplicator[1] == 0)
+                return this;
+        }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] tmp = new float[2];
-                        int idx = zero + startidx * stride;
-                        for (int k = startidx; k < stopidx; k++) {
-                            tmp[0] = elements[idx];
-                            tmp[1] = elements[idx + 1];
-                            tmp = function.apply(tmp);
-                            elements[idx] = tmp[0];
-                            elements[idx + 1] = tmp[1];
-                            idx += stride;
+                        int idx = zero + firstIdx * stride;
+                        if (function instanceof cern.jet.math.tfcomplex.FComplexMult) {
+                            float[] multiplicator = ((cern.jet.math.tfcomplex.FComplexMult) function).multiplicator;
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                elements[idx] = elements[idx] * multiplicator[0] - elements[idx + 1] * multiplicator[1];
+                                elements[idx + 1] = elements[idx + 1] * multiplicator[0] + elements[idx]
+                                        * multiplicator[1];
+                                idx += stride;
+                            }
+                        } else {
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                tmp[0] = elements[idx];
+                                tmp[1] = elements[idx + 1];
+                                tmp = function.apply(tmp);
+                                elements[idx] = tmp[0];
+                                elements[idx + 1] = tmp[1];
+                                idx += stride;
+                            }
                         }
                     }
                 });
@@ -265,37 +264,44 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         } else {
             float[] tmp = new float[2];
             int idx = zero;
-            for (int k = 0; k < size; k++) {
-                tmp[0] = elements[idx];
-                tmp[1] = elements[idx + 1];
-                tmp = function.apply(tmp);
-                elements[idx] = tmp[0];
-                elements[idx + 1] = tmp[1];
-                idx += stride;
+            if (function instanceof cern.jet.math.tfcomplex.FComplexMult) {
+                float[] multiplicator = ((cern.jet.math.tfcomplex.FComplexMult) function).multiplicator;
+                for (int k = 0; k < size; k++) {
+                    elements[idx] = elements[idx] * multiplicator[0] - elements[idx + 1] * multiplicator[1];
+                    elements[idx + 1] = elements[idx + 1] * multiplicator[0] + elements[idx] * multiplicator[1];
+                    idx += stride;
+                }
+            } else {
+                for (int k = 0; k < size; k++) {
+                    tmp[0] = elements[idx];
+                    tmp[1] = elements[idx + 1];
+                    tmp = function.apply(tmp);
+                    elements[idx] = tmp[0];
+                    elements[idx + 1] = tmp[1];
+                    idx += stride;
+                }
             }
         }
         return this;
     }
 
-    public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+    @Override
+    public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond,
+            final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         float[] elem = new float[2];
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem[0] = elements[idx];
                             elem[1] = elements[idx + 1];
                             if (cond.apply(elem) == true) {
@@ -326,24 +332,21 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
+    @Override
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         float[] elem = new float[2];
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem[0] = elements[idx];
                             elem[1] = elements[idx + 1];
                             if (cond.apply(elem) == true) {
@@ -372,52 +375,86 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
+    @Override
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexRealFunction function) {
         if (this.elements == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp = new float[2];
-                        int idx = zero + startidx * stride;
-                        for (int k = startidx; k < stopidx; k++) {
-                            tmp[0] = elements[idx];
-                            tmp[1] = elements[idx + 1];
-                            tmp[0] = function.apply(tmp);
-                            elements[idx] = tmp[0];
-                            elements[idx + 1] = 0;
-                            idx += stride;
+                        int idx = zero + firstIdx * stride;
+                        if (function == FComplexFunctions.abs) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                float absX = Math.abs(elements[idx]);
+                                float absY = Math.abs(elements[idx + 1]);
+                                if (absX == 0.0 && absY == 0.0) {
+                                    elements[idx] = 0;
+                                } else if (absX >= absY) {
+                                    float d = elements[idx + 1] / elements[idx];
+                                    elements[idx] = absX * (float) Math.sqrt(1.0 + d * d);
+                                } else {
+                                    float d = elements[idx] / elements[idx + 1];
+                                    elements[idx] = absY * (float) Math.sqrt(1.0 + d * d);
+                                }
+                                elements[idx + 1] = 0;
+                                idx += stride;
+                            }
+                        } else {
+                            float[] tmp = new float[2];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                tmp[0] = elements[idx];
+                                tmp[1] = elements[idx + 1];
+                                tmp[0] = function.apply(tmp);
+                                elements[idx] = tmp[0];
+                                elements[idx + 1] = 0;
+                                idx += stride;
+                            }
                         }
                     }
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp = new float[2];
             int idx = zero;
-            for (int k = 0; k < size; k++) {
-                tmp[0] = elements[idx];
-                tmp[1] = elements[idx + 1];
-                tmp[0] = function.apply(tmp);
-                elements[idx] = tmp[0];
-                elements[idx + 1] = 0;
-                idx += stride;
+            if (function == FComplexFunctions.abs) {
+                for (int k = 0; k < size; k++) {
+                    float absX = Math.abs(elements[idx]);
+                    float absY = Math.abs(elements[idx + 1]);
+                    if (absX == 0.0 && absY == 0.0) {
+                        elements[idx] = 0;
+                    } else if (absX >= absY) {
+                        float d = elements[idx + 1] / elements[idx];
+                        elements[idx] = absX * (float) Math.sqrt(1.0 + d * d);
+                    } else {
+                        float d = elements[idx] / elements[idx + 1];
+                        elements[idx] = absY * (float) Math.sqrt(1.0 + d * d);
+                    }
+                    elements[idx + 1] = 0;
+                    idx += stride;
+                }
+            } else {
+                float[] tmp = new float[2];
+                for (int k = 0; k < size; k++) {
+                    tmp[0] = elements[idx];
+                    tmp[1] = elements[idx + 1];
+                    tmp[0] = function.apply(tmp);
+                    elements[idx] = tmp[0];
+                    elements[idx + 1] = 0;
+                    idx += stride;
+                }
             }
         }
         return this;
     }
 
+    @Override
     public FComplexMatrix1D assign(FComplexMatrix1D source) {
         if (!(source instanceof DenseFComplexMatrix1D)) {
             return super.assign(source);
@@ -444,23 +481,19 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         final int strideOther = other.stride;
         final int zeroOther = (int) other.index(0);
 
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elements[idx] = elemsOther[idxOther];
                             elements[idx + 1] = elemsOther[idxOther + 1];
                             idx += stride;
@@ -483,7 +516,9 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    public FComplexMatrix1D assign(FComplexMatrix1D y, final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction function) {
+    @Override
+    public FComplexMatrix1D assign(FComplexMatrix1D y,
+            final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction function) {
         if (!(y instanceof DenseFComplexMatrix1D)) {
             return super.assign(y, function);
         }
@@ -494,76 +529,207 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
 
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        float[] tmp1 = new float[2];
-                        float[] tmp2 = new float[2];
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
-                            tmp1[0] = elements[idx];
-                            tmp1[1] = elements[idx + 1];
-                            tmp2[0] = elemsOther[idxOther];
-                            tmp2[1] = elemsOther[idxOther + 1];
-                            tmp1 = function.apply(tmp1, tmp2);
-                            elements[idx] = tmp1[0];
-                            elements[idx + 1] = tmp1[1];
-                            idx += stride;
-                            idxOther += strideOther;
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        if (function == cern.jet.math.tfcomplex.FComplexFunctions.plus) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                elements[idx] += elemsOther[idxOther];
+                                elements[idx + 1] += elemsOther[idxOther + 1];
+                                idx += stride;
+                                idxOther += strideOther;
+                            }
+                        } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.minus) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                elements[idx] -= elemsOther[idxOther];
+                                elements[idx + 1] -= elemsOther[idxOther + 1];
+                                idx += stride;
+                                idxOther += strideOther;
+                            }
+                        } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.div) {
+                            float[] tmp = new float[2];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                float re = elemsOther[idxOther];
+                                float im = elemsOther[idxOther + 1];
+                                float scalar;
+                                if (Math.abs(re) >= Math.abs(im)) {
+                                    scalar = (float) (1.0 / (re + im * (im / re)));
+                                    tmp[0] = scalar * (elements[idx] + elements[idx + 1] * (im / re));
+                                    tmp[1] = scalar * (elements[idx + 1] - elements[idx] * (im / re));
+                                } else {
+                                    scalar = (float) (1.0 / (re * (re / im) + im));
+                                    tmp[0] = scalar * (elements[idx] * (re / im) + elements[idx + 1]);
+                                    tmp[1] = scalar * (elements[idx + 1] * (re / im) - elements[idx]);
+                                }
+                                elements[idx] = tmp[0];
+                                elements[idx + 1] = tmp[1];
+                                idx += stride;
+                                idxOther += strideOther;
+                            }
+                        } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.mult) {
+                            float[] tmp = new float[2];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                tmp[0] = elements[idx] * elemsOther[idxOther] - elements[idx + 1]
+                                        * elemsOther[idxOther + 1];
+                                tmp[1] = elements[idx + 1] * elemsOther[idxOther] + elements[idx]
+                                        * elemsOther[idxOther + 1];
+                                elements[idx] = tmp[0];
+                                elements[idx + 1] = tmp[1];
+                                idx += stride;
+                                idxOther += strideOther;
+                            }
+                        } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjFirst) {
+                            float[] tmp = new float[2];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                tmp[0] = elements[idx] * elemsOther[idxOther] + elements[idx + 1]
+                                        * elemsOther[idxOther + 1];
+                                tmp[1] = -elements[idx + 1] * elemsOther[idxOther] + elements[idx]
+                                        * elemsOther[idxOther + 1];
+                                elements[idx] = tmp[0];
+                                elements[idx + 1] = tmp[1];
+                                idx += stride;
+                                idxOther += strideOther;
+                            }
+                        } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjSecond) {
+                            float[] tmp = new float[2];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                tmp[0] = elements[idx] * elemsOther[idxOther] + elements[idx + 1]
+                                        * elemsOther[idxOther + 1];
+                                tmp[1] = elements[idx + 1] * elemsOther[idxOther] - elements[idx]
+                                        * elemsOther[idxOther + 1];
+                                elements[idx] = tmp[0];
+                                elements[idx + 1] = tmp[1];
+                                idx += stride;
+                                idxOther += strideOther;
+                            }
+                        } else {
+                            float[] tmp1 = new float[2];
+                            float[] tmp2 = new float[2];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                tmp1[0] = elements[idx];
+                                tmp1[1] = elements[idx + 1];
+                                tmp2[0] = elemsOther[idxOther];
+                                tmp2[1] = elemsOther[idxOther + 1];
+                                tmp1 = function.apply(tmp1, tmp2);
+                                elements[idx] = tmp1[0];
+                                elements[idx + 1] = tmp1[1];
+                                idx += stride;
+                                idxOther += strideOther;
+                            }
                         }
                     }
                 });
             }
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
-            float[] tmp1 = new float[2];
-            float[] tmp2 = new float[2];
             int idx = zero;
             int idxOther = zeroOther;
-            for (int k = 0; k < size; k++) {
-                tmp1[0] = elements[idx];
-                tmp1[1] = elements[idx + 1];
-                tmp2[0] = elemsOther[idxOther];
-                tmp2[1] = elemsOther[idxOther + 1];
-                tmp1 = function.apply(tmp1, tmp2);
-                elements[idx] = tmp1[0];
-                elements[idx + 1] = tmp1[1];
-                idx += stride;
-                idxOther += strideOther;
+            if (function == cern.jet.math.tfcomplex.FComplexFunctions.plus) {
+                for (int k = 0; k < size; k++) {
+                    elements[idx] += elemsOther[idxOther];
+                    elements[idx + 1] += elemsOther[idxOther + 1];
+                    idx += stride;
+                    idxOther += strideOther;
+                }
+            } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.minus) {
+                for (int k = 0; k < size; k++) {
+                    elements[idx] -= elemsOther[idxOther];
+                    elements[idx + 1] -= elemsOther[idxOther + 1];
+                    idx += stride;
+                    idxOther += strideOther;
+                }
+            } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.div) {
+                float[] tmp = new float[2];
+                for (int k = 0; k < size; k++) {
+                    float re = elemsOther[idxOther];
+                    float im = elemsOther[idxOther + 1];
+                    float scalar;
+                    if (Math.abs(re) >= Math.abs(im)) {
+                        scalar = (float) (1.0 / (re + im * (im / re)));
+                        tmp[0] = scalar * (elements[idx] + elements[idx + 1] * (im / re));
+                        tmp[1] = scalar * (elements[idx + 1] - elements[idx] * (im / re));
+                    } else {
+                        scalar = (float) (1.0 / (re * (re / im) + im));
+                        tmp[0] = scalar * (elements[idx] * (re / im) + elements[idx + 1]);
+                        tmp[1] = scalar * (elements[idx + 1] * (re / im) - elements[idx]);
+                    }
+                    elements[idx] = tmp[0];
+                    elements[idx + 1] = tmp[1];
+                    idx += stride;
+                    idxOther += strideOther;
+                }
+            } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.mult) {
+                float[] tmp = new float[2];
+                for (int k = 0; k < size; k++) {
+                    tmp[0] = elements[idx] * elemsOther[idxOther] - elements[idx + 1] * elemsOther[idxOther + 1];
+                    tmp[1] = elements[idx + 1] * elemsOther[idxOther] + elements[idx] * elemsOther[idxOther + 1];
+                    elements[idx] = tmp[0];
+                    elements[idx + 1] = tmp[1];
+                    idx += stride;
+                    idxOther += strideOther;
+                }
+            } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjFirst) {
+                float[] tmp = new float[2];
+                for (int k = 0; k < size; k++) {
+                    tmp[0] = elements[idx] * elemsOther[idxOther] + elements[idx + 1] * elemsOther[idxOther + 1];
+                    tmp[1] = -elements[idx + 1] * elemsOther[idxOther] + elements[idx] * elemsOther[idxOther + 1];
+                    elements[idx] = tmp[0];
+                    elements[idx + 1] = tmp[1];
+                    idx += stride;
+                    idxOther += strideOther;
+                }
+            } else if (function == cern.jet.math.tfcomplex.FComplexFunctions.multConjSecond) {
+                float[] tmp = new float[2];
+                for (int k = 0; k < size; k++) {
+                    tmp[0] = elements[idx] * elemsOther[idxOther] + elements[idx + 1] * elemsOther[idxOther + 1];
+                    tmp[1] = elements[idx + 1] * elemsOther[idxOther] - elements[idx] * elemsOther[idxOther + 1];
+                    elements[idx] = tmp[0];
+                    elements[idx + 1] = tmp[1];
+                    idx += stride;
+                    idxOther += strideOther;
+                }
+            } else {
+                float[] tmp1 = new float[2];
+                float[] tmp2 = new float[2];
+                for (int k = 0; k < size; k++) {
+                    tmp1[0] = elements[idx];
+                    tmp1[1] = elements[idx + 1];
+                    tmp2[0] = elemsOther[idxOther];
+                    tmp2[1] = elemsOther[idxOther + 1];
+                    tmp1 = function.apply(tmp1, tmp2);
+                    elements[idx] = tmp1[0];
+                    elements[idx + 1] = tmp1[1];
+                    idx += stride;
+                    idxOther += strideOther;
+                }
             }
         }
         return this;
     }
 
+    @Override
     public FComplexMatrix1D assign(final float re, final float im) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elements[idx] = re;
                             elements[idx + 1] = im;
                             idx += stride;
@@ -583,6 +749,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
+    @Override
     public FComplexMatrix1D assign(float[] values) {
         if (isNoView) {
             if (values.length != 2 * size)
@@ -594,6 +761,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
+    @Override
     public FComplexMatrix1D assignImaginary(final FloatMatrix1D other) {
         if (!(other instanceof DenseFloatMatrix1D)) {
             return super.assignImaginary(other);
@@ -602,24 +770,19 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final float[] elemsOther = (float[]) other.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int i = startidx; i < stopidx; i++) {
-                            //                            elements[idx] = 0;
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elements[idx + 1] = elemsOther[idxOther];
                             idx += stride;
                             idxOther += strideOther;
@@ -632,7 +795,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             int idx = zero;
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
-                //                elements[idx] = 0;
                 elements[idx + 1] = elemsOther[idxOther];
                 idx += stride;
                 idxOther += strideOther;
@@ -641,6 +803,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
+    @Override
     public FComplexMatrix1D assignReal(final FloatMatrix1D other) {
         if (!(other instanceof DenseFloatMatrix1D)) {
             return super.assignReal(other);
@@ -649,25 +812,20 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
         final float[] elemsOther = (float[]) other.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elements[idx] = elemsOther[idxOther];
-                            //                            elements[idx + 1] = 0;
                             idx += stride;
                             idxOther += strideOther;
                         }
@@ -680,7 +838,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             int idxOther = zeroOther;
             for (int i = 0; i < size; i++) {
                 elements[idx] = elemsOther[idxOther];
-                //                elements[idx + 1] = 0;
                 idx += stride;
                 idxOther += strideOther;
             }
@@ -694,12 +851,11 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
      * number.
      */
     public void fft() {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (fft == null) {
             fft = new FloatFFT_1D(size);
         }
-
         if (isNoView) {
             fft.complexForward(elements);
         } else {
@@ -707,35 +863,33 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             fft.complexForward((float[]) copy.elements());
             this.assign((float[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
+    @Override
     public float[] elements() {
         return elements;
     }
 
+    @Override
     public FloatMatrix1D getImaginaryPart() {
         final DenseFloatMatrix1D Im = new DenseFloatMatrix1D(size);
-        final float[] elemsOther = (float[]) Im.elements();
+        final float[] elemsOther = Im.elements();
         final int zeroOther = (int) Im.index(0);
         final int strideOther = Im.stride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elemsOther[idxOther] = elements[idx + 1];
                             idx += stride;
                             idxOther += strideOther;
@@ -756,10 +910,11 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return Im;
     }
 
+    @Override
     public void getNonZeros(final IntArrayList indexList, final ArrayList<float[]> valueList) {
         indexList.clear();
         valueList.clear();
-        int s = size();
+        int s = (int) size();
 
         int idx = zero;
         for (int k = 0; k < s; k++) {
@@ -767,42 +922,38 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             value[0] = elements[idx];
             value[1] = elements[idx + 1];
             if (value[0] != 0 || value[1] != 0) {
-                synchronized (indexList) {
-                    indexList.add(k);
-                    valueList.add(value);
-                }
+                indexList.add(k);
+                valueList.add(value);
             }
             idx += stride;
         }
     }
 
+    @Override
     public float[] getQuick(int index) {
         int idx = zero + index * stride;
         return new float[] { elements[idx], elements[idx + 1] };
     }
 
+    @Override
     public FloatMatrix1D getRealPart() {
         final DenseFloatMatrix1D R = new DenseFloatMatrix1D(size);
-        final float[] elemsOther = (float[]) R.elements();
+        final float[] elemsOther = R.elements();
         final int zeroOther = (int) R.index(0);
         final int strideOther = R.stride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elemsOther[idxOther] = elements[idx];
                             idx += stride;
                             idxOther += strideOther;
@@ -832,8 +983,8 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
      *            if true, then scaling is performed.
      */
     public void ifft(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (fft == null) {
             fft = new FloatFFT_1D(size);
         }
@@ -844,44 +995,43 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             fft.complexInverse((float[]) copy.elements(), scale);
             this.assign((float[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
+    @Override
     public FComplexMatrix1D like(int size) {
         return new DenseFComplexMatrix1D(size);
     }
 
+    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new DenseFComplexMatrix2D(rows, columns);
     }
 
-    public FComplexMatrix2D reshape(final int rows, final int cols) {
-        if (rows * cols != size) {
-            throw new IllegalArgumentException("rows*cols != size");
+    @Override
+    public FComplexMatrix2D reshape(final int rows, final int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
         }
-        FComplexMatrix2D M = new DenseFComplexMatrix2D(rows, cols);
+        FComplexMatrix2D M = new DenseFComplexMatrix2D(rows, columns);
         final float[] elemsOther = (float[]) M.elements();
         final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
-        final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = cols / np;
-            for (int j = 0; j < np; j++) {
-                final int startcol = j * k;
-                final int stopcol;
-                if (j == np - 1) {
-                    stopcol = cols;
-                } else {
-                    stopcol = startcol + k;
-                }
+        final int columnStrideOther = M.columnStride();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = columns / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstColumn = j * k;
+                final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int c = startcol; c < stopcol; c++) {
-                            idxOther = zeroOther + c * colStrideOther;
+                        for (int c = firstColumn; c < lastColumn; c++) {
+                            idxOther = zeroOther + c * columnStrideOther;
                             idx = zero + (c * rows) * stride;
                             for (int r = 0; r < rows; r++) {
                                 elemsOther[idxOther] = elements[idx];
@@ -897,8 +1047,8 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         } else {
             int idxOther;
             int idx = zero;
-            for (int c = 0; c < cols; c++) {
-                idxOther = zeroOther + c * colStrideOther;
+            for (int c = 0; c < columns; c++) {
+                idxOther = zeroOther + c * columnStrideOther;
                 for (int r = 0; r < rows; r++) {
                     elemsOther[idxOther] = elements[idx];
                     elemsOther[idxOther + 1] = elements[idx + 1];
@@ -910,36 +1060,33 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return M;
     }
 
-    public FComplexMatrix3D reshape(final int slices, final int rows, final int cols) {
-        if (slices * rows * cols != size) {
-            throw new IllegalArgumentException("slices*rows*cols != size");
+    @Override
+    public FComplexMatrix3D reshape(final int slices, final int rows, final int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
         }
-        FComplexMatrix3D M = new DenseFComplexMatrix3D(slices, rows, cols);
+        FComplexMatrix3D M = new DenseFComplexMatrix3D(slices, rows, columns);
         final float[] elemsOther = (float[]) M.elements();
         final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
-        final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        final int columnStrideOther = M.columnStride();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
-                            for (int c = 0; c < cols; c++) {
-                                idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
-                                idx = zero + (s * rows * cols + c * rows) * stride;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int c = 0; c < columns; c++) {
+                                idxOther = zeroOther + s * sliceStrideOther + c * columnStrideOther;
+                                idx = zero + (s * rows * columns + c * rows) * stride;
                                 for (int r = 0; r < rows; r++) {
                                     elemsOther[idxOther] = elements[idx];
                                     elemsOther[idxOther + 1] = elements[idx + 1];
@@ -956,8 +1103,8 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             int idxOther;
             int idx = zero;
             for (int s = 0; s < slices; s++) {
-                for (int c = 0; c < cols; c++) {
-                    idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
+                for (int c = 0; c < columns; c++) {
+                    idxOther = zeroOther + s * sliceStrideOther + c * columnStrideOther;
                     for (int r = 0; r < rows; r++) {
                         elemsOther[idxOther] = elements[idx];
                         elemsOther[idxOther + 1] = elements[idx + 1];
@@ -970,18 +1117,21 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return M;
     }
 
+    @Override
     public void setQuick(int index, float re, float im) {
         int idx = zero + index * stride;
         this.elements[idx] = re;
         this.elements[idx + 1] = im;
     }
 
+    @Override
     public void setQuick(int index, float[] value) {
         int idx = zero + index * stride;
         this.elements[idx] = value[0];
         this.elements[idx + 1] = value[1];
     }
 
+    @Override
     public void swap(FComplexMatrix1D other) {
         if (!(other instanceof DenseFComplexMatrix1D)) {
             super.swap(other);
@@ -997,24 +1147,20 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         final int strideOther = y.stride;
         final int zeroOther = (int) y.index(0);
 
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
                         float tmp;
-                        for (int k = startidx; k < stopidx; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             tmp = elements[idx];
                             elements[idx] = elemsOther[idxOther];
                             elemsOther[idxOther] = tmp;
@@ -1045,38 +1191,107 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         }
     }
 
+    @Override
     public void toArray(float[] values) {
         if (values.length < 2 * size)
             throw new IllegalArgumentException("values too small");
-        if (this.isNoView)
+        if (isNoView)
             System.arraycopy(this.elements, 0, values, 0, this.elements.length);
         else
             super.toArray(values);
     }
 
+    @Override
+    public float[] zDotProduct(final FComplexMatrix1D y, final int from, int length) {
+        int size = (int) size();
+        if (from < 0 || length <= 0)
+            return new float[] { 0, 0 };
+
+        int tail = from + length;
+        if (size < tail)
+            tail = size;
+        if (y.size() < tail)
+            tail = (int) y.size();
+        length = tail - from;
+        final float[] elemsOther = (float[]) y.elements();
+        if (elements == null || elemsOther == null)
+            throw new InternalError();
+        final int strideOther = y.stride();
+        final int zero = (int) index(from);
+        final int zeroOther = (int) y.index(from);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        float[] sum = new float[2];
+
+        if ((nthreads > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, length);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = length / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
+                    public float[] call() throws Exception {
+                        float[] sum = new float[2];
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
+                            sum[0] += elements[idx] * elemsOther[idxOther] + elements[idx + 1]
+                                    * elemsOther[idxOther + 1];
+                            sum[1] += elements[idx + 1] * elemsOther[idxOther] - elements[idx]
+                                    * elemsOther[idxOther + 1];
+                            idx += stride;
+                            idxOther += strideOther;
+                        }
+                        return sum;
+                    }
+                });
+            }
+            try {
+                for (int j = 0; j < nthreads; j++) {
+                    results[j] = (float[]) futures[j].get();
+                }
+                sum = results[0];
+                for (int j = 1; j < nthreads; j++) {
+                    sum = FComplex.plus(sum, results[j]);
+                }
+            } catch (ExecutionException ex) {
+                ex.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            int idx = zero;
+            int idxOther = zeroOther;
+            for (int k = 0; k < length; k++) {
+                sum[0] += elements[idx] * elemsOther[idxOther] + elements[idx + 1] * elemsOther[idxOther + 1];
+                sum[1] += elements[idx + 1] * elemsOther[idxOther] - elements[idx] * elemsOther[idxOther + 1];
+                idx += stride;
+                idxOther += strideOther;
+            }
+        }
+        return sum;
+    }
+
+    @Override
     public float[] zSum() {
         float[] sum = new float[2];
         if (this.elements == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
-
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
                     public float[] call() throws Exception {
                         float[] sum = new float[2];
-                        int idx = zero + startidx * stride;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             sum[0] += elements[idx];
                             sum[1] += elements[idx + 1];
                             idx += stride;
@@ -1086,11 +1301,11 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (float[]) futures[j].get();
                 }
                 sum = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum[0] = sum[0] + results[j][0];
                     sum[1] = sum[1] + results[j][1];
                 }
@@ -1110,6 +1325,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return sum;
     }
 
+    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int idx = zero;
@@ -1123,6 +1339,7 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return cardinality;
     }
 
+    @Override
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedDenseFComplexMatrix1D) {
             SelectedDenseFComplexMatrix1D otherMatrix = (SelectedDenseFComplexMatrix1D) other;
@@ -1134,10 +1351,12 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return false;
     }
 
+    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
+    @Override
     protected FComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseFComplexMatrix1D(this.elements, offsets);
     }

@@ -1,7 +1,7 @@
 package cern.colt.matrix.tfloat.algo.solver;
 
-import cern.colt.matrix.tfloat.algo.FloatAlgebra;
-import cern.colt.matrix.tfloat.algo.decomposition.FloatEigenvalueDecomposition;
+import cern.colt.matrix.tfloat.algo.DenseFloatAlgebra;
+import cern.colt.matrix.tfloat.algo.decomposition.DenseFloatEigenvalueDecomposition;
 
 /**
  * Test of FloatChebyshev
@@ -15,7 +15,7 @@ public class FloatChebyshevTest extends FloatIterativeSolverTest {
     @Override
     protected void createSolver() throws Exception {
         // Get the extremal eigenvalues
-        FloatEigenvalueDecomposition evd = FloatAlgebra.DEFAULT.eig(A);
+        DenseFloatEigenvalueDecomposition evd = DenseFloatAlgebra.DEFAULT.eig(A);
         float[] eigs = (float[]) evd.getRealEigenvalues().elements();
 
         float eigmin = 1, eigmax = 1;

@@ -18,6 +18,11 @@ import cern.colt.list.AbstractList;
  */
 public class ObjectArrayList extends AbstractList {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The array buffer into which the elements of the list are stored. The
      * capacity of the list is the length of this array buffer.
      * 
@@ -161,6 +166,7 @@ public class ObjectArrayList extends AbstractList {
      * @param length
      *            number of dummies to be inserted.
      */
+    @Override
     protected void beforeInsertDummies(int index, int length) {
         if (index > size || index < 0)
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
@@ -295,9 +301,10 @@ public class ObjectArrayList extends AbstractList {
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         ObjectArrayList v = (ObjectArrayList) super.clone();
-        v.elements = (Object[]) elements.clone();
+        v.elements = elements.clone();
         return v;
     }
 
@@ -411,6 +418,7 @@ public class ObjectArrayList extends AbstractList {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
+    @Override
     public boolean equals(Object otherObj) { // delta
         return equals(otherObj, true);
     }
@@ -625,7 +633,7 @@ public class ObjectArrayList extends AbstractList {
 
         Object[] theElements = elements;
         for (int i = from + 1; i <= to; i++) {
-            if (((Comparable) theElements[i]).compareTo((Comparable) theElements[i - 1]) < 0)
+            if (((Comparable) theElements[i]).compareTo(theElements[i - 1]) < 0)
                 return false;
         }
         return true;
@@ -729,6 +737,7 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void mergeSortFromTo(int from, int to) {
         if (size == 0)
             return;
@@ -835,6 +844,7 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void quickSortFromTo(int from, int to) {
         if (size == 0)
             return;
@@ -926,6 +936,7 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void removeFromTo(int from, int to) {
         checkRangeFromTo(from, to, size);
         int numMoved = size - to - 1;
@@ -1069,6 +1080,7 @@ public class ObjectArrayList extends AbstractList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
+    @Override
     public void replaceFromWith(int from, java.util.Collection other) {
         checkRange(from, size);
         java.util.Iterator e = other.iterator();
@@ -1118,6 +1130,7 @@ public class ObjectArrayList extends AbstractList {
      * Reverses the elements of the receiver. Last becomes first, second last
      * becomes second first, and so on.
      */
+    @Override
     public void reverse() {
         Object tmp;
         int limit = size / 2;
@@ -1179,12 +1192,14 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
+    @Override
     public void shuffleFromTo(int from, int to) {
         if (size == 0)
             return;
         checkRangeFromTo(from, to, size);
 
-        cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(new cern.jet.random.tdouble.engine.DRand(new java.util.Date()));
+        cern.jet.random.tdouble.DoubleUniform gen = new cern.jet.random.tdouble.DoubleUniform(
+                new cern.jet.random.tdouble.engine.DRand(new java.util.Date()));
         Object tmpElement;
         Object[] theElements = elements;
         int random;
@@ -1203,6 +1218,7 @@ public class ObjectArrayList extends AbstractList {
      * 
      * @return the number of elements contained in the receiver.
      */
+    @Override
     public int size() {
         return size;
     }
@@ -1262,6 +1278,7 @@ public class ObjectArrayList extends AbstractList {
      * Returns a <code>java.util.ArrayList</code> containing all the elements in
      * the receiver.
      */
+    @Override
     public java.util.ArrayList toList() {
         int mySize = size();
         Object[] theElements = elements;
@@ -1275,6 +1292,7 @@ public class ObjectArrayList extends AbstractList {
      * Returns a string representation of the receiver, containing the String
      * representation of each element.
      */
+    @Override
     public String toString() {
         return cern.colt.Arrays.toString(partFromTo(0, size() - 1).elements());
     }
@@ -1284,6 +1302,7 @@ public class ObjectArrayList extends AbstractList {
      * Releases any superfluos internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
+    @Override
     public void trimToSize() {
         elements = cern.colt.Arrays.trimToCapacity(elements, size());
     }

@@ -25,8 +25,9 @@ public class BenchmarkFFT {
                 Ac = A.getFft2();
             }
             t.stop();
-            times[i] = t.seconds() / (double) niters;
-            System.out.println("Average execution time for getFft2() of size " + sizes2D[i] + " x " + sizes2D[i] + " : " + times[i]);
+            times[i] = t.seconds() / niters;
+            System.out.println("Average execution time for getFft2() of size " + sizes2D[i] + " x " + sizes2D[i]
+                    + " : " + times[i]);
         }
     }
 
@@ -34,7 +35,8 @@ public class BenchmarkFFT {
         Timer t = new Timer();
         double[] times = new double[sizes3D.length];
         for (int i = 0; i < sizes3D.length; i++) {
-            DenseDoubleMatrix3D A = (DenseDoubleMatrix3D) DoubleFactory3D.dense.random(sizes3D[i], sizes3D[i], sizes3D[i]);
+            DenseDoubleMatrix3D A = (DenseDoubleMatrix3D) DoubleFactory3D.dense.random(sizes3D[i], sizes3D[i],
+                    sizes3D[i]);
             // warm-up
             DComplexMatrix3D Ac = A.getFft3();
             Ac = A.getFft3();
@@ -43,8 +45,9 @@ public class BenchmarkFFT {
                 Ac = A.getFft3();
             }
             t.stop();
-            times[i] = t.seconds() / (double) niters;
-            System.out.println("Average execution time for getFft3() of size " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + " : " + times[i]);
+            times[i] = t.seconds() / niters;
+            System.out.println("Average execution time for getFft3() of size " + sizes3D[i] + " x " + sizes3D[i]
+                    + " x " + sizes3D[i] + " : " + times[i]);
         }
     }
 

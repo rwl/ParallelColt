@@ -10,6 +10,11 @@ import hep.aida.tfloat.FloatIHistogram;
  * @version 1.0, 23/03/2000
  */
 public class FloatVariableAxis implements FloatIAxis {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected float min;
 
     protected int bins;
@@ -35,13 +40,14 @@ public class FloatVariableAxis implements FloatIAxis {
         // check if really sorted and has no multiple identical elements
         for (int i = 0; i < edges.length - 1; i++) {
             if (edges[i + 1] <= edges[i]) {
-                throw new IllegalArgumentException("edges must be sorted ascending and must not contain multiple identical values");
+                throw new IllegalArgumentException(
+                        "edges must be sorted ascending and must not contain multiple identical values");
             }
         }
 
         this.min = edges[0];
         this.bins = edges.length - 1;
-        this.edges = (float[]) edges.clone();
+        this.edges = edges.clone();
     }
 
     public float binCentre(int index) {

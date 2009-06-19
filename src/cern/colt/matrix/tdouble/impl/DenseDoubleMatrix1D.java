@@ -34,10 +34,6 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * Internally holds one single contigous one-dimensional array. Note that this
  * implementation is not synchronized.
  * <p>
- * <b>Memory requirements:</b>
- * <p>
- * <tt>memory [bytes] = 8*size()</tt>. Thus, a 1000000 matrix uses 8 MB.
- * <p>
  * <b>Time complexity:</b>
  * <p>
  * <tt>O(1)</tt> (i.e. constant time) for the basic operations <tt>get</tt>,
@@ -51,7 +47,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  */
 public class DenseDoubleMatrix1D extends DoubleMatrix1D {
-    private static final long serialVersionUID = -706456704651139684L;
+    private static final long serialVersionUID = 1L;
 
     private DoubleFFT_1D fft;
 
@@ -116,17 +112,20 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         this.isNoView = !isView;
     }
 
-    public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleFunction f) {
+    @Override
+    public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
+            final cern.colt.function.tdouble.DoubleFunction f) {
         if (size == 0)
             return Double.NaN;
         double a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
                 final int firstIdx = size - j * k;
-                final int lastIdx = (j == (np - 1)) ? 0 : firstIdx - k;
+                final int lastIdx = (j == (nthreads - 1)) ? 0 : firstIdx - k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                     public Double call() throws Exception {
                         int idx = zero + (firstIdx - 1) * stride;
@@ -148,32 +147,30 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
         return a;
     }
-    
-    public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleFunction f, final IntArrayList indexList) {
+
+    @Override
+    public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
+            final cern.colt.function.tdouble.DoubleFunction f, final IntArrayList indexList) {
         if (size() == 0)
             return Double.NaN;
         final int size = indexList.size();
         final int[] indexElements = indexList.elements();
         double a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
 
                     public Double call() throws Exception {
-                        int idx = zero + indexElements[startidx] * stride;
+                        int idx = zero + indexElements[firstIdx] * stride;
                         double a = f.apply(elements[idx]);
                         double elem;
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx = zero + indexElements[i] * stride;
                             elem = elements[idx];
                             a = aggr.apply(a, f.apply(elem));
@@ -196,7 +193,9 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return a;
     }
 
-    public double aggregate(final DoubleMatrix1D other, final cern.colt.function.tdouble.DoubleDoubleFunction aggr, final cern.colt.function.tdouble.DoubleDoubleFunction f) {
+    @Override
+    public double aggregate(final DoubleMatrix1D other, final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
+            final cern.colt.function.tdouble.DoubleDoubleFunction f) {
         if (!(other instanceof DenseDoubleMatrix1D)) {
             return super.aggregate(other, aggr, f);
         }
@@ -205,30 +204,25 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             return Double.NaN;
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
-        final double[] elemsOther = (double[]) other.elements();
+        final double[] elementsOther = (double[]) other.elements();
         double a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Double[] results = new Double[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                     public Double call() throws Exception {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        double a = f.apply(elements[idx], elemsOther[idxOther]);
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        double a = f.apply(elements[idx], elementsOther[idxOther]);
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             idxOther += strideOther;
-                            a = aggr.apply(a, f.apply(elements[idx], elemsOther[idxOther]));
+                            a = aggr.apply(a, f.apply(elements[idx], elementsOther[idxOther]));
                         }
                         return a;
                     }
@@ -236,18 +230,19 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             }
             a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
-            a = f.apply(elements[zero], elemsOther[zeroOther]);
+            a = f.apply(elements[zero], elementsOther[zeroOther]);
             int idx = zero;
             int idxOther = zeroOther;
             for (int i = 1; i < size; i++) {
                 idx += stride;
                 idxOther += strideOther;
-                a = aggr.apply(a, f.apply(elements[idx], elemsOther[idxOther]));
+                a = aggr.apply(a, f.apply(elements[idx], elementsOther[idxOther]));
             }
         }
         return a;
     }
 
+    @Override
     public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         final double multiplicator;
         if (function instanceof cern.jet.math.tdouble.DoubleMult) {
@@ -259,32 +254,28 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         } else {
             multiplicator = 0;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         // specialization for speed
                         if (function instanceof cern.jet.math.tdouble.DoubleMult) {
                             // x[i] = mult*x[i]
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 elements[idx] *= multiplicator;
                                 idx += stride;
                             }
                         } else {
                             // the general case x[i] = f(x[i])
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 elements[idx] = function.apply(elements[idx]);
                                 idx += stride;
                             }
@@ -311,24 +302,22 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final cern.colt.function.tdouble.DoubleFunction function) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+    @Override
+    public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleProcedure cond,
+            final cern.colt.function.tdouble.DoubleFunction function) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (cond.apply(elements[idx]) == true) {
                                 elements[idx] = function.apply(elements[idx]);
                             }
@@ -350,24 +339,21 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
+    @Override
     public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final double value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (cond.apply(elements[idx]) == true) {
                                 elements[idx] = value;
                             }
@@ -389,24 +375,21 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
+    @Override
     public DoubleMatrix1D assign(final double value) {
         final double[] elems = this.elements;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elems[idx] = value;
                             idx += stride;
                         }
@@ -424,49 +407,27 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
+    @Override
     public DoubleMatrix1D assign(final double[] values) {
         if (values.length != size)
-            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()=" + size());
-        int np = ConcurrencyUtils.getNumberOfThreads();
+            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
+                    + size());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (isNoView) {
-            if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-                Future<?>[] futures = new Future[np];
-                int k = size / np;
-                for (int j = 0; j < np; j++) {
-                    final int startidx = j * k;
-                    final int length;
-                    if (j == np - 1) {
-                        length = size - startidx;
-                    } else {
-                        length = k;
-                    }
-                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                        public void run() {
-                            System.arraycopy(values, startidx, elements, startidx, length);
-                        }
-                    });
-                }
-                ConcurrencyUtils.waitForCompletion(futures);
-            } else {
-                System.arraycopy(values, 0, this.elements, 0, values.length);
-            }
+            System.arraycopy(values, 0, this.elements, 0, values.length);
         } else {
-            if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-                Future<?>[] futures = new Future[np];
-                int k = size / np;
-                for (int j = 0; j < np; j++) {
-                    final int startidx = j * k;
-                    final int stopidx;
-                    if (j == np - 1) {
-                        stopidx = size;
-                    } else {
-                        stopidx = startidx + k;
-                    }
+            if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+                nthreads = Math.min(nthreads, size);
+                Future<?>[] futures = new Future[nthreads];
+                int k = size / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
-                            int idx = zero + startidx * stride;
-                            for (int i = startidx; i < stopidx; i++) {
+                            int idx = zero + firstIdx * stride;
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 elements[idx] = values[i];
                                 idx += stride;
                             }
@@ -485,6 +446,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
+    @Override
     public DoubleMatrix1D assign(DoubleMatrix1D source) {
         // overriden for performance only
         if (!(source instanceof DenseDoubleMatrix1D)) {
@@ -510,29 +472,25 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             other = (DenseDoubleMatrix1D) c;
         }
 
-        final double[] elemsOther = other.elements;
-        if (elements == null || elemsOther == null)
+        final double[] elementsOther = other.elements;
+        if (elements == null || elementsOther == null)
             throw new InternalError();
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
-                            elements[idx] = elemsOther[idxOther];
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
+                            elements[idx] = elementsOther[idxOther];
                             idx += stride;
                             idxOther += strideOther;
                         }
@@ -544,7 +502,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             int idx = zero;
             int idxOther = zeroOther;
             for (int k = 0; k < size; k++) {
-                elements[idx] = elemsOther[idxOther];
+                elements[idx] = elementsOther[idxOther];
                 idx += stride;
                 idxOther += strideOther;
             }
@@ -552,6 +510,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
+    @Override
     public DoubleMatrix1D assign(final DoubleMatrix1D y, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseDoubleMatrix1D)) {
@@ -561,35 +520,31 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         checkSize(y);
         final int zeroOther = (int) y.index(0);
         final int strideOther = y.stride();
-        final double[] elemsOther = (double[]) y.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        final double[] elementsOther = (double[]) y.elements();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
                         // specialized for speed
                         if (function == cern.jet.math.tdouble.DoubleFunctions.mult) {
                             // x[i] = x[i] * y[i]
-                            for (int k = startidx; k < stopidx; k++) {
-                                elements[idx] *= elemsOther[idxOther];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                elements[idx] *= elementsOther[idxOther];
                                 idx += stride;
                                 idxOther += strideOther;
                             }
                         } else if (function == cern.jet.math.tdouble.DoubleFunctions.div) {
                             // x[i] = x[i] / y[i]
-                            for (int k = startidx; k < stopidx; k++) {
-                                elements[idx] /= elemsOther[idxOther];
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                elements[idx] /= elementsOther[idxOther];
                                 idx += stride;
                                 idxOther += strideOther;
 
@@ -598,29 +553,29 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                             double multiplicator = ((cern.jet.math.tdouble.DoublePlusMultFirst) function).multiplicator;
                             if (multiplicator == 0) {
                                 // x[i] = 0*x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
-                                    elements[idx] = elemsOther[idxOther];
+                                for (int k = firstIdx; k < lastIdx; k++) {
+                                    elements[idx] = elementsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else if (multiplicator == 1) {
                                 // x[i] = x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
-                                    elements[idx] += elemsOther[idxOther];
+                                for (int k = firstIdx; k < lastIdx; k++) {
+                                    elements[idx] += elementsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else if (multiplicator == -1) {
                                 // x[i] = -x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
-                                    elements[idx] = elemsOther[idxOther] - elements[idx];
+                                for (int k = firstIdx; k < lastIdx; k++) {
+                                    elements[idx] = elementsOther[idxOther] - elements[idx];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else {
                                 // the general case x[i] = mult*x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
-                                    elements[idx] = multiplicator * elements[idx] + elemsOther[idxOther];
+                                for (int k = firstIdx; k < lastIdx; k++) {
+                                    elements[idx] = multiplicator * elements[idx] + elementsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
@@ -632,22 +587,22 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                                 return;
                             } else if (multiplicator == 1) {
                                 // x[i] = x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
-                                    elements[idx] += elemsOther[idxOther];
+                                for (int k = firstIdx; k < lastIdx; k++) {
+                                    elements[idx] += elementsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else if (multiplicator == -1) {
                                 // x[i] = x[i] - y[i]
-                                for (int k = startidx; k < stopidx; k++) {
-                                    elements[idx] -= elemsOther[idxOther];
+                                for (int k = firstIdx; k < lastIdx; k++) {
+                                    elements[idx] -= elementsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else {
                                 // the general case x[i] = x[i] + mult*y[i]
-                                for (int k = startidx; k < stopidx; k++) {
-                                    elements[idx] += multiplicator * elemsOther[idxOther];
+                                for (int k = firstIdx; k < lastIdx; k++) {
+                                    elements[idx] += multiplicator * elementsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
@@ -655,8 +610,8 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                             }
                         } else {
                             // the general case x[i] = f(x[i],y[i])
-                            for (int k = startidx; k < stopidx; k++) {
-                                elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
+                            for (int k = firstIdx; k < lastIdx; k++) {
+                                elements[idx] = function.apply(elements[idx], elementsOther[idxOther]);
                                 idx += stride;
                                 idxOther += strideOther;
                             }
@@ -672,14 +627,14 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             if (function == cern.jet.math.tdouble.DoubleFunctions.mult) {
                 // x[i] = x[i] * y[i]
                 for (int k = 0; k < size; k++) {
-                    elements[idx] *= elemsOther[idxOther];
+                    elements[idx] *= elementsOther[idxOther];
                     idx += stride;
                     idxOther += strideOther;
                 }
             } else if (function == cern.jet.math.tdouble.DoubleFunctions.div) {
                 // x[i] = x[i] / y[i]
                 for (int k = 0; k < size; k++) {
-                    elements[idx] /= elemsOther[idxOther];
+                    elements[idx] /= elementsOther[idxOther];
                     idx += stride;
                     idxOther += strideOther;
                 }
@@ -691,21 +646,21 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                 } else if (multiplicator == 1) {
                     // x[i] = x[i] + y[i]
                     for (int k = 0; k < size; k++) {
-                        elements[idx] += elemsOther[idxOther];
+                        elements[idx] += elementsOther[idxOther];
                         idx += stride;
                         idxOther += strideOther;
                     }
                 } else if (multiplicator == -1) {
                     // x[i] = x[i] - y[i]
                     for (int k = 0; k < size; k++) {
-                        elements[idx] -= elemsOther[idxOther];
+                        elements[idx] -= elementsOther[idxOther];
                         idx += stride;
                         idxOther += strideOther;
                     }
                 } else {
                     // the general case x[i] = x[i] + mult*y[i]
                     for (int k = 0; k < size; k++) {
-                        elements[idx] += multiplicator * elemsOther[idxOther];
+                        elements[idx] += multiplicator * elementsOther[idxOther];
                         idx += stride;
                         idxOther += strideOther;
                     }
@@ -713,7 +668,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             } else {
                 // the general case x[i] = f(x[i],y[i])
                 for (int k = 0; k < size; k++) {
-                    elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
+                    elements[idx] = function.apply(elements[idx], elementsOther[idxOther]);
                     idx += stride;
                     idxOther += strideOther;
                 }
@@ -722,26 +677,23 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
+    @Override
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopsize; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (elements[idx] != 0)
                                 cardinality++;
                             idx += stride;
@@ -751,11 +703,11 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -779,13 +731,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * 
      * @param scale
      *            if true then scaling is performed
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
-     * 
      */
     public void dct(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (dct == null) {
             dct = new DoubleDCT_1D(size);
         }
@@ -796,19 +745,16 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             dct.forward((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
     /**
      * Computes the discrete Hartley transform (DHT) of this matrix.
      * 
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
-     * 
      */
     public void dht() {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (dht == null) {
             dht = new DoubleDHT_1D(size);
         }
@@ -819,7 +765,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             dht.forward((double[]) copy.elements());
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
     /**
@@ -827,12 +773,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * 
      * @param scale
      *            if true then scaling is performed
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
      */
     public void dst(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (dst == null) {
             dst = new DoubleDST_1D(size);
         }
@@ -843,9 +787,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             dst.forward((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
+    @Override
     public double[] elements() {
         return elements;
     }
@@ -865,12 +810,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * forward transform, use <code>getFft</code>. To get back the original
      * data, use <code>ifft</code>.
      * 
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
      */
     public void fft() {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
@@ -881,7 +824,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             fft.realForward((double[]) copy.elements());
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
     /**
@@ -889,12 +832,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * of this matrix.
      * 
      * @return the discrete Fourier transform (DFT) of this matrix.
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
      */
     public DenseDComplexMatrix1D getFft() {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         final double[] elems;
         if (isNoView == true) {
             elems = elements;
@@ -902,13 +843,13 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             elems = (double[]) this.copy().elements();
         }
         DenseDComplexMatrix1D c = new DenseDComplexMatrix1D(size);
-        final double[] cElems = (double[]) ((DenseDComplexMatrix1D) c).elements();
-        System.arraycopy(elems, 0, cElems, 0, size);
+        final double[] elementsC = (c).elements();
+        System.arraycopy(elems, 0, elementsC, 0, size);
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
-        fft.realForwardFull(cElems);
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        fft.realForwardFull(elementsC);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
         return c;
     }
 
@@ -918,12 +859,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * 
      * @return the inverse of the discrete Fourier transform (IDFT) of this
      *         matrix.
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
      */
     public DenseDComplexMatrix1D getIfft(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         final double[] elems;
         if (isNoView == true) {
             elems = elements;
@@ -931,16 +870,17 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             elems = (double[]) this.copy().elements();
         }
         DenseDComplexMatrix1D c = new DenseDComplexMatrix1D(size);
-        final double[] cElems = (double[]) ((DenseDComplexMatrix1D) c).elements();
-        System.arraycopy(elems, 0, cElems, 0, size);
+        final double[] elementsC = (c).elements();
+        System.arraycopy(elems, 0, elementsC, 0, size);
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
-        fft.realInverseFull(cElems, scale);
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        fft.realInverseFull(elementsC, scale);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
         return c;
     }
 
+    @Override
     public void getNonZeros(final IntArrayList indexList, final DoubleArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -953,10 +893,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         if (rem == 1) {
             double value = elements[idx];
             if (value != 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(0);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -966,20 +906,20 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         for (int i = rem; i < size; i += 2) {
             double value = elements[idx];
             if (value != 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
             idx += stride;
             value = elements[idx];
             if (value != 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i + 1);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -987,6 +927,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
     }
 
+    @Override
     public void getPositiveValues(final IntArrayList indexList, final DoubleArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -999,10 +940,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         if (rem == 1) {
             double value = elements[idx];
             if (value > 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(0);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -1012,20 +953,20 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         for (int i = rem; i < size; i += 2) {
             double value = elements[idx];
             if (value > 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
             idx += stride;
             value = elements[idx];
             if (value > 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i + 1);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -1033,6 +974,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
     }
 
+    @Override
     public void getNegativeValues(final IntArrayList indexList, final DoubleArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -1045,10 +987,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         if (rem == 1) {
             double value = elements[idx];
             if (value < 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(0);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -1058,20 +1000,20 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         for (int i = rem; i < size; i += 2) {
             double value = elements[idx];
             if (value < 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
             idx += stride;
             value = elements[idx];
             if (value < 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i + 1);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -1079,28 +1021,25 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
     }
 
+    @Override
     public double[] getMaxLocation() {
         int location = 0;
         double maxValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            double[][] results = new double[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            double[][] results = new double[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         double maxValue = elements[idx];
                         int location = (idx - zero) / stride;
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             if (maxValue < elements[idx]) {
                                 maxValue = elements[idx];
@@ -1112,12 +1051,12 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (double[]) futures[j].get();
                 }
                 maxValue = results[0][0];
                 location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
                         location = (int) results[j][1];
@@ -1143,28 +1082,25 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return new double[] { maxValue, location };
     }
 
+    @Override
     public double[] getMinLocation() {
         int location = 0;
         double minValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            double[][] results = new double[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            double[][] results = new double[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
                     public double[] call() throws Exception {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         double minValue = elements[idx];
                         int location = (idx - zero) / stride;
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             if (minValue > elements[idx]) {
                                 minValue = elements[idx];
@@ -1176,12 +1112,12 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (double[]) futures[j].get();
                 }
                 minValue = results[0][0];
                 location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
                         location = (int) results[j][1];
@@ -1207,6 +1143,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return new double[] { minValue, location };
     }
 
+    @Override
     public double getQuick(int index) {
         return elements[zero + index * stride];
     }
@@ -1217,13 +1154,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * 
      * @param scale
      *            if true then scaling is performed
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
-     * 
      */
     public void idct(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (dct == null) {
             dct = new DoubleDCT_1D(size);
         }
@@ -1234,7 +1168,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             dct.inverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
     /**
@@ -1243,13 +1177,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * 
      * @param scale
      *            if true then scaling is performed
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
-     * 
      */
     public void idht(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (dht == null) {
             dht = new DoubleDHT_1D(size);
         }
@@ -1260,7 +1191,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             dht.inverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
     /**
@@ -1268,12 +1199,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * 
      * @param scale
      *            if true then scaling is performed
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
      */
     public void idst(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (dst == null) {
             dst = new DoubleDST_1D(size);
         }
@@ -1284,7 +1213,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             dst.inverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
     /**
@@ -1301,12 +1230,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * other half satisfies the symmetry condition. If you want the full real
      * inverse transform, use <code>getIfft</code>.
      * 
-     * @throws IllegalArgumentException
-     *             if the size of this matrix is not a power of 2 number.
      */
     public void ifft(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (fft == null) {
             fft = new DoubleFFT_1D(size);
         }
@@ -1317,47 +1244,46 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             fft.realInverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
+    @Override
     public DoubleMatrix1D like(int size) {
         return new DenseDoubleMatrix1D(size);
     }
 
+    @Override
     public DoubleMatrix2D like2D(int rows, int columns) {
         return new DenseDoubleMatrix2D(rows, columns);
     }
 
-    public DoubleMatrix2D reshape(final int rows, final int cols) {
-        if (rows * cols != size) {
-            throw new IllegalArgumentException("rows*cols != size");
+    @Override
+    public DoubleMatrix2D reshape(final int rows, final int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
         }
-        DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, cols);
-        final double[] elemsOther = (double[]) M.elements();
+        DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, columns);
+        final double[] elementsOther = (double[]) M.elements();
         final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
-        final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = cols / np;
-            for (int j = 0; j < np; j++) {
-                final int startcol = j * k;
-                final int stopcol;
-                if (j == np - 1) {
-                    stopcol = cols;
-                } else {
-                    stopcol = startcol + k;
-                }
+        final int columnStrideOther = M.columnStride();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = columns / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstColumn = j * k;
+                final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int c = startcol; c < stopcol; c++) {
-                            idxOther = zeroOther + c * colStrideOther;
+                        for (int c = firstColumn; c < lastColumn; c++) {
+                            idxOther = zeroOther + c * columnStrideOther;
                             idx = zero + (c * rows) * stride;
                             for (int r = 0; r < rows; r++) {
-                                elemsOther[idxOther] = elements[idx];
+                                elementsOther[idxOther] = elements[idx];
                                 idxOther += rowStrideOther;
                                 idx += stride;
                             }
@@ -1369,10 +1295,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         } else {
             int idxOther;
             int idx = zero;
-            for (int c = 0; c < cols; c++) {
-                idxOther = zeroOther + c * colStrideOther;
+            for (int c = 0; c < columns; c++) {
+                idxOther = zeroOther + c * columnStrideOther;
                 for (int r = 0; r < rows; r++) {
-                    elemsOther[idxOther] = elements[idx];
+                    elementsOther[idxOther] = elements[idx];
                     idxOther += rowStrideOther;
                     idx += stride;
                 }
@@ -1381,38 +1307,35 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return M;
     }
 
-    public DoubleMatrix3D reshape(final int slices, final int rows, final int cols) {
-        if (slices * rows * cols != size) {
-            throw new IllegalArgumentException("slices*rows*cols != size");
+    @Override
+    public DoubleMatrix3D reshape(final int slices, final int rows, final int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
         }
-        DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, cols);
-        final double[] elemsOther = (double[]) M.elements();
+        DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, columns);
+        final double[] elementsOther = (double[]) M.elements();
         final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
-        final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        final int columnStrideOther = M.columnStride();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
-                            for (int c = 0; c < cols; c++) {
-                                idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
-                                idx = zero + (s * rows * cols + c * rows) * stride;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int c = 0; c < columns; c++) {
+                                idxOther = zeroOther + s * sliceStrideOther + c * columnStrideOther;
+                                idx = zero + (s * rows * columns + c * rows) * stride;
                                 for (int r = 0; r < rows; r++) {
-                                    elemsOther[idxOther] = elements[idx];
+                                    elementsOther[idxOther] = elements[idx];
                                     idxOther += rowStrideOther;
                                     idx += stride;
                                 }
@@ -1426,10 +1349,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             int idxOther;
             int idx = zero;
             for (int s = 0; s < slices; s++) {
-                for (int c = 0; c < cols; c++) {
-                    idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
+                for (int c = 0; c < columns; c++) {
+                    idxOther = zeroOther + s * sliceStrideOther + c * columnStrideOther;
                     for (int r = 0; r < rows; r++) {
-                        elemsOther[idxOther] = elements[idx];
+                        elementsOther[idxOther] = elements[idx];
                         idxOther += rowStrideOther;
                         idx += stride;
                     }
@@ -1439,10 +1362,12 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return M;
     }
 
+    @Override
     public void setQuick(int index, double value) {
         elements[zero + index * stride] = value;
     }
 
+    @Override
     public void swap(final DoubleMatrix1D other) {
         // overriden for performance only
         if (!(other instanceof DenseDoubleMatrix1D)) {
@@ -1452,31 +1377,27 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         if (y == this)
             return;
         checkSize(y);
-        final double[] elemsOther = y.elements;
-        if (elements == null || elemsOther == null)
+        final double[] elementsOther = y.elements;
+        if (elements == null || elementsOther == null)
             throw new InternalError();
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             double tmp = elements[idx];
-                            elements[idx] = elemsOther[idxOther];
-                            elemsOther[idxOther] = tmp;
+                            elements[idx] = elementsOther[idxOther];
+                            elementsOther[idxOther] = tmp;
                             idx += stride;
                             idxOther += strideOther;
                         }
@@ -1489,14 +1410,15 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             int idxOther = zeroOther;
             for (int k = 0; k < size; k++) {
                 double tmp = elements[idx];
-                elements[idx] = elemsOther[idxOther];
-                elemsOther[idxOther] = tmp;
+                elements[idx] = elementsOther[idxOther];
+                elementsOther[idxOther] = tmp;
                 idx += stride;
                 idxOther += strideOther;
             }
         }
     }
 
+    @Override
     public void toArray(double[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
@@ -1506,6 +1428,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             super.toArray(values);
     }
 
+    @Override
     public double zDotProduct(DoubleMatrix1D y, int from, int length) {
         if (!(y instanceof DenseDoubleMatrix1D)) {
             return super.zDotProduct(y, from, length);
@@ -1518,54 +1441,53 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         if (size < tail)
             tail = size;
         if (y.size() < tail)
-            tail = y.size();
-        final double[] elemsOther = yy.elements;
+            tail = (int) y.size();
+        final double[] elementsOther = yy.elements;
         int zeroThis = (int) index(from);
         int zeroOther = (int) yy.index(from);
         int strideOther = yy.stride;
-        if (elements == null || elemsOther == null)
+        if (elements == null || elementsOther == null)
             throw new InternalError();
         double sum = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
             final int zeroThisF = zeroThis;
             final int zeroOtherF = zeroOther;
             final int strideOtherF = strideOther;
-            Future<?>[] futures = new Future[np];
-            Double[] results = new Double[np];
-            int k = length / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = length;
-                } else {
-                    stopidx = startidx + k;
-                }
+            nthreads = Math.min(nthreads, length);
+            Future<?>[] futures = new Future[nthreads];
+            Double[] results = new Double[nthreads];
+            int k = length / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                     public Double call() throws Exception {
-                        int idx = zeroThisF + startidx * stride;
-                        int idxOther = zeroOtherF + startidx * strideOtherF;
+                        int idx = zeroThisF + firstIdx * stride;
+                        int idxOther = zeroOtherF + firstIdx * strideOtherF;
                         idx -= stride;
                         idxOther -= strideOtherF;
                         double sum = 0;
-                        int min = stopidx - startidx;
+                        int min = lastIdx - firstIdx;
                         for (int k = min / 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF];
                         }
                         for (int k = min % 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elementsOther[idxOther += strideOtherF];
                         }
                         return sum;
                     }
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Double) futures[j].get();
                 }
                 sum = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -1578,39 +1500,38 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             zeroOther -= strideOther;
             int min = tail - from;
             for (int k = min / 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride]
-                        * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther];
             }
             for (int k = min % 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elementsOther[zeroOther += strideOther];
             }
         }
         return sum;
     }
 
+    @Override
     public double zSum() {
         double sum = 0;
         final double[] elems = this.elements;
         if (elems == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Double[] results = new Double[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Double[] results = new Double[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Double>() {
                     public Double call() throws Exception {
                         double sum = 0;
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             sum += elems[idx];
                             idx += stride;
                         }
@@ -1619,11 +1540,11 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Double) futures[j].get();
                 }
                 sum = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -1641,6 +1562,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return sum;
     }
 
+    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int index = zero;
@@ -1654,6 +1576,7 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return cardinality;
     }
 
+    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix1D other) {
         if (other instanceof SelectedDenseDoubleMatrix1D) {
             SelectedDenseDoubleMatrix1D otherMatrix = (SelectedDenseDoubleMatrix1D) other;
@@ -1665,10 +1588,12 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return false;
     }
 
+    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
+    @Override
     protected DoubleMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseDoubleMatrix1D(this.elements, offsets);
     }

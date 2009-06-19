@@ -22,6 +22,10 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class Benchmark extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8509762371822439740L;
     protected DoubleRandomEngine randomGenerator;
 
     /**
@@ -50,7 +54,8 @@ public class Benchmark extends cern.colt.PersistentObject {
         cern.jet.random.tdouble.engine.DoubleRandomEngine engine = new cern.jet.random.tdouble.engine.DoubleMersenneTwister();
 
         // your favourite distribution goes here
-        cern.jet.random.tdouble.AbstractDoubleDistribution dist = new cern.jet.random.tdouble.Gamma(alpha, lambda, engine);
+        cern.jet.random.tdouble.AbstractDoubleDistribution dist = new cern.jet.random.tdouble.Gamma(alpha, lambda,
+                engine);
 
         // collect random numbers and print statistics
         int size = 100000;
@@ -96,7 +101,6 @@ public class Benchmark extends cern.colt.PersistentObject {
         System.out.println("Generating " + size + " random numbers per distribution...\n");
 
         // int large = 100000000;
-        int largeVariance = 100;
         DoubleRandomEngine gen; // = new MersenneTwister();
         try {
             gen = (DoubleRandomEngine) Class.forName(generatorName).newInstance();

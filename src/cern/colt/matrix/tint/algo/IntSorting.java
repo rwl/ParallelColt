@@ -9,6 +9,7 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tint.algo;
 
 import cern.colt.function.tint.IntComparator;
+import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix3D;
@@ -47,6 +48,11 @@ import cern.colt.matrix.tint.IntMatrix3D;
  */
 public class IntSorting extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A prefabricated quicksort.
      */
     public static final IntSorting quickSort = new IntSorting();
@@ -55,10 +61,17 @@ public class IntSorting extends cern.colt.PersistentObject {
      * A prefabricated mergesort.
      */
     public static final IntSorting mergeSort = new IntSorting() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        @Override
         protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
             cern.colt.Sorting.mergeSort(a, fromIndex, toIndex, c);
         }
 
+        @Override
         protected void runSort(int fromIndex, int toIndex, IntComparator c, cern.colt.Swapper swapper) {
             cern.colt.GenericSorting.mergeSort(fromIndex, toIndex, c, swapper);
         }
@@ -119,7 +132,7 @@ public class IntSorting extends cern.colt.PersistentObject {
      *         matrix is left unaffected.</b>
      */
     public IntMatrix1D sort(final IntMatrix1D vector) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -151,7 +164,7 @@ public class IntSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final IntMatrix1D vector) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -206,7 +219,7 @@ public class IntSorting extends cern.colt.PersistentObject {
      *         vector (matrix) is left unaffected.</b>
      */
     public IntMatrix1D sort(final IntMatrix1D vector, final cern.colt.function.tint.IntComparator c) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -235,7 +248,7 @@ public class IntSorting extends cern.colt.PersistentObject {
      * @return sorted indexes
      */
     public int[] sortIndex(final IntMatrix1D vector, final cern.colt.function.tint.IntComparator c) {
-        int[] indexes = new int[vector.size()]; // row indexes to reorder
+        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
@@ -433,7 +446,7 @@ public class IntSorting extends cern.colt.PersistentObject {
      */
     public IntMatrix2D sort(IntMatrix2D matrix, int column) {
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + IntFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] rowIndexes = new int[matrix.rows()]; // row indexes to reorder
         // instead of matrix itself
@@ -549,9 +562,9 @@ public class IntSorting extends cern.colt.PersistentObject {
      */
     public IntMatrix3D sort(IntMatrix3D matrix, int row, int column) {
         if (row < 0 || row >= matrix.rows())
-            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + IntFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("row=" + row + ", matrix=" + AbstractFormatter.shape(matrix));
         if (column < 0 || column >= matrix.columns())
-            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + IntFormatter.shape(matrix));
+            throw new IndexOutOfBoundsException("column=" + column + ", matrix=" + AbstractFormatter.shape(matrix));
 
         int[] sliceIndexes = new int[matrix.slices()]; // indexes to reorder
         // instead of matrix

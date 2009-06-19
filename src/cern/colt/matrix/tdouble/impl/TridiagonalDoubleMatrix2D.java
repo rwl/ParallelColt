@@ -22,6 +22,8 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
  * @version 0.9, 04/14/2000
  */
 public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
+    private static final long serialVersionUID = 1L;
+
     /*
      * The non zero elements of the matrix: {lower, diagonal, upper}.
      */
@@ -116,6 +118,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *            the value to be filled into the cells.
      * @return <tt>this</tt> (for convenience only).
      */
+    @Override
     public DoubleMatrix2D assign(double value) {
         // overriden for performance only
         if (value == 0) {
@@ -136,6 +139,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
+    @Override
     public DoubleMatrix2D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
             final double alpha = ((cern.jet.math.tdouble.DoubleMult) function).multiplicator;
@@ -179,6 +183,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *             if
      *             <tt>columns() != source.columns() || rows() != source.rows()</tt>
      */
+    @Override
     public DoubleMatrix2D assign(DoubleMatrix2D source) {
         // overriden for performance only
         if (source == this)
@@ -194,7 +199,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
             return this;
         }
 
-        if (source instanceof RCDoubleMatrix2D || source instanceof SparseDoubleMatrix2D) {
+        if (source instanceof SparseRCDoubleMatrix2D || source instanceof SparseDoubleMatrix2D) {
             assign(0);
             source.forEachNonZero(new cern.colt.function.tdouble.IntIntDoubleFunction() {
                 public double apply(int i, int j, double value) {
@@ -208,6 +213,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return super.assign(source);
     }
 
+    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D y, cern.colt.function.tdouble.DoubleDoubleFunction function) {
         checkShape(y);
 
@@ -250,6 +256,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return super.assign(y, function);
     }
 
+    @Override
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
         for (int kind = 0; kind <= 2; kind++) {
             int i = 0, j = 0;
@@ -284,6 +291,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
      * otherwise. Override this method in wrappers.
      */
+    @Override
     protected DoubleMatrix2D getContent() {
         return this;
     }
@@ -304,6 +312,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public double getQuick(int row, int column) {
         int i = row;
         int j = column;
@@ -351,6 +360,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new TridiagonalDoubleMatrix2D(rows, columns);
     }
@@ -367,6 +377,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public DoubleMatrix1D like1D(int size) {
         return new SparseDoubleMatrix1D(size);
     }
@@ -389,6 +400,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int row, int column, double value) {
         int i = row;
         int j = column;
@@ -414,7 +426,8 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
 
         if (!isZero)
-            throw new IllegalArgumentException("Can't store non-zero value to non-tridiagonal coordinate: row=" + row + ", column=" + column + ", value=" + value);
+            throw new IllegalArgumentException("Can't store non-zero value to non-tridiagonal coordinate: row=" + row
+                    + ", column=" + column + ", value=" + value);
 
         // int k = -1;
         // int q = 0;
@@ -477,6 +490,7 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         // value="+value);
     }
 
+    @Override
     public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, double alpha, double beta, final boolean transposeA) {
         int m = rows;
         int n = columns;
@@ -494,7 +508,9 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
 
         if (n != y.size() || m > z.size())
-            throw new IllegalArgumentException("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+            throw new IllegalArgumentException("Incompatible args: "
+                    + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", "
+                    + z.toStringShort());
 
         if (!ignore)
             z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(beta / alpha));
@@ -531,7 +547,9 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return z;
     }
 
-    public DoubleMatrix2D zMult(DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, double beta, final boolean transposeA, boolean transposeB) {
+    @Override
+    public DoubleMatrix2D zMult(DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, double beta,
+            final boolean transposeA, boolean transposeB) {
         if (transposeB)
             B = B.viewDice();
         int m = rows;
@@ -546,9 +564,11 @@ public class TridiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
             C = new DenseDoubleMatrix2D(m, p);
 
         if (B.rows() != n)
-            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
+            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
+                    + (transposeB ? B.viewDice() : B).toStringShort());
         if (C.rows() != m || C.columns() != p)
-            throw new IllegalArgumentException("Incompatibel result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
+            throw new IllegalArgumentException("Incompatibel result matrix: " + toStringShort() + ", "
+                    + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
         if (this == C || B == C)
             throw new IllegalArgumentException("Matrices must not be identical");
 

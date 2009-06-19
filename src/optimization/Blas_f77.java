@@ -415,7 +415,8 @@ public class Blas_f77 extends Object {
 
             for (i = m + 1; i <= n; i += 5) {
 
-                ddot += dx[i] * dy[i] + dx[i + 1] * dy[i + 1] + dx[i + 2] * dy[i + 2] + dx[i + 3] * dy[i + 3] + dx[i + 4] * dy[i + 4];
+                ddot += dx[i] * dy[i] + dx[i + 1] * dy[i + 1] + dx[i + 2] * dy[i + 2] + dx[i + 3] * dy[i + 3]
+                        + dx[i + 4] * dy[i + 4];
 
             }
 
@@ -1055,7 +1056,8 @@ public class Blas_f77 extends Object {
 
         for (i = mpbegin; i <= end; i += 5) {
 
-            coldot += x[i][j1] * x[i][j2] + x[i + 1][j1] * x[i + 1][j2] + x[i + 2][j1] * x[i + 2][j2] + x[i + 3][j1] * x[i + 3][j2] + x[i + 4][j1] * x[i + 4][j2];
+            coldot += x[i][j1] * x[i][j2] + x[i + 1][j1] * x[i + 1][j2] + x[i + 2][j1] * x[i + 2][j2] + x[i + 3][j1]
+                    * x[i + 3][j2] + x[i + 4][j1] * x[i + 4][j2];
 
         }
 
@@ -1108,7 +1110,8 @@ public class Blas_f77 extends Object {
 
         for (i = mpbegin; i <= end; i += 5) {
 
-            colvdot += x[i][j] * y[i] + x[i + 1][j] * y[i + 1] + x[i + 2][j] * y[i + 2] + x[i + 3][j] * y[i + 3] + x[i + 4][j] * y[i + 4];
+            colvdot += x[i][j] * y[i] + x[i + 1][j] * y[i + 1] + x[i + 2][j] * y[i + 2] + x[i + 3][j] * y[i + 3]
+                    + x[i + 4][j] * y[i + 4];
 
         }
 
@@ -1592,7 +1595,8 @@ public class Blas_f77 extends Object {
 
                 for (k = m + 1; k <= p; k += 5) {
 
-                    vdot += a[i][k] * b[k][j] + a[i][k + 1] * b[k + 1][j] + a[i][k + 2] * b[k + 2][j] + a[i][k + 3] * b[k + 3][j] + a[i][k + 4] * b[k + 4][j];
+                    vdot += a[i][k] * b[k][j] + a[i][k + 1] * b[k + 1][j] + a[i][k + 2] * b[k + 2][j] + a[i][k + 3]
+                            * b[k + 3][j] + a[i][k + 4] * b[k + 4][j];
 
                 }
 
@@ -1677,7 +1681,8 @@ public class Blas_f77 extends Object {
 
             for (j = m + 1; j <= p; j += 5) {
 
-                vdot += a[i][j] * b[j] + a[i][j + 1] * b[j + 1] + a[i][j + 2] * b[j + 2] + a[i][j + 3] * b[j + 3] + a[i][j + 4] * b[j + 4];
+                vdot += a[i][j] * b[j] + a[i][j + 1] * b[j + 1] + a[i][j + 2] * b[j + 2] + a[i][j + 3] * b[j + 3]
+                        + a[i][j + 4] * b[j + 4];
 
             }
 

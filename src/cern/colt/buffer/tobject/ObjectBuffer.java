@@ -19,6 +19,11 @@ import cern.colt.list.tobject.ObjectArrayList;
  * @version 1.0, 09/24/99
  */
 public class ObjectBuffer extends cern.colt.PersistentObject implements ObjectBufferConsumer {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected ObjectBufferConsumer target;
 
     protected Object[] elements;

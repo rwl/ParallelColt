@@ -14,6 +14,11 @@ import hep.aida.tfloat.FloatIHistogram3D;
  * @version 1.0, 23/03/2000
  */
 public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatIHistogram3D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private float[][][] heights;
 
     private float[][][] errors;
@@ -81,8 +86,10 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
      * @param zMax
      *            The maximum value on the Z axis.
      */
-    public FloatHistogram3D(String title, int xBins, float xMin, float xMax, int yBins, float yMin, float yMax, int zBins, float zMin, float zMax) {
-        this(title, new FloatFixedAxis(xBins, xMin, xMax), new FloatFixedAxis(yBins, yMin, yMax), new FloatFixedAxis(zBins, zMin, zMax));
+    public FloatHistogram3D(String title, int xBins, float xMin, float xMax, int yBins, float yMin, float yMax,
+            int zBins, float zMin, float zMax) {
+        this(title, new FloatFixedAxis(xBins, xMin, xMax), new FloatFixedAxis(yBins, yMin, yMax), new FloatFixedAxis(
+                zBins, zMin, zMax));
     }
 
     /**
@@ -112,6 +119,7 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
 
     }
 
+    @Override
     public int allEntries() {
         return nEntry;
     }
@@ -132,6 +140,7 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
         return sumWeight * sumWeight / sumWeightSquared;
     }
 
+    @Override
     public void fill(float x, float y, float z) {
         int xBin = mapX(xAxis.coordToIndex(x));
         int yBin = mapY(yAxis.coordToIndex(y));
@@ -178,6 +187,7 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
      * <b>Note 2</b>indexX1 and indexX2 may include the use of under and over
      * flow bins <b>Note 3</b>There is no note 3 (yet)
      */
+    @Override
     protected FloatIHistogram2D internalSliceXY(String title, int indexZ1, int indexZ2) {
         // Attention: our internal definition of bins has been choosen
         // so that this works properly even if the indeces passed in include
@@ -215,6 +225,7 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
      * <b>Note 2</b>indexY1 and indexY2 may include the use of under and over
      * flow bins <b>Note 3</b>There is no note 3 (yet)
      */
+    @Override
     protected FloatIHistogram2D internalSliceXZ(String title, int indexY1, int indexY2) {
         // Attention: our internal definition of bins has been choosen
         // so that this works properly even if the indeces passed in include
@@ -252,6 +263,7 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
      * <b>Note 2</b>indexX1 and indexX2 may include the use of under and over
      * flow bins <b>Note 3</b>There is no note 3 (yet)
      */
+    @Override
     protected FloatIHistogram2D internalSliceYZ(String title, int indexX1, int indexX2) {
         // Attention: our internal definition of bins has been choosen
         // so that this works properly even if the indeces passed in include
@@ -322,6 +334,7 @@ public class FloatHistogram3D extends FloatAbstractHistogram3D implements FloatI
         return (float) Math.sqrt(rmsZ / sumWeight - meanZ * meanZ / sumWeight / sumWeight);
     }
 
+    @Override
     public float sumAllBinHeights() {
         return sumWeight;
     }

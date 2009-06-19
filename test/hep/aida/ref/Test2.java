@@ -46,7 +46,8 @@ public class Test2 {
         for (int i = 0; i < 10000; i++)
             h1.fill(r.nextGaussian());
 
-        DoubleIHistogram2D h2 = new DoubleHistogram2D("AIDA 2D Histogram", new DoubleVariableAxis(bounds), new DoubleVariableAxis(bounds));
+        DoubleIHistogram2D h2 = new DoubleHistogram2D("AIDA 2D Histogram", new DoubleVariableAxis(bounds),
+                new DoubleVariableAxis(bounds));
         // IHistogram2D h2 = new Histogram2D("AIDA 2D Histogram",2,-3,3,
         // 2,-3,3);
         for (int i = 0; i < 10000; i++)

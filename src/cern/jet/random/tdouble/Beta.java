@@ -49,6 +49,11 @@ import cern.jet.stat.tdouble.Probability;
  * @version 1.0, 09/24/99
  */
 public class Beta extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double alpha;
 
     protected double beta;
@@ -345,6 +350,7 @@ public class Beta extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(alpha, beta);
     }
@@ -444,6 +450,7 @@ public class Beta extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + alpha + "," + beta + ")";
     }

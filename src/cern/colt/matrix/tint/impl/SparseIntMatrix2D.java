@@ -84,6 +84,11 @@ import cern.colt.matrix.tint.IntMatrix2D;
  * @version 1.1, 08/22/2007
  */
 public class SparseIntMatrix2D extends IntMatrix2D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /*
      * The elements of the matrix.
      */
@@ -183,7 +188,8 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *             <tt>rows<0 || columns<0 || (int)columns*rows > Integer.MAX_VALUE</tt>
      *             or flip's are illegal.
      */
-    protected SparseIntMatrix2D(int rows, int columns, AbstractIntIntMap elements, int rowZero, int columnZero, int rowStride, int columnStride) {
+    protected SparseIntMatrix2D(int rows, int columns, AbstractIntIntMap elements, int rowZero, int columnZero,
+            int rowStride, int columnStride) {
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
         this.elements = elements;
         this.isNoView = false;
@@ -217,6 +223,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      * @see cern.jet.math.tint.IntFunctions
      */
+    @Override
     public IntMatrix2D assign(cern.colt.function.tint.IntFunction function) {
         if (this.isNoView && function instanceof cern.jet.math.tint.IntMult) { // x[i]
             // =
@@ -235,6 +242,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *            the value to be filled into the cells.
      * @return <tt>this</tt> (for convenience only).
      */
+    @Override
     public IntMatrix2D assign(int value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -260,6 +268,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *             if
      *             <tt>columns() != source.columns() || rows() != source.rows()</tt>
      */
+    @Override
     public IntMatrix2D assign(IntMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof SparseIntMatrix2D)) {
@@ -277,6 +286,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
         return super.assign(source);
     }
 
+    @Override
     public IntMatrix2D assign(final IntMatrix2D y, cern.colt.function.tint.IntIntFunction function) {
         if (!this.isNoView)
             return super.assign(y, function);
@@ -329,6 +339,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
     /**
      * Returns the number of cells having non-zero values.
      */
+    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -341,6 +352,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * 
      * @return the elements
      */
+    @Override
     public AbstractIntIntMap elements() {
         return elements;
     }
@@ -359,10 +371,12 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * @param minCapacity
      *            the desired minimum number of non-zero cells.
      */
+    @Override
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
 
+    @Override
     public IntMatrix2D forEachNonZero(final cern.colt.function.tint.IntIntIntFunction function) {
         if (this.isNoView) {
             this.elements.forEachPair(new cern.colt.function.tint.IntIntProcedure() {
@@ -397,6 +411,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public int getQuick(int row, int column) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
@@ -414,6 +429,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
+    @Override
     public long index(int row, int column) {
         // return super.index(row,column);
         // manually inlined for speed:
@@ -435,6 +451,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public IntMatrix2D like(int rows, int columns) {
         return new SparseIntMatrix2D(rows, columns);
     }
@@ -451,6 +468,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public IntMatrix1D like1D(int size) {
         return new SparseIntMatrix1D(size);
     }
@@ -473,6 +491,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public synchronized void setQuick(int row, int column, int value) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
@@ -508,6 +527,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * already containing zeros does not generate obsolete memory since no
      * memory was allocated to them in the first place.
      */
+    @Override
     public void trimToSize() {
         this.elements.trimToSize();
     }
@@ -519,8 +539,9 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * @return a vector obtained by stacking the columns of the matrix on top of
      *         one another
      */
+    @Override
     public IntMatrix1D vectorize() {
-        SparseIntMatrix1D v = new SparseIntMatrix1D(size());
+        SparseIntMatrix1D v = new SparseIntMatrix1D((int) size());
         int idx = 0;
         for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
@@ -530,6 +551,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
         return v;
     }
 
+    @Override
     public IntMatrix1D zMult(IntMatrix1D y, IntMatrix1D z, int alpha, int beta, final boolean transposeA) {
         int m = rows;
         int n = columns;
@@ -547,7 +569,9 @@ public class SparseIntMatrix2D extends IntMatrix2D {
         }
 
         if (n != y.size() || m > z.size())
-            throw new IllegalArgumentException("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+            throw new IllegalArgumentException("Incompatible args: "
+                    + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", "
+                    + z.toStringShort());
 
         if (!ignore)
             z.assign(cern.jet.math.tint.IntFunctions.mult(beta / alpha));
@@ -594,7 +618,9 @@ public class SparseIntMatrix2D extends IntMatrix2D {
         return z;
     }
 
-    public IntMatrix2D zMult(IntMatrix2D B, IntMatrix2D C, final int alpha, int beta, final boolean transposeA, boolean transposeB) {
+    @Override
+    public IntMatrix2D zMult(IntMatrix2D B, IntMatrix2D C, final int alpha, int beta, final boolean transposeA,
+            boolean transposeB) {
         if (!(this.isNoView)) {
             return super.zMult(B, C, alpha, beta, transposeA, transposeB);
         }
@@ -612,9 +638,11 @@ public class SparseIntMatrix2D extends IntMatrix2D {
             C = new DenseIntMatrix2D(m, p);
 
         if (B.rows() != n)
-            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
+            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
+                    + (transposeB ? B.viewDice() : B).toStringShort());
         if (C.rows() != m || C.columns() != p)
-            throw new IllegalArgumentException("Incompatibel result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
+            throw new IllegalArgumentException("Incompatibel result matrix: " + toStringShort() + ", "
+                    + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
         if (this == C || B == C)
             throw new IllegalArgumentException("Matrices must not be identical");
 
@@ -656,6 +684,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(IntMatrix2D other) {
         if (other instanceof SelectedSparseIntMatrix2D) {
             SelectedSparseIntMatrix2D otherMatrix = (SelectedSparseIntMatrix2D) other;
@@ -684,6 +713,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     protected IntMatrix1D like1D(int size, int offset, int stride) {
         return new SparseIntMatrix1D(size, this.elements, offset, stride);
     }
@@ -697,6 +727,7 @@ public class SparseIntMatrix2D extends IntMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected IntMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseIntMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }

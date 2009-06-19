@@ -27,6 +27,11 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class FloatUniform extends AbstractContinousFloatDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected float min;
 
     protected float max;
@@ -82,6 +87,7 @@ public class FloatUniform extends AbstractContinousFloatDistribution {
      * Returns a uniformly distributed random number in the open interval
      * <tt>(min,max)</tt> (excluding <tt>min</tt> and <tt>max</tt>).
      */
+    @Override
     public float nextFloat() {
         return min + (max - min) * randomGenerator.raw();
     }
@@ -99,8 +105,9 @@ public class FloatUniform extends AbstractContinousFloatDistribution {
      * Returns a uniformly distributed random number in the closed interval
      * <tt>[min,max]</tt> (including <tt>min</tt> and <tt>max</tt>).
      */
+    @Override
     public int nextInt() {
-        return nextIntFromTo((int) Math.round(min), (int) Math.round(max));
+        return nextIntFromTo(Math.round(min), Math.round(max));
     }
 
     /**
@@ -109,7 +116,7 @@ public class FloatUniform extends AbstractContinousFloatDistribution {
      * conditions: <tt>from &lt;= to</tt>.
      */
     public int nextIntFromTo(int from, int to) {
-        return (int) ((long) from + (long) ((1L + (long) to - (long) from) * randomGenerator.raw()));
+        return (int) (from + (long) ((1L + to - from) * randomGenerator.raw()));
     }
 
     /**
@@ -252,6 +259,7 @@ public class FloatUniform extends AbstractContinousFloatDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + min + "," + max + ")";
     }

@@ -1,5 +1,17 @@
 Parallel Colt changelog
 
+0.8:	June 19, 2009
+	- Added JPlasma 1.0. 
+	- New, multithreaded versions of dense Cholesky and QR decompositions (JPlasma is used).
+	- Added CSparseJ 1.0.
+	- Added sparse Cholesky, LU and QR decompositions (CSparseJ is used).
+	- Added SparseDoubleAlgebra and SparseFloatAlgebra.
+	- Added 2D and 3D dense floating point matrices with elements stored in multidimensional arrays (to avoid 2^31 size limitation). 
+	- Removed JCublas.
+	- Removed corejava (replaced by String.format()).
+	- Fixed few bugs in MRNSD and CGLS. 
+	- Some refactoring and many cosmetic changes.
+
 0.7.2:	March 25, 2009
 	- Added new aggregate() method in 1D dense matrices.
 	- Added Modified Residual Norm Steepest Descent (MRNSD) solver.

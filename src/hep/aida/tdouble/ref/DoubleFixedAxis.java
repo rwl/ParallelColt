@@ -10,6 +10,11 @@ import hep.aida.tdouble.DoubleIHistogram;
  * @version 1.0, 23/03/2000
  */
 public class DoubleFixedAxis implements DoubleIAxis {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private int bins;
 
     private double min;

@@ -24,6 +24,8 @@ package cern.colt.matrix;
  * @version 1.0, 09/24/99
  */
 public abstract class AbstractFormatter extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The alignment string aligning the cells of a column to the left.
      */
@@ -110,9 +112,7 @@ public abstract class AbstractFormatter extends cern.colt.PersistentObject {
      */
     protected boolean printShape = true;
 
-    private static String[] blanksCache; // for efficient String
-
-    // manipulations
+    private static String[] blanksCache; // for efficient String manipulations
 
     protected static final FormerFactory factory = new FormerFactory();
 
@@ -192,35 +192,25 @@ public abstract class AbstractFormatter extends cern.colt.PersistentObject {
      * (left,centered,right,decimal).
      */
     protected void alignRow(String[] row, int[] maxColWidth, int[] maxColLead) {
-        int align = alignmentCode(alignment); // {-1,0,1,2} =
-        // {left,centered,right,decimal
-        // point}
         StringBuffer s = new StringBuffer();
 
         int columns = row.length;
         for (int column = 0; column < columns; column++) {
             s.setLength(0);
             String c = row[column];
-            // if (alignment==1) {
             if (alignment.equals(RIGHT)) {
                 s.append(blanks(maxColWidth[column] - s.length()));
                 s.append(c);
-            }
-            // else if (alignment==2) {
-            else if (alignment.equals(DECIMAL)) {
+            } else if (alignment.equals(DECIMAL)) {
                 s.append(blanks(maxColLead[column] - lead(c)));
                 s.append(c);
                 s.append(blanks(maxColWidth[column] - s.length()));
-            }
-            // else if (align==0) {
-            else if (alignment.equals(CENTER)) {
+            } else if (alignment.equals(CENTER)) {
                 s.append(blanks((maxColWidth[column] - c.length()) / 2));
                 s.append(c);
                 s.append(blanks(maxColWidth[column] - s.length()));
 
-            }
-            // else if (align<0) {
-            else if (alignment.equals(LEFT)) {
+            } else if (alignment.equals(LEFT)) {
                 s.append(c);
                 s.append(blanks(maxColWidth[column] - s.length()));
             } else
@@ -247,99 +237,6 @@ public abstract class AbstractFormatter extends cern.colt.PersistentObject {
     }
 
     /**
-     * Demonstrates how to use this class.
-     */
-    public static void demo1() {
-        /*
-         * // parameters Object[][] values = { {3, 0, -3.4, 0}, {5.1 ,0,
-         * +3.0123456789, 0}, {16.37, 0.0, 2.5, 0}, {-16.3, 0, -3.012345678E-4,
-         * -1}, {1236.3456789, 0, 7, -1.2} }; String[] formats = {"%G",
-         * "%1.10G", "%f", "%1.2f", "%0.2e", null}; // now the processing int
-         * size = formats.length; ObjectMatrix2D matrix =
-         * cern.colt.matrix.ObjectFactory2D.dense.make(values); String[] strings =
-         * new String[size]; String[] sourceCodes = new String[size]; String[]
-         * htmlStrings = new String[size]; String[] htmlSourceCodes = new
-         * String[size];
-         * 
-         * for (int i=0; i<size; i++) { String format = formats[i]; strings[i] =
-         * toString(matrix,format); sourceCodes[i] =
-         * toSourceCode(matrix,format); // may not compile because of packages
-         * not included in the distribution //htmlStrings[i] =
-         * cern.colt.matrixpattern.Converting.toHTML(strings[i]);
-         * //htmlSourceCodes[i] =
-         * cern.colt.matrixpattern.Converting.toHTML(sourceCodes[i]); }
-         * 
-         * System.out.println("original:\n"+toString(matrix)); // may not
-         * compile because of packages not included in the distribution for (int
-         * i=0; i<size; i++) {
-         * //System.out.println("\nhtmlString("+formats[i]+"):\n"+htmlStrings[i]);
-         * //System.out.println("\nhtmlSourceCode("+formats[i]+"):\n"+htmlSourceCodes[i]); }
-         * 
-         * for (int i=0; i<size; i++) {
-         * System.out.println("\nstring("+formats[i]+"):\n"+strings[i]);
-         * System.out.println("\nsourceCode("+formats[i]+"):\n"+sourceCodes[i]); }
-         */
-    }
-
-    /**
-     * Demonstrates how to use this class.
-     */
-    public static void demo2() {
-        /*
-         * // parameters Object[] values = { //5, 0.0, -0.0, -Object.NaN,
-         * Object.NaN, 0.0/0.0, Object.NEGATIVE_INFINITY,
-         * Object.POSITIVE_INFINITY, Object.MIN_VALUE, Object.MAX_VALUE 5, 0.0,
-         * -0.0, -Object.NaN, Object.NaN, 0.0/0.0, Object.MIN_VALUE,
-         * Object.MAX_VALUE , Object.NEGATIVE_INFINITY, Object.POSITIVE_INFINITY
-         * //Object.MIN_VALUE, Object.MAX_VALUE //, Object.NEGATIVE_INFINITY,
-         * Object.POSITIVE_INFINITY }; //String[] formats = {"%G", "%1.10G",
-         * "%f", "%1.2f", "%0.2e"}; String[] formats = {"%G", "%1.19G"}; // now
-         * the processing int size = formats.length; ObjectMatrix1D matrix = new
-         * DenseObjectMatrix1D(values);
-         * 
-         * String[] strings = new String[size]; //String[] javaStrings = new
-         * String[size];
-         * 
-         * for (int i=0; i<size; i++) { String format = formats[i]; strings[i] =
-         * toString(matrix,format); for (int j=0; j<matrix.size(); j++) {
-         * System.out.println(String.valueOf(matrix.get(j))); } }
-         * 
-         * System.out.println("original:\n"+toString(matrix));
-         * 
-         * for (int i=0; i<size; i++) {
-         * System.out.println("\nstring("+formats[i]+"):\n"+strings[i]); }
-         */
-    }
-
-    /**
-     * Demonstrates how to use this class.
-     */
-    public static void demo3(int size, Object value) {
-        /*
-         * cern.colt.Timer timer = new cern.colt.Timer(); String s; StringBuffer
-         * buf; ObjectMatrix2D matrix =
-         * cern.colt.matrix.ObjectFactory2D.dense.make(size,size, value);
-         * 
-         * timer.reset().start(); buf = new StringBuffer(); for (int i=size; --i >=
-         * 0; ) { for (int j=size; --j >= 0; ) {
-         * buf.append(matrix.getQuick(i,j)); } } buf = null;
-         * timer.stop().display();
-         * 
-         * timer.reset().start(); corejava.Format format = new
-         * corejava.Format("%G"); buf = new StringBuffer(); for (int i=size; --i >=
-         * 0; ) { for (int j=size; --j >= 0; ) {
-         * buf.append(format.form(matrix.getQuick(i,j))); } } buf = null;
-         * timer.stop().display();
-         * 
-         * timer.reset().start(); s = Formatting.toString(matrix, null);
-         * //System.out.println(s); s = null; timer.stop().display();
-         * 
-         * timer.reset().start(); s = Formatting.toString(matrix, "%G");
-         * //System.out.println(s); s = null; timer.stop().display();
-         */
-    }
-
-    /**
      * Converts a given cell to a String; no alignment considered.
      */
     protected abstract String form(AbstractMatrix1D matrix, int index, Former formatter);
@@ -355,7 +252,7 @@ public abstract class AbstractFormatter extends cern.colt.PersistentObject {
     protected String[] formatRow(AbstractMatrix1D vector) {
         Former formatter = null;
         formatter = factory.create(format);
-        int s = vector.size();
+        int s = (int) vector.size();
         String[] strings = new String[s];
         for (int i = 0; i < s; i++) {
             strings[i] = form(vector, i, formatter);

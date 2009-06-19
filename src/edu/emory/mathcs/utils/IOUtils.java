@@ -46,8 +46,6 @@ import java.util.Random;
  */
 public class IOUtils {
 
-    private static final String FF = "%.4f";
-
     /**
      * Fills 1D matrix with random numbers.
      * 
@@ -258,23 +256,23 @@ public class IOUtils {
      * @param x
      * @param title
      */
-    public static void showComplex_1D(double[] x, String title) {
+    public static void showComplex_1D(String format, double[] x, String title) {
         System.out.println(title);
         System.out.println("-------------------");
         for (int i = 0; i < x.length; i = i + 2) {
             if (x[i + 1] == 0) {
-                System.out.println(String.format(FF, x[i]));
+                System.out.println(String.format(format, x[i]));
                 continue;
             }
             if (x[i] == 0) {
-                System.out.println(String.format(FF, x[i + 1]) + "i");
+                System.out.println(String.format(format, x[i + 1]) + "i");
                 continue;
             }
             if (x[i + 1] < 0) {
-                System.out.println(String.format(FF, x[i]) + " - " + (String.format(FF, -x[i + 1])) + "i");
+                System.out.println(String.format(format, x[i]) + " - " + (String.format(format, -x[i + 1])) + "i");
                 continue;
             }
-            System.out.println(String.format(FF, x[i]) + " + " + (String.format(FF, x[i + 1])) + "i");
+            System.out.println(String.format(format, x[i]) + " + " + (String.format(format, x[i + 1])) + "i");
         }
         System.out.println();
     }
@@ -289,23 +287,26 @@ public class IOUtils {
      * @param x
      * @param title
      */
-    public static void showComplex_2D(int rows, int columns, double[] x, String title) {
-        StringBuffer s = new StringBuffer(String.format(title + ": complex array 2D: %d rows, %d columns\n\n", rows, columns));
+    public static void showComplex_2D(String format, int rows, int columns, double[] x, String title) {
+        StringBuffer s = new StringBuffer(String.format(title + ": complex array 2D: %d rows, %d columns\n\n", rows,
+                columns));
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < 2 * columns; c = c + 2) {
                 if (x[r * 2 * columns + c + 1] == 0) {
-                    s.append(String.format(FF + "\t", x[r * 2 * columns + c]));
+                    s.append(String.format(format + "\t", x[r * 2 * columns + c]));
                     continue;
                 }
                 if (x[r * 2 * columns + c] == 0) {
-                    s.append(String.format(FF + "i\t", x[r * 2 * columns + c + 1]));
+                    s.append(String.format(format + "i\t", x[r * 2 * columns + c + 1]));
                     continue;
                 }
                 if (x[r * 2 * columns + c + 1] < 0) {
-                    s.append(String.format(FF + " - " + FF + "i\t", x[r * 2 * columns + c], -x[r * 2 * columns + c + 1]));
+                    s.append(String.format(format + " - " + format + "i\t", x[r * 2 * columns + c], -x[r * 2 * columns
+                            + c + 1]));
                     continue;
                 }
-                s.append(String.format(FF + " + " + FF + "i\t", x[r * 2 * columns + c], x[r * 2 * columns + c + 1]));
+                s.append(String.format(format + " + " + format + "i\t", x[r * 2 * columns + c], x[r * 2 * columns + c
+                        + 1]));
             }
             s.append("\n");
         }
@@ -323,7 +324,7 @@ public class IOUtils {
      * @param x
      * @param title
      */
-    public static void showComplex_3D(int n1, int n2, int n3, double[] x, String title) {
+    public static void showComplex_3D(String format, int n1, int n2, int n3, double[] x, String title) {
         int sliceStride = n2 * 2 * n3;
         int rowStride = 2 * n3;
 
@@ -335,18 +336,20 @@ public class IOUtils {
             for (int i = 0; i < n1; i++) {
                 for (int j = 0; j < n2; j++) {
                     if (x[i * sliceStride + j * rowStride + k + 1] == 0) {
-                        System.out.print(String.format(FF, x[i * sliceStride + j * rowStride + k]) + "\t");
+                        System.out.print(String.format(format, x[i * sliceStride + j * rowStride + k]) + "\t");
                         continue;
                     }
                     if (x[i * sliceStride + j * rowStride + k] == 0) {
-                        System.out.print(String.format(FF, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
+                        System.out.print(String.format(format, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
                         continue;
                     }
                     if (x[i * sliceStride + j * rowStride + k + 1] < 0) {
-                        System.out.print(String.format(FF, x[i * sliceStride + j * rowStride + k]) + " - " + String.format(FF, -x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
+                        System.out.print(String.format(format, x[i * sliceStride + j * rowStride + k]) + " - "
+                                + String.format(format, -x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
                         continue;
                     }
-                    System.out.print(String.format(FF, x[i * sliceStride + j * rowStride + k]) + " + " + String.format(FF, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
+                    System.out.print(String.format(format, x[i * sliceStride + j * rowStride + k]) + " + "
+                            + String.format(format, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
                 }
                 System.out.println("");
             }
@@ -360,11 +363,11 @@ public class IOUtils {
      * @param x
      * @param title
      */
-    public static void showReal_1D(double[] x, String title) {
+    public static void showReal_1D(String format, double[] x, String title) {
         System.out.println(title);
         System.out.println("-------------------");
         for (int j = 0; j < x.length; j++) {
-            System.out.println(String.format(FF, x[j]));
+            System.out.println(String.format(format, x[j]));
         }
         System.out.println();
     }
@@ -377,7 +380,7 @@ public class IOUtils {
      * @param x
      * @param title
      */
-    public static void showReal_2D(int n1, int n2, double[] x, String title) {
+    public static void showReal_2D(String format, int n1, int n2, double[] x, String title) {
         System.out.println(title);
         System.out.println("-------------------");
         for (int i = 0; i < n1; i++) {
@@ -385,7 +388,7 @@ public class IOUtils {
                 if (Math.abs(x[i * n2 + j]) < 5e-5) {
                     System.out.print("0\t");
                 } else {
-                    System.out.print(String.format(FF, x[i * n2 + j]) + "\t");
+                    System.out.print(String.format(format, x[i * n2 + j]) + "\t");
                 }
             }
             System.out.println();
@@ -402,7 +405,7 @@ public class IOUtils {
      * @param x
      * @param title
      */
-    public static void showReal_3D(int n1, int n2, int n3, double[] x, String title) {
+    public static void showReal_3D(String format, int n1, int n2, int n3, double[] x, String title) {
         int sliceStride = n2 * n3;
         int rowStride = n3;
 
@@ -417,7 +420,7 @@ public class IOUtils {
                     if (Math.abs(x[i * sliceStride + j * rowStride + k]) <= 5e-5) {
                         System.out.print("0\t");
                     } else {
-                        System.out.print(String.format(FF, x[i * sliceStride + j * rowStride + k]) + "\t");
+                        System.out.print(String.format(format, x[i * sliceStride + j * rowStride + k]) + "\t");
                     }
                 }
                 System.out.println();
@@ -434,26 +437,26 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileComplex_1D(double[] x, String filename) {
+    public static void writeToFileComplex_1D(String format, double[] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < x.length; i = i + 2) {
                 if (x[i + 1] == 0) {
-                    out.write(String.format(FF, x[i]));
+                    out.write(String.format(format, x[i]));
                     out.newLine();
                     continue;
                 }
                 if (x[i] == 0) {
-                    out.write(String.format(FF, x[i + 1]) + "i");
+                    out.write(String.format(format, x[i + 1]) + "i");
                     out.newLine();
                     continue;
                 }
                 if (x[i + 1] < 0) {
-                    out.write(String.format(FF, x[i]) + " - " + String.format(FF, -x[i + 1]) + "i");
+                    out.write(String.format(format, x[i]) + " - " + String.format(format, -x[i + 1]) + "i");
                     out.newLine();
                     continue;
                 }
-                out.write(String.format(FF, x[i]) + " + " + String.format(FF, x[i + 1]) + "i");
+                out.write(String.format(format, x[i]) + " + " + String.format(format, x[i + 1]) + "i");
                 out.newLine();
             }
             out.newLine();
@@ -473,7 +476,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileComplex_2D(int n1, int n2, double[] x, String filename) {
+    public static void writeToFileComplex_2D(String format, int n1, int n2, double[] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < n1; i++) {
@@ -489,25 +492,27 @@ public class IOUtils {
 
                     if (Math.abs(x[i * 2 * n2 + j + 1]) < 5e-5) {
                         if (x[i * 2 * n2 + j + 1] >= 0.0) {
-                            out.write(String.format(FF, x[i * 2 * n2 + j]) + " + 0i\t");
+                            out.write(String.format(format, x[i * 2 * n2 + j]) + " + 0i\t");
                         } else {
-                            out.write(String.format(FF, x[i * 2 * n2 + j]) + " - 0i\t");
+                            out.write(String.format(format, x[i * 2 * n2 + j]) + " - 0i\t");
                         }
                         continue;
                     }
                     if (Math.abs(x[i * 2 * n2 + j]) < 5e-5) {
                         if (x[i * 2 * n2 + j + 1] >= 0.0) {
-                            out.write("0 + " + String.format(FF, x[i * 2 * n2 + j + 1]) + "i\t");
+                            out.write("0 + " + String.format(format, x[i * 2 * n2 + j + 1]) + "i\t");
                         } else {
-                            out.write("0 - " + String.format(FF, -x[i * 2 * n2 + j + 1]) + "i\t");
+                            out.write("0 - " + String.format(format, -x[i * 2 * n2 + j + 1]) + "i\t");
                         }
                         continue;
                     }
                     if (x[i * 2 * n2 + j + 1] < 0) {
-                        out.write(String.format(FF, x[i * 2 * n2 + j]) + " - " + String.format(FF, -x[i * 2 * n2 + j + 1]) + "i\t");
+                        out.write(String.format(format, x[i * 2 * n2 + j]) + " - "
+                                + String.format(format, -x[i * 2 * n2 + j + 1]) + "i\t");
                         continue;
                     }
-                    out.write(String.format(FF, x[i * 2 * n2 + j]) + " + " + String.format(FF, x[i * 2 * n2 + j + 1]) + "i\t");
+                    out.write(String.format(format, x[i * 2 * n2 + j]) + " + "
+                            + String.format(format, x[i * 2 * n2 + j + 1]) + "i\t");
                 }
                 out.newLine();
             }
@@ -529,7 +534,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileComplex_2D(int n1, int n2, double[][] x, String filename) {
+    public static void writeToFileComplex_2D(String format, int n1, int n2, double[][] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < n1; i++) {
@@ -545,25 +550,25 @@ public class IOUtils {
 
                     if (Math.abs(x[i][j + 1]) < 5e-5) {
                         if (x[i][j + 1] >= 0.0) {
-                            out.write(String.format(FF, x[i][j]) + " + 0i\t");
+                            out.write(String.format(format, x[i][j]) + " + 0i\t");
                         } else {
-                            out.write(String.format(FF, x[i][j]) + " - 0i\t");
+                            out.write(String.format(format, x[i][j]) + " - 0i\t");
                         }
                         continue;
                     }
                     if (Math.abs(x[i][j]) < 5e-5) {
                         if (x[i][j + 1] >= 0.0) {
-                            out.write("0 + " + String.format(FF, x[i][j + 1]) + "i\t");
+                            out.write("0 + " + String.format(format, x[i][j + 1]) + "i\t");
                         } else {
-                            out.write("0 - " + String.format(FF, -x[i][j + 1]) + "i\t");
+                            out.write("0 - " + String.format(format, -x[i][j + 1]) + "i\t");
                         }
                         continue;
                     }
                     if (x[i][j + 1] < 0) {
-                        out.write(String.format(FF, x[i][j]) + " - " + String.format(FF, -x[i][j + 1]) + "i\t");
+                        out.write(String.format(format, x[i][j]) + " - " + String.format(format, -x[i][j + 1]) + "i\t");
                         continue;
                     }
-                    out.write(String.format(FF, x[i][j]) + " + " + String.format(FF, x[i][j + 1]) + "i\t");
+                    out.write(String.format(format, x[i][j]) + " + " + String.format(format, x[i][j + 1]) + "i\t");
                 }
                 out.newLine();
             }
@@ -586,7 +591,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileComplex_3D(int n1, int n2, int n3, double[] x, String filename) {
+    public static void writeToFileComplex_3D(String format, int n1, int n2, int n3, double[] x, String filename) {
         int sliceStride = n2 * n3 * 2;
         int rowStride = n3 * 2;
         try {
@@ -599,18 +604,20 @@ public class IOUtils {
                 for (int i = 0; i < n1; i++) {
                     for (int j = 0; j < n2; j++) {
                         if (x[i * sliceStride + j * rowStride + k + 1] == 0) {
-                            out.write(String.format(FF, x[i * sliceStride + j * rowStride + k]) + "\t");
+                            out.write(String.format(format, x[i * sliceStride + j * rowStride + k]) + "\t");
                             continue;
                         }
                         if (x[i * sliceStride + j * rowStride + k] == 0) {
-                            out.write(String.format(FF, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
+                            out.write(String.format(format, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
                             continue;
                         }
                         if (x[i * sliceStride + j * rowStride + k + 1] < 0) {
-                            out.write(String.format(FF, x[i * sliceStride + j * rowStride + k]) + " - " + String.format(FF, -x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
+                            out.write(String.format(format, x[i * sliceStride + j * rowStride + k]) + " - "
+                                    + String.format(format, -x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
                             continue;
                         }
-                        out.write(String.format(FF, x[i * sliceStride + j * rowStride + k]) + " + " + String.format(FF, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
+                        out.write(String.format(format, x[i * sliceStride + j * rowStride + k]) + " + "
+                                + String.format(format, x[i * sliceStride + j * rowStride + k + 1]) + "i\t");
                     }
                     out.newLine();
                 }
@@ -633,7 +640,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileComplex_3D(int n1, int n2, int n3, double[][][] x, String filename) {
+    public static void writeToFileComplex_3D(String format, int n1, int n2, int n3, double[][][] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int k = 0; k < 2 * n3; k = k + 2) {
@@ -644,18 +651,20 @@ public class IOUtils {
                 for (int i = 0; i < n1; i++) {
                     for (int j = 0; j < n2; j++) {
                         if (x[i][j][k + 1] == 0) {
-                            out.write(String.format(FF, x[i][j][k]) + "\t");
+                            out.write(String.format(format, x[i][j][k]) + "\t");
                             continue;
                         }
                         if (x[i][j][k] == 0) {
-                            out.write(String.format(FF, x[i][j][k + 1]) + "i\t");
+                            out.write(String.format(format, x[i][j][k + 1]) + "i\t");
                             continue;
                         }
                         if (x[i][j][k + 1] < 0) {
-                            out.write(String.format(FF, x[i][j][k]) + " - " + String.format(FF, -x[i][j][k + 1]) + "i\t");
+                            out.write(String.format(format, x[i][j][k]) + " - "
+                                    + String.format(format, -x[i][j][k + 1]) + "i\t");
                             continue;
                         }
-                        out.write(String.format(FF, x[i][j][k]) + " + " + String.format(FF, x[i][j][k + 1]) + "i\t");
+                        out.write(String.format(format, x[i][j][k]) + " + " + String.format(format, x[i][j][k + 1])
+                                + "i\t");
                     }
                     out.newLine();
                 }
@@ -674,11 +683,11 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_1D(double[] x, String filename) {
+    public static void writeToFileReal_1D(String format, double[] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int j = 0; j < x.length; j++) {
-                out.write(String.format(FF, x[j]));
+                out.write(String.format(format, x[j]));
                 out.newLine();
             }
             out.close();
@@ -716,7 +725,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_2D(int n1, int n2, double[] x, String filename) {
+    public static void writeToFileReal_2D(String format, int n1, int n2, double[] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < n1; i++) {
@@ -724,7 +733,7 @@ public class IOUtils {
                     if (Math.abs(x[i * n2 + j]) < 5e-5) {
                         out.write("0\t");
                     } else {
-                        out.write(String.format(FF, x[i * n2 + j]) + "\t");
+                        out.write(String.format(format, x[i * n2 + j]) + "\t");
                     }
                 }
                 out.newLine();
@@ -741,7 +750,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_2D(double[][] x, String filename) {
+    public static void writeToFileReal_2D(String format, double[][] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < x.length; i++) {
@@ -749,7 +758,7 @@ public class IOUtils {
                     if (Math.abs(x[i][j]) < 5e-5) {
                         out.write("0\t");
                     } else {
-                        out.write(String.format(FF, x[i][j]) + "\t");
+                        out.write(String.format(format, x[i][j]) + "\t");
                     }
                 }
                 out.newLine();
@@ -770,7 +779,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_3D(int slices, int rows, int columns, double[] x, String filename) {
+    public static void writeToFileReal_3D(String format, int slices, int rows, int columns, double[] x, String filename) {
         int sliceStride = rows * columns;
         int rowStride = columns;
 
@@ -783,7 +792,7 @@ public class IOUtils {
                 out.newLine();
                 for (int r = 0; r < rows; r++) {
                     for (int c = 0; c < columns; c++) {
-                        out.write(String.format(FF, x[s * sliceStride + r * rowStride + c]) + "\t");
+                        out.write(String.format(format, x[s * sliceStride + r * rowStride + c]) + "\t");
                     }
                     out.newLine();
                 }
@@ -802,11 +811,11 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_1D(float[] x, String filename) {
+    public static void writeToFileReal_1D(String format, float[] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int j = 0; j < x.length; j++) {
-                out.write(String.format(FF, x[j]));
+                out.write(String.format(format, x[j]));
                 out.newLine();
             }
             out.close();
@@ -824,7 +833,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_2D(int n1, int n2, float[] x, String filename) {
+    public static void writeToFileReal_2D(String format, int n1, int n2, float[] x, String filename) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < n1; i++) {
@@ -832,7 +841,7 @@ public class IOUtils {
                     if (Math.abs(x[i * n2 + j]) < 5e-5) {
                         out.write("0\t");
                     } else {
-                        out.write(String.format(FF, x[i * n2 + j]) + "\t");
+                        out.write(String.format(format, x[i * n2 + j]) + "\t");
                     }
                 }
                 out.newLine();
@@ -853,7 +862,7 @@ public class IOUtils {
      * @param x
      * @param filename
      */
-    public static void writeToFileReal_3D(int n1, int n2, int n3, float[] x, String filename) {
+    public static void writeToFileReal_3D(String format, int n1, int n2, int n3, float[] x, String filename) {
         int sliceStride = n2 * n3;
         int rowStride = n3;
 
@@ -866,7 +875,7 @@ public class IOUtils {
                 out.newLine();
                 for (int i = 0; i < n1; i++) {
                     for (int j = 0; j < n2; j++) {
-                        out.write(String.format(FF, x[i * sliceStride + j * rowStride + k]) + "\t");
+                        out.write(String.format(format, x[i * sliceStride + j * rowStride + k]) + "\t");
                     }
                     out.newLine();
                 }
@@ -889,7 +898,8 @@ public class IOUtils {
      * @param times
      * @param sizes
      */
-    public static void writeFFTBenchmarkResultsToFile(String filename, int nthread, int niter, boolean doWarmup, boolean doScaling, int[] sizes, double[] times) {
+    public static void writeFFTBenchmarkResultsToFile(String filename, int nthread, int niter, boolean doWarmup,
+            boolean doScaling, int[] sizes, double[] times) {
         String[] properties = { "os.name", "os.version", "os.arch", "java.vendor", "java.version" };
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename, false));
@@ -923,7 +933,8 @@ public class IOUtils {
             out.newLine();
             out.write("\tscaling performed = " + doScaling);
             out.newLine();
-            out.write("--------------------------------------------------------------------------------------------------");
+            out
+                    .write("--------------------------------------------------------------------------------------------------");
             out.newLine();
             out.write("sizes=[");
             for (int i = 0; i < sizes.length; i++) {

@@ -10,8 +10,8 @@ class TestNormInfinity {
         DoubleMatrix1D x2 = DoubleFactory1D.dense.make(new double[] { 1.0, -2.0 });
         DoubleMatrix1D x3 = DoubleFactory1D.dense.make(new double[] { -1.0, -2.0 });
 
-        System.out.println(DoubleAlgebra.DEFAULT.normInfinity(x1));
-        System.out.println(DoubleAlgebra.DEFAULT.normInfinity(x2));
-        System.out.println(DoubleAlgebra.DEFAULT.normInfinity(x3));
+        System.out.println(DenseDoubleAlgebra.DEFAULT.normInfinity(x1));
+        System.out.println(DenseDoubleAlgebra.DEFAULT.normInfinity(x2));
+        System.out.println(DenseDoubleAlgebra.DEFAULT.normInfinity(x3));
     }
 }

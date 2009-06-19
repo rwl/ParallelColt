@@ -54,6 +54,11 @@ import cern.colt.matrix.tdouble.DoubleMatrix3D;
  */
 class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The elements of this matrix.
      */
     protected double[] elements;
@@ -105,6 +110,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
         this.isNoView = false;
     }
 
+    @Override
     public double[] elements() {
         return elements;
     }
@@ -122,6 +128,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
+    @Override
     public double getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements[index(index)];
@@ -137,6 +144,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      * @param rank
      *            the rank of the element.
      */
+    @Override
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
@@ -156,6 +164,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public DoubleMatrix1D like(int size) {
         return new DenseDoubleMatrix1D(size);
     }
@@ -174,16 +183,18 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public DoubleMatrix2D like2D(int rows, int columns) {
         return new DenseDoubleMatrix2D(rows, columns);
     }
 
+    @Override
     public DoubleMatrix2D reshape(int rows, int cols) {
         if (rows * cols != size) {
             throw new IllegalArgumentException("rows*cols != size");
         }
         DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, cols);
-        final double[] elemsOther = (double[]) M.elements();
+        final double[] elementsOther = (double[]) M.elements();
         final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
@@ -192,19 +203,20 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
         for (int c = 0; c < cols; c++) {
             idxOther = zeroOther + c * colStrideOther;
             for (int r = 0; r < rows; r++) {
-                elemsOther[idxOther] = getQuick(idx++);
+                elementsOther[idxOther] = getQuick(idx++);
                 idxOther += rowStrideOther;
             }
         }
         return M;
     }
 
+    @Override
     public DoubleMatrix3D reshape(int slices, int rows, int cols) {
         if (slices * rows * cols != size) {
             throw new IllegalArgumentException("slices*rows*cols != size");
         }
         DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, cols);
-        final double[] elemsOther = (double[]) M.elements();
+        final double[] elementsOther = (double[]) M.elements();
         final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
@@ -215,7 +227,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
             for (int c = 0; c < cols; c++) {
                 idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
                 for (int r = 0; r < rows; r++) {
-                    elemsOther[idxOther] = getQuick(idx++);
+                    elementsOther[idxOther] = getQuick(idx++);
                     idxOther += rowStrideOther;
                 }
             }
@@ -237,6 +249,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int index, double value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // elements[index(index)] = value;
@@ -253,6 +266,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
@@ -260,6 +274,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
+    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix1D other) {
         if (other instanceof SelectedDenseDoubleMatrix1D) {
             SelectedDenseDoubleMatrix1D otherMatrix = (SelectedDenseDoubleMatrix1D) other;
@@ -277,6 +292,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
+    @Override
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -290,6 +306,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected DoubleMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseDoubleMatrix1D(this.elements, offsets);
     }

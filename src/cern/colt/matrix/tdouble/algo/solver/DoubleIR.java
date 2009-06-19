@@ -55,7 +55,8 @@ public class DoubleIR extends AbstractDoubleIterativeSolver {
         r = template.copy();
     }
 
-    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
+    public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
+            throws IterativeSolverDoubleNotConvergedException {
         checkSizes(A, b, x);
 
         A.zMult(x, r.assign(b), -1, 1, false);

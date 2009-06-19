@@ -140,6 +140,11 @@ import java.util.Date;
  * @see java.util.Random
  */
 public class DoubleMersenneTwister extends DoubleRandomEngine {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private int mti;
 
     private int[] mt = new int[N]; /* set initial seeds: N = 624 words */
@@ -152,14 +157,14 @@ public class DoubleMersenneTwister extends DoubleRandomEngine {
     private static final int MATRIX_A = 0x9908b0df; /* constant vector a */
 
     private static final int UPPER_MASK = 0x80000000; /*
-                                                            * most significant w-r
-                                                            * bits
-                                                            */
+                                                               * most significant w-r
+                                                               * bits
+                                                               */
 
     private static final int LOWER_MASK = 0x7fffffff; /*
-                                                            * least significant r
-                                                            * bits
-                                                            */
+                                                               * least significant r
+                                                               * bits
+                                                               */
 
     /* for tempering */
     private static final int TEMPERING_MASK_B = 0x9d2c5680;
@@ -210,9 +215,10 @@ public class DoubleMersenneTwister extends DoubleRandomEngine {
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         DoubleMersenneTwister clone = (DoubleMersenneTwister) super.clone();
-        clone.mt = (int[]) this.mt.clone();
+        clone.mt = this.mt.clone();
         return clone;
     }
 
@@ -262,6 +268,7 @@ public class DoubleMersenneTwister extends DoubleRandomEngine {
      * interval <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> (including
      * <tt>Integer.MIN_VALUE</tt> and <tt>Integer.MAX_VALUE</tt>).
      */
+    @Override
     public int nextInt() {
         /* Each single bit including the sign bit will be random */
         if (mti == N)

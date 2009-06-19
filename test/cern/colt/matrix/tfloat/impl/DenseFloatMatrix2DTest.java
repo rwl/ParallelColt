@@ -19,17 +19,18 @@ public class DenseFloatMatrix2DTest extends FloatMatrix2DTest {
     }
 
     public void testAssignFloatArray() {
-        float[] expected = new float[NROWS * NCOLUMNS];
-        for (int i = 0; i < NROWS * NCOLUMNS; i++) {
+        float[] expected = new float[(int) A.size()];
+        for (int i = 0; i < A.size(); i++) {
             expected[i] = (float) Math.random();
         }
         A.assign(expected);
         int idx = 0;
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(expected[idx++], A.getQuick(r, c), TOL);
+                assertEquals(0, Math.abs(expected[idx++] - A.getQuick(r, c)), TOL);
             }
         }
+
     }
 
     public void testDct2() {
@@ -131,6 +132,16 @@ public class DenseFloatMatrix2DTest extends FloatMatrix2DTest {
         ((DenseFloatMatrix2D) A).ifft2(true);
         for (int r = 0; r < nrows; r++) {
             for (int c = 0; c < ncolumns; c++) {
+                assertEquals(Acopy.getQuick(r, c), A.getQuick(r, c), TOL);
+            }
+        }
+
+        A = A.viewDice();
+        Acopy = A.copy();
+        ((DenseFloatMatrix2D) A).fft2();
+        ((DenseFloatMatrix2D) A).ifft2(true);
+        for (int r = 0; r < ncolumns; r++) {
+            for (int c = 0; c < nrows; c++) {
                 assertEquals(Acopy.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }

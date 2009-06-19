@@ -364,7 +364,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     }
 
     public void testZDotProductComplexMatrix1DIntInt() {
-        float[] actual = A.zDotProduct(B, 5, B.size() - 10);
+        float[] actual = A.zDotProduct(B, 5, (int) B.size() - 10);
         float[] expected = new float[2];
         for (int i = 5; i < SIZE - 5; i++) {
             expected = FComplex.plus(expected, FComplex.mult(A.getQuick(i), FComplex.conj(B.getQuick(i))));
@@ -376,7 +376,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         IntArrayList indexList = new IntArrayList();
         ArrayList<float[]> valueList = new ArrayList<float[]>();
         B.getNonZeros(indexList, valueList);
-        float[] actual = A.zDotProduct(B, 5, B.size() - 10, indexList);
+        float[] actual = A.zDotProduct(B, 5, (int) B.size() - 10, indexList);
         float[] expected = new float[2];
         for (int i = 5; i < SIZE - 5; i++) {
             expected = FComplex.plus(expected, FComplex.mult(A.getQuick(i), FComplex.conj(B.getQuick(i))));

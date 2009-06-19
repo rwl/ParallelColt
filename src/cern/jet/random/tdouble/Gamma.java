@@ -60,6 +60,11 @@ import cern.jet.stat.tdouble.Probability;
  * @version 1.0, 09/24/99
  */
 public class Gamma extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double alpha;
 
     protected double lambda;
@@ -88,6 +93,7 @@ public class Gamma extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(alpha, lambda);
     }
@@ -190,7 +196,12 @@ public class Gamma extends AbstractContinousDoubleDistribution {
                 if (Math.abs(v) > 0.25) {
                     q = q0 - s * t + 0.25 * t * t + (ss + ss) * Math.log(1.0 + v);
                 } else {
-                    q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
+                    q = q0
+                            + 0.5
+                            * t
+                            * t
+                            * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1)
+                            * v;
                 } // Step 7. Quotient acceptance
                 if (Math.log(1.0 - u) <= q)
                     return (gds / lambda);
@@ -208,7 +219,12 @@ public class Gamma extends AbstractContinousDoubleDistribution {
                 if (Math.abs(v) > 0.25) {
                     q = q0 - s * t + 0.25 * t * t + (ss + ss) * Math.log(1.0 + v);
                 } else {
-                    q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
+                    q = q0
+                            + 0.5
+                            * t
+                            * t
+                            * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1)
+                            * v;
                 }
                 if (q <= 0.0)
                     continue; // Step 11.
@@ -273,6 +289,7 @@ public class Gamma extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + alpha + "," + lambda + ")";
     }

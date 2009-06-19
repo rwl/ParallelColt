@@ -31,6 +31,11 @@ import cern.colt.map.tdouble.AbstractDoubleMap;
  * @see java.util.HashMap
  */
 public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public static int hashCollisions = 0; // for debug only
     /**
      * Makes this class non instantiable, but still let's others inherit from
@@ -110,6 +115,7 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -289,7 +295,8 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void pairsMatching(final LongObjectProcedure condition, final LongArrayList keyList, final ObjectArrayList valueList) {
+    public void pairsMatching(final LongObjectProcedure condition, final LongArrayList keyList,
+            final ObjectArrayList valueList) {
         keyList.clear();
         valueList.clear();
 
@@ -364,7 +371,7 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
 
         cern.colt.function.tint.IntComparator comp = new cern.colt.function.tint.IntComparator() {
             public int compare(int a, int b) {
-                int ab = ((Comparable) v[a]).compareTo((Comparable) v[b]);
+                int ab = ((Comparable) v[a]).compareTo(v[b]);
                 return ab < 0 ? -1 : ab > 0 ? 1 : (k[a] < k[b] ? -1 : (k[a] == k[b] ? 0 : 1));
                 // return v[a]<v[b] ? -1 : v[a]>v[b] ? 1 : (k[a]<k[b] ? -1 :
                 // (k[a]==k[b] ? 0 : 1));
@@ -403,6 +410,7 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
+    @Override
     public String toString() {
         LongArrayList theKeys = keys();
         theKeys.sort();

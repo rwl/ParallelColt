@@ -77,14 +77,14 @@ public class DefaultFloatIterationMonitor extends AbstractFloatIterationMonitor 
 
     /**
      * Constructor for DefaultIterationMonitor. Default is 100000 iterations at
-     * most, relative tolerance of 1e-5, absolute tolerance of 1e-25 and a
-     * divergence tolerance of 1e+5.
+     * most, relative tolerance of 1e-3, absolute tolerance of 1e-25 and a
+     * divergence tolerance of 1e+3.
      */
     public DefaultFloatIterationMonitor() {
         this.maxIter = 100000;
-        this.rtol = 1e-5f;
+        this.rtol = 1e-3f;
         this.atol = 1e-25f;
-        this.dtol = 1e+5f;
+        this.dtol = 1e+3f;
     }
 
     /**
@@ -151,16 +151,15 @@ public class DefaultFloatIterationMonitor extends AbstractFloatIterationMonitor 
     public void setDivergenceTolerance(float dtol) {
         this.dtol = dtol;
     }
-    
-    
+
     /**
      * Returns the relative divergence tolerance
+     * 
      * @return relative divergence tolerance (to initial residual)
      */
     public float getDivergenceTolerance() {
         return dtol;
     }
-       
 
     @Override
     protected boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException {

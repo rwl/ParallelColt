@@ -1,5 +1,6 @@
 package hep.aida.ref;
 
+import hep.aida.tdouble.DoubleIHistogram;
 import hep.aida.tdouble.DoubleIHistogram1D;
 import hep.aida.tdouble.DoubleIHistogram2D;
 import hep.aida.tdouble.ref.DoubleHistogram1D;
@@ -55,8 +56,8 @@ public class Test {
             out.println("/>");
             out.println("<statistics>");
             out.println("<statistic name=\"Entries\" value=\"" + h.entries() + "\"/>");
-            out.println("<statistic name=\"Underflow\" value=\"" + h.binEntries(h.UNDERFLOW) + "\"/>");
-            out.println("<statistic name=\"Overflow\" value=\"" + h.binEntries(h.OVERFLOW) + "\"/>");
+            out.println("<statistic name=\"Underflow\" value=\"" + h.binEntries(DoubleIHistogram.UNDERFLOW) + "\"/>");
+            out.println("<statistic name=\"Overflow\" value=\"" + h.binEntries(DoubleIHistogram.OVERFLOW) + "\"/>");
             if (!Double.isNaN(h.mean()))
                 out.println("<statistic name=\"Mean\" value=\"" + h.mean() + "\"/>");
             if (!Double.isNaN(h.rms()))
@@ -81,7 +82,8 @@ public class Test {
             out.println("<plot>");
             out.println("<dataArea>");
             out.println("<data2d type=\"xxx\">");
-            out.println("<bins2d title=\"" + h.title() + "\" xSize=\"" + h.xAxis().bins() + "\" ySize=\"" + h.yAxis().bins() + "\">");
+            out.println("<bins2d title=\"" + h.title() + "\" xSize=\"" + h.xAxis().bins() + "\" ySize=\""
+                    + h.yAxis().bins() + "\">");
             for (int i = 0; i < h.xAxis().bins(); i++)
                 for (int j = 0; j < h.yAxis().bins(); j++) {
                     out.println(h.binEntries(i, j) + "," + h.binError(i, j));

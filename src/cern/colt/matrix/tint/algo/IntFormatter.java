@@ -18,19 +18,10 @@ import cern.colt.matrix.tint.IntMatrix3D;
 
 /**
  * Flexible, well human readable matrix print formatting; By default decimal
- * point aligned. Build on top of the C-like <i>sprintf</i> functionality
- * provided by the {@link corejava.Format} class written by Cay Horstmann.
- * Currenly works on 1-d, 2-d and 3-d matrices. Note that in most cases you will
- * not need to get familiar with this class; just call
+ * point aligned. Currenly works on 1-d, 2-d and 3-d matrices. Note that in most
+ * cases you will not need to get familiar with this class; just call
  * <tt>matrix.toString()</tt> and be happy with the default formatting. This
  * class is for advanced requirements.
- * <p>
- * Can't exactly remember the syntax of printf format strings? See
- * {@link corejava.Format} or <a
- * href="http://www.braju.com/docs/index.html">Henrik Nordberg's
- * documentation</a>, or the <a
- * href="http://www.dinkumware.com/htm_cl/lib_prin.html#Print%20Functions"
- * >Dinkumware's C Library Reference</a>.
  * 
  * <p>
  * <b>Examples:</b>
@@ -295,6 +286,11 @@ import cern.colt.matrix.tint.IntMatrix3D;
  */
 public class IntFormatter extends AbstractFormatter {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Constructs and returns a matrix formatter with format <tt>"%G"</tt>.
      */
     public IntFormatter() {
@@ -322,6 +318,7 @@ public class IntFormatter extends AbstractFormatter {
     /**
      * Converts a given cell to a String; no alignment considered.
      */
+    @Override
     protected String form(AbstractMatrix1D matrix, int index, Former formatter) {
         return this.form((IntMatrix1D) matrix, index, formatter);
     }
@@ -339,6 +336,7 @@ public class IntFormatter extends AbstractFormatter {
     /**
      * Returns a string representations of all cells; no alignment considered.
      */
+    @Override
     protected String[][] format(AbstractMatrix2D matrix) {
         return this.format((IntMatrix2D) matrix);
     }
@@ -360,6 +358,7 @@ public class IntFormatter extends AbstractFormatter {
     /**
      * Returns the number of characters before the decimal point.
      */
+    @Override
     protected int lead(String s) {
         if (alignment.equals(DECIMAL))
             return indexOfDecimalPoint(s);
@@ -427,7 +426,7 @@ public class IntFormatter extends AbstractFormatter {
      *            the matrix to convert.
      */
     public String toString(IntMatrix1D matrix) {
-        IntMatrix2D easy = matrix.like2D(1, matrix.size());
+        IntMatrix2D easy = matrix.like2D(1, (int) matrix.size());
         easy.viewRow(0).assign(matrix);
         return toString(easy);
     }
@@ -469,6 +468,7 @@ public class IntFormatter extends AbstractFormatter {
      * @param matrix
      *            the matrix to convert.
      */
+    @Override
     protected String toString(AbstractMatrix2D matrix) {
         return this.toString((IntMatrix2D) matrix);
     }
@@ -493,7 +493,8 @@ public class IntFormatter extends AbstractFormatter {
      *            The overall title of the matrix to be formatted.
      * @return the matrix converted to a string.
      */
-    protected String toTitleString(IntMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName, String columnAxisName, String title) {
+    protected String toTitleString(IntMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName,
+            String columnAxisName, String title) {
         if (matrix.size() == 0)
             return "Empty matrix";
         String[][] s = format(matrix);
@@ -501,7 +502,9 @@ public class IntFormatter extends AbstractFormatter {
         // this.alignment = DECIMAL;
         align(s);
         // this.alignment = oldAlignment;
-        return new cern.colt.matrix.tobject.algo.ObjectFormatter().toTitleString(cern.colt.matrix.tobject.ObjectFactory2D.dense.make(s), rowNames, columnNames, rowAxisName, columnAxisName, title);
+        return new cern.colt.matrix.tobject.algo.ObjectFormatter().toTitleString(
+                cern.colt.matrix.tobject.ObjectFactory2D.dense.make(s), rowNames, columnNames, rowAxisName,
+                columnAxisName, title);
     }
 
     /**
@@ -528,14 +531,16 @@ public class IntFormatter extends AbstractFormatter {
      *            The overall title of the matrix to be formatted.
      * @return the matrix converted to a string.
      */
-    private String xtoTitleString(IntMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames, String sliceAxisName, String rowAxisName, String columnAxisName, String title) {
+    private String xtoTitleString(IntMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames,
+            String sliceAxisName, String rowAxisName, String columnAxisName, String title) {
         if (matrix.size() == 0)
             return "Empty matrix";
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < matrix.slices(); i++) {
             if (i != 0)
                 buf.append(sliceSeparator);
-            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title + "\n" + sliceAxisName + "=" + sliceNames[i]));
+            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title
+                    + "\n" + sliceAxisName + "=" + sliceNames[i]));
         }
         return buf.toString();
     }

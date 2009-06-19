@@ -44,6 +44,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class EmpiricalWalker extends AbstractDiscreteDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected int K;
 
     protected int[] A;
@@ -195,20 +200,22 @@ public class EmpiricalWalker extends AbstractDiscreteDistribution {
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         EmpiricalWalker copy = (EmpiricalWalker) super.clone();
         if (this.cdf != null)
-            copy.cdf = (double[]) this.cdf.clone();
+            copy.cdf = this.cdf.clone();
         if (this.A != null)
-            copy.A = (int[]) this.A.clone();
+            copy.A = this.A.clone();
         if (this.F != null)
-            copy.F = (double[]) this.F.clone();
+            copy.F = this.F.clone();
         return copy;
     }
 
     /**
      * Returns a random integer <tt>k</tt> with probability <tt>pdf(k)</tt>.
      */
+    @Override
     public int nextInt() {
         int c = 0;
         double u, f;
@@ -415,6 +422,7 @@ public class EmpiricalWalker extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         String interpolation = null;
         return this.getClass().getName() + "(" + ((cdf != null) ? cdf.length : 0) + ")";

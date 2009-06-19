@@ -171,7 +171,8 @@ class BenchmarkMatrix2D {
     /**
      * Runs a bench on matrices holding double elements.
      */
-    public static void doubleBenchmark(int runs, int rows, int columns, String kind, boolean print, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
+    public static void doubleBenchmark(int runs, int rows, int columns, String kind, boolean print,
+            int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         System.out.println("benchmarking double matrix");
         // certain loops need to be constructed so that the jitter can't
         // optimize them away and we get fantastic numbers.
@@ -247,7 +248,8 @@ class BenchmarkMatrix2D {
 
         Runtime.getRuntime().gc(); // invite gc
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread();
+            Thread.sleep(1000);
         } catch (InterruptedException exc) {
         }
         ;
@@ -334,7 +336,8 @@ class BenchmarkMatrix2D {
         System.out.println(size / timer3.minus(emptyLoop).seconds() + " elements / sec");
         Runtime.getRuntime().gc(); // invite gc
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread();
+            Thread.sleep(1000);
         } catch (InterruptedException exc) {
         }
         ;
@@ -353,7 +356,8 @@ class BenchmarkMatrix2D {
     /**
      * Runs a bench on matrices holding double elements.
      */
-    public static void doubleBenchmarkMult(int runs, int rows, int columns, String kind, boolean print, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
+    public static void doubleBenchmarkMult(int runs, int rows, int columns, String kind, boolean print,
+            int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         System.out.println("benchmarking double matrix");
         // certain loops need to be constructed so that the jitter can't
         // optimize them away and we get fantastic numbers.
@@ -484,7 +488,8 @@ class BenchmarkMatrix2D {
 
         Runtime.getRuntime().gc(); // invite gc
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread();
+            Thread.sleep(1000);
         } catch (InterruptedException exc) {
         }
         ;
@@ -538,7 +543,8 @@ class BenchmarkMatrix2D {
         System.out.println(size / timer3.minus(emptyLoop).seconds() + " elements / sec");
         Runtime.getRuntime().gc(); // invite gc
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread();
+            Thread.sleep(1000);
         } catch (InterruptedException exc) {
         }
         ;
@@ -619,7 +625,8 @@ class BenchmarkMatrix2D {
 
         Runtime.getRuntime().gc(); // invite gc
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread();
+            Thread.sleep(1000);
         } catch (InterruptedException exc) {
         }
         ;
@@ -672,7 +679,8 @@ class BenchmarkMatrix2D {
         System.out.println(size / timer3.minus(emptyLoop).seconds() + " elements / sec");
         Runtime.getRuntime().gc(); // invite gc
         try {
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread();
+            Thread.sleep(1000);
         } catch (InterruptedException exc) {
         }
         ;
@@ -692,7 +700,8 @@ class BenchmarkMatrix2D {
     /**
      * Runs a bench on matrices holding int elements.
      */
-    public static void intBenchmark(int runs, int rows, int columns, String kind, boolean print, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
+    public static void intBenchmark(int runs, int rows, int columns, String kind, boolean print, int initialCapacity,
+            double minLoadFactor, double maxLoadFactor) {
         throw new InternalError();
         /*
          * // certain loops need to be constructed so that the jitter can't

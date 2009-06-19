@@ -45,7 +45,7 @@ public class FloatDiagonal implements FloatPreconditioner {
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -62,7 +62,7 @@ public class FloatDiagonal implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 

@@ -176,7 +176,8 @@ public class FloatQuantileFinderFactory extends Object {
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>returnSamplingRate[0]</tt>=the required sampling rate.
      */
-    public static long[] known_N_compute_B_and_K(long N, float epsilon, float delta, int quantiles, float[] returnSamplingRate) {
+    public static long[] known_N_compute_B_and_K(long N, float epsilon, float delta, int quantiles,
+            float[] returnSamplingRate) {
         returnSamplingRate[0] = 1.0f;
         if (epsilon <= 0.0) {
             // no way around exact quantile search
@@ -218,7 +219,7 @@ public class FloatQuantileFinderFactory extends Object {
     protected static long[] known_N_compute_B_and_K_quick(long N, float epsilon) {
         final int maxBuffers = 50;
         final int maxHeight = 50;
-        final float N_float = (float) N;
+        final float N_float = N;
         final float c = N_float * epsilon * 2.0f;
         int[] heightMaximums = new int[maxBuffers - 1];
 
@@ -230,19 +231,26 @@ public class FloatQuantileFinderFactory extends Object {
             int h = 3;
 
             while (h <= maxHeight && // skip heights until x<=0
-                    (h - 2) * (FloatArithmetic.binomial(b + h - 2, h - 1)) - (FloatArithmetic.binomial(b + h - 3, h - 3)) + (FloatArithmetic.binomial(b + h - 3, h - 2)) - c > 0.0) {
+                    (h - 2) * (FloatArithmetic.binomial(b + h - 2, h - 1))
+                            - (FloatArithmetic.binomial(b + h - 3, h - 3))
+                            + (FloatArithmetic.binomial(b + h - 3, h - 2)) - c > 0.0) {
                 h++;
             }
             // from now on x is monotonically growing...
             while (h <= maxHeight && // skip heights until x>0
-                    (h - 2) * (FloatArithmetic.binomial(b + h - 2, h - 1)) - (FloatArithmetic.binomial(b + h - 3, h - 3)) + (FloatArithmetic.binomial(b + h - 3, h - 2)) - c <= 0.0) {
+                    (h - 2) * (FloatArithmetic.binomial(b + h - 2, h - 1))
+                            - (FloatArithmetic.binomial(b + h - 3, h - 3))
+                            + (FloatArithmetic.binomial(b + h - 3, h - 2)) - c <= 0.0) {
                 h++;
             }
             h--; // go back to last height
 
             // was x>0 or did we loop without finding anything?
             int hMax;
-            if (h >= maxHeight && (h - 2) * (FloatArithmetic.binomial(b + h - 2, h - 1)) - (FloatArithmetic.binomial(b + h - 3, h - 3)) + (FloatArithmetic.binomial(b + h - 3, h - 2)) - c > 0.0) {
+            if (h >= maxHeight
+                    && (h - 2) * (FloatArithmetic.binomial(b + h - 2, h - 1))
+                            - (FloatArithmetic.binomial(b + h - 3, h - 3))
+                            + (FloatArithmetic.binomial(b + h - 3, h - 2)) - c > 0.0) {
                 hMax = Integer.MIN_VALUE;
             } else {
                 hMax = h;
@@ -272,7 +280,7 @@ public class FloatQuantileFinderFactory extends Object {
         int minB = -1;
         for (int b = 2; b <= maxBuffers; b++) {
             if (kMinimums[b - 2] < Long.MAX_VALUE) {
-                long mult = ((long) b) * ((long) kMinimums[b - 2]);
+                long mult = (b) * (kMinimums[b - 2]);
                 if (mult < multMin) {
                     multMin = mult;
                     minB = b;
@@ -325,7 +333,8 @@ public class FloatQuantileFinderFactory extends Object {
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>returnSamplingRate[0]</tt>=the required sampling rate.
      */
-    protected static long[] known_N_compute_B_and_K_slow(long N, float epsilon, float delta, int quantiles, float[] returnSamplingRate) {
+    protected static long[] known_N_compute_B_and_K_slow(long N, float epsilon, float delta, int quantiles,
+            float[] returnSamplingRate) {
         final int maxBuffers = 50;
         final int maxHeight = 50;
         final float N_float = N;
@@ -350,14 +359,17 @@ public class FloatQuantileFinderFactory extends Object {
             for (long h = 3; h < maxHeight; h++) {
                 float binomial = FloatArithmetic.binomial(b + h - 2, h - 1);
                 long tmp = (long) Math.ceil(N_float / binomial);
-                if ((b * tmp < memory) && ((h - 2) * binomial - FloatArithmetic.binomial(b + h - 3, h - 3) + FloatArithmetic.binomial(b + h - 3, h - 2) <= c)) {
+                if ((b * tmp < memory)
+                        && ((h - 2) * binomial - FloatArithmetic.binomial(b + h - 3, h - 3)
+                                + FloatArithmetic.binomial(b + h - 3, h - 2) <= c)) {
                     ret_k = tmp;
                     ret_b = b;
                     memory = ret_k * b;
                     sampling_rate = 1.0f;
                 }
                 if (delta > 0.0) {
-                    float t = (h - 2) * FloatArithmetic.binomial(b + h - 2, h - 1) - FloatArithmetic.binomial(b + h - 3, h - 3) + FloatArithmetic.binomial(b + h - 3, h - 2);
+                    float t = (h - 2) * FloatArithmetic.binomial(b + h - 2, h - 1)
+                            - FloatArithmetic.binomial(b + h - 3, h - 3) + FloatArithmetic.binomial(b + h - 3, h - 2);
                     float u = logarithm / epsilon;
                     float v = FloatArithmetic.binomial(b + h - 2, h - 1);
                     float w = logarithm / (2.0f * epsilon * epsilon);
@@ -431,7 +443,8 @@ public class FloatQuantileFinderFactory extends Object {
      * @return the quantile finder minimizing memory requirements under the
      *         given constraints.
      */
-    public static FloatQuantileFinder newFloatQuantileFinder(boolean known_N, long N, float epsilon, float delta, int quantiles, FloatRandomEngine generator) {
+    public static FloatQuantileFinder newFloatQuantileFinder(boolean known_N, long N, float epsilon, float delta,
+            int quantiles, FloatRandomEngine generator) {
         // boolean known_N = true;
         // if (N==Long.MAX_VALUE) known_N = false;
         // check parameters.

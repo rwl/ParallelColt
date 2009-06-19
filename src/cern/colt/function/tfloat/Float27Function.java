@@ -18,9 +18,10 @@ public interface Float27Function {
      * 
      * @return the result of the function.
      */
-    abstract public float apply(float a000, float a001, float a002, float a010, float a011, float a012, float a020, float a021, float a022,
+    abstract public float apply(float a000, float a001, float a002, float a010, float a011, float a012, float a020,
+            float a021, float a022,
 
-    float a100, float a101, float a102, float a110, float a111, float a112, float a120, float a121, float a122,
+            float a100, float a101, float a102, float a110, float a111, float a112, float a120, float a121, float a122,
 
-    float a200, float a201, float a202, float a210, float a211, float a212, float a220, float a221, float a222);
+            float a200, float a201, float a202, float a210, float a211, float a212, float a220, float a221, float a222);
 }

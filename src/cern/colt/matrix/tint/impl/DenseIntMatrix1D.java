@@ -45,7 +45,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  */
 public class DenseIntMatrix1D extends IntMatrix1D {
-    private static final long serialVersionUID = -706456704651139684L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The elements of this matrix.
@@ -102,28 +102,24 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         this.isNoView = !isView;
     }
 
+    @Override
     public int aggregate(final cern.colt.function.tint.IntIntFunction aggr, final cern.colt.function.tint.IntFunction f) {
         if (size == 0)
             throw new IllegalArgumentException("size == 0");
         int a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         int a = f.apply(elements[idx]);
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             a = aggr.apply(a, f.apply(elements[idx]));
                         }
@@ -143,7 +139,9 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return a;
     }
 
-    public int aggregate(final IntMatrix1D other, final cern.colt.function.tint.IntIntFunction aggr, final cern.colt.function.tint.IntIntFunction f) {
+    @Override
+    public int aggregate(final IntMatrix1D other, final cern.colt.function.tint.IntIntFunction aggr,
+            final cern.colt.function.tint.IntIntFunction f) {
         if (!(other instanceof DenseIntMatrix1D)) {
             return super.aggregate(other, aggr, f);
         }
@@ -154,25 +152,20 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         final int strideOther = other.stride();
         final int[] elemsOther = (int[]) other.elements();
         int a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
                         int a = f.apply(elements[idx], elemsOther[idxOther]);
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             idxOther += strideOther;
                             a = aggr.apply(a, f.apply(elements[idx], elemsOther[idxOther]));
@@ -195,6 +188,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return a;
     }
 
+    @Override
     public IntMatrix1D assign(final cern.colt.function.tint.IntFunction function) {
         final int multiplicator;
         if (function instanceof cern.jet.math.tint.IntMult) {
@@ -206,32 +200,28 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         } else {
             multiplicator = 0;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         // specialization for speed
                         if (function instanceof cern.jet.math.tint.IntMult) {
                             // x[i] = mult*x[i]
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 elements[idx] *= multiplicator;
                                 idx += stride;
                             }
                         } else {
                             // the general case x[i] = f(x[i])
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 elements[idx] = function.apply(elements[idx]);
                                 idx += stride;
                             }
@@ -258,24 +248,22 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond, final cern.colt.function.tint.IntFunction function) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+    @Override
+    public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond,
+            final cern.colt.function.tint.IntFunction function) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (cond.apply(elements[idx]) == true) {
                                 elements[idx] = function.apply(elements[idx]);
                             }
@@ -297,24 +285,21 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
+    @Override
     public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond, final int value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (cond.apply(elements[idx]) == true) {
                                 elements[idx] = value;
                             }
@@ -336,24 +321,21 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
+    @Override
     public IntMatrix1D assign(final int value) {
         final int[] elems = this.elements;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elems[idx] = value;
                             idx += stride;
                         }
@@ -371,49 +353,32 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
+    @Override
     public IntMatrix1D assign(final int[] values) {
         if (values.length != size)
-            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()=" + size());
-        int np = ConcurrencyUtils.getNumberOfThreads();
+            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
+                    + size());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (isNoView) {
-            if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-                Future<?>[] futures = new Future[np];
-                int k = size / np;
-                for (int j = 0; j < np; j++) {
-                    final int startidx = j * k;
-                    final int length;
-                    if (j == np - 1) {
-                        length = size - startidx;
-                    } else {
-                        length = k;
-                    }
-                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                        public void run() {
-                            System.arraycopy(values, startidx, elements, startidx, length);
-                        }
-                    });
-                }
-                ConcurrencyUtils.waitForCompletion(futures);
-            } else {
-                System.arraycopy(values, 0, this.elements, 0, values.length);
-            }
+            System.arraycopy(values, 0, this.elements, 0, values.length);
         } else {
-            if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-                Future<?>[] futures = new Future[np];
-                int k = size / np;
-                for (int j = 0; j < np; j++) {
-                    final int startidx = j * k;
-                    final int stopidx;
-                    if (j == np - 1) {
-                        stopidx = size;
+            if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+                nthreads = Math.min(nthreads, size);
+                Future<?>[] futures = new Future[nthreads];
+                int k = size / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx;
+                    if (j == nthreads - 1) {
+                        lastIdx = size;
                     } else {
-                        stopidx = startidx + k;
+                        lastIdx = firstIdx + k;
                     }
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
-                            int idx = zero + startidx * stride;
-                            for (int i = startidx; i < stopidx; i++) {
+                            int idx = zero + firstIdx * stride;
+                            for (int i = firstIdx; i < lastIdx; i++) {
                                 elements[idx] = values[i];
                                 idx += stride;
                             }
@@ -432,6 +397,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
+    @Override
     public IntMatrix1D assign(IntMatrix1D source) {
         // overriden for performance only
         if (!(source instanceof DenseIntMatrix1D)) {
@@ -462,23 +428,20 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             throw new InternalError();
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elements[idx] = elemsOther[idxOther];
                             idx += stride;
                             idxOther += strideOther;
@@ -499,6 +462,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
+    @Override
     public IntMatrix1D assign(final IntMatrix1D y, final cern.colt.function.tint.IntIntFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseIntMatrix1D)) {
@@ -509,33 +473,30 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         final int zeroOther = (int) y.index(0);
         final int strideOther = y.stride();
         final int[] elemsOther = (int[]) y.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
                         // specialized for speed
                         if (function == cern.jet.math.tint.IntFunctions.mult) {
                             // x[i] = x[i] * y[i]
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 elements[idx] *= elemsOther[idxOther];
                                 idx += stride;
                                 idxOther += strideOther;
                             }
                         } else if (function == cern.jet.math.tint.IntFunctions.div) {
                             // x[i] = x[i] / y[i]
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 elements[idx] /= elemsOther[idxOther];
                                 idx += stride;
                                 idxOther += strideOther;
@@ -545,28 +506,28 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                             int multiplicator = ((cern.jet.math.tint.IntPlusMultFirst) function).multiplicator;
                             if (multiplicator == 0) {
                                 // x[i] = 0*x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
+                                for (int k = firstIdx; k < lastIdx; k++) {
                                     elements[idx] = elemsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else if (multiplicator == 1) {
                                 // x[i] = x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
+                                for (int k = firstIdx; k < lastIdx; k++) {
                                     elements[idx] += elemsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else if (multiplicator == -1) {
                                 // x[i] = -x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
+                                for (int k = firstIdx; k < lastIdx; k++) {
                                     elements[idx] = elemsOther[idxOther] - elements[idx];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else {
                                 // the general case x[i] = mult*x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
+                                for (int k = firstIdx; k < lastIdx; k++) {
                                     elements[idx] = multiplicator * elements[idx] + elemsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
@@ -579,21 +540,21 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                                 return;
                             } else if (multiplicator == 1) {
                                 // x[i] = x[i] + y[i]
-                                for (int k = startidx; k < stopidx; k++) {
+                                for (int k = firstIdx; k < lastIdx; k++) {
                                     elements[idx] += elemsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else if (multiplicator == -1) {
                                 // x[i] = x[i] - y[i]
-                                for (int k = startidx; k < stopidx; k++) {
+                                for (int k = firstIdx; k < lastIdx; k++) {
                                     elements[idx] -= elemsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
                                 }
                             } else {
                                 // the general case x[i] = x[i] + mult*y[i]
-                                for (int k = startidx; k < stopidx; k++) {
+                                for (int k = firstIdx; k < lastIdx; k++) {
                                     elements[idx] += multiplicator * elemsOther[idxOther];
                                     idx += stride;
                                     idxOther += strideOther;
@@ -602,7 +563,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                             }
                         } else {
                             // the general case x[i] = f(x[i],y[i])
-                            for (int k = startidx; k < stopidx; k++) {
+                            for (int k = firstIdx; k < lastIdx; k++) {
                                 elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
                                 idx += stride;
                                 idxOther += strideOther;
@@ -669,26 +630,24 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
+    @Override
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopsize; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (elements[idx] != 0)
                                 cardinality++;
                             idx += stride;
@@ -698,11 +657,11 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -721,10 +680,12 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return cardinality;
     }
 
+    @Override
     public int[] elements() {
         return elements;
     }
 
+    @Override
     public void getNonZeros(final IntArrayList indexList, final IntArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -755,6 +716,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
+    @Override
     public void getPositiveValues(final IntArrayList indexList, final IntArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -785,6 +747,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
+    @Override
     public void getNegativeValues(final IntArrayList indexList, final IntArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -815,28 +778,26 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
+    @Override
     public int[] getMaxLocation() {
         int location = 0;
         int maxValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int[][] results = new int[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int[][] results = new int[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Callable<int[]>() {
                     public int[] call() throws Exception {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         int maxValue = elements[idx];
                         int location = (idx - zero) / stride;
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             if (maxValue < elements[idx]) {
                                 maxValue = elements[idx];
@@ -848,15 +809,15 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (int[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                location = results[0][1];
+                for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        location = (int) results[j][1];
+                        location = results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -879,28 +840,26 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return new int[] { maxValue, location };
     }
 
+    @Override
     public int[] getMinLocation() {
         int location = 0;
         int minValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int[][] results = new int[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int[][] results = new int[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Callable<int[]>() {
                     public int[] call() throws Exception {
-                        int idx = zero + startidx * stride;
+                        int idx = zero + firstIdx * stride;
                         int minValue = elements[idx];
                         int location = (idx - zero) / stride;
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             idx += stride;
                             if (minValue > elements[idx]) {
                                 minValue = elements[idx];
@@ -912,15 +871,15 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (int[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
+                location = results[0][1];
+                for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        location = (int) results[j][1];
+                        location = results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -943,44 +902,44 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return new int[] { minValue, location };
     }
 
+    @Override
     public int getQuick(int index) {
         return elements[zero + index * stride];
     }
 
+    @Override
     public IntMatrix1D like(int size) {
         return new DenseIntMatrix1D(size);
     }
 
+    @Override
     public IntMatrix2D like2D(int rows, int columns) {
         return new DenseIntMatrix2D(rows, columns);
     }
 
-    public IntMatrix2D reshape(final int rows, final int cols) {
-        if (rows * cols != size) {
+    @Override
+    public IntMatrix2D reshape(final int rows, final int columns) {
+        if (rows * columns != size) {
             throw new IllegalArgumentException("rows*cols != size");
         }
-        IntMatrix2D M = new DenseIntMatrix2D(rows, cols);
+        IntMatrix2D M = new DenseIntMatrix2D(rows, columns);
         final int[] elemsOther = (int[]) M.elements();
         final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = cols / np;
-            for (int j = 0; j < np; j++) {
-                final int startcol = j * k;
-                final int stopcol;
-                if (j == np - 1) {
-                    stopcol = cols;
-                } else {
-                    stopcol = startcol + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, columns);
+            Future<?>[] futures = new Future[nthreads];
+            int k = columns / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstColumn = j * k;
+                final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int c = startcol; c < stopcol; c++) {
+                        for (int c = firstColumn; c < lastColumn; c++) {
                             idxOther = zeroOther + c * colStrideOther;
                             idx = zero + (c * rows) * stride;
                             for (int r = 0; r < rows; r++) {
@@ -996,7 +955,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         } else {
             int idxOther;
             int idx = zero;
-            for (int c = 0; c < cols; c++) {
+            for (int c = 0; c < columns; c++) {
                 idxOther = zeroOther + c * colStrideOther;
                 for (int r = 0; r < rows; r++) {
                     elemsOther[idxOther] = elements[idx];
@@ -1008,36 +967,33 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return M;
     }
 
-    public IntMatrix3D reshape(final int slices, final int rows, final int cols) {
-        if (slices * rows * cols != size) {
+    @Override
+    public IntMatrix3D reshape(final int slices, final int rows, final int columns) {
+        if (slices * rows * columns != size) {
             throw new IllegalArgumentException("slices*rows*cols != size");
         }
-        IntMatrix3D M = new DenseIntMatrix3D(slices, rows, cols);
+        IntMatrix3D M = new DenseIntMatrix3D(slices, rows, columns);
         final int[] elemsOther = (int[]) M.elements();
         final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
-                            for (int c = 0; c < cols; c++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int c = 0; c < columns; c++) {
                                 idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
-                                idx = zero + (s * rows * cols + c * rows) * stride;
+                                idx = zero + (s * rows * columns + c * rows) * stride;
                                 for (int r = 0; r < rows; r++) {
                                     elemsOther[idxOther] = elements[idx];
                                     idxOther += rowStrideOther;
@@ -1053,7 +1009,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             int idxOther;
             int idx = zero;
             for (int s = 0; s < slices; s++) {
-                for (int c = 0; c < cols; c++) {
+                for (int c = 0; c < columns; c++) {
                     idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
                     for (int r = 0; r < rows; r++) {
                         elemsOther[idxOther] = elements[idx];
@@ -1066,10 +1022,12 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return M;
     }
 
+    @Override
     public void setQuick(int index, int value) {
         elements[zero + index * stride] = value;
     }
 
+    @Override
     public void swap(final IntMatrix1D other) {
         // overriden for performance only
         if (!(other instanceof DenseIntMatrix1D)) {
@@ -1084,23 +1042,20 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             throw new InternalError();
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             int tmp = elements[idx];
                             elements[idx] = elemsOther[idxOther];
                             elemsOther[idxOther] = tmp;
@@ -1124,6 +1079,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
+    @Override
     public void toArray(int[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
@@ -1133,6 +1089,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             super.toArray(values);
     }
 
+    @Override
     public int zDotProduct(IntMatrix1D y) {
         if (!(y instanceof DenseIntMatrix1D)) {
             return super.zDotProduct(y);
@@ -1145,32 +1102,32 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         int sum = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
             final int zeroThisF = zeroThis;
             final int zeroOtherF = zeroOther;
             final int strideOtherF = strideOther;
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
-                        int idx = zeroThisF + startidx * stride;
-                        int idxOther = zeroOtherF + startidx * strideOtherF;
+                        int idx = zeroThisF + firstIdx * stride;
+                        int idxOther = zeroOtherF + firstIdx * strideOtherF;
                         idx -= stride;
                         idxOther -= strideOtherF;
                         int sum = 0;
-                        int min = stopidx - startidx;
+                        int min = lastIdx - firstIdx;
                         for (int k = min / 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
                         }
                         for (int k = min % 4; --k >= 0;) {
                             sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF];
@@ -1180,11 +1137,11 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 sum = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -1196,8 +1153,10 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             zeroThis -= stride;
             zeroOther -= strideOther;
             for (int k = size / 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride]
-                        * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
             }
             for (int k = size % 4; --k >= 0;) {
                 sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
@@ -1206,6 +1165,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return sum;
     }
 
+    @Override
     public int zDotProduct(IntMatrix1D y, int from, int length) {
         if (!(y instanceof DenseIntMatrix1D)) {
             return super.zDotProduct(y, from, length);
@@ -1218,7 +1178,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         if (size < tail)
             tail = size;
         if (y.size() < tail)
-            tail = y.size();
+            tail = (int) y.size();
         final int[] elemsOther = yy.elements;
         int zeroThis = (int) index(from);
         int zeroOther = (int) yy.index(from);
@@ -1226,32 +1186,32 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         if (elements == null || elemsOther == null)
             throw new InternalError();
         int sum = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
             final int zeroThisF = zeroThis;
             final int zeroOtherF = zeroOther;
             final int strideOtherF = strideOther;
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = length / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = length;
-                } else {
-                    stopidx = startidx + k;
-                }
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = length / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
-                        int idx = zeroThisF + startidx * stride;
-                        int idxOther = zeroOtherF + startidx * strideOtherF;
+                        int idx = zeroThisF + firstIdx * stride;
+                        int idxOther = zeroOtherF + firstIdx * strideOtherF;
                         idx -= stride;
                         idxOther -= strideOtherF;
                         int sum = 0;
-                        int min = stopidx - startidx;
+                        int min = lastIdx - firstIdx;
                         for (int k = min / 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF] + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
                         }
                         for (int k = min % 4; --k >= 0;) {
                             sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF];
@@ -1261,11 +1221,11 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 sum = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -1278,8 +1238,10 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             zeroOther -= strideOther;
             int min = tail - from;
             for (int k = min / 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther] + elements[zeroThis += stride]
-                        * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
             }
             for (int k = min % 4; --k >= 0;) {
                 sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
@@ -1288,29 +1250,27 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return sum;
     }
 
+    @Override
     public int zSum() {
         int sum = 0;
         final int[] elems = this.elements;
         if (elems == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int sum = 0;
-                        int idx = zero + startidx * stride;
-                        for (int i = startidx; i < stopidx; i++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             sum += elems[idx];
                             idx += stride;
                         }
@@ -1319,11 +1279,11 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 sum = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -1341,6 +1301,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return sum;
     }
 
+    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int index = zero;
@@ -1354,6 +1315,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return cardinality;
     }
 
+    @Override
     protected boolean haveSharedCellsRaw(IntMatrix1D other) {
         if (other instanceof SelectedDenseIntMatrix1D) {
             SelectedDenseIntMatrix1D otherMatrix = (SelectedDenseIntMatrix1D) other;
@@ -1365,10 +1327,12 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return false;
     }
 
+    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
+    @Override
     protected IntMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseIntMatrix1D(this.elements, offsets);
     }

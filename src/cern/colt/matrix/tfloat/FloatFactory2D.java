@@ -9,8 +9,10 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tfloat;
 
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.RCFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseCCFloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
+import cern.jet.math.tfloat.FloatFunctions;
 
 /**
  * Factory for convenient construction of 2-d matrices holding <tt>float</tt>
@@ -85,8 +87,12 @@ import cern.colt.matrix.tfloat.impl.SparseFloatMatrix2D;
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
+ * 
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class FloatFactory2D extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     /**
      * A factory producing dense matrices.
      */
@@ -102,16 +108,87 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      */
     public static final FloatFactory2D rowCompressed = new FloatFactory2D();
 
-    /*
-     * A factory producing sparse row compressed modified matrices.
+    /**
+     * A factory producing sparse row compressed matrices.
      */
-    // public static final FloatFactory2D rowCompressedModified = new
-    // FloatFactory2D();
+    public static final FloatFactory2D columnCompressed = new FloatFactory2D();
+
+    /**
+     * Checks whether the given array is rectangular, that is, whether all rows
+     * have the same number of columns.
+     * 
+     * @throws IllegalArgumentException
+     *             if the array is not rectangular.
+     */
+    protected static void checkRectangularShape(float[][] array) {
+        int columns = -1;
+        for (int row = array.length; --row >= 0;) {
+            if (array[row] != null) {
+                if (columns == -1)
+                    columns = array[row].length;
+                if (array[row].length != columns)
+                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
+            }
+        }
+    }
+
+    /**
+     * Checks whether the given array is rectangular, that is, whether all rows
+     * have the same number of columns.
+     * 
+     * @throws IllegalArgumentException
+     *             if the array is not rectangular.
+     */
+    protected static void checkRectangularShape(FloatMatrix2D[][] array) {
+        int columns = -1;
+        for (int row = array.length; --row >= 0;) {
+            if (array[row] != null) {
+                if (columns == -1)
+                    columns = array[row].length;
+                if (array[row].length != columns)
+                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
+            }
+        }
+    }
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
     protected FloatFactory2D() {
+    }
+
+    /**
+     * C = A||b; Constructs a new matrix which is the column-wise concatenation
+     * of two other matrices.
+     * 
+     * <pre>
+     *   0 1 2
+     *   3 4 5
+     *   appendColumn
+     *   6 
+     *   8 
+     *   --&gt;
+     *   0 1 2 6 
+     *   3 4 5 8
+     * 
+     * </pre>
+     */
+    public FloatMatrix2D appendColumn(FloatMatrix2D A, FloatMatrix1D b) {
+        // force both to have maximal shared number of rows.
+        if (b.size() > A.rows())
+            b = b.viewPart(0, A.rows());
+        else if (b.size() < A.rows())
+            A = A.viewPart(0, 0, (int) b.size(), A.columns());
+
+        // concatenate
+        int ac = A.columns();
+        int bc = 1;
+        int r = A.rows();
+        FloatMatrix2D matrix = make(r, ac + bc);
+        matrix.viewPart(0, 0, r, ac).assign(A);
+        matrix.viewColumn(ac).assign(b);
+        return matrix;
     }
 
     /**
@@ -147,20 +224,38 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
-    public FloatMatrix2D appendColumn(FloatMatrix2D A, FloatMatrix1D b) {
-        // force both to have maximal shared number of rows.
-        if (b.size() > A.rows())
-            b = b.viewPart(0, A.rows());
-        else if (b.size() < A.rows())
-            A = A.viewPart(0, 0, b.size(), A.columns());
+    /**
+     * C = A||b; Constructs a new matrix which is the row-wise concatenation of
+     * two other matrices.
+     * 
+     * <pre>
+     *   0 1 
+     *   2 3 
+     *   4 5
+     *   appendRow
+     *   6 7
+     *   --&gt;
+     *   0 1 
+     *   2 3 
+     *   4 5
+     *   6 7
+     * 
+     * </pre>
+     */
+    public FloatMatrix2D appendRow(FloatMatrix2D A, FloatMatrix1D b) {
+        // force both to have maximal shared number of columns.
+        if (b.size() > A.columns())
+            b = b.viewPart(0, A.columns());
+        else if (b.size() < A.columns())
+            A = A.viewPart(0, 0, A.rows(), (int) b.size());
 
         // concatenate
-        int ac = A.columns();
-        int bc = 1;
-        int r = A.rows();
-        FloatMatrix2D matrix = make(r, ac + bc);
-        matrix.viewPart(0, 0, r, ac).assign(A);
-        matrix.viewColumn(ac).assign(b);
+        int ar = A.rows();
+        int br = 1;
+        int c = A.columns();
+        FloatMatrix2D matrix = make(ar + br, c);
+        matrix.viewPart(0, 0, ar, c).assign(A);
+        matrix.viewRow(ar).assign(b);
         return matrix;
     }
 
@@ -201,23 +296,6 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
         return matrix;
     }
 
-    public FloatMatrix2D appendRow(FloatMatrix2D A, FloatMatrix1D b) {
-        // force both to have maximal shared number of columns.
-        if (b.size() > A.columns())
-            b = b.viewPart(0, A.columns());
-        else if (b.size() < A.columns())
-            A = A.viewPart(0, 0, A.rows(), b.size());
-
-        // concatenate
-        int ar = A.rows();
-        int br = 1;
-        int c = A.columns();
-        FloatMatrix2D matrix = make(ar + br, c);
-        matrix.viewPart(0, 0, ar, c).assign(A);
-        matrix.viewRow(ar).assign(b);
-        return matrix;
-    }
-
     /**
      * Constructs a matrix with cells having ascending values. For debugging
      * purposes. Example:
@@ -229,62 +307,8 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * </pre>
      */
     public FloatMatrix2D ascending(int rows, int columns) {
-        cern.jet.math.tfloat.FloatFunctions F = cern.jet.math.tfloat.FloatFunctions.functions;
-        return descending(rows, columns).assign(F.chain(F.neg, F.minus(columns * rows)));
-    }
-
-    /**
-     * Checks whether the given array is rectangular, that is, whether all rows
-     * have the same number of columns.
-     * 
-     * @throws IllegalArgumentException
-     *             if the array is not rectangular.
-     */
-    protected static void checkRectangularShape(float[][] array) {
-        int columns = -1;
-        for (int row = array.length; --row >= 0;) {
-            if (array[row] != null) {
-                if (columns == -1)
-                    columns = array[row].length;
-                if (array[row].length != columns)
-                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
-            }
-        }
-    }
-
-    /**
-     * Checks whether the given array is rectangular, that is, whether all rows
-     * have the same number of columns.
-     * 
-     * @throws IllegalArgumentException
-     *             if the array is not rectangular.
-     */
-    protected static void checkRectangularShape(FloatMatrix2D[][] array) {
-        int columns = -1;
-        for (int row = array.length; --row >= 0;) {
-            if (array[row] != null) {
-                if (columns == -1)
-                    columns = array[row].length;
-                if (array[row].length != columns)
-                    throw new IllegalArgumentException("All rows of array must have same number of columns.");
-            }
-        }
-    }
-
-    public FloatMatrix2D reshape(FloatMatrix1D a, int rows, int columns) {
-        if (a.size() != rows * columns) {
-            throw new IllegalArgumentException("a.size() != rows*columns");
-        }
-        FloatMatrix2D A;
-        if (this == sparse) {
-            A = new SparseFloatMatrix2D(rows, columns);
-        } else {
-            A = new DenseFloatMatrix2D(rows, columns);
-        }
-        for (int c = 0; c < columns; c++) {
-            A.viewColumn(c).assign(a.viewPart(c * rows, rows));
-        }
-        return A;
+        return descending(rows, columns).assign(
+                FloatFunctions.chain(FloatFunctions.neg, FloatFunctions.minus(columns * rows)));
     }
 
     /**
@@ -306,7 +330,8 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * FloatMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 2, 4), null } };
+     * FloatMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 2, 4), null } };
      * System.out.println(compose(parts1));
      * </pre>
      * 
@@ -325,7 +350,8 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * FloatMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() }, { identity(3).viewRowFlip(), null } };
+     * FloatMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() },
+     *         { identity(3).viewRowFlip(), null } };
      * System.out.println(&quot;\n&quot; + make(parts3));
      * </pre>
      * 
@@ -364,7 +390,8 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * FloatMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 3, 4), null } };
+     * FloatMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 3, 4), null } };
      * System.out.println(&quot;\n&quot; + Factory2D.make(parts2));
      * </pre>
      * 
@@ -449,6 +476,36 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
+     * Constructs a bidiagonal block matrix from the given parts. The
+     * concatenation has the form
+     * 
+     * <pre>
+     *   A 0 0
+     *   0 B 0
+     *   0 0 C
+     * 
+     * </pre>
+     * 
+     * from the given parts. Cells are copied.
+     * 
+     * @param A
+     *            bidiagonal matrix
+     * @param B
+     *            bidiagonal matrix
+     * @return bidiagonal matrix
+     */
+    public FloatMatrix2D composeBidiagonal(FloatMatrix2D A, FloatMatrix2D B) {
+        int ar = A.rows();
+        int ac = A.columns();
+        int br = B.rows();
+        int bc = B.columns();
+        FloatMatrix2D sum = make(ar + br - 1, ac + bc);
+        sum.viewPart(0, 0, ar, ac).assign(A);
+        sum.viewPart(ar - 1, ac, br, bc).assign(B);
+        return sum;
+    }
+
+    /**
      * Constructs a diagonal block matrix from the given parts (the <i>direct
      * sum</i> of two matrices). That is the concatenation
      * 
@@ -493,17 +550,6 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
         diag.viewPart(A.rows(), A.columns(), B.rows(), B.columns()).assign(B);
         diag.viewPart(A.rows() + B.rows(), A.columns() + B.columns(), C.rows(), C.columns()).assign(C);
         return diag;
-    }
-
-    public FloatMatrix2D composeBidiagonal(FloatMatrix2D A, FloatMatrix2D B) {
-        int ar = A.rows();
-        int ac = A.columns();
-        int br = B.rows();
-        int bc = B.columns();
-        FloatMatrix2D sum = make(ar + br - 1, ac + bc);
-        sum.viewPart(0, 0, ar, ac).assign(A);
-        sum.viewPart(ar - 1, ac, br, bc).assign(B);
-        return sum;
     }
 
     /**
@@ -661,7 +707,8 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      */
     public void demo1() {
         System.out.println("\n\n");
-        FloatMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 2, 4), null } };
+        FloatMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+                { null, make(2, 2, 4), null } };
         System.out.println("\n" + compose(parts1));
         // System.out.println("\n"+cern.colt.matrixpattern.Converting.toHTML(make(parts1).toString()));
 
@@ -671,7 +718,8 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
          * System.out.println("\n"+make(parts2));
          */
 
-        FloatMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() }, { identity(3).viewRowFlip(), null } };
+        FloatMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() },
+                { identity(3).viewRowFlip(), null } };
         System.out.println("\n" + compose(parts3));
         // System.out.println("\n"+cern.colt.matrixpattern.Converting.toHTML(make(parts3).toString()));
 
@@ -691,7 +739,7 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
     public void demo2() {
         System.out.println("\n\n");
         FloatMatrix2D matrix;
-        FloatMatrix2D A, B, C, D, E, F, G;
+        FloatMatrix2D A, B, C, D;
         FloatMatrix2D _ = null;
         A = make(2, 2, 1);
         B = make(4, 4, 2);
@@ -724,8 +772,8 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
          * System.out.println("\n"+make(parts3));
          * //System.out.println("\n"+cern.colt.matrixpattern.Converting.toHTML(make(parts3).toString()));
          * 
-         * FloatMatrix2D A = ascending(2,2); FloatMatrix2D B = descending(2,2);
-         * FloatMatrix2D _ = null;
+         * FloatMatrix2D A = ascending(2,2); FloatMatrix2D B =
+         * descending(2,2); FloatMatrix2D _ = null;
          * 
          * FloatMatrix2D[][] parts4 = { { A, _, A, _ }, { _, A, _, B } };
          * System.out.println("\n"+make(parts4));
@@ -769,11 +817,11 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * 
      * @return a new matrix.
      */
-    public FloatMatrix2D diagonal(FloatMatrix1D vector) {
-        int size = vector.size();
+    public FloatMatrix2D diagonal(float[] vector) {
+        int size = vector.length;
         FloatMatrix2D diag = make(size, size);
-        for (int i = size; --i >= 0;) {
-            diag.setQuick(i, i, vector.getQuick(i));
+        for (int i = 0; i < size; i++) {
+            diag.setQuick(i, i, vector[i]);
         }
         return diag;
     }
@@ -793,11 +841,11 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * 
      * @return a new matrix.
      */
-    public FloatMatrix2D diagonal(float[] vector) {
-        int size = vector.length;
+    public FloatMatrix2D diagonal(FloatMatrix1D vector) {
+        int size = (int) vector.size();
         FloatMatrix2D diag = make(size, size);
-        for (int i = 0; i < size; i++) {
-            diag.setQuick(i, i, vector[i]);
+        for (int i = size; --i >= 0;) {
+            diag.setQuick(i, i, vector.getQuick(i));
         }
         return diag;
     }
@@ -840,28 +888,6 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Constructs a matrix with the given cell values. <tt>values</tt> is
-     * required to have the form <tt>values[row][column]</tt> and have exactly
-     * the same number of columns in every row.
-     * <p>
-     * The values are copied. So subsequent changes in <tt>values</tt> are not
-     * reflected in the matrix, and vice-versa.
-     * 
-     * @param values
-     *            The values to be filled into the new matrix.
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
-     *             .
-     */
-    public FloatMatrix2D make(float[][] values) {
-        if (this == sparse)
-            return new SparseFloatMatrix2D(values);
-        else
-            return new DenseFloatMatrix2D(values);
-    }
-
-    /**
      * Construct a matrix from a one-dimensional column-major packed array, ala
      * Fortran. Has the form
      * <tt>matrix.get(row,column) == values[row + column*rows]</tt>. The values
@@ -891,18 +917,41 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
+     * Constructs a matrix with the given cell values. <tt>values</tt> is
+     * required to have the form <tt>values[row][column]</tt> and have exactly
+     * the same number of columns in every row.
+     * <p>
+     * The values are copied. So subsequent changes in <tt>values</tt> are not
+     * reflected in the matrix, and vice-versa.
+     * 
+     * @param values
+     *            The values to be filled into the new matrix.
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+     *             .
+     */
+    public FloatMatrix2D make(float[][] values) {
+        if (this == sparse)
+            return new SparseFloatMatrix2D(values);
+        else
+            return new DenseFloatMatrix2D(values);
+    }
+
+    /**
      * Constructs a matrix with the given shape, each cell initialized with
      * zero.
      */
     public FloatMatrix2D make(int rows, int columns) {
-        if (this == sparse)
+        if (this == sparse) {
             return new SparseFloatMatrix2D(rows, columns);
-        if (this == rowCompressed)
-            return new RCFloatMatrix2D(rows, columns);
-        // if (this==rowCompressedModified) return new
-        // RCMFloatMatrix2D(rows,columns);
-        else
+        } else if (this == rowCompressed) {
+            return new SparseRCFloatMatrix2D(rows, columns);
+        } else if (this == columnCompressed) {
+            return new SparseCCFloatMatrix2D(rows, columns);
+        } else {
             return new DenseFloatMatrix2D(rows, columns);
+        }
     }
 
     /**
@@ -913,13 +962,6 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
         if (initialValue == 0)
             return make(rows, columns);
         return make(rows, columns).assign(initialValue);
-    }
-
-    /**
-     * Constructs a 1d matrix of the right dynamic type.
-     */
-    protected FloatMatrix1D make1D(int size) {
-        return make(0, 0).like1D(size);
     }
 
     /**
@@ -958,6 +1000,49 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
+     * Modifies the given matrix to be a randomly sampled matrix. Randomly picks
+     * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
+     * initializes them to <tt>value</tt>, all the rest will be initialized to
+     * zero. Note that this is not the same as setting each cell with
+     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
+     * seed is a constant.
+     * 
+     * @throws IllegalArgumentException
+     *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
+     * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
+     */
+    public FloatMatrix2D sample(FloatMatrix2D matrix, float value, float nonZeroFraction) {
+        int rows = matrix.rows();
+        int columns = matrix.columns();
+        float epsilon = 1e-05f;
+        if (nonZeroFraction < 0 - epsilon || nonZeroFraction > 1 + epsilon)
+            throw new IllegalArgumentException();
+        if (nonZeroFraction < 0)
+            nonZeroFraction = 0;
+        if (nonZeroFraction > 1)
+            nonZeroFraction = 1;
+
+        matrix.assign(0);
+
+        int size = rows * columns;
+        int n = Math.round(size * nonZeroFraction);
+        if (n == 0)
+            return matrix;
+
+        cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant sampler = new cern.jet.random.tfloat.sampling.FloatRandomSamplingAssistant(
+                n, size, new cern.jet.random.tfloat.engine.FloatMersenneTwister());
+        for (int i = 0; i < size; i++) {
+            if (sampler.sampleNextElement()) {
+                int row = (i / columns);
+                int column = (i % columns);
+                matrix.setQuick(row, column, value);
+            }
+        }
+
+        return matrix;
+    }
+
+    /**
      * Constructs a randomly sampled matrix with the given shape. Randomly picks
      * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
      * initializes them to <tt>value</tt>, all the rest will be initialized to
@@ -976,44 +1061,9 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
     }
 
     /**
-     * Modifies the given matrix to be a randomly sampled matrix. Randomly picks
-     * exactly <tt>Math.round(rows*columns*nonZeroFraction)</tt> cells and
-     * initializes them to <tt>value</tt>, all the rest will be initialized to
-     * zero. Note that this is not the same as setting each cell with
-     * probability <tt>nonZeroFraction</tt> to <tt>value</tt>. Note: The random
-     * seed is a constant.
-     * 
-     * @throws IllegalArgumentException
-     *             if <tt>nonZeroFraction < 0 || nonZeroFraction > 1</tt>.
-     * @see cern.jet.random.tfloat.sampling.FloatRandomSampler
+     * Constructs a 1d matrix of the right dynamic type.
      */
-    public FloatMatrix2D sample(FloatMatrix2D matrix, float value, float nonZeroFraction) {
-        int rows = matrix.rows();
-        int columns = matrix.columns();
-        float epsilon = 1e-08f;
-        if (nonZeroFraction < 0 - epsilon || nonZeroFraction > 1 + epsilon)
-            throw new IllegalArgumentException();
-        if (nonZeroFraction < 0)
-            nonZeroFraction = 0;
-        if (nonZeroFraction > 1)
-            nonZeroFraction = 1;
-
-        matrix.assign(0);
-
-        int size = rows * columns;
-        int n = (int) Math.round(size * nonZeroFraction);
-        if (n == 0)
-            return matrix;
-
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
-        for (int i = 0; i < size; i++) {
-            if (sampler.sampleNextElement()) {
-                int row = (int) (i / columns);
-                int column = (int) (i % columns);
-                matrix.set(row, column, value);
-            }
-        }
-
-        return matrix;
+    protected FloatMatrix1D make1D(int size) {
+        return make(0, 0).like1D(size);
     }
 }

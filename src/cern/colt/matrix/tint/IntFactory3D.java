@@ -10,6 +10,7 @@ package cern.colt.matrix.tint;
 
 import cern.colt.matrix.tint.impl.DenseIntMatrix3D;
 import cern.colt.matrix.tint.impl.SparseIntMatrix3D;
+import cern.jet.math.tint.IntFunctions;
 
 /**
  * Factory for convenient construction of 3-d matrices holding <tt>int</tt>
@@ -38,6 +39,11 @@ import cern.colt.matrix.tint.impl.SparseIntMatrix3D;
  */
 public class IntFactory3D extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A factory producing dense matrices.
      */
     public static final IntFactory3D dense = new IntFactory3D();
@@ -60,7 +66,7 @@ public class IntFactory3D extends cern.colt.PersistentObject {
      */
     public IntMatrix3D ascending(int slices, int rows, int columns) {
         cern.jet.math.tint.IntFunctions F = cern.jet.math.tint.IntFunctions.intFunctions;
-        return descending(slices, rows, columns).assign(F.chain(F.neg, F.minus(slices * rows * columns)));
+        return descending(slices, rows, columns).assign(IntFunctions.chain(IntFunctions.neg, IntFunctions.minus(slices * rows * columns)));
     }
 
     /**

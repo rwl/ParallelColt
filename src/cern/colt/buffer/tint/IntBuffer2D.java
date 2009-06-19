@@ -19,6 +19,11 @@ import cern.colt.list.tint.IntArrayList;
  * @version 1.0, 09/24/99
  */
 public class IntBuffer2D extends cern.colt.PersistentObject implements IntBuffer2DConsumer {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected IntBuffer2DConsumer target;
 
     protected int[] xElements;

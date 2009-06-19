@@ -7,6 +7,10 @@ package hep.aida.tdouble.ref;
  * @version 1.0, 23/03/2000
  */
 abstract class DoubleHistogram implements hep.aida.tdouble.DoubleIHistogram {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private String title;
 
     DoubleHistogram(String title) {

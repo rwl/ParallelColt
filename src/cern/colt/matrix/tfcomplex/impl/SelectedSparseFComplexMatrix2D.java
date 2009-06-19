@@ -14,16 +14,16 @@ import cern.colt.matrix.AbstractMatrix2D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.SparseFloatMatrix2D;
 
 /**
- * Selection view on sparse 2-d matrices holding <tt>complex</tt> elements. Note
- * that this implementation uses ConcurrentHashMap
+ * Selection view on sparse 2-d matrices holding <tt>complex</tt> elements. This
+ * implementation uses ConcurrentHashMap
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.0, 12/10/2007
  */
 class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
+    private static final long serialVersionUID = 1L;
+
     /*
      * The elements of the matrix.
      */
@@ -66,7 +66,9 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseFComplexMatrix2D(int rows, int columns, ConcurrentHashMap<Integer, float[]> elements, int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedSparseFComplexMatrix2D(int rows, int columns, ConcurrentHashMap<Integer, float[]> elements,
+            int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets,
+            int offset) {
         // be sure parameters are valid, we do not check...
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -89,58 +91,30 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseFComplexMatrix2D(ConcurrentHashMap<Integer, float[]> elements, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedSparseFComplexMatrix2D(ConcurrentHashMap<Integer, float[]> elements, int[] rowOffsets,
+            int[] columnOffsets, int offset) {
         this(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
     }
 
-    /**
-     * Returns the position of the given absolute rank within the (virtual or
-     * non-virtual) internal 1-dimensional array. Default implementation.
-     * Override, if necessary.
-     * 
-     * @param rank
-     *            the absolute rank of the element.
-     * @return the position.
-     */
+    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
 
-    /**
-     * Returns the position of the given absolute rank within the (virtual or
-     * non-virtual) internal 1-dimensional array. Default implementation.
-     * Override, if necessary.
-     * 
-     * @param rank
-     *            the absolute rank of the element.
-     * @return the position.
-     */
+    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
 
-    /**
-     * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may return invalid objects
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @return the value at the specified coordinate.
-     */
+    @Override
     public float[] getQuick(int row, int column) {
-        return elements.get(offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
+        return elements.get(offset + rowOffsets[rowZero + row * rowStride]
+                + columnOffsets[columnZero + column * columnStride]);
     }
 
+    @Override
     public ConcurrentHashMap<Integer, float[]> elements() {
-        return elements;
+        throw new IllegalAccessError("This method is not supported.");
     }
 
     /**
@@ -153,6 +127,7 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(FComplexMatrix2D other) {
         if (other instanceof SelectedSparseFComplexMatrix2D) {
             SelectedSparseFComplexMatrix2D otherMatrix = (SelectedSparseFComplexMatrix2D) other;
@@ -164,96 +139,29 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
         return false;
     }
 
-    /**
-     * Returns the position of the given coordinate within the (virtual or
-     * non-virtual) internal 1-dimensional array.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     */
+    @Override
     public long index(int row, int column) {
         return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
     }
 
-    /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseComplexMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseComplexMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseComplexMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseComplexMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @return a new empty matrix of the same dynamic type.
-     */
+    @Override
     public FComplexMatrix2D like(int rows, int columns) {
         return new SparseFComplexMatrix2D(rows, columns);
     }
 
-    /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseComplexMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseComplexMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseComplexMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseComplexMatrix1D</tt>, etc.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     public FComplexMatrix1D like1D(int size) {
         return new SparseFComplexMatrix1D(size);
     }
 
-    /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseComplexMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseComplexMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseComplexMatrix2D</tt> the new matrix must be of type
-     * <tt>SparseComplexMatrix1D</tt>, etc.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @param zero
-     *            the index of the first element.
-     * @param stride
-     *            the number of indexes between any two elements, i.e.
-     *            <tt>index(i+1)-index(i)</tt>.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     protected FComplexMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
         // properly.
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-     * value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param value
-     *            the value to be filled into the specified cell.
-     */
+    @Override
     public void setQuick(int row, int column, float[] value) {
         int index = offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
 
@@ -263,45 +171,12 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
             this.elements.put(index, value);
     }
 
-    /**
-     * Returns a vector obtained by stacking the columns of the matrix on top of
-     * one another.
-     * 
-     * @return
-     */
+    @Override
     public FComplexMatrix1D vectorize() {
-        SparseFComplexMatrix1D v = new SparseFComplexMatrix1D(size());
-        int idx = 0;
-        for (int c = 0; c < columns; c++) {
-            for (int r = 0; r < rows; r++) {
-                v.setQuick(idx++, getQuick(c, r));
-            }
-        }
-        return v;
+        throw new IllegalAccessError("This method is not supported.");
     }
 
-    /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-     * value.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param re
-     *            the real part of the value to be filled into the specified
-     *            cell.
-     * @param im
-     *            the imaginary part of the value to be filled into the
-     *            specified cell.
-     */
+    @Override
     public void setQuick(int row, int column, float re, float im) {
         int index = offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
 
@@ -312,16 +187,7 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
 
     }
 
-    /**
-     * Sets up a matrix with a given number of rows and columns.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @throws IllegalArgumentException
-     *             if <tt>(float)columns*rows > Integer.MAX_VALUE</tt>.
-     */
+    @Override
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -329,9 +195,7 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
         this.offset = 0;
     }
 
-    /**
-     * Self modifying version of viewDice().
-     */
+    @Override
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -345,20 +209,7 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    /**
-     * Constructs and returns a new <i>slice view</i> representing the rows of
-     * the given column. The returned view is backed by this matrix, so changes
-     * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (
-     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-     * 
-     * @param the
-     *            column to fix.
-     * @return a new slice view.
-     * @throws IllegalArgumentException
-     *             if <tt>column < 0 || column >= columns()</tt>.
-     * @see #viewRow(int)
-     */
+    @Override
     public FComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -366,23 +217,11 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
         int viewStride = this.rowStride;
         int[] viewOffsets = this.rowOffsets;
         int viewOffset = this.offset + _columnOffset(_columnRank(column));
-        return new SelectedSparseFComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets, viewOffset);
+        return new SelectedSparseFComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets,
+                viewOffset);
     }
 
-    /**
-     * Constructs and returns a new <i>slice view</i> representing the columns
-     * of the given row. The returned view is backed by this matrix, so changes
-     * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (
-     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-     * 
-     * @param the
-     *            row to fix.
-     * @return a new slice view.
-     * @throws IndexOutOfBoundsException
-     *             if <tt>row < 0 || row >= rows()</tt>.
-     * @see #viewColumn(int)
-     */
+    @Override
     public FComplexMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -390,54 +229,23 @@ class SelectedSparseFComplexMatrix2D extends FComplexMatrix2D {
         int viewStride = this.columnStride;
         int[] viewOffsets = this.columnOffsets;
         int viewOffset = this.offset + _rowOffset(_rowRank(row));
-        return new SelectedSparseFComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets, viewOffset);
+        return new SelectedSparseFComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets,
+                viewOffset);
     }
 
-    /**
-     * Construct and returns a new selection view.
-     * 
-     * @param rowOffsets
-     *            the offsets of the visible elements.
-     * @param columnOffsets
-     *            the offsets of the visible elements.
-     * @return a new view.
-     */
+    @Override
     protected FComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFComplexMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }
 
-    /**
-     * Returns the imaginary part of this matrix
-     * 
-     * @return the imaginary part
-     */
+    @Override
     public FloatMatrix2D getImaginaryPart() {
-        FloatMatrix2D Im = new SparseFloatMatrix2D(rows, columns);
-        float[] tmp;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < columns; c++) {
-                tmp = getQuick(r, c);
-                Im.setQuick(r, c, tmp[1]);
-            }
-        }
-        return Im;
+        throw new IllegalAccessError("This method is not supported.");
     }
 
-    /**
-     * Returns the real part of this matrix
-     * 
-     * @return the real part
-     */
+    @Override
     public FloatMatrix2D getRealPart() {
-        FloatMatrix2D R = new SparseFloatMatrix2D(rows, columns);
-        float[] tmp;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < columns; c++) {
-                tmp = getQuick(r, c);
-                R.setQuick(r, c, tmp[0]);
-            }
-        }
-        return R;
+        throw new IllegalAccessError("This method is not supported.");
     }
 
 }

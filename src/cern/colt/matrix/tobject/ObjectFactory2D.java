@@ -74,6 +74,11 @@ import cern.colt.matrix.tobject.impl.SparseObjectMatrix2D;
  */
 public class ObjectFactory2D extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A factory producing dense matrices.
      */
     public static final ObjectFactory2D dense = new ObjectFactory2D();
@@ -217,7 +222,8 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * ObjectMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 2, 4), null } };
+     * ObjectMatrix2D[][] parts1 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 2, 4), null } };
      * System.out.println(compose(parts1));
      * </pre>
      * 
@@ -236,7 +242,8 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * ObjectMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() }, { identity(3).viewRowFlip(), null } };
+     * ObjectMatrix2D[][] parts3 = { { identity(3), null, }, { null, identity(3).viewColumnFlip() },
+     *         { identity(3).viewRowFlip(), null } };
      * System.out.println(&quot;\n&quot; + make(parts3));
      * </pre>
      * 
@@ -275,7 +282,8 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * <td>
      * 
      * <pre>
-     * ObjectMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) }, { null, make(2, 3, 4), null } };
+     * ObjectMatrix2D[][] parts2 = { { null, make(2, 2, 1), null }, { make(4, 4, 2), null, make(4, 3, 3) },
+     *         { null, make(2, 3, 4), null } };
      * System.out.println(&quot;\n&quot; + Factory2D.make(parts2));
      * </pre>
      * 
@@ -572,7 +580,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * @return a new matrix.
      */
     public ObjectMatrix2D diagonal(ObjectMatrix1D vector) {
-        int size = vector.size();
+        int size = (int) vector.size();
         ObjectMatrix2D diag = make(size, size);
         for (int i = size; --i >= 0;) {
             diag.setQuick(i, i, vector.getQuick(i));

@@ -2,11 +2,9 @@ package cern.colt.matrix;
 
 /**
  * Factory producing implementations of {@link cern.colt.matrix.Former} via
- * method create(); Implementations of can use existing libraries such as
- * corejava.PrintfFormat or corejava.Format or other. Serves to isolate the
- * interface of String formatting from the actual implementation. If you want to
- * plug in a different String formatting implementation, simply replace this
- * class with your alternative.
+ * method create(); Serves to isolate the interface of String formatting from
+ * the actual implementation. If you want to plug in a different String
+ * formatting implementation, simply replace this class with your alternative.
  * 
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 21/07/00
@@ -71,23 +69,23 @@ public class FormerFactory {
      */
     public Former create(final String format) {
         return new Former() {
-            // private FormatStringBuffer f = (format!=null ? new
-            // corejava.FormatStringBuffer(format) : null);
-            private corejava.Format f = (format != null ? new corejava.Format(format) : null);
-
-            // private corejava.PrintfFormat f = (format!=null ? new
-            // corejava.PrintfFormat(format) : null);
             public String form(double value) {
-                if (f == null || value == Double.POSITIVE_INFINITY || value == Double.NEGATIVE_INFINITY || value != value) {
-                    // value != value <==> Double.isNaN(value)
-                    // Work around bug in corejava.Format.form() for inf, -inf,
-                    // NaN
-                    return String.valueOf(value);
-                }
-                // return f.format(value).toString();
-                return f.format(value);
-                // return f.sprintf(value);
+                return String.format(format, value);
             }
+
+            public String form(double[] value) {
+                if (value[0] == 0 && value[1] == 0) {
+                    return "0.0";
+                }
+                if (value[1] == 0) {
+                    return String.format(format, value[0]);
+                }
+                if (value[1] < 0) {
+                    return String.format(format, value[0]) + " - " + String.format(format, -value[1]);
+                }
+                return String.format(format, value[0]) + " + " + String.format(format, value[1]);
+            }
+
         };
     }
 }

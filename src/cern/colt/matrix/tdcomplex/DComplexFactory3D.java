@@ -36,7 +36,7 @@ import cern.colt.matrix.tdcomplex.impl.SparseDComplexMatrix3D;
  * @version 1.0, 12/10/2007
  */
 public class DComplexFactory3D extends cern.colt.PersistentObject {
-    private static final long serialVersionUID = 1879870163732933608L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * A factory producing dense matrices.

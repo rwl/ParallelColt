@@ -17,7 +17,7 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
         Bt = new SparseDoubleMatrix2D(NCOLUMNS, NROWS);
     }
 
-    public void testConvertToRCDoubleMatrix2D() {
+    public void testGetRowCompressed() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
@@ -28,7 +28,13 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
             values[i] = Math.random();
         }
         SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        RCDoubleMatrix2D B = A.convertToRCDoubleMatrix2D();
+        SparseRCDoubleMatrix2D B = A.getRowCompressed(false);
+        for (int r = 0; r < NROWS; r++) {
+            for (int c = 0; c < NCOLUMNS; c++) {
+                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+            }
+        }
+        B = A.getRowCompressed(true);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
@@ -36,7 +42,7 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    public void testConvertToRCMDoubleMatrix2D() {
+    public void testGetRowCompressedModified() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
@@ -47,7 +53,7 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
             values[i] = Math.random();
         }
         SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        RCMDoubleMatrix2D B = A.convertToRCMDoubleMatrix2D();
+        SparseRCMDoubleMatrix2D B = A.getRowCompressedModified();
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
@@ -55,7 +61,7 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    public void testConvertToCCDoubleMatrix2D() {
+    public void testGetColumnCompressed() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
@@ -66,15 +72,22 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
             values[i] = Math.random();
         }
         SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        CCDoubleMatrix2D B = A.convertToCCDoubleMatrix2D();
+        SparseCCDoubleMatrix2D B = A.getColumnCompressed(false);
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
             }
         }
+        B = A.getColumnCompressed(true);
+        for (int r = 0; r < NROWS; r++) {
+            for (int c = 0; c < NCOLUMNS; c++) {
+                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+            }
+        }
+
     }
 
-    public void testConvertToCCMDoubleMatrix2D() {
+    public void testGetColumnCompressedModified() {
         int SIZE = NROWS * NCOLUMNS;
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
@@ -85,7 +98,7 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
             values[i] = Math.random();
         }
         SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        CCMDoubleMatrix2D B = A.convertToCCMDoubleMatrix2D();
+        SparseCCMDoubleMatrix2D B = A.getColumnCompressedModified();
         for (int r = 0; r < NROWS; r++) {
             for (int c = 0; c < NCOLUMNS; c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));

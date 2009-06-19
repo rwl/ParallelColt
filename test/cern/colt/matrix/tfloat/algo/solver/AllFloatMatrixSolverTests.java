@@ -10,7 +10,6 @@ public class AllFloatMatrixSolverTests {
 
     public static Test suite() {
         TestSuite suite = new TestSuite("cern.colt.matrix.tfloat.algo.solvers tests");
-        suite.addTestSuite(FloatHyBRTest.class);
 
         suite.addTestSuite(FloatCGTest.class);
         suite.addTestSuite(FloatCGDiagonalTest.class);

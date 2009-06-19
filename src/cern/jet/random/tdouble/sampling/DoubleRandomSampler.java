@@ -139,6 +139,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.1 05/26/99
  */
 public class DoubleRandomSampler extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     // public class RandomSampler extends Object implements java.io.Serializable
     // {
     long my_n;
@@ -188,6 +193,7 @@ public class DoubleRandomSampler extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         DoubleRandomSampler copy = (DoubleRandomSampler) super.clone();
         copy.my_RandomGenerator = (DoubleRandomEngine) this.my_RandomGenerator.clone();
@@ -281,7 +287,8 @@ public class DoubleRandomSampler extends cern.colt.PersistentObject {
      * @param randomGenerator
      *            a random number generator.
      */
-    protected static void rejectMethodD(long n, long N, int count, long low, long[] values, int fromIndex, DoubleRandomEngine randomGenerator) {
+    protected static void rejectMethodD(long n, long N, int count, long low, long[] values, int fromIndex,
+            DoubleRandomEngine randomGenerator) {
         /*
          * This algorithm is applicable if a large percentage (90%..100%) of N
          * shall be sampled. In such cases it is more efficient than
@@ -442,7 +449,8 @@ public class DoubleRandomSampler extends cern.colt.PersistentObject {
      *            a random number generator. Set this parameter to <tt>null</tt>
      *            to use the default random number generator.
      */
-    public static void sample(long n, long N, int count, long low, long[] values, int fromIndex, DoubleRandomEngine randomGenerator) {
+    public static void sample(long n, long N, int count, long low, long[] values, int fromIndex,
+            DoubleRandomEngine randomGenerator) {
         if (n <= 0 || count <= 0)
             return;
         if (count > n)
@@ -501,7 +509,8 @@ public class DoubleRandomSampler extends cern.colt.PersistentObject {
      * @param randomGenerator
      *            a random number generator.
      */
-    protected static void sampleMethodA(long n, long N, int count, long low, long[] values, int fromIndex, DoubleRandomEngine randomGenerator) {
+    protected static void sampleMethodA(long n, long N, int count, long low, long[] values, int fromIndex,
+            DoubleRandomEngine randomGenerator) {
         double V, quot, Nreal, top;
         long S;
         long chosen = -1 + low;
@@ -569,7 +578,8 @@ public class DoubleRandomSampler extends cern.colt.PersistentObject {
      * @param randomGenerator
      *            a random number generator.
      */
-    protected static void sampleMethodD(long n, long N, int count, long low, long[] values, int fromIndex, DoubleRandomEngine randomGenerator) {
+    protected static void sampleMethodD(long n, long N, int count, long low, long[] values, int fromIndex,
+            DoubleRandomEngine randomGenerator) {
         double nreal, Nreal, ninv, nmin1inv, U, X, Vprime, y1, y2, top, bottom, negSreal, qu1real;
         long qu1, threshold, t, limit;
         long S;
@@ -670,7 +680,8 @@ public class DoubleRandomSampler extends cern.colt.PersistentObject {
 
         cern.colt.Timer timer = new cern.colt.Timer().start();
         for (long t = times; --t >= 0;) {
-            DoubleRandomSampler sampler = new DoubleRandomSampler(n, N, low, cern.jet.random.tdouble.AbstractDoubleDistribution.makeDefaultGenerator());
+            DoubleRandomSampler sampler = new DoubleRandomSampler(n, N, low,
+                    cern.jet.random.tdouble.AbstractDoubleDistribution.makeDefaultGenerator());
             for (long i = 0; i < chunks; i++) {
                 sampler.nextBlock(chunkSize, values, 0);
 

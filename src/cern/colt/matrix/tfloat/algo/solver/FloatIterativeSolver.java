@@ -41,7 +41,8 @@ public interface FloatIterativeSolver {
      *            Solution is stored here. Also used as initial guess
      * @return The solution vector x
      */
-    FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException;
+    FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
+            throws IterativeSolverFloatNotConvergedException;
 
     /**
      * Sets preconditioner

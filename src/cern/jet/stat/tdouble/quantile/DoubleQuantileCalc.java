@@ -79,7 +79,8 @@ class DoubleQuantileCalc extends Object {
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>returnSamplingRate[0]</tt>=the required sampling rate.
      */
-    public static long[] known_N_compute_B_and_K(long N, double epsilon, double delta, int quantiles, double[] returnSamplingRate) {
+    public static long[] known_N_compute_B_and_K(long N, double epsilon, double delta, int quantiles,
+            double[] returnSamplingRate) {
         if (delta > 0.0) {
             return known_N_compute_B_and_K_slow(N, epsilon, delta, quantiles, returnSamplingRate);
         }
@@ -114,7 +115,7 @@ class DoubleQuantileCalc extends Object {
 
         final int maxBuffers = 50;
         final int maxHeight = 50;
-        final double N_double = (double) N;
+        final double N_double = N;
         final double c = N_double * epsilon * 2.0;
         int[] heightMaximums = new int[maxBuffers - 1];
 
@@ -126,19 +127,26 @@ class DoubleQuantileCalc extends Object {
             int h = 3;
 
             while (h <= maxHeight && // skip heights until x<=0
-                    (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1))) - ((double) Math.round(binomial(b + h - 3, h - 3))) + ((double) Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
+                    (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1)))
+                            - (Math.round(binomial(b + h - 3, h - 3)))
+                            + (Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
                 h++;
             }
             // from now on x is monotonically growing...
             while (h <= maxHeight && // skip heights until x>0
-                    (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1))) - ((double) Math.round(binomial(b + h - 3, h - 3))) + ((double) Math.round(binomial(b + h - 3, h - 2))) - c <= 0.0) {
+                    (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1)))
+                            - (Math.round(binomial(b + h - 3, h - 3)))
+                            + (Math.round(binomial(b + h - 3, h - 2))) - c <= 0.0) {
                 h++;
             }
             h--; // go back to last height
 
             // was x>0 or did we loop without finding anything?
             int hMax;
-            if (h >= maxHeight && (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1))) - ((double) Math.round(binomial(b + h - 3, h - 3))) + ((double) Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
+            if (h >= maxHeight
+                    && (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1)))
+                            - (Math.round(binomial(b + h - 3, h - 3)))
+                            + (Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
                 hMax = Integer.MIN_VALUE;
             } else {
                 hMax = h;
@@ -154,7 +162,7 @@ class DoubleQuantileCalc extends Object {
             int h = heightMaximums[b - 2];
             long kMin = Long.MAX_VALUE;
             if (h > Integer.MIN_VALUE) {
-                double value = ((double) Math.round(binomial(b + h - 2, h - 1)));
+                double value = (Math.round(binomial(b + h - 2, h - 1)));
                 long tmpK = ceiling(N_double / value);
                 if (tmpK <= Long.MAX_VALUE) {
                     kMin = tmpK;
@@ -168,7 +176,7 @@ class DoubleQuantileCalc extends Object {
         int minB = -1;
         for (int b = 2; b <= maxBuffers; b++) {
             if (kMinimums[b - 2] < Long.MAX_VALUE) {
-                long mult = ((long) b) * ((long) kMinimums[b - 2]);
+                long mult = (b) * (kMinimums[b - 2]);
                 if (mult < multMin) {
                     multMin = mult;
                     minB = b;
@@ -221,7 +229,8 @@ class DoubleQuantileCalc extends Object {
      *         <tt>long[1]</tt>=the number of elements per buffer,
      *         <tt>returnSamplingRate[0]</tt>=the required sampling rate.
      */
-    protected static long[] known_N_compute_B_and_K_slow(long N, double epsilon, double delta, int quantiles, double[] returnSamplingRate) {
+    protected static long[] known_N_compute_B_and_K_slow(long N, double epsilon, double delta, int quantiles,
+            double[] returnSamplingRate) {
         // delta can be set to zero, i.e., all quantiles should be approximate
         // with probability 1
         if (epsilon <= 0.0) {
@@ -257,14 +266,16 @@ class DoubleQuantileCalc extends Object {
             for (long h = 3; h < maxHeight; h++) {
                 double binomial = binomial(b + h - 2, h - 1);
                 long tmp = ceiling(N_double / binomial);
-                if ((b * tmp < memory) && ((h - 2) * binomial - binomial(b + h - 3, h - 3) + binomial(b + h - 3, h - 2) <= c)) {
+                if ((b * tmp < memory)
+                        && ((h - 2) * binomial - binomial(b + h - 3, h - 3) + binomial(b + h - 3, h - 2) <= c)) {
                     ret_k = tmp;
                     ret_b = b;
                     memory = ret_k * b;
                     sampling_rate = 1.0;
                 }
                 if (delta > 0.0) {
-                    double t = (h - 2) * binomial(b + h - 2, h - 1) - binomial(b + h - 3, h - 3) + binomial(b + h - 3, h - 2);
+                    double t = (h - 2) * binomial(b + h - 2, h - 1) - binomial(b + h - 3, h - 3)
+                            + binomial(b + h - 3, h - 2);
                     double u = logarithm / epsilon;
                     double v = binomial(b + h - 2, h - 1);
                     double w = logarithm / (2.0 * epsilon * epsilon);

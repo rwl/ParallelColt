@@ -45,6 +45,8 @@ import java.awt.Rectangle;
  * @see java.util.BitSet
  */
 public class BitMatrix extends cern.colt.PersistentObject {
+    private static final long serialVersionUID = 1L;
+
     protected int columns;
 
     protected int rows;
@@ -122,7 +124,8 @@ public class BitMatrix extends cern.colt.PersistentObject {
      */
     protected void checkDimensionCompatibility(BitMatrix other) {
         if (columns != other.columns() || rows != other.rows())
-            throw new IllegalArgumentException("Incompatible dimensions: (columns,rows)=(" + columns + "," + rows + "), (other.columns,other.rows)=(" + other.columns() + "," + other.rows() + ")");
+            throw new IllegalArgumentException("Incompatible dimensions: (columns,rows)=(" + columns + "," + rows
+                    + "), (other.columns,other.rows)=(" + other.columns() + "," + other.rows() + ")");
     }
 
     /**
@@ -140,10 +143,11 @@ public class BitMatrix extends cern.colt.PersistentObject {
      * 
      * @return a clone of this bit matrix.
      */
+    @Override
     public Object clone() {
         BitMatrix clone = (BitMatrix) super.clone();
         if (this.bits != null)
-            clone.bits = (long[]) this.bits.clone();
+            clone.bits = this.bits.clone();
         return clone;
     }
 
@@ -159,7 +163,8 @@ public class BitMatrix extends cern.colt.PersistentObject {
      */
     protected void containsBox(int column, int row, int width, int height) {
         if (column < 0 || column + width > columns || row < 0 || row + height > rows)
-            throw new IndexOutOfBoundsException("column:" + column + ", row:" + row + " ,width:" + width + ", height:" + height);
+            throw new IndexOutOfBoundsException("column:" + column + ", row:" + row + " ,width:" + width + ", height:"
+                    + height);
     }
 
     /**
@@ -208,6 +213,7 @@ public class BitMatrix extends cern.colt.PersistentObject {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof BitMatrix))
             return false;
@@ -380,6 +386,7 @@ public class BitMatrix extends cern.colt.PersistentObject {
     /**
      * Returns a hash code value for the receiver.
      */
+    @Override
     public int hashCode() {
         return toBitVector().hashCode();
     }
@@ -430,7 +437,8 @@ public class BitMatrix extends cern.colt.PersistentObject {
      */
     public BitMatrix part(int column, int row, int width, int height) {
         if (column < 0 || column + width > columns || row < 0 || row + height > rows)
-            throw new IndexOutOfBoundsException("column:" + column + ", row:" + row + " ,width:" + width + ", height:" + height);
+            throw new IndexOutOfBoundsException("column:" + column + ", row:" + row + " ,width:" + width + ", height:"
+                    + height);
         if (width <= 0 || height <= 0)
             return new BitMatrix(0, 0);
 
@@ -516,7 +524,8 @@ public class BitMatrix extends cern.colt.PersistentObject {
      * 
      *             <tt>sourceColumn&lt;0 || sourceColumn+width&gt;source.columns() || sourceRow&lt;0 || sourceRow+height&gt;source.rows()</tt>
      */
-    public void replaceBoxWith(int column, int row, int width, int height, BitMatrix source, int sourceColumn, int sourceRow) {
+    public void replaceBoxWith(int column, int row, int width, int height, BitMatrix source, int sourceColumn,
+            int sourceRow) {
         this.containsBox(column, row, width, height);
         source.containsBox(sourceColumn, sourceRow, width, height);
         if (width <= 0 || height <= 0)
@@ -602,6 +611,7 @@ public class BitMatrix extends cern.colt.PersistentObject {
     /**
      * Returns a (very crude) string representation of the receiver.
      */
+    @Override
     public String toString() {
         return toBitVector().toString();
     }

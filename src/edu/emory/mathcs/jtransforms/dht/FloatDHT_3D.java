@@ -95,7 +95,8 @@ public class FloatDHT_3D {
         if (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D()) {
             this.useThreads = true;
         }
-        if (ConcurrencyUtils.isPowerOf2(slices) && ConcurrencyUtils.isPowerOf2(rows) && ConcurrencyUtils.isPowerOf2(columns)) {
+        if (ConcurrencyUtils.isPowerOf2(slices) && ConcurrencyUtils.isPowerOf2(rows)
+                && ConcurrencyUtils.isPowerOf2(columns)) {
             isPowerOfTwo = true;
             oldNthreads = ConcurrencyUtils.getNumberOfThreads();
             nt = slices;
@@ -1056,7 +1057,8 @@ public class FloatDHT_3D {
     }
 
     private void ddxt3da_subth(final int isgn, final float[] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils
+                .getNumberOfThreads();
         int nt = 4 * rows;
         if (columns == 2) {
             nt >>= 1;
@@ -1166,7 +1168,8 @@ public class FloatDHT_3D {
     }
 
     private void ddxt3da_subth(final int isgn, final float[][][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > slices ? slices : ConcurrencyUtils
+                .getNumberOfThreads();
         int nt = 4 * rows;
         if (columns == 2) {
             nt >>= 1;
@@ -1266,7 +1269,8 @@ public class FloatDHT_3D {
     }
 
     private void ddxt3db_subth(final int isgn, final float[] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
         int nt = 4 * slices;
         if (columns == 2) {
             nt >>= 1;
@@ -1376,7 +1380,8 @@ public class FloatDHT_3D {
     }
 
     private void ddxt3db_subth(final int isgn, final float[][][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
         int nt = 4 * slices;
         if (columns == 2) {
             nt >>= 1;

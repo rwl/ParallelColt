@@ -2008,7 +2008,8 @@ public strictfp class FloatFFT_2D {
     }
 
     private void xdft2d0_subth1(final int icr, final int isgn, final float[] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
 
         Future<?>[] futures = new Future[nthreads];
         for (int i = 0; i < nthreads; i++) {
@@ -2043,7 +2044,8 @@ public strictfp class FloatFFT_2D {
     }
 
     private void xdft2d0_subth2(final int icr, final int isgn, final float[] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
 
         Future<?>[] futures = new Future[nthreads];
         for (int i = 0; i < nthreads; i++) {
@@ -2078,7 +2080,8 @@ public strictfp class FloatFFT_2D {
     }
 
     private void xdft2d0_subth1(final int icr, final int isgn, final float[][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
 
         Future<?>[] futures = new Future[nthreads];
         for (int i = 0; i < nthreads; i++) {
@@ -2113,7 +2116,8 @@ public strictfp class FloatFFT_2D {
     }
 
     private void xdft2d0_subth2(final int icr, final int isgn, final float[][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
 
         Future<?>[] futures = new Future[nthreads];
         for (int i = 0; i < nthreads; i++) {

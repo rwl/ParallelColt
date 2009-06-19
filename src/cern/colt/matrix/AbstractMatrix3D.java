@@ -20,6 +20,8 @@ package cern.colt.matrix;
  * @version 1.0, 09/24/99
  */
 public abstract class AbstractMatrix3D extends AbstractMatrix {
+    private static final long serialVersionUID = 1L;
+
     /** the number of slices this matrix (view) has */
     protected int slices;
 
@@ -139,8 +141,10 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      *             <tt>row<0 || height<0 || row+height>rows || slice<0 || depth<0 || slice+depth>slices  || column<0 || width<0 || column+width>columns</tt>
      */
     protected void checkBox(int slice, int row, int column, int depth, int height, int width) {
-        if (slice < 0 || depth < 0 || slice + depth > slices || row < 0 || height < 0 || row + height > rows || column < 0 || width < 0 || column + width > columns)
-            throw new IndexOutOfBoundsException(toStringShort() + ", slice:" + slice + ", row:" + row + " ,column:" + column + ", depth:" + depth + " ,height:" + height + ", width:" + width);
+        if (slice < 0 || depth < 0 || slice + depth > slices || row < 0 || height < 0 || row + height > rows
+                || column < 0 || width < 0 || column + width > columns)
+            throw new IndexOutOfBoundsException(toStringShort() + ", slice:" + slice + ", row:" + row + " ,column:"
+                    + column + ", depth:" + depth + " ,height:" + height + ", width:" + width);
     }
 
     /**
@@ -206,7 +210,8 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      */
     public void checkShape(AbstractMatrix3D B) {
         if (slices != B.slices || rows != B.rows || columns != B.columns)
-            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + " and " + B.toStringShort());
+            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + " and "
+                    + B.toStringShort());
     }
 
     /**
@@ -220,8 +225,10 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      *             .
      */
     public void checkShape(AbstractMatrix3D B, AbstractMatrix3D C) {
-        if (slices != B.slices || rows != B.rows || columns != B.columns || slices != C.slices || rows != C.rows || columns != C.columns)
-            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
+        if (slices != B.slices || rows != B.rows || columns != B.columns || slices != C.slices || rows != C.rows
+                || columns != C.columns)
+            throw new IllegalArgumentException("Incompatible dimensions: " + toStringShort() + ", " + B.toStringShort()
+                    + ", " + C.toStringShort());
     }
 
     /**
@@ -341,7 +348,8 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected void setUp(int slices, int rows, int columns, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
+    protected void setUp(int slices, int rows, int columns, int sliceZero, int rowZero, int columnZero,
+            int sliceStride, int rowStride, int columnStride) {
         if (slices < 0 || rows < 0 || columns < 0)
             throw new IllegalArgumentException("negative size");
         if ((double) slices * rows * columns > Integer.MAX_VALUE)
@@ -373,7 +381,8 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
     /**
      * Returns the number of cells which is <tt>slices()*rows()*columns()</tt>.
      */
-    public int size() {
+    @Override
+    public long size() {
         return slices * rows * columns;
     }
 
@@ -418,7 +427,8 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      */
     protected AbstractMatrix3D vDice(int axis0, int axis1, int axis2) {
         int d = 3;
-        if (axis0 < 0 || axis0 >= d || axis1 < 0 || axis1 >= d || axis2 < 0 || axis2 >= d || axis0 == axis1 || axis0 == axis2 || axis1 == axis2) {
+        if (axis0 < 0 || axis0 >= d || axis1 < 0 || axis1 >= d || axis2 < 0 || axis2 >= d || axis0 == axis1
+                || axis0 == axis2 || axis1 == axis2) {
             throw new IllegalArgumentException("Illegal Axes: " + axis0 + ", " + axis1 + ", " + axis2);
         }
 
@@ -499,7 +509,8 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
      */
     protected AbstractMatrix3D vStrides(int sliceStride, int rowStride, int columnStride) {
         if (sliceStride <= 0 || rowStride <= 0 || columnStride <= 0)
-            throw new IndexOutOfBoundsException("illegal strides: " + sliceStride + ", " + rowStride + ", " + columnStride);
+            throw new IndexOutOfBoundsException("illegal strides: " + sliceStride + ", " + rowStride + ", "
+                    + columnStride);
 
         this.sliceStride *= sliceStride;
         this.rowStride *= rowStride;

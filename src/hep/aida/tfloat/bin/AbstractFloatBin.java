@@ -17,6 +17,11 @@ package hep.aida.tfloat.bin;
  */
 public abstract class AbstractFloatBin extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
@@ -60,11 +65,13 @@ public abstract class AbstractFloatBin extends cern.colt.PersistentObject {
      * returns true if the other object is a bin and has the same size, value,
      * error and center.
      */
+    @Override
     public boolean equals(Object otherObj) {
         if (!(otherObj instanceof AbstractFloatBin))
             return false;
         AbstractFloatBin other = (AbstractFloatBin) otherObj;
-        return size() == other.size() && value() == other.value() && error() == other.error() && center() == other.center();
+        return size() == other.size() && value() == other.value() && error() == other.error()
+                && center() == other.center();
     }
 
     /**
@@ -126,6 +133,7 @@ public abstract class AbstractFloatBin extends cern.colt.PersistentObject {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(getClass().getName());

@@ -34,6 +34,10 @@ package cern.jet.stat.tfloat.quantile;
  * @version 1.0, 09/24/99
  */
 public class FloatEquiDepthHistogram extends cern.colt.PersistentObject {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected float[] binBoundaries;
 
     /**
@@ -137,6 +141,7 @@ public class FloatEquiDepthHistogram extends cern.colt.PersistentObject {
     /**
      * @deprecated Deprecated. Returns the number of bin boundaries.
      */
+    @Deprecated
     public int size() {
         return binBoundaries.length;
     }
@@ -155,7 +160,8 @@ public class FloatEquiDepthHistogram extends cern.colt.PersistentObject {
      * Not yet commented.
      */
     public static void test(float element) {
-        float[] quantileElements = { 50.0f, 100.0f, 200.0f, 300.0f, 1400.0f, 1500.0f, 1600.0f, 1700.0f, 1800.0f, 1900.0f, 2000.0f };
+        float[] quantileElements = { 50.0f, 100.0f, 200.0f, 300.0f, 1400.0f, 1500.0f, 1600.0f, 1700.0f, 1800.0f,
+                1900.0f, 2000.0f };
         FloatEquiDepthHistogram histo = new FloatEquiDepthHistogram(quantileElements);
         System.out.println("elem=" + element + ", phi=" + histo.phi(element));
     }

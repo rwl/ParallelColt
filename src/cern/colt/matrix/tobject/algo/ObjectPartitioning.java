@@ -129,7 +129,8 @@ public class ObjectPartitioning extends Object {
      *            accordingly. Therefore, must satisfy
      *            <tt>splitIndexes.length >= splitters.length</tt>.
      */
-    public static void partition(ObjectMatrix2D matrix, int[] rowIndexes, int rowFrom, int rowTo, int column, final Object[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    public static void partition(ObjectMatrix2D matrix, int[] rowIndexes, int rowFrom, int rowTo, int column,
+            final Object[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
         if (rowFrom < 0 || rowTo >= matrix.rows() || rowTo >= rowIndexes.length)
             throw new IllegalArgumentException();
         if (column < 0 || column >= matrix.columns())
@@ -181,7 +182,8 @@ public class ObjectPartitioning extends Object {
         };
 
         // generic partitioning does the main work of reordering row indexes
-        cern.colt.Partitioning.genericPartition(rowFrom, rowTo, splitFrom, splitTo, splitIndexes, comp, comp2, comp3, swapper);
+        cern.colt.Partitioning.genericPartition(rowFrom, rowTo, splitFrom, splitTo, splitIndexes, comp, comp2, comp3,
+                swapper);
     }
 
     /**
@@ -251,7 +253,8 @@ public class ObjectPartitioning extends Object {
      * @return a new matrix view having rows partitioned by the given column and
      *         splitters.
      */
-    public static ObjectMatrix2D partition(ObjectMatrix2D matrix, int column, final Object[] splitters, int[] splitIndexes) {
+    public static ObjectMatrix2D partition(ObjectMatrix2D matrix, int column, final Object[] splitters,
+            int[] splitIndexes) {
         int rowFrom = 0;
         int rowTo = matrix.rows() - 1;
         int splitFrom = 0;
@@ -332,7 +335,8 @@ public class ObjectPartitioning extends Object {
      * </tr>
      * </table>
      */
-    private static void xPartitionOld(ObjectMatrix2D matrix, ObjectMatrix1D column, int from, int to, Object[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    private static void xPartitionOld(ObjectMatrix2D matrix, ObjectMatrix1D column, int from, int to,
+            Object[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
         /*
          * Object splitter; // int, Object --> template type dependent
          * 

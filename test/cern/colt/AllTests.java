@@ -10,7 +10,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class AllTests {
 
-    public static final int NTHREADS = 2;
+    public static int NTHREADS = 2;
 
     public static Test suite() {
         ConcurrencyUtils.setNumberOfThreads(NTHREADS);
@@ -25,6 +25,5 @@ public class AllTests {
 
     public static void main(String[] args) {
         org.junit.runner.JUnitCore.main(AllTests.class.getName().toString());
-
     }
 }

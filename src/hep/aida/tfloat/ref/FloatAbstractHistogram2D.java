@@ -13,6 +13,10 @@ import hep.aida.tfloat.FloatIHistogram2D;
  * @version 1.0, 23/03/2000
  */
 abstract class FloatAbstractHistogram2D extends FloatHistogram implements FloatIHistogram2D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected FloatIAxis xAxis, yAxis;
 
     FloatAbstractHistogram2D(String title) {

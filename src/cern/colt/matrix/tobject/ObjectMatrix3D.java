@@ -38,6 +38,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public abstract class ObjectMatrix3D extends AbstractMatrix3D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
@@ -79,29 +84,25 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      * @return the aggregated measure.
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr, final cern.colt.function.tobject.ObjectFunction f) {
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f) {
         if (size() == 0)
             return null;
         Object a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Object[] results = new Object[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
 
                     public Object call() throws Exception {
-                        Object a = f.apply(getQuick(startslice, 0, 0));
+                        Object a = f.apply(getQuick(firstSlice, 0, 0));
                         int d = 1;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = d; c < columns; c++) {
                                     a = aggr.apply(a, f.apply(getQuick(s, r, c)));
@@ -180,29 +181,25 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      *             <tt>slices() != other.slices() || rows() != other.rows() || columns() != other.columns()</tt>
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    public Object aggregate(final ObjectMatrix3D other, final cern.colt.function.tobject.ObjectObjectFunction aggr, final cern.colt.function.tobject.ObjectObjectFunction f) {
+    public Object aggregate(final ObjectMatrix3D other, final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectObjectFunction f) {
         checkShape(other);
         if (size() == 0)
             return null;
         Object a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Object[] results = new Object[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
                     public Object call() throws Exception {
-                        Object a = f.apply(getQuick(startslice, 0, 0), other.getQuick(startslice, 0, 0));
+                        Object a = f.apply(getQuick(firstSlice, 0, 0), other.getQuick(firstSlice, 0, 0));
                         int d = 1;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = d; c < columns; c++) {
                                     a = aggr.apply(a, f.apply(getQuick(s, r, c), other.getQuick(s, r, c)));
@@ -252,30 +249,31 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      */
     public ObjectMatrix3D assign(final Object[][][] values) {
         if (values.length != slices)
-            throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+            throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
+                    + slices());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             Object[][] currentSlice = values[s];
                             if (currentSlice.length != rows)
-                                throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                                throw new IllegalArgumentException(
+                                        "Must have same number of rows in every slice: rows=" + currentSlice.length
+                                                + "rows()=" + rows());
                             for (int r = 0; r < rows; r++) {
                                 Object[] currentRow = currentSlice[r];
                                 if (currentRow.length != columns)
-                                    throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                                    throw new IllegalArgumentException(
+                                            "Must have same number of columns in every row: columns="
+                                                    + currentRow.length + "columns()=" + columns());
                                 for (int c = 0; c < columns; c++) {
                                     setQuick(s, r, c, currentRow[c]);
                                 }
@@ -290,11 +288,13 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
             for (int s = 0; s < slices; s++) {
                 Object[][] currentSlice = values[s];
                 if (currentSlice.length != rows)
-                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows="
+                            + currentSlice.length + "rows()=" + rows());
                 for (int r = 0; r < rows; r++) {
                     Object[] currentRow = currentSlice[r];
                     if (currentRow.length != columns)
-                        throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+                        throw new IllegalArgumentException("Must have same number of columns in every row: columns="
+                                + currentRow.length + "columns()=" + columns());
                     for (int c = 0; c < columns; c++) {
                         setQuick(s, r, c, currentRow[c]);
                     }
@@ -333,21 +333,17 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
     public ObjectMatrix3D assign(final cern.colt.function.tobject.ObjectFunction function) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
                                     setQuick(s, r, c, function.apply(getQuick(s, r, c)));
@@ -397,22 +393,18 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
         } else {
             otherLoc = other;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
                                     setQuick(s, r, c, otherLoc.getQuick(s, r, c));
@@ -476,22 +468,18 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      */
     public ObjectMatrix3D assign(final ObjectMatrix3D y, final cern.colt.function.tobject.ObjectObjectFunction function) {
         checkShape(y);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
                                     setQuick(s, r, c, function.apply(getQuick(s, r, c), y.getQuick(s, r, c)));
@@ -523,21 +511,17 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      * @return <tt>this</tt> (for convenience only).
      */
     public ObjectMatrix3D assign(final Object value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
                                     setQuick(s, r, c, value);
@@ -565,23 +549,19 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      */
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = 0; c < columns; c++) {
                                     if (getQuick(s, r, c) != null)
@@ -594,11 +574,11 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -648,6 +628,7 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
+    @Override
     public boolean equals(Object otherObj) { // delta
         return equals(otherObj, true);
     }
@@ -697,7 +678,8 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
             for (int slice = slices; --slice >= 0;) {
                 for (int row = rows; --row >= 0;) {
                     for (int column = columns; --column >= 0;) {
-                        if (!(getQuick(slice, row, column) == null ? other.getQuick(slice, row, column) == null : getQuick(slice, row, column).equals(other.getQuick(slice, row, column))))
+                        if (!(getQuick(slice, row, column) == null ? other.getQuick(slice, row, column) == null
+                                : getQuick(slice, row, column).equals(other.getQuick(slice, row, column))))
                             return false;
                     }
                 }
@@ -760,7 +742,8 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void getNonZeros(IntArrayList sliceList, IntArrayList rowList, IntArrayList columnList, ObjectArrayList valueList) {
+    public void getNonZeros(IntArrayList sliceList, IntArrayList rowList, IntArrayList columnList,
+            ObjectArrayList valueList) {
         sliceList.clear();
         rowList.clear();
         columnList.clear();
@@ -881,7 +864,8 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    protected abstract ObjectMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride);
+    protected abstract ObjectMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
+            int columnStride);
 
     /**
      * Sets the matrix cell at coordinate <tt>[slice,row,column]</tt> to the
@@ -941,21 +925,17 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      */
     public Object[][][] toArray() {
         final Object[][][] values = new Object[slices][rows][columns];
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             Object[][] currentSlice = values[s];
                             for (int r = 0; r < rows; r++) {
                                 Object[] currentRow = currentSlice[r];
@@ -987,6 +967,7 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      * 
      * @see cern.colt.matrix.tobject.algo.ObjectFormatter
      */
+    @Override
     public String toString() {
         return new cern.colt.matrix.tobject.algo.ObjectFormatter().toString(this);
     }

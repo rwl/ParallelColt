@@ -70,6 +70,8 @@ public class BitVector extends cern.colt.PersistentObject {
      * determined purely by performance concerns.
      */
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The bits of this object. The ith bit is stored in bits[i/64] at bit
      * position i % 64 (where bit position 0 refers to the least significant bit
@@ -249,10 +251,11 @@ public class BitVector extends cern.colt.PersistentObject {
      * 
      * @return a deep copy of this bit vector.
      */
+    @Override
     public Object clone() {
         BitVector clone = (BitVector) super.clone();
         if (this.bits != null)
-            clone.bits = (long[]) this.bits.clone();
+            clone.bits = this.bits.clone();
         return clone;
     }
 
@@ -330,6 +333,7 @@ public class BitVector extends cern.colt.PersistentObject {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof BitVector))
             return false;
@@ -389,7 +393,8 @@ public class BitVector extends cern.colt.PersistentObject {
      *             <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *             ).
      */
-    public boolean forEachIndexFromToInState(int from, int to, boolean state, cern.colt.function.tint.IntProcedure procedure) {
+    public boolean forEachIndexFromToInState(int from, int to, boolean state,
+            cern.colt.function.tint.IntProcedure procedure) {
         /*
          * // this version is equivalent to the low level version below, but
          * about 100 times slower for large ranges. if (nbits==0) return true;
@@ -599,6 +604,7 @@ public class BitVector extends cern.colt.PersistentObject {
      * 
      * @return a hash code value for the receiver.
      */
+    @Override
     public int hashCode() {
         long h = 1234;
         for (int i = bits.length; --i >= 0;)
@@ -970,6 +976,7 @@ public class BitVector extends cern.colt.PersistentObject {
      * 
      * @return a string representation of this bit vector.
      */
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer(nbits);
         String separator = "";

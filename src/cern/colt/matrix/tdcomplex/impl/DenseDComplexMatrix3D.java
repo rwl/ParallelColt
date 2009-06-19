@@ -25,8 +25,6 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 /**
  * Dense 3-d matrix holding <tt>complex</tt> elements.
  * <p>
- * <b>Implementation:</b>
- * <p>
  * Internally holds one single contigous one-dimensional array, addressed in (in
  * decreasing order of significance): slice major, row major, column major.
  * Complex data is represented by 2 double values in sequence, i.e.
@@ -34,16 +32,6 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * imaginary part, where idx = index(0,0,0) + slice * sliceStride + row *
  * rowStride + column * columnStride. Note that this implementation is not
  * synchronized.
- * <p>
- * <b>Memory requirements:</b>
- * <p>
- * <tt>memory [bytes] = 8*slices()*rows()*2*columns()</tt>. Thus, a 100*100*100
- * matrix uses 16 MB.
- * <p>
- * <b>Time complexity:</b>
- * <p>
- * <tt>O(1)</tt> (i.e. constant time) for the basic operations <tt>get</tt>,
- * <tt>getQuick</tt>, <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt>,
  * <p>
  * Applications demanding utmost speed can exploit knowledge about the internal
  * addressing. Setting/getting values in a loop slice-by-slice, row-by-row,
@@ -75,7 +63,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class DenseDComplexMatrix3D extends DComplexMatrix3D {
-    private static final long serialVersionUID = 3008992680697668332L;
+    private static final long serialVersionUID = 1L;
 
     private DoubleFFT_3D fft3;
 
@@ -111,14 +99,14 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
      *             .
      */
     public DenseDComplexMatrix3D(double[][][] values) {
-        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0 : values[0].length == 0 ? 0 : values[0][0].length / 2));
+        this(values.length, (values.length == 0 ? 0 : values[0].length), (values.length == 0 ? 0
+                : values[0].length == 0 ? 0 : values[0][0].length / 2));
         assign(values);
     }
 
     /**
-     * Constructs a complex matrix with the same size as <tt>realPart</tt>
-     * matrix and fills the real part of this matrix with elements of
-     * <tt>realPart</tt>.
+     * Constructs a matrix with the same size as <tt>realPart</tt> matrix and
+     * fills the real part of this matrix with elements of <tt>realPart</tt>.
      * 
      * @param realPart
      *            a real matrix whose elements become a real part of this matrix
@@ -153,7 +141,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
     }
 
     /**
-     * Constructs a view with the given parameters.
+     * Constructs a matrix with the given parameters.
      * 
      * @param slices
      *            the number of slices the matrix shall have.
@@ -178,18 +166,24 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
      * @param columnStride
      *            the number of elements between two columns, i.e.
      *            <tt>index(k,i,j+1)-index(k,i,j)</tt>.
+     * @param isNoView
+     *            if false then the view is constructed
+     * 
      * @throws IllegalArgumentException
      *             if <tt>(double)slices*columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    public DenseDComplexMatrix3D(int slices, int rows, int columns, double[] elements, int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
+    public DenseDComplexMatrix3D(int slices, int rows, int columns, double[] elements, int sliceZero, int rowZero,
+            int columnZero, int sliceStride, int rowStride, int columnStride, boolean isNoView) {
         setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         this.elements = elements;
-        this.isNoView = false;
+        this.isNoView = isNoView;
     }
 
-    public double[] aggregate(final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr, final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
+    @Override
+    public double[] aggregate(final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr,
+            final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
         double[] b = new double[2];
         if (size() == 0) {
             b[0] = Double.NaN;
@@ -198,26 +192,21 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         }
         final int zero = (int) index(0, 0, 0);
         double[] a = null;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            double[][] results = new double[np][2];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 
                     public double[] call() throws Exception {
-                        int idx = zero + startslice * sliceStride;
+                        int idx = zero + firstSlice * sliceStride;
                         double[] a = f.apply(new double[] { elements[idx], elements[idx + 1] });
                         int d = 1;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = d; c < columns; c++) {
                                     idx = zero + s * sliceStride + r * rowStride + c * columnStride;
@@ -248,7 +237,10 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return a;
     }
 
-    public double[] aggregate(final DComplexMatrix3D other, final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr, final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction f) {
+    @Override
+    public double[] aggregate(final DComplexMatrix3D other,
+            final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr,
+            final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction f) {
         checkShape(other);
         double[] b = new double[2];
         if (size() == 0) {
@@ -264,32 +256,30 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         final double[] elemsOther = (double[]) other.elements();
 
         double[] a = null;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            double[][] results = new double[np][2];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 
                     public double[] call() throws Exception {
-                        int idx = zero + startslice * sliceStride;
-                        int idxOther = zeroOther + startslice * sliceStrideOther;
-                        double[] a = f.apply(new double[] { elements[idx], elements[idx + 1] }, new double[] { elemsOther[idxOther], elemsOther[idxOther + 1] });
+                        int idx = zero + firstSlice * sliceStride;
+                        int idxOther = zeroOther + firstSlice * sliceStrideOther;
+                        double[] a = f.apply(new double[] { elements[idx], elements[idx + 1] }, new double[] {
+                                elemsOther[idxOther], elemsOther[idxOther + 1] });
                         int d = 1;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 for (int c = d; c < columns; c++) {
                                     idx = zero + s * sliceStride + r * rowStride + c * columnStride;
-                                    idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther + c * colStrideOther;
-                                    a = aggr.apply(a, f.apply(new double[] { elements[idx], elements[idx + 1] }, new double[] { elemsOther[idxOther], elemsOther[idxOther + 1] }));
+                                    idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther + c
+                                            * colStrideOther;
+                                    a = aggr.apply(a, f.apply(new double[] { elements[idx], elements[idx + 1] },
+                                            new double[] { elemsOther[idxOther], elemsOther[idxOther + 1] }));
                                 }
                                 d = 0;
                             }
@@ -300,7 +290,8 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
             }
             a = ConcurrencyUtils.waitForCompletion(futures, aggr);
         } else {
-            a = f.apply(new double[] { elements[zero], elements[zero + 1] }, new double[] { elemsOther[zeroOther], elemsOther[zeroOther + 1] });
+            a = f.apply(new double[] { elements[zero], elements[zero + 1] }, new double[] { elemsOther[zeroOther],
+                    elemsOther[zeroOther + 1] });
             int d = 1; // first cell already done
             int idx;
             int idxOther;
@@ -309,7 +300,8 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                     for (int c = d; c < columns; c++) {
                         idx = zero + s * sliceStride + r * rowStride + c * columnStride;
                         idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther + c * colStrideOther;
-                        a = aggr.apply(a, f.apply(new double[] { elements[idx], elements[idx + 1] }, new double[] { elemsOther[idxOther], elemsOther[idxOther + 1] }));
+                        a = aggr.apply(a, f.apply(new double[] { elements[idx], elements[idx + 1] }, new double[] {
+                                elemsOther[idxOther], elemsOther[idxOther + 1] }));
                     }
                     d = 0;
                 }
@@ -318,34 +310,49 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return a;
     }
 
+    @Override
     public DComplexMatrix3D assign(final cern.colt.function.tdcomplex.DComplexDComplexFunction function) {
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         double[] elem = new double[2];
-                        for (int s = startslice; s < stopslice; s++) {
-                            for (int r = 0; r < rows; r++) {
-                                idx = zero + s * sliceStride + r * rowStride;
-                                for (int c = 0; c < columns; c++) {
-                                    elem[0] = elements[idx];
-                                    elem[1] = elements[idx + 1];
-                                    elem = function.apply(elem);
-                                    elements[idx] = elem[0];
-                                    elements[idx + 1] = elem[1];
-                                    idx += columnStride;
+                        if (function instanceof cern.jet.math.tdcomplex.DComplexMult) {
+                            double[] multiplicator = ((cern.jet.math.tdcomplex.DComplexMult) function).multiplicator;
+                            // x[i] = mult*x[i]
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx = zero + s * sliceStride + r * rowStride;
+                                    for (int c = 0; c < columns; c++) {
+                                        elem[0] = elements[idx];
+                                        elem[1] = elements[idx + 1];
+                                        elements[idx] = elem[0] * multiplicator[0] - elem[1] * multiplicator[1];
+                                        elements[idx + 1] = elem[1] * multiplicator[0] + elem[0] * multiplicator[1];
+                                        idx += columnStride;
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx = zero + s * sliceStride + r * rowStride;
+                                    for (int c = 0; c < columns; c++) {
+                                        elem[0] = elements[idx];
+                                        elem[1] = elements[idx + 1];
+                                        elem = function.apply(elem);
+                                        elements[idx] = elem[0];
+                                        elements[idx + 1] = elem[1];
+                                        idx += columnStride;
+                                    }
                                 }
                             }
                         }
@@ -357,16 +364,33 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         } else {
             int idx;
             double[] elem = new double[2];
-            for (int s = 0; s < slices; s++) {
-                for (int r = 0; r < rows; r++) {
-                    idx = zero + s * sliceStride + r * rowStride;
-                    for (int c = 0; c < columns; c++) {
-                        elem[0] = elements[idx];
-                        elem[1] = elements[idx + 1];
-                        elem = function.apply(elem);
-                        elements[idx] = elem[0];
-                        elements[idx + 1] = elem[1];
-                        idx += columnStride;
+            if (function instanceof cern.jet.math.tdcomplex.DComplexMult) {
+                double[] multiplicator = ((cern.jet.math.tdcomplex.DComplexMult) function).multiplicator;
+                // x[i] = mult*x[i]
+                for (int s = 0; s < slices; s++) {
+                    for (int r = 0; r < rows; r++) {
+                        idx = zero + s * sliceStride + r * rowStride;
+                        for (int c = 0; c < columns; c++) {
+                            elem[0] = elements[idx];
+                            elem[1] = elements[idx + 1];
+                            elements[idx] = elem[0] * multiplicator[0] - elem[1] * multiplicator[1];
+                            elements[idx + 1] = elem[1] * multiplicator[0] + elem[0] * multiplicator[1];
+                            idx += columnStride;
+                        }
+                    }
+                }
+            } else {
+                for (int s = 0; s < slices; s++) {
+                    for (int r = 0; r < rows; r++) {
+                        idx = zero + s * sliceStride + r * rowStride;
+                        for (int c = 0; c < columns; c++) {
+                            elem[0] = elements[idx];
+                            elem[1] = elements[idx + 1];
+                            elem = function.apply(elem);
+                            elements[idx] = elem[0];
+                            elements[idx + 1] = elem[1];
+                            idx += columnStride;
+                        }
                     }
                 }
             }
@@ -374,25 +398,24 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
-    public DComplexMatrix3D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
+    @Override
+    public DComplexMatrix3D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond,
+            final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         double[] elem = new double[2];
                         int idx;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 for (int c = 0; c < columns; c++) {
@@ -433,26 +456,24 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final double[] value) {
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         double[] elem = new double[2];
                         int idx;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 for (int c = 0; c < columns; c++) {
@@ -491,34 +512,57 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assign(final cern.colt.function.tdcomplex.DComplexRealFunction function) {
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         double[] elem = new double[2];
-                        for (int s = startslice; s < stopslice; s++) {
-                            for (int r = 0; r < rows; r++) {
-                                idx = zero + s * sliceStride + r * rowStride;
-                                for (int c = 0; c < columns; c++) {
-                                    elem[0] = elements[idx];
-                                    elem[1] = elements[idx + 1];
-                                    elem[0] = function.apply(elem);
-                                    elements[idx] = elem[0];
-                                    elements[idx + 1] = 0;
-                                    idx += columnStride;
+                        if (function == cern.jet.math.tdcomplex.DComplexFunctions.abs) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx = zero + s * sliceStride + r * rowStride;
+                                    for (int c = 0; c < columns; c++) {
+                                        elem[0] = elements[idx];
+                                        elem[1] = elements[idx + 1];
+                                        double absX = Math.abs(elements[idx]);
+                                        double absY = Math.abs(elements[idx + 1]);
+                                        if (absX == 0 && absY == 0) {
+                                            elements[idx] = 0;
+                                        } else if (absX >= absY) {
+                                            double d = elem[1] / elem[0];
+                                            elements[idx] = absX * Math.sqrt(1 + d * d);
+                                        } else {
+                                            double d = elem[0] / elem[1];
+                                            elements[idx] = absY * Math.sqrt(1 + d * d);
+                                        }
+                                        elements[idx + 1] = 0;
+                                        idx += columnStride;
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx = zero + s * sliceStride + r * rowStride;
+                                    for (int c = 0; c < columns; c++) {
+                                        elem[0] = elements[idx];
+                                        elem[1] = elements[idx + 1];
+                                        elem[0] = function.apply(elem);
+                                        elements[idx] = elem[0];
+                                        elements[idx + 1] = 0;
+                                        idx += columnStride;
+                                    }
                                 }
                             }
                         }
@@ -547,22 +591,22 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assign(DComplexMatrix3D source) {
         // overriden for performance only
         if (!(source instanceof DenseDComplexMatrix3D)) {
             super.assign(source);
             return this;
         }
-        final DenseDComplexMatrix3D other_final = (DenseDComplexMatrix3D) source;
-        if (other_final == this)
+        DenseDComplexMatrix3D other = (DenseDComplexMatrix3D) source;
+        if (other == this)
             return this;
-        checkShape(other_final);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if (this.isNoView && other_final.isNoView) { // quickest
-            System.arraycopy(other_final.elements, 0, this.elements, 0, this.elements.length);
+        checkShape(other);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if (this.isNoView && other.isNoView) { // quickest
+            System.arraycopy(other.elements, 0, this.elements, 0, this.elements.length);
             return this;
         }
-        DenseDComplexMatrix3D other = (DenseDComplexMatrix3D) source;
         if (haveSharedCells(other)) {
             DComplexMatrix3D c = other.copy();
             if (!(c instanceof DenseDComplexMatrix3D)) { // should not happen
@@ -577,22 +621,18 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         final int rowStrideOther = other.rowStride;
         final int columnStrideOther = other.columnStride;
         final double[] elemsOther = other.elements;
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -627,7 +667,9 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
-    public DComplexMatrix3D assign(final DComplexMatrix3D y, final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction function) {
+    @Override
+    public DComplexMatrix3D assign(final DComplexMatrix3D y,
+            final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction function) {
         checkShape(y);
         final int zero = (int) index(0, 0, 0);
         final int zeroOther = (int) y.index(0, 0, 0);
@@ -635,18 +677,14 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         final int sliceStrideOther = y.sliceStride();
         final int rowStrideOther = y.rowStride();
         final double[] elemsOther = (double[]) y.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
@@ -654,7 +692,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                         double[] tmp1 = new double[2];
                         double[] tmp2 = new double[2];
                         if (function == cern.jet.math.tdcomplex.DComplexFunctions.mult) {
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -671,7 +709,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                                 }
                             }
                         } else if (function == cern.jet.math.tdcomplex.DComplexFunctions.multConjFirst) {
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -689,7 +727,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                             }
 
                         } else if (function == cern.jet.math.tdcomplex.DComplexFunctions.multConjSecond) {
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -706,7 +744,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                                 }
                             }
                         } else {
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -808,27 +846,24 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assign(final double re, final double im) {
         if (this.isNoView == false) {
             return super.assign(re, im);
         }
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 for (int c = 0; c < columns; c++) {
@@ -859,31 +894,29 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assign(final double[] values) {
         if (values.length != slices * rows * 2 * columns)
-            throw new IllegalArgumentException("Must have same length: length=" + values.length + "slices()*rows()*2*columns()=" + slices() * rows() * 2 * columns());
-        int np = ConcurrencyUtils.getNumberOfThreads();
+            throw new IllegalArgumentException("Must have same length: length=" + values.length
+                    + "slices()*rows()*2*columns()=" + slices() * rows() * 2 * columns());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (this.isNoView) {
             System.arraycopy(values, 0, elements, 0, values.length);
         } else {
             final int zero = (int) index(0, 0, 0);
-            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-                Future<?>[] futures = new Future[np];
-                int k = slices / np;
-                for (int j = 0; j < np; j++) {
-                    final int startslice = j * k;
-                    final int stopslice;
-                    final int glob_idx = j * k * 2 * rows * columns;
-                    if (j == np - 1) {
-                        stopslice = slices;
-                    } else {
-                        stopslice = startslice + k;
-                    }
+            if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                nthreads = Math.min(nthreads, slices);
+                Future<?>[] futures = new Future[nthreads];
+                int k = slices / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstSlice = j * k;
+                    final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            int idxOther = glob_idx;
+                            int idxOther = firstSlice * 2 * rows * columns;
                             int idx;
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     for (int c = 0; c < columns; c++) {
@@ -915,34 +948,36 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assign(final double[][][] values) {
         if (values.length != slices)
-            throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()=" + slices());
+            throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
+                    + slices());
         final int length = 2 * columns;
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (this.isNoView) {
-            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-                Future<?>[] futures = new Future[np];
-                int k = slices / np;
-                for (int j = 0; j < np; j++) {
-                    final int startslice = j * k;
-                    final int stopslice;
-                    if (j == np - 1) {
-                        stopslice = slices;
-                    } else {
-                        stopslice = startslice + k;
-                    }
+            if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                nthreads = Math.min(nthreads, slices);
+                Future<?>[] futures = new Future[nthreads];
+                int k = slices / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstSlice = j * k;
+                    final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
-                            int i = startslice * sliceStride;
-                            for (int s = startslice; s < stopslice; s++) {
+                            int i = firstSlice * sliceStride;
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 double[][] currentSlice = values[s];
                                 if (currentSlice.length != rows)
-                                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                                    throw new IllegalArgumentException(
+                                            "Must have same number of rows in every slice: rows=" + currentSlice.length
+                                                    + "rows()=" + rows());
                                 for (int r = 0; r < rows; r++) {
                                     double[] currentRow = currentSlice[r];
                                     if (currentRow.length != length)
-                                        throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "2 * columns()=" + length);
+                                        throw new IllegalArgumentException(
+                                                "Must have same number of columns in every row: columns="
+                                                        + currentRow.length + "2 * columns()=" + length);
                                     System.arraycopy(currentRow, 0, elements, i, length);
                                     i += length;
                                 }
@@ -956,11 +991,14 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                 for (int s = 0; s < slices; s++) {
                     double[][] currentSlice = values[s];
                     if (currentSlice.length != rows)
-                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows="
+                                + currentSlice.length + "rows()=" + rows());
                     for (int r = 0; r < rows; r++) {
                         double[] currentRow = currentSlice[r];
                         if (currentRow.length != length)
-                            throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "2 * columns()=" + length);
+                            throw new IllegalArgumentException(
+                                    "Must have same number of columns in every row: columns=" + currentRow.length
+                                            + "2 * columns()=" + length);
                         System.arraycopy(currentRow, 0, elements, i, length);
                         i += length;
                     }
@@ -968,30 +1006,30 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
             }
         } else {
             final int zero = (int) index(0, 0, 0);
-            if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-                Future<?>[] futures = new Future[np];
-                int k = slices / np;
-                for (int j = 0; j < np; j++) {
-                    final int startslice = j * k;
-                    final int stopslice;
-                    if (j == np - 1) {
-                        stopslice = slices;
-                    } else {
-                        stopslice = startslice + k;
-                    }
+            if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                nthreads = Math.min(nthreads, slices);
+                Future<?>[] futures = new Future[nthreads];
+                int k = slices / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstSlice = j * k;
+                    final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
                             int idx;
-                            for (int s = startslice; s < stopslice; s++) {
+                            for (int s = firstSlice; s < lastSlice; s++) {
                                 double[][] currentSlice = values[s];
                                 if (currentSlice.length != rows)
-                                    throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                                    throw new IllegalArgumentException(
+                                            "Must have same number of rows in every slice: rows=" + currentSlice.length
+                                                    + "rows()=" + rows());
                                 for (int r = 0; r < rows; r++) {
                                     idx = zero + s * sliceStride + r * rowStride;
                                     double[] currentRow = currentSlice[r];
                                     if (currentRow.length != length)
-                                        throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + length);
+                                        throw new IllegalArgumentException(
+                                                "Must have same number of columns in every row: columns="
+                                                        + currentRow.length + "2*columns()=" + length);
                                     for (int c = 0; c < columns; c++) {
                                         elements[idx] = currentRow[2 * c];
                                         elements[idx + 1] = currentRow[2 * c + 1];
@@ -1009,12 +1047,15 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                 for (int s = 0; s < slices; s++) {
                     double[][] currentSlice = values[s];
                     if (currentSlice.length != rows)
-                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows=" + currentSlice.length + "rows()=" + rows());
+                        throw new IllegalArgumentException("Must have same number of rows in every slice: rows="
+                                + currentSlice.length + "rows()=" + rows());
                     for (int r = 0; r < rows; r++) {
                         idx = zero + s * sliceStride + r * rowStride;
                         double[] currentRow = currentSlice[r];
                         if (currentRow.length != length)
-                            throw new IllegalArgumentException("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + length);
+                            throw new IllegalArgumentException(
+                                    "Must have same number of columns in every row: columns=" + currentRow.length
+                                            + "2*columns()=" + length);
                         for (int c = 0; c < columns; c++) {
                             elements[idx] = currentRow[2 * c];
                             elements[idx + 1] = currentRow[2 * c + 1];
@@ -1027,6 +1068,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assignImaginary(final DoubleMatrix3D other) {
         checkShape(other);
         final int zero = (int) index(0, 0, 0);
@@ -1035,28 +1077,23 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         final int rowStrideOther = other.rowStride();
         final int colStrideOther = other.columnStride();
         final double[] elemsOther = (double[]) other.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
                                 for (int c = 0; c < columns; c++) {
-                                    //                                    elements[idx] = 0;
                                     elements[idx + 1] = elemsOther[idxOther];
                                     idx += columnStride;
                                     idxOther += colStrideOther;
@@ -1075,7 +1112,6 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                     idx = zero + s * sliceStride + r * rowStride;
                     idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
                     for (int c = 0; c < columns; c++) {
-                        //                        elements[idx] = 0;
                         elements[idx + 1] = elemsOther[idxOther];
                         idx += columnStride;
                         idxOther += colStrideOther;
@@ -1086,6 +1122,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public DComplexMatrix3D assignReal(final DoubleMatrix3D other) {
         checkShape(other);
         final int zero = (int) index(0, 0, 0);
@@ -1094,29 +1131,24 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         final int rowStrideOther = other.rowStride();
         final int colStrideOther = other.columnStride();
         final double[] elemsOther = (double[]) other.elements();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
                                 for (int c = 0; c < columns; c++) {
                                     elements[idx] = elemsOther[idxOther];
-                                    //                                    elements[idx + 1] = 0;
                                     idx += columnStride;
                                     idxOther += colStrideOther;
                                 }
@@ -1135,7 +1167,6 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                     idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
                     for (int c = 0; c < columns; c++) {
                         elements[idx] = elemsOther[idxOther];
-                        //                        elements[idx + 1] = 0;
                         idx += columnStride;
                         idxOther += colStrideOther;
                     }
@@ -1145,27 +1176,24 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
+    @Override
     public int cardinality() {
         int cardinality = 0;
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
                         int idx;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 for (int c = 0; c < columns; c++) {
@@ -1181,11 +1209,11 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -1212,26 +1240,44 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
 
     /**
      * Computes the 2D discrete Fourier transform (DFT) of each slice of this
-     * matrix. Throws IllegalArgumentException if the column size or a the row
-     * size of a slice is not a power of 2 number.
+     * matrix.
      */
     public void fft2Slices() {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
-        for (int s = 0; s < slices; s++) {
-            ((DenseDComplexMatrix2D) viewSlice(s)).fft2();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            ConcurrencyUtils.setThreadsBeginN_2D(Integer.MAX_VALUE);
+            ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
+            ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            ((DenseDComplexMatrix2D) viewSlice(s)).fft2();
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+            ConcurrencyUtils.resetThreadsBeginN();
+            ConcurrencyUtils.resetThreadsBeginN_FFT();
+        } else {
+            for (int s = 0; s < slices; s++) {
+                ((DenseDComplexMatrix2D) viewSlice(s)).fft2();
+            }
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     /**
-     * Computes the 3D discrete Fourier transform (DFT) of this matrix. Throws
-     * IllegalArgumentException if the slice size or the row size or the column
-     * size of this matrix is not a power of 2 number.
+     * Computes the 3D discrete Fourier transform (DFT) of this matrix.
      */
     public void fft3() {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (fft3 == null) {
             fft3 = new DoubleFFT_3D(slices, rows, columns);
         }
@@ -1242,38 +1288,36 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
             fft3.complexForward((double[]) copy.elements());
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
+    @Override
     public double[] elements() {
         return elements;
     }
 
+    @Override
     public DoubleMatrix3D getImaginaryPart() {
         final DenseDoubleMatrix3D Im = new DenseDoubleMatrix3D(slices, rows, columns);
-        final double[] elemsOther = (double[]) Im.elements();
+        final double[] elemsOther = Im.elements();
         final int sliceStrideOther = Im.sliceStride();
         final int rowStrideOther = Im.rowStride();
         final int columnStrideOther = Im.columnStride();
         final int zeroOther = (int) Im.index(0, 0, 0);
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -1306,7 +1350,9 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return Im;
     }
 
-    public void getNonZeros(final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList, final ArrayList<double[]> valueList) {
+    @Override
+    public void getNonZeros(final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList,
+            final ArrayList<double[]> valueList) {
         sliceList.clear();
         rowList.clear();
         columnList.clear();
@@ -1334,36 +1380,34 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         }
     }
 
+    @Override
     public double[] getQuick(int slice, int row, int column) {
         int idx = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         return new double[] { elements[idx], elements[idx + 1] };
     }
 
+    @Override
     public DoubleMatrix3D getRealPart() {
         final DenseDoubleMatrix3D R = new DenseDoubleMatrix3D(slices, rows, columns);
-        final double[] elemsOther = (double[]) R.elements();
+        final double[] elemsOther = R.elements();
         final int sliceStrideOther = R.sliceStride();
         final int rowStrideOther = R.rowStride();
         final int columnStrideOther = R.columnStride();
         final int zeroOther = (int) R.index(0, 0, 0);
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
@@ -1398,32 +1442,51 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
 
     /**
      * Computes the 2D inverse of the discrete Fourier transform (IDFT) of each
-     * slice of this matrix. Throws IllegalArgumentException if the column size
-     * or the row size of a slice is not a power of 2 number.
+     * slice of this matrix.
      * 
      * @param scale
      *            if true then scaling is performed
      */
-    public void ifft2Slices(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
-        for (int s = 0; s < slices; s++) {
-            ((DenseDComplexMatrix2D) viewSlice(s)).ifft2(scale);
+    public void ifft2Slices(final boolean scale) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            ConcurrencyUtils.setThreadsBeginN_2D(Integer.MAX_VALUE);
+            ConcurrencyUtils.setThreadsBeginN_1D_FFT_2Threads(Integer.MAX_VALUE);
+            ConcurrencyUtils.setThreadsBeginN_1D_FFT_4Threads(Integer.MAX_VALUE);
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            ((DenseDComplexMatrix2D) viewSlice(s)).ifft2(scale);
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+            ConcurrencyUtils.resetThreadsBeginN();
+            ConcurrencyUtils.resetThreadsBeginN_FFT();
+        } else {
+            for (int s = 0; s < slices; s++) {
+                ((DenseDComplexMatrix2D) viewSlice(s)).ifft2(scale);
+            }
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
     }
 
     /**
      * Computes the 3D inverse of the discrete Fourier transform (IDFT) of this
-     * matrix. Throws IllegalArgumentException if slice the size or the row size
-     * or the column size of this matrix is not a power of 2 number.
+     * matrix.
      * 
      * @param scale
      *            if true then scaling is performed
      */
     public void ifft3(boolean scale) {
-        int oldNp = ConcurrencyUtils.getNumberOfThreads();
-        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNp));
+        int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
         if (fft3 == null) {
             fft3 = new DoubleFFT_3D(slices, rows, columns);
         }
@@ -1434,44 +1497,49 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
             fft3.complexInverse((double[]) copy.elements(), scale);
             this.assign((double[]) copy.elements());
         }
-        ConcurrencyUtils.setNumberOfThreads(oldNp);
+        ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
+    @Override
     public DComplexMatrix3D like(int slices, int rows, int columns) {
         return new DenseDComplexMatrix3D(slices, rows, columns);
     }
 
+    @Override
+    public DComplexMatrix2D like2D(int rows, int columns) {
+        return new DenseDComplexMatrix2D(rows, columns);
+    }
+
+    @Override
     public void setQuick(int slice, int row, int column, double re, double im) {
         int idx = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = re;
         elements[idx + 1] = im;
     }
 
+    @Override
     public void setQuick(int slice, int row, int column, double[] value) {
         int idx = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = value[0];
         elements[idx + 1] = value[1];
     }
 
+    @Override
     public double[][][] toArray() {
         final int zero = (int) index(0, 0, 0);
         final double[][][] values = new double[slices][rows][2 * columns];
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             double[][] currentSlice = values[s];
                             for (int r = 0; r < rows; r++) {
                                 double[] currentRow = currentSlice[r];
@@ -1505,8 +1573,9 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return values;
     }
 
+    @Override
     public DComplexMatrix1D vectorize() {
-        DComplexMatrix1D v = new DenseDComplexMatrix1D(size());
+        DComplexMatrix1D v = new DenseDComplexMatrix1D((int) size());
         int length = rows * columns;
         for (int s = 0; s < slices; s++) {
             DComplexMatrix2D slice = viewSlice(s);
@@ -1515,27 +1584,24 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return v;
     }
 
+    @Override
     public double[] zSum() {
         double[] sum = new double[2];
         final int zero = (int) index(0, 0, 0);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
-            Future<?>[] futures = new Future[np];
-            int k = slices / np;
-            for (int j = 0; j < np; j++) {
-                final int startslice = j * k;
-                final int stopslice;
-                if (j == np - 1) {
-                    stopslice = slices;
-                } else {
-                    stopslice = startslice + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<double[]>() {
 
                     public double[] call() throws Exception {
                         double[] sum = new double[2];
                         int idx;
-                        for (int s = startslice; s < stopslice; s++) {
+                        for (int s = firstSlice; s < lastSlice; s++) {
                             for (int r = 0; r < rows; r++) {
                                 idx = zero + s * sliceStride + r * rowStride;
                                 for (int c = 0; c < columns; c++) {
@@ -1551,7 +1617,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
             }
             double[] tmp;
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     tmp = (double[]) futures[j].get();
                     sum[0] += tmp[0];
                     sum[1] += tmp[1];
@@ -1577,6 +1643,7 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return sum;
     }
 
+    @Override
     protected boolean haveSharedCellsRaw(DComplexMatrix3D other) {
         if (other instanceof SelectedDenseDComplexMatrix3D) {
             SelectedDenseDComplexMatrix3D otherMatrix = (SelectedDenseDComplexMatrix3D) other;
@@ -1588,14 +1655,19 @@ public class DenseDComplexMatrix3D extends DComplexMatrix3D {
         return false;
     }
 
+    @Override
     public long index(int slice, int row, int column) {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    protected DComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
-        return new DenseDComplexMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
+    @Override
+    protected DComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
+            int columnStride) {
+        return new DenseDComplexMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride,
+                false);
     }
 
+    @Override
     protected DComplexMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDComplexMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

@@ -1868,7 +1868,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radf2: Real FFT's forward processing of factor 2
       -------------------------------------------------*/
-    void radf2(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radf2(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         int i, ic, idx0, idx1, idx2, idx3, idx4;
         double t1i, t1r, w1r, w1i;
         int iw1;
@@ -1938,7 +1939,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radb2: Real FFT's backward processing of factor 2
       -------------------------------------------------*/
-    void radb2(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radb2(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         int i, ic;
         double t1i, t1r, w1r, w1i;
         int iw1 = offset;
@@ -2005,7 +2007,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radf3: Real FFT's forward processing of factor 3 
       -------------------------------------------------*/
-    void radf3(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radf3(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         final double taur = -0.5;
         final double taui = 0.866025403784438707610604524234076962;
         int i, ic;
@@ -2091,7 +2094,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radb3: Real FFT's backward processing of factor 3
       -------------------------------------------------*/
-    void radb3(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radb3(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         final double taur = -0.5;
         final double taui = 0.866025403784438707610604524234076962;
         int i, ic;
@@ -2176,7 +2180,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radf4: Real FFT's forward processing of factor 4
       -------------------------------------------------*/
-    void radf4(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radf4(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         final double hsqt2 = 0.707106781186547572737310929369414225;
         int i, ic;
         double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, tr3, tr4, w1r, w1i, w2r, w2i, w3r, w3i;
@@ -2312,7 +2317,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radb4: Real FFT's backward processing of factor 4
       -------------------------------------------------*/
-    void radb4(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radb4(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         final double sqrt2 = 1.41421356237309514547462185873882845;
         int i, ic;
         double ci2, ci3, ci4, cr2, cr3, cr4;
@@ -2455,7 +2461,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radf5: Real FFT's forward processing of factor 5
       -------------------------------------------------*/
-    void radf5(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radf5(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         final double tr11 = 0.309016994374947451262869435595348477;
         final double ti11 = 0.951056516295153531181938433292089030;
         final double tr12 = -0.809016994374947340240566973079694435;
@@ -2598,7 +2605,8 @@ public class DoubleFFT_1D {
     /*-------------------------------------------------
        radb5: Real FFT's backward processing of factor 5
       -------------------------------------------------*/
-    void radb5(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radb5(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off,
+            final int offset) {
         final double tr11 = 0.309016994374947451262869435595348477;
         final double ti11 = 0.951056516295153531181938433292089030;
         final double tr12 = -0.809016994374947340240566973079694435;
@@ -2740,7 +2748,8 @@ public class DoubleFFT_1D {
     /*---------------------------------------------------------
        radfg: Real FFT's forward processing of general factor
       --------------------------------------------------------*/
-    void radfg(final int ido, final int ip, final int l1, final int idl1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radfg(final int ido, final int ip, final int l1, final int idl1, final double in[], final int in_off,
+            final double out[], final int out_off, final int offset) {
         int idij, ipph, j2, ic, jc, lc, is, nbd;
         double dc2, ai1, ai2, ar1, ar2, ds2, dcp, arg, dsp, ar1h, ar2h, w1r, w1i;
         int iw1 = offset;
@@ -3029,7 +3038,8 @@ public class DoubleFFT_1D {
     /*---------------------------------------------------------
        radbg: Real FFT's backward processing of general factor
       --------------------------------------------------------*/
-    void radbg(final int ido, final int ip, final int l1, final int idl1, final double in[], final int in_off, final double out[], final int out_off, final int offset) {
+    void radbg(final int ido, final int ip, final int l1, final int idl1, final double in[], final int in_off,
+            final double out[], final int out_off, final int offset) {
         int idij, ipph, j2, ic, jc, lc, is;
         double dc2, ai1, ai2, ar1, ar2, ds2, w1r, w1i;
         int nbd;
@@ -3404,7 +3414,8 @@ public class DoubleFFT_1D {
        isign is +1 for backward and -1 for forward transforms
       ----------------------------------------------------------------------*/
 
-    void passf2(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset, final int isign) {
+    void passf2(final int ido, final int l1, final double in[], final int in_off, final double out[],
+            final int out_off, final int offset, final int isign) {
         double t1i, t1r;
         int iw1;
         iw1 = offset;
@@ -3459,7 +3470,8 @@ public class DoubleFFT_1D {
        passf3: Complex FFT's forward/backward processing of factor 3;
        isign is +1 for backward and -1 for forward transforms
       ----------------------------------------------------------------------*/
-    void passf3(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset, final int isign) {
+    void passf3(final int ido, final int l1, final double in[], final int in_off, final double out[],
+            final int out_off, final int offset, final int isign) {
         final double taur = -0.5;
         final double taui = 0.866025403784438707610604524234076962;
         double ci2, ci3, di2, di3, cr2, cr3, dr2, dr3, ti2, tr2;
@@ -3550,7 +3562,8 @@ public class DoubleFFT_1D {
        passf4: Complex FFT's forward/backward processing of factor 4;
        isign is +1 for backward and -1 for forward transforms
       ----------------------------------------------------------------------*/
-    void passf4(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset, final int isign) {
+    void passf4(final int ido, final int l1, final double in[], final int in_off, final double out[],
+            final int out_off, final int offset, final int isign) {
         double ci2, ci3, ci4, cr2, cr3, cr4, ti1, ti2, ti3, ti4, tr1, tr2, tr3, tr4;
         int iw1, iw2, iw3;
         iw1 = offset;
@@ -3661,7 +3674,8 @@ public class DoubleFFT_1D {
        passf5: Complex FFT's forward/backward processing of factor 5;
        isign is +1 for backward and -1 for forward transforms
       ----------------------------------------------------------------------*/
-    void passf5(final int ido, final int l1, final double in[], final int in_off, final double out[], final int out_off, final int offset, final int isign)
+    void passf5(final int ido, final int l1, final double in[], final int in_off, final double out[],
+            final int out_off, final int offset, final int isign)
     /* isign==-1 for forward transform and+1 for backward transform */
     {
         final double tr11 = 0.309016994374947451262869435595348477;
@@ -3813,7 +3827,8 @@ public class DoubleFFT_1D {
        passfg: Complex FFT's forward/backward processing of general factor;
        isign is +1 for backward and -1 for forward transforms
       ----------------------------------------------------------------------*/
-    void passfg(final int nac[], final int ido, final int ip, final int l1, final int idl1, final double in[], final int in_off, final double out[], final int out_off, final int offset, final int isign) {
+    void passfg(final int nac[], final int ido, final int ip, final int l1, final int idl1, final double in[],
+            final int in_off, final double out[], final int out_off, final int offset, final int isign) {
         int idij, idlj, idot, ipph, l, jc, lc, idj, idl, inc, idp;
         double w1r, w1i, w2i, w2r;
         int iw1;
@@ -4010,7 +4025,8 @@ public class DoubleFFT_1D {
         if (n > 8) {
             if (n > 32) {
                 cftf1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1)
+                        && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);
@@ -4038,7 +4054,8 @@ public class DoubleFFT_1D {
         if (n > 8) {
             if (n > 32) {
                 cftb1st(n, a, offa, w, nw - (n >> 2));
-                if ((ConcurrencyUtils.getNumberOfThreads() > 1) && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
+                if ((ConcurrencyUtils.getNumberOfThreads() > 1)
+                        && (n > ConcurrencyUtils.getThreadsBeginN_1D_FFT_2Threads())) {
                     cftrec4_th(n, a, offa, nw, w);
                 } else if (n > 512) {
                     cftrec4(n, a, offa, nw, w);

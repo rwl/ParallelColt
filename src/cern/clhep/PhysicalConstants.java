@@ -127,7 +127,8 @@ public class PhysicalConstants extends Object {
 
     public static final double alpha_rcl2 = fine_structure_const * classic_electr_radius * classic_electr_radius;
 
-    public static final double twopi_mc2_rcl2 = twopi * electron_mass_c2 * classic_electr_radius * classic_electr_radius;
+    public static final double twopi_mc2_rcl2 = twopi * electron_mass_c2 * classic_electr_radius
+            * classic_electr_radius;
 
     //
     //

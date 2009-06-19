@@ -28,6 +28,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class BreitWigner extends AbstractContinousDoubleDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double mean;
 
     protected double gamma;
@@ -51,6 +56,7 @@ public class BreitWigner extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public double nextDouble() {
         return nextDouble(mean, gamma, cut);
     }
@@ -107,6 +113,7 @@ public class BreitWigner extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + mean + "," + gamma + "," + cut + ")";
     }

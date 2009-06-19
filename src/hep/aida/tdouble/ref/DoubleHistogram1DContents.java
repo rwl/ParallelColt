@@ -15,7 +15,8 @@ public class DoubleHistogram1DContents {
 
     private double mean, rms;
 
-    public DoubleHistogram1DContents(int[] entries, double[] heights, double[] errors, int nEntry, double sumWeight, double sumWeightSquared, double mean, double rms) {
+    public DoubleHistogram1DContents(int[] entries, double[] heights, double[] errors, int nEntry, double sumWeight,
+            double sumWeightSquared, double mean, double rms) {
         this.entries = entries;
         this.heights = heights;
         this.errors = errors;

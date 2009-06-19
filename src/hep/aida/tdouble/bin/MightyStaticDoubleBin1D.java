@@ -16,6 +16,11 @@ import cern.jet.stat.tdouble.DoubleDescriptive;
  * @version 0.9, 03-Jul-99
  */
 public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected boolean hasSumOfLogarithms = false;
 
     protected double sumOfLogarithms = 0.0; // Sum( Log(x[i]) )
@@ -87,12 +92,14 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
+    @Override
     public synchronized void addAllOfFromTo(DoubleArrayList list, int from, int to) {
         super.addAllOfFromTo(list, from, to);
 
         if (this.sumOfPowers != null) {
             // int max_k = this.min_k + this.sumOfPowers.length-1;
-            DoubleDescriptive.incrementalUpdateSumsOfPowers(list, from, to, 3, getMaxOrderForSumOfPowers(), this.sumOfPowers);
+            DoubleDescriptive.incrementalUpdateSumsOfPowers(list, from, to, 3, getMaxOrderForSumOfPowers(),
+                    this.sumOfPowers);
         }
 
         if (this.hasSumOfInversions) {
@@ -107,6 +114,7 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
     /**
      * Resets the values of all measures.
      */
+    @Override
     protected void clearAllMeasures() {
         super.clearAllMeasures();
 
@@ -125,10 +133,11 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public synchronized Object clone() {
         MightyStaticDoubleBin1D clone = (MightyStaticDoubleBin1D) super.clone();
         if (this.sumOfPowers != null)
-            clone.sumOfPowers = (double[]) clone.sumOfPowers.clone();
+            clone.sumOfPowers = clone.sumOfPowers.clone();
         return clone;
     }
 
@@ -140,6 +149,7 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
      *            the other bin to compare with
      * @return a summary of the deviations.
      */
+    @Override
     public String compareWith(AbstractDoubleBin1D other) {
         StringBuffer buf = new StringBuffer(super.compareWith(other));
         if (other instanceof MightyStaticDoubleBin1D) {
@@ -406,6 +416,7 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
 
@@ -464,7 +475,8 @@ public class MightyStaticDoubleBin1D extends StaticDoubleBin1D {
         if (!(object instanceof MightyStaticDoubleBin1D))
             return false;
         MightyStaticDoubleBin1D other = (MightyStaticDoubleBin1D) object;
-        return super.equals(other) && sumOfInversions() == other.sumOfInversions() && sumOfLogarithms() == other.sumOfLogarithms();
+        return super.equals(other) && sumOfInversions() == other.sumOfInversions()
+                && sumOfLogarithms() == other.sumOfLogarithms();
     }
 
     /**

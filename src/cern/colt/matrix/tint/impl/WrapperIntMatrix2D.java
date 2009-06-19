@@ -22,6 +22,10 @@ import cern.colt.matrix.tint.IntMatrix2D;
  * @version 1.1, 08/22/2007
  */
 public class WrapperIntMatrix2D extends IntMatrix2D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /*
      * The elements of the matrix.
      */
@@ -33,6 +37,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
         this.content = newContent;
     }
 
+    @Override
     public Object elements() {
         return content.elements();
     }
@@ -53,6 +58,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public int getQuick(int row, int column) {
         return content.getQuick(row, column);
     }
@@ -72,6 +78,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public IntMatrix2D like(int rows, int columns) {
         return content.like(rows, columns);
     }
@@ -88,6 +95,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public IntMatrix1D like1D(int size) {
         return content.like1D(size);
     }
@@ -110,6 +118,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int row, int column, int value) {
         content.setQuick(row, column, value);
     }
@@ -121,6 +130,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * @return a vector obtained by stacking the columns of the matrix on top of
      *         one another.
      */
+    @Override
     public IntMatrix1D vectorize() {
         return content.vectorize();
     }
@@ -151,6 +161,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *             if <tt>column < 0 || column >= columns()</tt>.
      * @see #viewRow(int)
      */
+    @Override
     public IntMatrix1D viewColumn(int column) {
         return viewDice().viewRow(column);
     }
@@ -182,14 +193,22 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * @return a new flip view.
      * @see #viewRowFlip()
      */
+    @Override
     public IntMatrix2D viewColumnFlip() {
         if (columns == 0)
             return this;
         IntMatrix2D view = new WrapperIntMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int row, int column) {
                 return content.get(row, columns - 1 - column);
             }
 
+            @Override
             public void setQuick(int row, int column, int value) {
                 content.set(row, columns - 1 - column, value);
             }
@@ -229,12 +248,20 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * 
      * @return a new dice view.
      */
+    @Override
     public IntMatrix2D viewDice() {
         WrapperIntMatrix2D view = new WrapperIntMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int row, int column) {
                 return content.get(column, row);
             }
 
+            @Override
             public void setQuick(int row, int column, int value) {
                 content.set(column, row, value);
             }
@@ -298,13 +325,21 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * @return the new view.
      * 
      */
+    @Override
     public IntMatrix2D viewPart(final int row, final int column, int height, int width) {
         checkBox(row, column, height, width);
         WrapperIntMatrix2D view = new WrapperIntMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int i, int j) {
                 return content.get(row + i, column + j);
             }
 
+            @Override
             public void setQuick(int i, int j, int value) {
                 content.set(row + i, column + j, value);
             }
@@ -341,6 +376,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *             if <tt>row < 0 || row >= rows()</tt>.
      * @see #viewColumn(int)
      */
+    @Override
     public IntMatrix1D viewRow(int row) {
         checkRow(row);
         return new DelegateIntMatrix1D(this, row);
@@ -373,14 +409,22 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * @return a new flip view.
      * @see #viewColumnFlip()
      */
+    @Override
     public IntMatrix2D viewRowFlip() {
         if (rows == 0)
             return this;
         IntMatrix2D view = new WrapperIntMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int row, int column) {
                 return content.get(rows - 1 - row, column);
             }
 
+            @Override
             public void setQuick(int row, int column, int value) {
                 content.set(rows - 1 - row, column, value);
             }
@@ -434,6 +478,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
      *             <tt>i=0..columnIndexes.length()-1</tt>.
      */
+    @Override
     public IntMatrix2D viewSelection(int[] rowIndexes, int[] columnIndexes) {
         // check for "all"
         if (rowIndexes == null) {
@@ -453,10 +498,17 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
         final int[] cix = columnIndexes;
 
         WrapperIntMatrix2D view = new WrapperIntMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int i, int j) {
                 return content.get(rix[i], cix[j]);
             }
 
+            @Override
             public void setQuick(int i, int j, int value) {
                 content.set(rix[i], cix[j], value);
             }
@@ -485,14 +537,22 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * @throws IndexOutOfBoundsException
      *             if <tt>rowStride<=0 || columnStride<=0</tt>.
      */
+    @Override
     public IntMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
         if (_rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
         WrapperIntMatrix2D view = new WrapperIntMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public int getQuick(int row, int column) {
                 return content.get(_rowStride * row, _columnStride * column);
             }
 
+            @Override
             public void setQuick(int row, int column, int value) {
                 content.set(_rowStride * row, _columnStride * column, value);
             }
@@ -510,6 +570,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
      * otherwise. Override this method in wrappers.
      */
+    @Override
     protected IntMatrix2D getContent() {
         return content;
     }
@@ -531,6 +592,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     protected IntMatrix1D like1D(int size, int offset, int stride) {
         throw new InternalError(); // should never get called
     }
@@ -544,6 +606,7 @@ public class WrapperIntMatrix2D extends IntMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected IntMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never be called
     }

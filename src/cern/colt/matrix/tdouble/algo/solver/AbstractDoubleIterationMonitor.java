@@ -22,7 +22,7 @@ package cern.colt.matrix.tdouble.algo.solver;
 
 import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 
 /**
  * Partial implementation of an iteration reporter
@@ -75,7 +75,7 @@ public abstract class AbstractDoubleIterationMonitor implements DoubleIterationM
     }
 
     public boolean converged(DoubleMatrix1D r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
-        return converged(DoubleAlgebra.DEFAULT.norm(r, normType), x);
+        return converged(DenseDoubleAlgebra.DEFAULT.norm(r, normType), x);
     }
 
     public boolean converged(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
@@ -95,7 +95,7 @@ public abstract class AbstractDoubleIterationMonitor implements DoubleIterationM
     protected abstract boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException;
 
     public boolean converged(DoubleMatrix1D r) throws IterativeSolverDoubleNotConvergedException {
-        return converged(DoubleAlgebra.DEFAULT.norm(r, normType));
+        return converged(DenseDoubleAlgebra.DEFAULT.norm(r, normType));
     }
 
     public Norm getNormType() {

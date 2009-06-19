@@ -33,22 +33,12 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * addressing overhead is 1 additional array index access per get/set.
  * <p>
  * Note that this implementation is not synchronized.
- * <p>
- * <b>Memory requirements:</b>
- * <p>
- * <tt>memory [bytes] = 4*indexes.length</tt>. Thus, an index view with 1000
- * indexes additionally uses 4 KB.
- * <p>
- * <b>Time complexity:</b>
- * <p>
- * Depends on the parent view holding cells.
- * <p>
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
 
-    private static final long serialVersionUID = 1358904244890406059L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The elements of this matrix.
@@ -102,34 +92,33 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         this.isNoView = false;
     }
 
+    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
 
+    @Override
     public double[] getQuick(int index) {
         int idx = zero + index * stride;
         return new double[] { elements[offset + offsets[idx]], elements[offset + offsets[idx] + 1] };
     }
 
+    @Override
     public DoubleMatrix1D getRealPart() {
         final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     double[] tmp;
 
                     public void run() {
-                        for (int k = startidx; k < stopidx; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             tmp = getQuick(k);
                             R.setQuick(k, tmp[0]);
                         }
@@ -147,25 +136,22 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         return R;
     }
 
+    @Override
     public DoubleMatrix1D getImaginaryPart() {
         final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(size);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     double[] tmp;
 
                     public void run() {
-                        for (int k = startidx; k < stopidx; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             tmp = getQuick(k);
                             Im.setQuick(k, tmp[1]);
                         }
@@ -184,6 +170,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         return Im;
     }
 
+    @Override
     public double[] elements() {
         throw new IllegalAccessError("This method is not supported.");
     }
@@ -195,6 +182,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
      *            matrix
      * @return <tt>true</tt> if both matrices share at least one identical cell.
      */
+    @Override
     protected boolean haveSharedCellsRaw(DComplexMatrix1D other) {
         if (other instanceof SelectedDenseDComplexMatrix1D) {
             SelectedDenseDComplexMatrix1D otherMatrix = (SelectedDenseDComplexMatrix1D) other;
@@ -206,43 +194,52 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         return false;
     }
 
+    @Override
     public long index(int rank) {
         return offset + offsets[zero + rank * stride];
     }
 
+    @Override
     public DComplexMatrix1D like(int size) {
         return new DenseDComplexMatrix1D(size);
     }
 
+    @Override
     public DComplexMatrix2D like2D(int rows, int columns) {
         return new DenseDComplexMatrix2D(rows, columns);
     }
 
+    @Override
     public DComplexMatrix2D reshape(int rows, int cols) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
+    @Override
     public DComplexMatrix3D reshape(int slices, int rows, int cols) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
+    @Override
     public void setQuick(int index, double[] value) {
         int idx = zero + index * stride;
         elements[offset + offsets[idx]] = value[0];
         elements[offset + offsets[idx] + 1] = value[1];
     }
 
+    @Override
     public void setQuick(int index, double re, double im) {
         int idx = zero + index * stride;
         elements[offset + offsets[idx]] = re;
         elements[offset + offsets[idx] + 1] = im;
     }
 
+    @Override
     protected void setUp(int size) {
         super.setUp(size, 0, 1);
         this.offset = 0;
     }
 
+    @Override
     protected DComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseDComplexMatrix1D(this.elements, offsets);
     }

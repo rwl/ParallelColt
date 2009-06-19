@@ -1,7 +1,7 @@
 package cern.colt.matrix.tdouble.algo.solver;
 
-import cern.colt.matrix.tdouble.algo.DoubleAlgebra;
-import cern.colt.matrix.tdouble.algo.decomposition.DoubleEigenvalueDecomposition;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleEigenvalueDecomposition;
 
 /**
  * Test of DoubleChebyshev
@@ -15,7 +15,7 @@ public class DoubleChebyshevTest extends DoubleIterativeSolverTest {
     @Override
     protected void createSolver() throws Exception {
         // Get the extremal eigenvalues
-        DoubleEigenvalueDecomposition evd = DoubleAlgebra.DEFAULT.eig(A);
+        DenseDoubleEigenvalueDecomposition evd = DenseDoubleAlgebra.DEFAULT.eig(A);
         double[] eigs = (double[]) evd.getRealEigenvalues().elements();
 
         double eigmin = 1, eigmax = 1;

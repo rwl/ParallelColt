@@ -38,6 +38,11 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @version 1.0, 09/24/99
  */
 public class PoissonSlow extends AbstractDiscreteDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected double mean;
 
     // precomputed and cached values (for performance only)
@@ -63,7 +68,8 @@ public class PoissonSlow extends AbstractDiscreteDistribution {
     // to method B
 
     protected static final double[] cof = { // for method logGamma()
-    76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5 };
+    76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2,
+            -0.5395239384953e-5 };
 
     // The uniform random number generated shared by all <b>static</b> methods.
     protected static PoissonSlow shared = new PoissonSlow(0.0, makeDefaultGenerator());
@@ -98,6 +104,7 @@ public class PoissonSlow extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public int nextInt() {
         return nextInt(this.mean);
     }
@@ -137,7 +144,7 @@ public class PoissonSlow extends AbstractDiscreteDistribution {
                     y = Math.tan(Math.PI * rand.raw());
                     em = sq * y + xm;
                 } while (em < 0.0);
-                em = (double) (int) (em); // faster than em = Math.floor(em);
+                em = (int) (em); // faster than em = Math.floor(em);
                 // (em>=0.0)
                 t = 0.9 * (1.0 + y * y) * Math.exp(em * alxm - logGamma(em + 1.0) - g);
             } while (rand.raw() > t);
@@ -194,6 +201,7 @@ public class PoissonSlow extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + mean + ")";
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="D:/workspace/ParallelColt/parallelcolt-0.7.2.jar"/>
+    <jar path="D:/workspace/ParallelColt/parallelcolt-0.8.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/ParallelColt/parallelcolt.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>

@@ -55,6 +55,11 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
  */
 class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The elements of this matrix.
      */
     protected double[] elements;
@@ -111,7 +116,8 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedDenseDoubleMatrix2D(int rows, int columns, double[] elements, int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedDenseDoubleMatrix2D(int rows, int columns, double[] elements, int rowZero, int columnZero,
+            int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -123,6 +129,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
         this.isNoView = false;
     }
 
+    @Override
     public double[] elements() {
         return elements;
     }
@@ -143,12 +150,14 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public double getQuick(int row, int column) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
         // return elements[index(row,column)];
         // manually inlined:
-        return elements[offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]];
+        return elements[offset + rowOffsets[rowZero + row * rowStride]
+                + columnOffsets[columnZero + column * columnStride]];
     }
 
     /**
@@ -160,6 +169,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
+    @Override
     public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
@@ -182,6 +192,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new DenseDoubleMatrix2D(rows, columns);
     }
@@ -198,6 +209,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public DoubleMatrix1D like1D(int size) {
         return new DenseDoubleMatrix1D(size);
     }
@@ -220,6 +232,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int row, int column, double value) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
@@ -234,8 +247,9 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      * 
      * @return
      */
+    @Override
     public DoubleMatrix1D vectorize() {
-        DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(size());
+        DenseDoubleMatrix1D v = new DenseDoubleMatrix1D((int) size());
         int idx = 0;
         for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
@@ -271,6 +285,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *             if <tt>column < 0 || column >= columns()</tt>.
      * @see #viewRow(int)
      */
+    @Override
     public DoubleMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -307,6 +322,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *             if <tt>row < 0 || row >= rows()</tt>.
      * @see #viewColumn(int)
      */
+    @Override
     public DoubleMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -326,6 +342,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -339,6 +356,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -353,6 +371,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix2D other) {
         if (other instanceof SelectedDenseDoubleMatrix2D) {
             SelectedDenseDoubleMatrix2D otherMatrix = (SelectedDenseDoubleMatrix2D) other;
@@ -381,6 +400,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     protected DoubleMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -397,6 +417,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>(double)columns*rows > Integer.MAX_VALUE</tt>.
      */
+    @Override
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -407,6 +428,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
     /**
      * Self modifying version of viewDice().
      */
+    @Override
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -429,6 +451,7 @@ class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDoubleMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }

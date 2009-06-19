@@ -104,7 +104,8 @@ public class Partitioning extends Object {
      * except that it <i>synchronously</i> partitions <tt>double[]</tt> rather
      * than <tt>int[]</tt> arrays.
      */
-    public static void dualPartition(double[] list, double[] secondary, int from, int to, double[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    public static void dualPartition(double[] list, double[] secondary, int from, int to, double[] splitters,
+            int splitFrom, int splitTo, int[] splitIndexes) {
         double splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -226,7 +227,8 @@ public class Partitioning extends Object {
      * <p>
      * Same as for single-partition methods.
      */
-    public static void dualPartition(int[] list, int[] secondary, int from, int to, int[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    public static void dualPartition(int[] list, int[] secondary, int from, int to, int[] splitters, int splitFrom,
+            int splitTo, int[] splitIndexes) {
         int splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -412,7 +414,8 @@ public class Partitioning extends Object {
      * 
      * @see Sorting#binarySearchFromTo(int,int,IntComparator)
      */
-    public static void genericPartition(int from, int to, int splitFrom, int splitTo, int[] splitIndexes, IntComparator comp, IntComparator comp2, IntComparator comp3, Swapper swapper) {
+    public static void genericPartition(int from, int to, int splitFrom, int splitTo, int[] splitIndexes,
+            IntComparator comp, IntComparator comp2, IntComparator comp3, Swapper swapper) {
         int splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -544,7 +547,8 @@ public class Partitioning extends Object {
      * Same as {@link #partition(int[],int,int,int[],int,int,int[])} except that
      * it partitions <tt>double[]</tt> rather than <tt>int[]</tt> arrays.
      */
-    public static void partition(double[] list, int from, int to, double[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    public static void partition(double[] list, int from, int to, double[] splitters, int splitFrom, int splitTo,
+            int[] splitIndexes) {
         double splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -738,7 +742,8 @@ public class Partitioning extends Object {
      * @see cern.colt.GenericSorting
      * @see java.util.Arrays
      */
-    public static void partition(int[] list, int from, int to, int[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    public static void partition(int[] list, int from, int to, int[] splitters, int splitFrom, int splitTo,
+            int[] splitIndexes) {
         int element, splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -989,7 +994,8 @@ public class Partitioning extends Object {
      * Same as {@link #partition(int[],int,int,int[],int,int,int[])} except that
      * it partitions <tt>Object[]</tt> rather than <tt>int[]</tt> arrays.
      */
-    public static void partition(Object[] list, int from, int to, Object[] splitters, int splitFrom, int splitTo, int[] splitIndexes, java.util.Comparator comp) {
+    public static void partition(Object[] list, int from, int to, Object[] splitters, int splitFrom, int splitTo,
+            int[] splitIndexes, java.util.Comparator comp) {
         Object splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -1091,7 +1097,8 @@ public class Partitioning extends Object {
      * <tt>partition(list.elements(), from, to, splitters.elements(), 0, splitters.size()-1, splitIndexes.elements())</tt>
      * .
      */
-    public static void partition(DoubleArrayList list, int from, int to, DoubleArrayList splitters, IntArrayList splitIndexes) {
+    public static void partition(DoubleArrayList list, int from, int to, DoubleArrayList splitters,
+            IntArrayList splitIndexes) {
         partition(list.elements(), from, to, splitters.elements(), 0, splitters.size() - 1, splitIndexes.elements());
     }
 
@@ -1110,7 +1117,8 @@ public class Partitioning extends Object {
      * except that it <i>synchronously</i> partitions <tt>double[]</tt> rather
      * than <tt>int[]</tt> arrays.
      */
-    public static void triplePartition(double[] list, double[] secondary, double[] tertiary, int from, int to, double[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    public static void triplePartition(double[] list, double[] secondary, double[] tertiary, int from, int to,
+            double[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
         double splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -1179,12 +1187,14 @@ public class Partitioning extends Object {
 
         // recursively partition left half
         if (splitFrom <= medianIndex - 1) {
-            triplePartition(list, secondary, tertiary, from, splitIndex, splitters, splitFrom, medianIndex - 1, splitIndexes);
+            triplePartition(list, secondary, tertiary, from, splitIndex, splitters, splitFrom, medianIndex - 1,
+                    splitIndexes);
         }
 
         // recursively partition right half
         if (medianIndex + 1 <= splitTo) {
-            triplePartition(list, secondary, tertiary, splitIndex + 1, to, splitters, medianIndex + 1, splitTo, splitIndexes);
+            triplePartition(list, secondary, tertiary, splitIndex + 1, to, splitters, medianIndex + 1, splitTo,
+                    splitIndexes);
         }
     }
 
@@ -1193,7 +1203,8 @@ public class Partitioning extends Object {
      * that it <i>synchronously</i> partitions <tt>double[]</tt> rather than
      * <tt>int[]</tt> arrays.
      */
-    public static int triplePartition(double[] list, double[] secondary, double[] tertiary, int from, int to, double splitter) {
+    public static int triplePartition(double[] list, double[] secondary, double[] tertiary, int from, int to,
+            double splitter) {
         double element; // int, double --> template type dependent
         for (int i = from - 1; ++i <= to;) {
             element = list[i];
@@ -1238,7 +1249,8 @@ public class Partitioning extends Object {
      * <p>
      * Same as for single-partition methods.
      */
-    public static void triplePartition(int[] list, int[] secondary, int[] tertiary, int from, int to, int[] splitters, int splitFrom, int splitTo, int[] splitIndexes) {
+    public static void triplePartition(int[] list, int[] secondary, int[] tertiary, int from, int to, int[] splitters,
+            int splitFrom, int splitTo, int[] splitIndexes) {
         int splitter; // int, double --> template type dependent
 
         if (splitFrom > splitTo)
@@ -1307,12 +1319,14 @@ public class Partitioning extends Object {
 
         // recursively partition left half
         if (splitFrom <= medianIndex - 1) {
-            triplePartition(list, secondary, tertiary, from, splitIndex, splitters, splitFrom, medianIndex - 1, splitIndexes);
+            triplePartition(list, secondary, tertiary, from, splitIndex, splitters, splitFrom, medianIndex - 1,
+                    splitIndexes);
         }
 
         // recursively partition right half
         if (medianIndex + 1 <= splitTo) {
-            triplePartition(list, secondary, tertiary, splitIndex + 1, to, splitters, medianIndex + 1, splitTo, splitIndexes);
+            triplePartition(list, secondary, tertiary, splitIndex + 1, to, splitters, medianIndex + 1, splitTo,
+                    splitIndexes);
         }
     }
 

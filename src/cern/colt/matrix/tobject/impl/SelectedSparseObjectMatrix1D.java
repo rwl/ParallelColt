@@ -50,6 +50,11 @@ import cern.colt.matrix.tobject.ObjectMatrix2D;
  * @version 1.0, 09/24/99
  */
 class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /*
      * The elements of the matrix.
      */
@@ -81,7 +86,8 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      *            the offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseObjectMatrix1D(int size, AbstractIntObjectMap elements, int zero, int stride, int[] offsets, int offset) {
+    protected SelectedSparseObjectMatrix1D(int size, AbstractIntObjectMap elements, int zero, int stride,
+            int[] offsets, int offset) {
         setUp(size, zero, stride);
 
         this.elements = elements;
@@ -111,10 +117,12 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
 
+    @Override
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -132,6 +140,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
+    @Override
     public Object getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements.get(index(index));
@@ -142,6 +151,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
+    @Override
     protected boolean haveSharedCellsRaw(ObjectMatrix1D other) {
         if (other instanceof SelectedSparseObjectMatrix1D) {
             SelectedSparseObjectMatrix1D otherMatrix = (SelectedSparseObjectMatrix1D) other;
@@ -161,6 +171,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      * @param rank
      *            the rank of the element.
      */
+    @Override
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
@@ -180,6 +191,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public ObjectMatrix1D like(int size) {
         return new SparseObjectMatrix1D(size);
     }
@@ -198,6 +210,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public ObjectMatrix2D like2D(int rows, int columns) {
         return new SparseObjectMatrix2D(rows, columns);
     }
@@ -216,6 +229,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int index, Object value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
@@ -233,6 +247,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
+    @Override
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -246,6 +261,7 @@ class SelectedSparseObjectMatrix1D extends ObjectMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected ObjectMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseObjectMatrix1D(this.elements, offsets);
     }

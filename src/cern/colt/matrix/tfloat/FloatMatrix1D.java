@@ -20,9 +20,9 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding
- * <tt>float</tt> elements. First see the <a
- * href="package-summary.html">package summary</a> and javadoc <a
- * href="package-tree.html">tree view</a> to get the broad picture.
+ * <tt>float</tt> elements. First see the <a href="package-summary.html">package
+ * summary</a> and javadoc <a href="package-tree.html">tree view</a> to get the
+ * broad picture.
  * <p>
  * A matrix has a number of cells (its <i>size</i>), which are assigned upon
  * instance construction. Elements are accessed via zero based indexes. Legal
@@ -37,6 +37,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  */
 public abstract class FloatMatrix1D extends AbstractMatrix1D {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
@@ -53,12 +55,12 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b>
      * 
      * <pre>
-     *   cern.jet.math.Functions F = cern.jet.math.Functions.functions;
-     *   matrix = 0 1 2 3 
+     * 	 cern.jet.math.Functions F = cern.jet.math.Functions.functions;
+     * 	 matrix = 0 1 2 3 
      * 
-     *   // Sum( x[i]*x[i] ) 
-     *   matrix.aggregate(F.plus,F.square);
-     *   --&gt; 14
+     * 	 // Sum( x[i]*x[i] ) 
+     * 	 matrix.aggregate(F.plus,F.square);
+     * 	 --&gt; 14
      * 
      * </pre>
      * 
@@ -74,27 +76,23 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @return the aggregated measure.
      * @see cern.jet.math.tfloat.FloatFunctions
      */
-    public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr, final cern.colt.function.tfloat.FloatFunction f) {
+    public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
+            final cern.colt.function.tfloat.FloatFunction f) {
         if (size == 0)
             return Float.NaN;
         float a = f.apply(getQuick(0));
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Float[] results = new Float[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
                     public Float call() throws Exception {
-                        float a = f.apply(getQuick(startsize));
-                        for (int i = startsize + 1; i < stopsize; i++) {
+                        float a = f.apply(getQuick(firstIdx));
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             a = aggr.apply(a, f.apply(getQuick(i)));
                         }
                         return Float.valueOf(a);
@@ -105,81 +103,6 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
         } else {
             for (int i = 1; i < size; i++) {
                 a = aggr.apply(a, f.apply(getQuick(i)));
-            }
-        }
-        return a;
-    }
-
-    /**
-     * Applies a function to each corresponding cell of two matrices and
-     * aggregates the results. Returns a value <tt>v</tt> such that
-     * <tt>v==a(size())</tt> where
-     * <tt>a(i) == aggr( a(i-1), f(get(i),other.get(i)) )</tt> and terminators
-     * are <tt>a(1) == f(get(0),other.get(0)), a(0)==Float.NaN</tt>.
-     * <p>
-     * <b>Example:</b>
-     * 
-     * <pre>
-     *   cern.jet.math.Functions F = cern.jet.math.Functions.functions;
-     *   x = 0 1 2 3 
-     *   y = 0 1 2 3 
-     * 
-     *   // Sum( x[i]*y[i] )
-     *   x.aggregate(y, F.plus, F.mult);
-     *   --&gt; 14
-     * 
-     *   // Sum( (x[i]+y[i])&circ;2 )
-     *   x.aggregate(y, F.plus, F.chain(F.square,F.plus));
-     *   --&gt; 56
-     * 
-     * </pre>
-     * 
-     * For further examples, see the <a
-     * href="package-summary.html#FunctionObjects">package doc</a>.
-     * 
-     * @param aggr
-     *            an aggregation function taking as first argument the current
-     *            aggregation and as second argument the transformed current
-     *            cell values.
-     * @param f
-     *            a function transforming the current cell values.
-     * @return the aggregated measure.
-     * @throws IllegalArgumentException
-     *             if <tt>size() != other.size()</tt>.
-     * @see cern.jet.math.tfloat.FloatFunctions
-     */
-    public float aggregate(final FloatMatrix1D other, final cern.colt.function.tfloat.FloatFloatFunction aggr, final cern.colt.function.tfloat.FloatFloatFunction f) {
-        checkSize(other);
-        if (size == 0)
-            return Float.NaN;
-        float a = f.apply(getQuick(0), other.getQuick(0));
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Float[] results = new Float[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
-                    public Float call() throws Exception {
-                        float a = f.apply(getQuick(startsize), other.getQuick(startsize));
-                        for (int i = startsize + 1; i < stopsize; i++) {
-                            a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
-                        }
-                        return Float.valueOf(a);
-                    }
-                });
-            }
-            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
-        } else {
-            for (int i = 1; i < size; i++) {
-                a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
             }
         }
         return a;
@@ -202,30 +125,27 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @return the aggregated measure.
      * @see cern.jet.math.tfloat.FloatFunctions
      */
-    public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr, final cern.colt.function.tfloat.FloatFunction f, final IntArrayList indexList) {
+    public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
+            final cern.colt.function.tfloat.FloatFunction f, final IntArrayList indexList) {
         if (size() == 0)
             return Float.NaN;
         final int size = indexList.size();
         final int[] indexElements = indexList.elements();
         float a = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
 
                     public Float call() throws Exception {
-                        float a = f.apply(getQuick(indexElements[startidx]));
+                        float a = f.apply(getQuick(indexElements[firstIdx]));
                         float elem;
-                        for (int i = startidx + 1; i < stopidx; i++) {
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
                             elem = getQuick(indexElements[i]);
                             a = aggr.apply(a, f.apply(elem));
                         }
@@ -246,6 +166,77 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     }
 
     /**
+     * Applies a function to each corresponding cell of two matrices and
+     * aggregates the results. Returns a value <tt>v</tt> such that
+     * <tt>v==a(size())</tt> where
+     * <tt>a(i) == aggr( a(i-1), f(get(i),other.get(i)) )</tt> and terminators
+     * are <tt>a(1) == f(get(0),other.get(0)), a(0)==Float.NaN</tt>.
+     * <p>
+     * <b>Example:</b>
+     * 
+     * <pre>
+     * 	 cern.jet.math.Functions F = cern.jet.math.Functions.functions;
+     * 	 x = 0 1 2 3 
+     * 	 y = 0 1 2 3 
+     * 
+     * 	 // Sum( x[i]*y[i] )
+     * 	 x.aggregate(y, F.plus, F.mult);
+     * 	 --&gt; 14
+     * 
+     * 	 // Sum( (x[i]+y[i])&circ;2 )
+     * 	 x.aggregate(y, F.plus, F.chain(F.square,F.plus));
+     * 	 --&gt; 56
+     * 
+     * </pre>
+     * 
+     * For further examples, see the <a
+     * href="package-summary.html#FunctionObjects">package doc</a>.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell values.
+     * @param f
+     *            a function transforming the current cell values.
+     * @return the aggregated measure.
+     * @throws IllegalArgumentException
+     *             if <tt>size() != other.size()</tt>.
+     * @see cern.jet.math.tfloat.FloatFunctions
+     */
+    public float aggregate(final FloatMatrix1D other, final cern.colt.function.tfloat.FloatFloatFunction aggr,
+            final cern.colt.function.tfloat.FloatFloatFunction f) {
+        checkSize(other);
+        if (size == 0)
+            return Float.NaN;
+        float a = f.apply(getQuick(0), other.getQuick(0));
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
+                    public Float call() throws Exception {
+                        float a = f.apply(getQuick(firstIdx), other.getQuick(firstIdx));
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
+                        }
+                        return Float.valueOf(a);
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            for (int i = 1; i < size; i++) {
+                a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
+            }
+        }
+        return a;
+    }
+
+    /**
      * Assigns the result of a function to each cell;
      * <tt>x[i] = function(x[i])</tt>. (Iterates downwards from
      * <tt>[size()-1]</tt> to <tt>[0]</tt>).
@@ -253,11 +244,11 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b>
      * 
      * <pre>
-     *   // change each cell to its sine
-     *   matrix =   0.5      1.5      2.5       3.5 
-     *   matrix.assign(cern.jet.math.Functions.sin);
-     *   --&gt;
-     *   matrix ==  0.479426 0.997495 0.598472 -0.350783
+     * 	 // change each cell to its sine
+     * 	 matrix =   0.5      1.5      2.5       3.5 
+     * 	 matrix.assign(cern.jet.math.Functions.sin);
+     * 	 --&gt;
+     * 	 matrix ==  0.479426 0.997495 0.598472 -0.350783
      * 
      * </pre>
      * 
@@ -270,22 +261,18 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @see cern.jet.math.tfloat.FloatFunctions
      */
     public FloatMatrix1D assign(final cern.colt.function.tfloat.FloatFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, f.apply(getQuick(i)));
                         }
                     }
@@ -311,24 +298,20 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @return <tt>this</tt> (for convenience only).
      * @see cern.jet.math.tfloat.FloatFunctions
      */
-    public FloatMatrix1D assign(final cern.colt.function.tfloat.FloatProcedure cond, final cern.colt.function.tfloat.FloatFunction f) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+    public FloatMatrix1D assign(final cern.colt.function.tfloat.FloatProcedure cond,
+            final cern.colt.function.tfloat.FloatFunction f) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
-
                     public void run() {
                         float elem;
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (cond.apply(elem) == true) {
                                 setQuick(i, f.apply(elem));
@@ -362,23 +345,19 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * 
      */
     public FloatMatrix1D assign(final cern.colt.function.tfloat.FloatProcedure cond, final float value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         float elem;
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             elem = getQuick(i);
                             if (cond.apply(elem) == true) {
                                 setQuick(i, value);
@@ -408,22 +387,18 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @return <tt>this</tt> (for convenience only).
      */
     public FloatMatrix1D assign(final float value) {
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, value);
                         }
                     }
@@ -453,23 +428,20 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      */
     public FloatMatrix1D assign(final float[] values) {
         if (values.length != size)
-            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()=" + size());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+            throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
+                    + size());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, values[i]);
                         }
                     }
@@ -502,29 +474,25 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
         if (other == this)
             return this;
         checkSize(other);
-        final FloatMatrix1D other_loc;
+        final FloatMatrix1D source;
         if (haveSharedCells(other)) {
-            other_loc = other.copy();
+            source = other.copy();
         } else {
-            other_loc = other;
+            source = other;
         }
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
-                            setQuick(i, other_loc.getQuick(i));
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            setQuick(i, source.getQuick(i));
                         }
                     }
                 });
@@ -532,7 +500,7 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
             ConcurrencyUtils.waitForCompletion(futures);
         } else {
             for (int i = 0; i < size; i++) {
-                setQuick(i, other_loc.getQuick(i));
+                setQuick(i, source.getQuick(i));
             }
         }
         return this;
@@ -545,12 +513,12 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b>
      * 
      * <pre>
-     *   // assign x[i] = x[i]&lt;sup&gt;y[i]&lt;/sup&gt;
-     *   m1 = 0 1 2 3;
-     *   m2 = 0 2 4 6;
-     *   m1.assign(m2, cern.jet.math.Functions.pow);
-     *   --&gt;
-     *   m1 == 1 1 16 729
+     * 	 // assign x[i] = x[i]&lt;sup&gt;y[i]&lt;/sup&gt;
+     * 	 m1 = 0 1 2 3;
+     * 	 m2 = 0 2 4 6;
+     * 	 m1.assign(m2, cern.jet.math.Functions.pow);
+     * 	 --&gt;
+     * 	 m1 == 1 1 16 729
      * 
      * </pre>
      * 
@@ -570,22 +538,18 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      */
     public FloatMatrix1D assign(final FloatMatrix1D y, final cern.colt.function.tfloat.FloatFloatFunction function) {
         checkSize(y);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             setQuick(i, function.apply(getQuick(i), y.getQuick(i)));
                         }
                     }
@@ -608,19 +572,19 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b>
      * 
      * <pre>
-     *   // assign x[i] = x[i]&lt;sup&gt;y[i]&lt;/sup&gt;
-     *   m1 = 0 1 2 3;
-     *   m2 = 0 2 4 6;
-     *   m1.assign(m2, cern.jet.math.Functions.pow);
-     *   --&gt;
-     *   m1 == 1 1 16 729
+     * 	 // assign x[i] = x[i]&lt;sup&gt;y[i]&lt;/sup&gt;
+     * 	 m1 = 0 1 2 3;
+     * 	 m2 = 0 2 4 6;
+     * 	 m1.assign(m2, cern.jet.math.Functions.pow);
+     * 	 --&gt;
+     * 	 m1 == 1 1 16 729
      * 
-     *   // for non-standard functions there is no shortcut: 
-     *   m1.assign(m2,
-     *      new FloatFloatFunction() {
-     *         public float apply(float x, float y) { return Math.pow(x,y); }
-     *      }
-     *   );
+     * 	 // for non-standard functions there is no shortcut: 
+     * 	 m1.assign(m2,
+     * 	    new FloatFloatFunction() {
+     * 	       public float apply(float x, float y) { return Math.pow(x,y); }
+     * 	    }
+     * 	 );
      * 
      * </pre>
      * 
@@ -640,20 +604,19 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      *             if <tt>size() != y.size()</tt>.
      * @see cern.jet.math.tfloat.FloatFunctions
      */
-    public FloatMatrix1D assign(FloatMatrix1D y, cern.colt.function.tfloat.FloatFloatFunction function, cern.colt.list.tint.IntArrayList nonZeroIndexes) {
+    public FloatMatrix1D assign(FloatMatrix1D y, cern.colt.function.tfloat.FloatFloatFunction function,
+            cern.colt.list.tint.IntArrayList nonZeroIndexes) {
         checkSize(y);
         int[] nonZeroElements = nonZeroIndexes.elements();
 
         // specialized for speed
-        if (function == cern.jet.math.tfloat.FloatFunctions.mult) { // x[i] = x[i] *
-            // y[i]
+        if (function == cern.jet.math.tfloat.FloatFunctions.mult) { // x[i] = x[i] * y[i]
             int j = 0;
             for (int index = nonZeroIndexes.size(); --index >= 0;) {
                 int i = nonZeroElements[index];
                 for (; j < i; j++)
                     setQuick(j, 0); // x[i] = 0 for all zeros
-                setQuick(i, getQuick(i) * y.getQuick(i)); // x[i] * y[i] for
-                // all nonZeros
+                setQuick(i, getQuick(i) * y.getQuick(i)); // x[i] * y[i] for all nonZeros
                 j++;
             }
         } else if (function instanceof cern.jet.math.tfloat.FloatPlusMultSecond) {
@@ -689,23 +652,19 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      */
     public int cardinality() {
         int cardinality = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Integer[] results = new Integer[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            Integer[] results = new Integer[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int cardinality = 0;
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (getQuick(i) != 0)
                                 cardinality++;
                         }
@@ -714,11 +673,11 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0];
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     cardinality += results[j];
                 }
             } catch (ExecutionException ex) {
@@ -731,20 +690,6 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
                 if (getQuick(i) != 0)
                     cardinality++;
             }
-        }
-        return cardinality;
-    }
-
-    /**
-     * Returns the number of cells having non-zero values, but at most
-     * maxCardinality; ignores tolerance.
-     */
-    protected int cardinality(int maxCardinality) {
-        int cardinality = 0;
-        int i = size;
-        while (--i >= 0 && cardinality < maxCardinality) {
-            if (getQuick(i) != 0)
-                cardinality++;
         }
         return cardinality;
     }
@@ -795,6 +740,7 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -822,11 +768,131 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     }
 
     /**
-     * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
-     * otherwise. Override this method in wrappers.
+     * Return the maximum value of this matrix together with its location
+     * 
+     * @return { maximum_value, location };
      */
-    protected FloatMatrix1D getContent() {
-        return this;
+    public float[] getMaxLocation() {
+        int location = 0;
+        float maxValue = 0;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
+                    public float[] call() throws Exception {
+                        int location = firstIdx;
+                        float maxValue = getQuick(location);
+                        float elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            elem = getQuick(i);
+                            if (maxValue < elem) {
+                                maxValue = elem;
+                                location = i;
+                            }
+                        }
+                        return new float[] { maxValue, location };
+                    }
+                });
+            }
+            try {
+                for (int j = 0; j < nthreads; j++) {
+                    results[j] = (float[]) futures[j].get();
+                }
+                maxValue = results[0][0];
+                location = (int) results[0][1];
+                for (int j = 1; j < nthreads; j++) {
+                    if (maxValue < results[j][0]) {
+                        maxValue = results[j][0];
+                        location = (int) results[j][1];
+                    }
+                }
+            } catch (ExecutionException ex) {
+                ex.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            maxValue = getQuick(location);
+            float elem;
+            for (int i = 1; i < size(); i++) {
+                elem = getQuick(i);
+                if (maxValue < elem) {
+                    maxValue = elem;
+                    location = i;
+                }
+            }
+        }
+        return new float[] { maxValue, location };
+    }
+
+    /**
+     * Return the minimum value of this matrix together with its location
+     * 
+     * @return { minimum_value, location };
+     */
+    public float[] getMinLocation() {
+        int location = 0;
+        float minValue = 0;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            float[][] results = new float[nthreads][2];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
+                    public float[] call() throws Exception {
+                        int location = firstIdx;
+                        float minValue = getQuick(location);
+                        float elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            elem = getQuick(i);
+                            if (minValue > elem) {
+                                minValue = elem;
+                                location = i;
+                            }
+                        }
+                        return new float[] { minValue, location };
+                    }
+                });
+            }
+            try {
+                for (int j = 0; j < nthreads; j++) {
+                    results[j] = (float[]) futures[j].get();
+                }
+                minValue = results[0][0];
+                location = (int) results[0][1];
+                for (int j = 1; j < nthreads; j++) {
+                    if (minValue > results[j][0]) {
+                        minValue = results[j][0];
+                        location = (int) results[j][1];
+                    }
+                }
+            } catch (ExecutionException ex) {
+                ex.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            minValue = getQuick(location);
+            float elem;
+            for (int i = 1; i < size(); i++) {
+                elem = getQuick(i);
+                if (minValue > elem) {
+                    minValue = elem;
+                    location = i;
+                }
+            }
+        }
+        return new float[] { minValue, location };
     }
 
     /**
@@ -897,10 +963,10 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b> <br>
      * 
      * <pre>
-     *   0, 0, 8, 0, 7
-     *   --&gt;
-     *   indexList  = (2,4)
-     *   valueList  = (8,7)
+     * 	 0, 0, 8, 0, 7
+     * 	 --&gt;
+     * 	 indexList  = (2,4)
+     * 	 valueList  = (8,7)
      * 
      * </pre>
      * 
@@ -922,10 +988,10 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
         if (rem == 1) {
             float value = getQuick(0);
             if (value != 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(0);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -934,19 +1000,19 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
         for (int i = rem; i < size; i += 2) {
             float value = getQuick(i);
             if (value != 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
             value = getQuick(i + 1);
             if (value != 0) {
-                if(fillIndexList) {
+                if (fillIndexList) {
                     indexList.add(i + 1);
                 }
-                if(fillValueList) {
+                if (fillValueList) {
                     valueList.add(value);
                 }
             }
@@ -968,10 +1034,10 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b> <br>
      * 
      * <pre>
-     *   0, 0, 8, 0, 7
-     *   --&gt;
-     *   indexList  = (2,4)
-     *   valueList  = (8,7)
+     * 	 0, 0, 8, 0, 7
+     * 	 --&gt;
+     * 	 indexList  = (2,4)
+     * 	 valueList  = (8,7)
      * 
      * </pre>
      * 
@@ -987,7 +1053,6 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     public void getNonZeros(IntArrayList indexList, FloatArrayList valueList, int maxCardinality) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
-        int card = cardinality(maxCardinality);
         if (fillIndexList)
             indexList.clear();
         if (fillValueList)
@@ -1078,31 +1143,13 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     public abstract float getQuick(int index);
 
     /**
-     * Returns <tt>true</tt> if both matrices share at least one identical cell.
-     */
-    protected boolean haveSharedCells(FloatMatrix1D other) {
-        if (other == null)
-            return false;
-        if (this == other)
-            return true;
-        return getContent().haveSharedCellsRaw(other.getContent());
-    }
-
-    /**
-     * Returns <tt>true</tt> if both matrices share at least one identical cell.
-     */
-    protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
-        return false;
-    }
-
-    /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same size. For example, if the receiver is an
      * instance of type <tt>DenseFloatMatrix1D</tt> the new matrix must also be
      * of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an instance of
      * type <tt>SparseFloatMatrix1D</tt> the new matrix must also be of type
-     * <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
+     * <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1115,8 +1162,8 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * as the receiver, having the specified size. For example, if the receiver
      * is an instance of type <tt>DenseFloatMatrix1D</tt> the new matrix must
      * also be of type <tt>DenseFloatMatrix1D</tt>, if the receiver is an
-     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also
-     * be of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
+     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must also be
+     * of type <tt>SparseFloatMatrix1D</tt>, etc. In general, the new matrix
      * should have internal parametrization as similar as possible.
      * 
      * @param size
@@ -1129,9 +1176,9 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseFloatMatrix1D</tt> the new
-     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is
-     * an instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be
-     * of type <tt>SparseFloatMatrix2D</tt>, etc.
+     * matrix must be of type <tt>DenseFloatMatrix2D</tt>, if the receiver is an
+     * instance of type <tt>SparseFloatMatrix1D</tt> the new matrix must be of
+     * type <tt>SparseFloatMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -1140,142 +1187,6 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @return a new matrix of the corresponding dynamic type.
      */
     public abstract FloatMatrix2D like2D(int rows, int columns);
-
-    /**
-     * Return the maximum value of this matrix together with its location
-     * 
-     * @return { maximum_value, location };
-     */
-    public float[] getMaxLocation() {
-        int location = 0;
-        float maxValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
-                    public float[] call() throws Exception {
-                        int location = startsize;
-                        float maxValue = getQuick(location);
-                        float elem;
-                        for (int i = startsize + 1; i < stopsize; i++) {
-                            elem = getQuick(i);
-                            if (maxValue < elem) {
-                                maxValue = elem;
-                                location = i;
-                            }
-                        }
-                        return new float[] { maxValue, location };
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (float[]) futures[j].get();
-                }
-                maxValue = results[0][0];
-                location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
-                    if (maxValue < results[j][0]) {
-                        maxValue = results[j][0];
-                        location = (int) results[j][1];
-                    }
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            maxValue = getQuick(location);
-            float elem;
-            for (int i = 1; i < size(); i++) {
-                elem = getQuick(i);
-                if (maxValue < elem) {
-                    maxValue = elem;
-                    location = i;
-                }
-            }
-        }
-        return new float[] { maxValue, location };
-    }
-
-    /**
-     * Return the minimum value of this matrix together with its location
-     * 
-     * @return { minimum_value, location };
-     */
-    public float[] getMinLocation() {
-        int location = 0;
-        float minValue = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            float[][] results = new float[np][2];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
-                futures[j] = ConcurrencyUtils.submit(new Callable<float[]>() {
-                    public float[] call() throws Exception {
-                        int location = startsize;
-                        float minValue = getQuick(location);
-                        float elem;
-                        for (int i = startsize + 1; i < stopsize; i++) {
-                            elem = getQuick(i);
-                            if (minValue > elem) {
-                                minValue = elem;
-                                location = i;
-                            }
-                        }
-                        return new float[] { minValue, location };
-                    }
-                });
-            }
-            try {
-                for (int j = 0; j < np; j++) {
-                    results[j] = (float[]) futures[j].get();
-                }
-                minValue = results[0][0];
-                location = (int) results[0][1];
-                for (int j = 1; j < np; j++) {
-                    if (minValue > results[j][0]) {
-                        minValue = results[j][0];
-                        location = (int) results[j][1];
-                    }
-                }
-            } catch (ExecutionException ex) {
-                ex.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            minValue = getQuick(location);
-            float elem;
-            for (int i = 1; i < size(); i++) {
-                elem = getQuick(i);
-                if (minValue > elem) {
-                    minValue = elem;
-                    location = i;
-                }
-            }
-        }
-        return new float[] { minValue, location };
-    }
 
     /**
      * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
@@ -1288,17 +1199,17 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
             assign(FloatFunctions.minus(min));
         }
         if (getMaxLocation()[0] == 0) {
-            assign((float)(1.0 / size()));
+            assign(1.0f / size());
         } else {
             float sumScaleFactor = zSum();
-            sumScaleFactor = (float)(1.0 / sumScaleFactor);
+            sumScaleFactor = 1.0f / sumScaleFactor;
             assign(FloatFunctions.mult(sumScaleFactor));
         }
     }
 
     /**
-     * Returns new FloatMatrix2D of size rows x columns whose elements are
-     * taken column-wise from this matrix.
+     * Returns new FloatMatrix2D of size rows x columns whose elements are taken
+     * column-wise from this matrix.
      * 
      * @param rows
      *            number of rows
@@ -1309,8 +1220,8 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     public abstract FloatMatrix2D reshape(int rows, int cols);
 
     /**
-     * Returns new FloatMatrix3D of size slices x rows x columns, whose
-     * elements are taken column-wise from this matrix.
+     * Returns new FloatMatrix3D of size slices x rows x columns, whose elements
+     * are taken column-wise from this matrix.
      * 
      * @param rows
      *            number of rows
@@ -1353,15 +1264,6 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     public abstract void setQuick(int index, float value);
 
     /**
-     * Sets the size of this matrix.
-     * 
-     * @param size
-     */
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    /**
      * Swaps each element <tt>this[i]</tt> with <tt>other[i]</tt>.
      * 
      * @throws IllegalArgumentException
@@ -1369,21 +1271,17 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      */
     public void swap(final FloatMatrix1D other) {
         checkSize(other);
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             float tmp = getQuick(i);
                             setQuick(i, other.getQuick(i));
                             other.setQuick(i, tmp);
@@ -1429,21 +1327,17 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     public void toArray(final float[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == np - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             values[i] = getQuick(i);
                         }
                     }
@@ -1462,25 +1356,9 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * 
      * @see cern.colt.matrix.tfloat.algo.FloatFormatter
      */
+    @Override
     public String toString() {
         return new cern.colt.matrix.tfloat.algo.FloatFormatter().toString(this);
-    }
-
-    /**
-     * Constructs and returns a new view equal to the receiver. The view is a
-     * shallow clone. Calls <code>clone()</code> and casts the result.
-     * <p>
-     * <b>Note that the view is not a deep copy.</b> The returned matrix is
-     * backed by this matrix, so changes in the returned matrix are reflected in
-     * this matrix, and vice-versa.
-     * <p>
-     * Use {@link #copy()} to construct an independent deep copy rather than a
-     * new view.
-     * 
-     * @return a new view of the receiver.
-     */
-    protected FloatMatrix1D view() {
-        return (FloatMatrix1D) clone();
     }
 
     /**
@@ -1537,15 +1415,15 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b> <br>
      * 
      * <pre>
-     *   // extract and view all cells with even value
-     *   matrix = 0 1 2 3 
-     *   matrix.viewSelection( 
-     *      new FloatProcedure() {
-     *         public final boolean apply(float a) { return a % 2 == 0; }
-     *      }
-     *   );
-     *   --&gt;
-     *   matrix ==  0 2
+     * 	 // extract and view all cells with even value
+     * 	 matrix = 0 1 2 3 
+     * 	 matrix.viewSelection( 
+     * 	    new FloatProcedure() {
+     * 	       public final boolean apply(float a) { return a % 2 == 0; }
+     * 	    }
+     * 	 );
+     * 	 --&gt;
+     * 	 matrix ==  0 2
      * 
      * </pre>
      * 
@@ -1578,10 +1456,10 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * <b>Example:</b> <br>
      * 
      * <pre>
-     *   this     = (0,0,8,0,7)
-     *   indexes  = (0,2,4,2)
-     *   --&gt;
-     *   view     = (0,8,7,8)
+     * 	 this     = (0,0,8,0,7)
+     * 	 indexes  = (0,2,4,2)
+     * 	 --&gt;
+     * 	 view     = (0,8,7,8)
      * 
      * </pre>
      * 
@@ -1614,15 +1492,6 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
         }
         return viewSelectionLike(offsets);
     }
-
-    /**
-     * Construct and returns a new selection view.
-     * 
-     * @param offsets
-     *            the offsets of the visible elements.
-     * @return a new view.
-     */
-    protected abstract FloatMatrix1D viewSelectionLike(int[] offsets);
 
     /**
      * Sorts the vector into ascending order, according to the <i>natural
@@ -1693,25 +1562,20 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
         length = tail - from;
 
         float sum = 0;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            Float[] results = new Float[np];
-            int k = length / np;
-            for (int j = 0; j < np; j++) {
-                final int startlength = j * k;
-                final int stoplength;
-                if (j == np - 1) {
-                    stoplength = length;
-                } else {
-                    stoplength = startlength + k;
-                }
-
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, length);
+            Future<?>[] futures = new Future[nthreads];
+            Float[] results = new Float[nthreads];
+            int k = length / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Float>() {
                     public Float call() throws Exception {
                         float sum = 0;
                         int idx;
-                        for (int k = startlength; k < stoplength; k++) {
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             idx = k + from;
                             sum += getQuick(idx) * y.getQuick(idx);
                         }
@@ -1720,11 +1584,11 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
                 });
             }
             try {
-                for (int j = 0; j < np; j++) {
+                for (int j = 0; j < nthreads; j++) {
                     results[j] = (Float) futures[j].get();
                 }
                 sum = results[0].floatValue();
-                for (int j = 1; j < np; j++) {
+                for (int j = 1; j < nthreads; j++) {
                     sum += results[j].floatValue();
                 }
             } catch (ExecutionException ex) {
@@ -1784,6 +1648,83 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
     }
 
     /**
+     * Returns the sum of all cells; <tt>Sum( x[i] )</tt>.
+     * 
+     * @return the sum.
+     */
+    public float zSum() {
+        if (size() == 0)
+            return 0;
+        return aggregate(cern.jet.math.tfloat.FloatFunctions.plus, cern.jet.math.tfloat.FloatFunctions.identity);
+    }
+
+    /**
+     * Returns the number of cells having non-zero values, but at most
+     * maxCardinality; ignores tolerance.
+     */
+    protected int cardinality(int maxCardinality) {
+        int cardinality = 0;
+        int i = size;
+        while (--i >= 0 && cardinality < maxCardinality) {
+            if (getQuick(i) != 0)
+                cardinality++;
+        }
+        return cardinality;
+    }
+
+    /**
+     * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
+     * otherwise. Override this method in wrappers.
+     */
+    protected FloatMatrix1D getContent() {
+        return this;
+    }
+
+    /**
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
+     */
+    protected boolean haveSharedCells(FloatMatrix1D other) {
+        if (other == null)
+            return false;
+        if (this == other)
+            return true;
+        return getContent().haveSharedCellsRaw(other.getContent());
+    }
+
+    /**
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
+     */
+    protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
+        return false;
+    }
+
+    /**
+     * Constructs and returns a new view equal to the receiver. The view is a
+     * shallow clone. Calls <code>clone()</code> and casts the result.
+     * <p>
+     * <b>Note that the view is not a deep copy.</b> The returned matrix is
+     * backed by this matrix, so changes in the returned matrix are reflected in
+     * this matrix, and vice-versa.
+     * <p>
+     * Use {@link #copy()} to construct an independent deep copy rather than a
+     * new view.
+     * 
+     * @return a new view of the receiver.
+     */
+    protected FloatMatrix1D view() {
+        return (FloatMatrix1D) clone();
+    }
+
+    /**
+     * Construct and returns a new selection view.
+     * 
+     * @param offsets
+     *            the offsets of the visible elements.
+     * @return a new view.
+     */
+    protected abstract FloatMatrix1D viewSelectionLike(int[] offsets);
+
+    /**
      * Returns the dot product of two vectors x and y, which is
      * <tt>Sum(x[i]*y[i])</tt>. Where <tt>x == this</tt>.
      * 
@@ -1795,16 +1736,5 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      */
     protected float zDotProduct(FloatMatrix1D y, IntArrayList nonZeroIndexes) {
         return zDotProduct(y, 0, size, nonZeroIndexes);
-    }
-
-    /**
-     * Returns the sum of all cells; <tt>Sum( x[i] )</tt>.
-     * 
-     * @return the sum.
-     */
-    public float zSum() {
-        if (size() == 0)
-            return 0;
-        return aggregate(cern.jet.math.tfloat.FloatFunctions.plus, cern.jet.math.tfloat.FloatFunctions.identity);
     }
 }

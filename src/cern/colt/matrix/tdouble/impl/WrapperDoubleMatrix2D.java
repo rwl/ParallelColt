@@ -10,6 +10,7 @@ package cern.colt.matrix.tdouble.impl;
 
 import java.util.concurrent.Future;
 
+import cern.colt.matrix.tdcomplex.impl.DenseLargeDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -22,9 +23,12 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @version 1.0, 04/14/2000
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * @version 1.1, 08/22/2007
  */
 public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /*
      * The elements of the matrix.
      */
@@ -36,30 +40,17 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         this.content = newContent;
     }
 
+    @Override
     public Object elements() {
         return content.elements();
     }
 
-    /**
-     * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
-     * 
-     * <p>
-     * Provided with invalid parameters this method may return invalid objects
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @return the value at the specified coordinate.
-     */
+    @Override
     public double getQuick(int row, int column) {
         return content.getQuick(row, column);
     }
 
+    @Override
     public boolean equals(double value) {
         if (content instanceof DiagonalDoubleMatrix2D) {
             double epsilon = cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.tolerance();
@@ -79,6 +70,7 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (content instanceof DiagonalDoubleMatrix2D && obj instanceof DiagonalDoubleMatrix2D) {
             double epsilon = cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.tolerance();
@@ -88,10 +80,11 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
                 return false;
             DiagonalDoubleMatrix2D A = (DiagonalDoubleMatrix2D) content;
             DiagonalDoubleMatrix2D B = (DiagonalDoubleMatrix2D) obj;
-            if (A.columns() != B.columns() || A.rows() != B.rows() || A.dindex() != B.dindex() || A.dlength() != B.dlength())
+            if (A.columns() != B.columns() || A.rows() != B.rows() || A.diagonalIndex() != B.diagonalIndex()
+                    || A.diagonalLength() != B.diagonalLength())
                 return false;
-            double[] AElements = (double[]) A.elements();
-            double[] BElements = (double[]) B.elements();
+            double[] AElements = A.elements();
+            double[] BElements = B.elements();
             for (int r = 0; r < AElements.length; r++) {
                 double x = AElements[r];
                 double value = BElements[r];
@@ -108,91 +101,609 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseDoubleMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseDoubleMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseDoubleMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseDoubleMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
-     * 
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @return a new empty matrix of the same dynamic type.
-     */
+    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return content.like(rows, columns);
     }
 
-    /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseDoubleMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseDoubleMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseDoubleMatrix1D</tt>, etc.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     public DoubleMatrix1D like1D(int size) {
         return content.like1D(size);
     }
 
     /**
-     * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-     * value.
+     * Computes the 2D discrete cosine transform (DCT-II) of this matrix.
      * 
-     * <p>
-     * Provided with invalid parameters this method may access illegal indexes
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
+     * @param scale
+     *            if true then scaling is performed
      * 
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @param value
-     *            the value to be filled into the specified cell.
      */
+    public void dct2(boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dct2(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dct2(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the discrete cosine transform (DCT-II) of each column of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void dctColumns(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dctColumns(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dctColumns(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the discrete cosine transform (DCT-II) of each row of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void dctRows(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dctRows(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dctRows(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the 2D discrete sine transform (DST-II) of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void dst2(boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dst2(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dst2(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the discrete sine transform (DST-II) of each column of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     */
+    public void dstColumns(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dstColumns(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dstColumns(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the discrete sine transform (DST-II) of each row of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void dstRows(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dstRows(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dstRows(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the 2D discrete Hartley transform (DHT) of this matrix.
+     */
+    public void dht2() {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dht2();
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dht2();
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the discrete Hertley transform (DHT) of each column of this
+     * matrix.
+     */
+    public void dhtColumns() {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dhtColumns();
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dhtColumns();
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the discrete Hertley transform (DHT) of each row of this matrix.
+     */
+    public void dhtRows() {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).dhtRows();
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.dhtRows();
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the 2D discrete Fourier transform (DFT) of this matrix. The
+     * physical layout of the output data is as follows:
+     * 
+     * <pre>
+     * this[k1][2*k2] = Re[k1][k2] = Re[rows-k1][columns-k2], 
+     * this[k1][2*k2+1] = Im[k1][k2] = -Im[rows-k1][columns-k2], 
+     *       0&lt;k1&lt;rows, 0&lt;k2&lt;columns/2, 
+     * this[0][2*k2] = Re[0][k2] = Re[0][columns-k2], 
+     * this[0][2*k2+1] = Im[0][k2] = -Im[0][columns-k2], 
+     *       0&lt;k2&lt;columns/2, 
+     * this[k1][0] = Re[k1][0] = Re[rows-k1][0], 
+     * this[k1][1] = Im[k1][0] = -Im[rows-k1][0], 
+     * this[rows-k1][1] = Re[k1][columns/2] = Re[rows-k1][columns/2], 
+     * this[rows-k1][0] = -Im[k1][columns/2] = Im[rows-k1][columns/2], 
+     *       0&lt;k1&lt;rows/2, 
+     * this[0][0] = Re[0][0], 
+     * this[0][1] = Re[0][columns/2], 
+     * this[rows/2][0] = Re[rows/2][0], 
+     * this[rows/2][1] = Re[rows/2][columns/2]
+     * </pre>
+     * 
+     * This method computes only half of the elements of the real transform. The
+     * other half satisfies the symmetry condition. If you want the full real
+     * forward transform, use <code>getFft2</code>. To get back the original
+     * data, use <code>ifft2</code>.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     */
+    public void fft2() {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).fft2();
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.fft2();
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Returns new complex matrix which is the 2D discrete Fourier transform
+     * (DFT) of this matrix.
+     * 
+     * @return the 2D discrete Fourier transform (DFT) of this matrix.
+     * 
+     */
+    public DenseLargeDComplexMatrix2D getFft2() {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                return ((DenseLargeDoubleMatrix2D) content).getFft2();
+            } else {
+                return ((DenseLargeDoubleMatrix2D) copy()).getFft2();
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Returns new complex matrix which is the 2D inverse of the discrete
+     * Fourier transform (IDFT) of this matrix.
+     * 
+     * @return the 2D inverse of the discrete Fourier transform (IDFT) of this
+     *         matrix.
+     */
+    public DenseLargeDComplexMatrix2D getIfft2(boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                return ((DenseLargeDoubleMatrix2D) content).getIfft2(scale);
+            } else {
+                return ((DenseLargeDoubleMatrix2D) copy()).getIfft2(scale);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Returns new complex matrix which is the discrete Fourier transform (DFT)
+     * of each column of this matrix.
+     * 
+     * @return the discrete Fourier transform (DFT) of each column of this
+     *         matrix.
+     */
+    public DenseLargeDComplexMatrix2D getFftColumns() {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                return ((DenseLargeDoubleMatrix2D) content).getFftColumns();
+            } else {
+                return ((DenseLargeDoubleMatrix2D) copy()).getFftColumns();
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Returns new complex matrix which is the discrete Fourier transform (DFT)
+     * of each row of this matrix.
+     * 
+     * @return the discrete Fourier transform (DFT) of each row of this matrix.
+     */
+    public DenseLargeDComplexMatrix2D getFftRows() {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                return ((DenseLargeDoubleMatrix2D) content).getFftRows();
+            } else {
+                return ((DenseLargeDoubleMatrix2D) copy()).getFftRows();
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Returns new complex matrix which is the inverse of the discrete Fourier
+     * transform (IDFT) of each column of this matrix.
+     * 
+     * @return the inverse of the discrete Fourier transform (IDFT) of each
+     *         column of this matrix.
+     */
+    public DenseLargeDComplexMatrix2D getIfftColumns(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                return ((DenseLargeDoubleMatrix2D) content).getIfftColumns(scale);
+            } else {
+                return ((DenseLargeDoubleMatrix2D) copy()).getIfftColumns(scale);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Returns new complex matrix which is the inverse of the discrete Fourier
+     * transform (IDFT) of each row of this matrix.
+     * 
+     * @return the inverse of the discrete Fourier transform (IDFT) of each row
+     *         of this matrix.
+     */
+    public DenseLargeDComplexMatrix2D getIfftRows(final boolean scale) {
+        if (this.isNoView == true) {
+            return ((DenseLargeDoubleMatrix2D) content).getIfftRows(scale);
+        } else {
+            return ((DenseLargeDoubleMatrix2D) copy()).getIfftRows(scale);
+        }
+
+    }
+
+    /**
+     * Computes the 2D inverse of the discrete cosine transform (DCT-III) of
+     * this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void idct2(boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idct2(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idct2(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the inverse of the discrete cosine transform (DCT-III) of each
+     * column of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void idctColumns(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idctColumns(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idctColumns(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the inverse of the discrete cosine transform (DCT-III) of each
+     * row of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void idctRows(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idctRows(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idctRows(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the 2D inverse of the discrete size transform (DST-III) of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void idst2(boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idst2(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idst2(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the inverse of the discrete sine transform (DST-III) of each
+     * column of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void idstColumns(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idstColumns(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idstColumns(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the inverse of the discrete sine transform (DST-III) of each row
+     * of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     */
+    public void idstRows(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idstRows(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idstRows(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the 2D inverse of the discrete Hartley transform (DHT) of this
+     * matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void idht2(boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idht2(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idht2(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the inverse of the discrete Hartley transform (DHT) of each
+     * column of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     */
+    public void idhtColumns(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idhtColumns(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idhtColumns(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the inverse of the discrete Hartley transform (DHT) of each row
+     * of this matrix.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     */
+    public void idhtRows(final boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).idhtRows(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.idhtRows(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    /**
+     * Computes the 2D inverse of the discrete Fourier transform (IDFT) of this
+     * matrix. The physical layout of the input data has to be as follows:
+     * 
+     * <pre>
+     * this[k1][2*k2] = Re[k1][k2] = Re[rows-k1][columns-k2], 
+     * this[k1][2*k2+1] = Im[k1][k2] = -Im[rows-k1][columns-k2], 
+     *       0&lt;k1&lt;rows, 0&lt;k2&lt;columns/2, 
+     * this[0][2*k2] = Re[0][k2] = Re[0][columns-k2], 
+     * this[0][2*k2+1] = Im[0][k2] = -Im[0][columns-k2], 
+     *       0&lt;k2&lt;columns/2, 
+     * this[k1][0] = Re[k1][0] = Re[rows-k1][0], 
+     * this[k1][1] = Im[k1][0] = -Im[rows-k1][0], 
+     * this[rows-k1][1] = Re[k1][columns/2] = Re[rows-k1][columns/2], 
+     * this[rows-k1][0] = -Im[k1][columns/2] = Im[rows-k1][columns/2], 
+     *       0&lt;k1&lt;rows/2, 
+     * this[0][0] = Re[0][0], 
+     * this[0][1] = Re[0][columns/2], 
+     * this[rows/2][0] = Re[rows/2][0], 
+     * this[rows/2][1] = Re[rows/2][columns/2]
+     * </pre>
+     * 
+     * This method computes only half of the elements of the real transform. The
+     * other half satisfies the symmetry condition. If you want the full real
+     * inverse transform, use <code>getIfft2</code>.
+     * 
+     * @throws IllegalArgumentException
+     *             if the row size or the column size of this matrix is not a
+     *             power of 2 number.
+     * 
+     * @param scale
+     *            if true then scaling is performed
+     * 
+     */
+    public void ifft2(boolean scale) {
+        if (content instanceof DenseLargeDoubleMatrix2D) {
+            if (this.isNoView == true) {
+                ((DenseLargeDoubleMatrix2D) content).ifft2(scale);
+            } else {
+                DenseLargeDoubleMatrix2D copy = (DenseLargeDoubleMatrix2D) copy();
+                copy.ifft2(scale);
+                assign(copy);
+            }
+        } else {
+            throw new IllegalArgumentException("This method is not supported");
+        }
+    }
+
+    @Override
     public void setQuick(int row, int column, double value) {
         content.setQuick(row, column, value);
     }
 
-    /**
-     * Returns a vector obtained by stacking the columns of the matrix on top of
-     * one another.
-     * 
-     * @return a vector obtained by stacking the columns of the matrix on top of
-     *         one another.
-     */
+    @Override
     public DoubleMatrix1D vectorize() {
-        final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(size());
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            Future<?>[] futures = new Future[np];
-            int k = columns / np;
-            for (int j = 0; j < np; j++) {
-                final int startcol = j * k;
-                final int stopcol;
-                final int startidx = j * k * rows;
-                if (j == np - 1) {
-                    stopcol = columns;
-                } else {
-                    stopcol = startcol + k;
-                }
+        final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D((int) size());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, columns);
+            Future<?>[] futures = new Future[nthreads];
+            int k = columns / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstCol = j * k;
+                final int lastCol = (j == nthreads - 1) ? columns : firstCol + k;
+                final int firstidx = j * k * rows;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
-
                     public void run() {
-                        int idx = startidx;
-                        for (int c = startcol; c < stopcol; c++) {
+                        int idx = firstidx;
+                        for (int c = firstCol; c < lastCol; c++) {
                             for (int r = 0; r < rows; r++) {
                                 v.setQuick(idx++, getQuick(r, c));
                             }
@@ -212,346 +723,158 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return v;
     }
 
-    /**
-     * Constructs and returns a new <i>slice view</i> representing the rows of
-     * the given column. The returned view is backed by this matrix, so changes
-     * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (
-     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-     * <p>
-     * <b>Example:</b>
-     * <table border="0">
-     * <tr nowrap>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * <td>viewColumn(0) ==></td>
-     * <td valign="top">Matrix1D of size 2:<br>
-     * 1, 4</td>
-     * </tr>
-     * </table>
-     * 
-     * @param column
-     *            the column to fix.
-     * @return a new slice view.
-     * @throws IndexOutOfBoundsException
-     *             if <tt>column < 0 || column >= columns()</tt>.
-     * @see #viewRow(int)
-     */
+    @Override
     public DoubleMatrix1D viewColumn(int column) {
         return viewDice().viewRow(column);
     }
 
-    /**
-     * Constructs and returns a new <i>flip view</i> along the column axis. What
-     * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
-     * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
-     * returned view is backed by this matrix, so changes in the returned view
-     * are reflected in this matrix, and vice-versa.
-     * <p>
-     * <b>Example:</b>
-     * <table border="0">
-     * <tr nowrap>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * <td>columnFlip ==></td>
-     * <td valign="top">2 x 3 matrix:<br>
-     * 3, 2, 1 <br>
-     * 6, 5, 4</td>
-     * <td>columnFlip ==></td>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * </tr>
-     * </table>
-     * 
-     * @return a new flip view.
-     * @see #viewRowFlip()
-     */
+    @Override
     public DoubleMatrix2D viewColumnFlip() {
         if (columns == 0)
             return this;
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public double getQuick(int row, int column) {
                 return content.getQuick(row, columns - 1 - column);
             }
 
+            @Override
             public void setQuick(int row, int column, double value) {
                 content.setQuick(row, columns - 1 - column, value);
             }
 
+            @Override
             public double get(int row, int column) {
                 return content.get(row, columns - 1 - column);
             }
 
+            @Override
             public void set(int row, int column, double value) {
                 content.set(row, columns - 1 - column, value);
             }
         };
+        view.isNoView = false;
+
         return view;
     }
 
-    /**
-     * Constructs and returns a new <i>dice (transposition) view</i>; Swaps
-     * axes; example: 3 x 4 matrix --> 4 x 3 matrix. The view has both
-     * dimensions exchanged; what used to be columns become rows, what used to
-     * be rows become columns. In other words:
-     * <tt>view.get(row,column)==this.get(column,row)</tt>. This is a zero-copy
-     * transposition, taking O(1), i.e. constant time. The returned view is
-     * backed by this matrix, so changes in the returned view are reflected in
-     * this matrix, and vice-versa. Use idioms like
-     * <tt>result = viewDice(A).copy()</tt> to generate an independent
-     * transposed matrix.
-     * <p>
-     * <b>Example:</b>
-     * <table border="0">
-     * <tr nowrap>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * <td>transpose ==></td>
-     * <td valign="top">3 x 2 matrix:<br>
-     * 1, 4 <br>
-     * 2, 5 <br>
-     * 3, 6</td>
-     * <td>transpose ==></td>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * </tr>
-     * </table>
-     * 
-     * @return a new dice view.
-     */
+    @Override
     public DoubleMatrix2D viewDice() {
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public double getQuick(int row, int column) {
                 return content.getQuick(column, row);
             }
 
+            @Override
             public void setQuick(int row, int column, double value) {
                 content.setQuick(column, row, value);
             }
 
+            @Override
             public double get(int row, int column) {
                 return content.get(column, row);
             }
 
+            @Override
             public void set(int row, int column, double value) {
                 content.set(column, row, value);
             }
         };
-        view.setNrows(columns);
-        view.setNcolumns(rows);
+        view.rows = columns;
+        view.columns = rows;
+        view.isNoView = false;
+
         return view;
     }
 
-    /**
-     * Sets the number of rows of this matrix
-     * 
-     * @param columns
-     */
-    public void setNcolumns(int columns) {
-        this.columns = columns;
-    }
-
-    /**
-     * Sets the number of rows of this matrix
-     * 
-     * @param rows
-     */
-    public void setNrows(int rows) {
-        this.rows = rows;
-    }
-
-    /**
-     * Constructs and returns a new <i>sub-range view</i> that is a
-     * <tt>height x width</tt> sub matrix starting at <tt>[row,column]</tt>.
-     * 
-     * Operations on the returned view can only be applied to the restricted
-     * range. Any attempt to access coordinates not contained in the view will
-     * throw an <tt>IndexOutOfBoundsException</tt>.
-     * <p>
-     * <b>Note that the view is really just a range restriction:</b> The
-     * returned matrix is backed by this matrix, so changes in the returned
-     * matrix are reflected in this matrix, and vice-versa.
-     * <p>
-     * The view contains the cells from <tt>[row,column]</tt> to
-     * <tt>[row+height-1,column+width-1]</tt>, all inclusive. and has
-     * <tt>view.rows() == height; view.columns() == width;</tt>. A view's legal
-     * coordinates are again zero based, as usual. In other words, legal
-     * coordinates of the view range from <tt>[0,0]</tt> to
-     * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As usual,
-     * any attempt to access a cell at a coordinate
-     * <tt>column&lt;0 || column&gt;=view.columns() || row&lt;0 || row&gt;=view.rows()</tt>
-     * will throw an <tt>IndexOutOfBoundsException</tt>.
-     * 
-     * @param row
-     *            The index of the row-coordinate.
-     * @param column
-     *            The index of the column-coordinate.
-     * @param height
-     *            The height of the box.
-     * @param width
-     *            The width of the box.
-     * @throws IndexOutOfBoundsException
-     *             if
-     *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
-     * @return the new view.
-     * 
-     */
+    @Override
     public DoubleMatrix2D viewPart(final int row, final int column, int height, int width) {
         checkBox(row, column, height, width);
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public double getQuick(int i, int j) {
                 return content.getQuick(row + i, column + j);
             }
 
+            @Override
             public void setQuick(int i, int j, double value) {
                 content.setQuick(row + i, column + j, value);
             }
 
+            @Override
             public double get(int i, int j) {
                 return content.get(row + i, column + j);
             }
 
+            @Override
             public void set(int i, int j, double value) {
                 content.set(row + i, column + j, value);
             }
         };
-        view.setNrows(height);
-        view.setNcolumns(width);
+        view.rows = height;
+        view.columns = width;
+        view.isNoView = false;
+
         return view;
     }
 
-    /**
-     * Constructs and returns a new <i>slice view</i> representing the columns
-     * of the given row. The returned view is backed by this matrix, so changes
-     * in the returned view are reflected in this matrix, and vice-versa. To
-     * obtain a slice view on subranges, construct a sub-ranging view (
-     * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-     * <p>
-     * <b>Example:</b>
-     * <table border="0">
-     * <tr nowrap>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * <td>viewRow(0) ==></td>
-     * <td valign="top">Matrix1D of size 3:<br>
-     * 1, 2, 3</td>
-     * </tr>
-     * </table>
-     * 
-     * @param row
-     *            the row to fix.
-     * @return a new slice view.
-     * @throws IndexOutOfBoundsException
-     *             if <tt>row < 0 || row >= rows()</tt>.
-     * @see #viewColumn(int)
-     */
+    @Override
     public DoubleMatrix1D viewRow(int row) {
         checkRow(row);
         return new DelegateDoubleMatrix1D(this, row);
     }
 
-    /**
-     * Constructs and returns a new <i>flip view</i> along the row axis. What
-     * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
-     * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
-     * backed by this matrix, so changes in the returned view are reflected in
-     * this matrix, and vice-versa.
-     * <p>
-     * <b>Example:</b>
-     * <table border="0">
-     * <tr nowrap>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * <td>rowFlip ==></td>
-     * <td valign="top">2 x 3 matrix:<br>
-     * 4, 5, 6 <br>
-     * 1, 2, 3</td>
-     * <td>rowFlip ==></td>
-     * <td valign="top">2 x 3 matrix: <br>
-     * 1, 2, 3<br>
-     * 4, 5, 6</td>
-     * </tr>
-     * </table>
-     * 
-     * @return a new flip view.
-     * @see #viewColumnFlip()
-     */
+    @Override
     public DoubleMatrix2D viewRowFlip() {
         if (rows == 0)
             return this;
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public double getQuick(int row, int column) {
                 return content.getQuick(rows - 1 - row, column);
             }
 
+            @Override
             public void setQuick(int row, int column, double value) {
                 content.setQuick(rows - 1 - row, column, value);
             }
 
+            @Override
             public double get(int row, int column) {
                 return content.get(rows - 1 - row, column);
             }
 
+            @Override
             public void set(int row, int column, double value) {
                 content.set(rows - 1 - row, column, value);
             }
         };
+        view.isNoView = false;
         return view;
     }
 
-    /**
-     * Constructs and returns a new <i>selection view</i> that is a matrix
-     * holding the indicated cells. There holds
-     * <tt>view.rows() == rowIndexes.length, view.columns() == columnIndexes.length</tt>
-     * and <tt>view.get(i,j) == this.get(rowIndexes[i],columnIndexes[j])</tt>.
-     * Indexes can occur multiple times and can be in arbitrary order.
-     * <p>
-     * <b>Example:</b>
-     * 
-     * <pre>
-     * 	 this = 2 x 3 matrix:
-     * 	 1, 2, 3
-     * 	 4, 5, 6
-     * 	 rowIndexes     = (0,1)
-     * 	 columnIndexes  = (1,0,1,0)
-     * 	 --&gt;
-     * 	 view = 2 x 4 matrix:
-     * 	 2, 1, 2, 1
-     * 	 5, 4, 5, 4
-     * 
-     * </pre>
-     * 
-     * Note that modifying the index arguments after this call has returned has
-     * no effect on the view. The returned view is backed by this matrix, so
-     * changes in the returned view are reflected in this matrix, and
-     * vice-versa.
-     * <p>
-     * To indicate "all" rows or "all columns", simply set the respective
-     * parameter
-     * 
-     * @param rowIndexes
-     *            The rows of the cells that shall be visible in the new view.
-     *            To indicate that <i>all</i> rows shall be visible, simply set
-     *            this parameter to <tt>null</tt>.
-     * @param columnIndexes
-     *            The columns of the cells that shall be visible in the new
-     *            view. To indicate that <i>all</i> columns shall be visible,
-     *            simply set this parameter to <tt>null</tt>.
-     * @return the new view.
-     * @throws IndexOutOfBoundsException
-     *             if <tt>!(0 <= rowIndexes[i] < rows())</tt> for any
-     *             <tt>i=0..rowIndexes.length()-1</tt>.
-     * @throws IndexOutOfBoundsException
-     *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
-     *             <tt>i=0..columnIndexes.length()-1</tt>.
-     */
+    @Override
     public DoubleMatrix2D viewSelection(int[] rowIndexes, int[] columnIndexes) {
         // check for "all"
         if (rowIndexes == null) {
@@ -571,112 +894,88 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         final int[] cix = columnIndexes;
 
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public double getQuick(int i, int j) {
                 return content.getQuick(rix[i], cix[j]);
             }
 
+            @Override
             public void setQuick(int i, int j, double value) {
                 content.setQuick(rix[i], cix[j], value);
             }
 
+            @Override
             public double get(int i, int j) {
                 return content.get(rix[i], cix[j]);
             }
 
+            @Override
             public void set(int i, int j, double value) {
                 content.set(rix[i], cix[j], value);
             }
         };
-        view.setNrows(rowIndexes.length);
-        view.setNcolumns(columnIndexes.length);
+        view.rows = rowIndexes.length;
+        view.columns = columnIndexes.length;
+        view.isNoView = false;
+
         return view;
     }
 
-    /**
-     * Constructs and returns a new <i>stride view</i> which is a sub matrix
-     * consisting of every i-th cell. More specifically, the view has
-     * <tt>this.rows()/rowStride</tt> rows and
-     * <tt>this.columns()/columnStride</tt> columns holding cells
-     * <tt>this.get(i*rowStride,j*columnStride)</tt> for all
-     * <tt>i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1</tt>.
-     * The returned view is backed by this matrix, so changes in the returned
-     * view are reflected in this matrix, and vice-versa.
-     * 
-     * @param _rowStride
-     *            the row step factor.
-     * @param _columnStride
-     *            the column step factor.
-     * @return a new view.
-     * @throws IndexOutOfBoundsException
-     *             if <tt>rowStride<=0 || columnStride<=0</tt>.
-     */
+    @Override
     public DoubleMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
         if (_rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
             public double getQuick(int row, int column) {
                 return content.getQuick(_rowStride * row, _columnStride * column);
             }
 
+            @Override
             public void setQuick(int row, int column, double value) {
                 content.setQuick(_rowStride * row, _columnStride * column, value);
             }
 
+            @Override
             public double get(int row, int column) {
                 return content.get(_rowStride * row, _columnStride * column);
             }
 
+            @Override
             public void set(int row, int column, double value) {
                 content.set(_rowStride * row, _columnStride * column, value);
             }
         };
-        view.setNrows(rows);
-        view.setNcolumns(columns);
         if (rows != 0)
-            view.setNrows((rows - 1) / _rowStride + 1);
+            view.rows = (rows - 1) / _rowStride + 1;
         if (columns != 0)
-            view.setNcolumns((columns - 1) / _columnStride + 1);
+            view.columns = (columns - 1) / _columnStride + 1;
+        view.isNoView = false;
+
         return view;
     }
 
-    /**
-     * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
-     * otherwise. Override this method in wrappers.
-     */
+    @Override
     protected DoubleMatrix2D getContent() {
         return content;
     }
 
-    /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseDoubleMatrix2D</tt> the new matrix must be of
-     * type <tt>DenseDoubleMatrix1D</tt>, if the receiver is an instance of type
-     * <tt>SparseDoubleMatrix2D</tt> the new matrix must be of type
-     * <tt>SparseDoubleMatrix1D</tt>, etc.
-     * 
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @param offset
-     *            the index of the first element.
-     * @param stride
-     *            the number of indexes between any two elements, i.e.
-     *            <tt>index(i+1)-index(i)</tt>.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+    @Override
     protected DoubleMatrix1D like1D(int size, int offset, int stride) {
         throw new InternalError(); // should never get called
     }
 
-    /**
-     * Construct and returns a new selection view.
-     * 
-     * @param rowOffsets
-     *            the offsets of the visible elements.
-     * @param columnOffsets
-     *            the offsets of the visible elements.
-     * @return a new view.
-     */
+    @Override
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never be called
     }

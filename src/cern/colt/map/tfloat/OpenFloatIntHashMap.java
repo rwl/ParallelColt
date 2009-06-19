@@ -31,6 +31,11 @@ import cern.colt.map.PrimeFinder;
  */
 public class OpenFloatIntHashMap extends AbstractFloatIntMap {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * The hash table keys.
      * 
      * @serial
@@ -108,6 +113,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * Removes all (key,value) associations from the receiver. Implicitly calls
      * <tt>trimToSize()</tt>.
      */
+    @Override
     public void clear() {
         new ByteArrayList(this.state).fillFromToWith(0, this.state.length - 1, FREE);
         // new FloatArrayList(values).fillFromToWith(0, state.length-1, 0); //
@@ -123,11 +129,12 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         OpenFloatIntHashMap copy = (OpenFloatIntHashMap) super.clone();
-        copy.table = (float[]) copy.table.clone();
-        copy.values = (int[]) copy.values.clone();
-        copy.state = (byte[]) copy.state.clone();
+        copy.table = copy.table.clone();
+        copy.values = copy.values.clone();
+        copy.state = copy.state.clone();
         return copy;
     }
 
@@ -136,6 +143,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified key.
      */
+    @Override
     public boolean containsKey(float key) {
         return indexOfKey(key) >= 0;
     }
@@ -145,6 +153,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified value.
      */
+    @Override
     public boolean containsValue(int value) {
         return indexOfValue(value) >= 0;
     }
@@ -163,6 +172,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @param minCapacity
      *            the desired minimum capacity.
      */
+    @Override
     public void ensureCapacity(int minCapacity) {
         if (table.length < minCapacity) {
             int newCapacity = nextPrime(minCapacity);
@@ -186,6 +196,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
+    @Override
     public boolean forEachKey(FloatProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -206,6 +217,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
+    @Override
     public boolean forEachPair(final FloatIntProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -226,6 +238,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @return the value associated with the specified key; <tt>0</tt> if no
      *         such key is present.
      */
+    @Override
     public int get(float key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -353,6 +366,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
      *         <tt>Float.NaN</tt> if no such key exists.
      */
+    @Override
     public float keyOf(int value) {
         // returns the first key found; there may be more matching keys,
         // however.
@@ -374,6 +388,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @param list
      *            the list to be filled, can have any size.
      */
+    @Override
     public void keys(FloatArrayList list) {
         list.setSize(distinct);
         float[] elements = list.elements();
@@ -413,7 +428,9 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void pairsMatching(final FloatIntProcedure condition, final FloatArrayList keyList, final IntArrayList valueList) {
+    @Override
+    public void pairsMatching(final FloatIntProcedure condition, final FloatArrayList keyList,
+            final IntArrayList valueList) {
         keyList.clear();
         valueList.clear();
 
@@ -437,6 +454,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      *         <tt>false</tt> if the receiver did already contain such a key -
      *         the new value has now replaced the formerly associated value.
      */
+    @Override
     public boolean put(float key, int value) {
         int i = indexOfInsertion(key);
         if (i < 0) { // already contained
@@ -517,6 +535,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @return <tt>true</tt> if the receiver contained the specified key,
      *         <tt>false</tt> otherwise.
      */
+    @Override
     public boolean removeKey(float key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -554,6 +573,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      */
+    @Override
     protected void setUp(int initialCapacity, float minLoadFactor, float maxLoadFactor) {
         int capacity = initialCapacity;
         super.setUp(capacity, minLoadFactor, maxLoadFactor);
@@ -592,6 +612,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * Releases any superfluous internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
+    @Override
     public void trimToSize() {
         // * 1.2 because open addressing's performance exponentially degrades
         // beyond that point
@@ -614,6 +635,7 @@ public class OpenFloatIntHashMap extends AbstractFloatIntMap {
      * @param list
      *            the list to be filled, can have any size.
      */
+    @Override
     public void values(IntArrayList list) {
         list.setSize(distinct);
         int[] elements = list.elements();

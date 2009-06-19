@@ -44,7 +44,13 @@ import cern.jet.random.tdouble.engine.MersenneTwister64;
 // public abstract class RandomEngine extends
 // edu.cornell.lassp.houle.RngPack.RandomSeedable implements
 // cern.colt.function.FloatFunction, cern.colt.function.IntFunction {
-public abstract class FloatRandomEngine extends cern.colt.PersistentObject implements cern.colt.function.tfloat.FloatFunction, cern.colt.function.tint.IntFunction {
+public abstract class FloatRandomEngine extends cern.colt.PersistentObject implements
+        cern.colt.function.tfloat.FloatFunction, cern.colt.function.tint.IntFunction {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
@@ -87,7 +93,7 @@ public abstract class FloatRandomEngine extends cern.colt.PersistentObject imple
         // catch loss of precision of float --> float conversion
         float nextFloat;
         do {
-            nextFloat = (float) raw();
+            nextFloat = raw();
         } while (nextFloat >= 1.0f);
 
         // --> in (0.0f,1.0f)

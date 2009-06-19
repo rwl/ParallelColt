@@ -10,6 +10,7 @@ package cern.colt.matrix.tint;
 
 import cern.colt.matrix.tint.impl.DenseIntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseIntMatrix1D;
+import cern.jet.math.tint.IntFunctions;
 
 /**
  * Factory for convenient construction of 1-d matrices holding <tt>int</tt>
@@ -38,6 +39,11 @@ import cern.colt.matrix.tint.impl.SparseIntMatrix1D;
  */
 public class IntFactory1D extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A factory producing dense matrices.
      */
     public static final IntFactory1D dense = new IntFactory1D();
@@ -60,9 +66,9 @@ public class IntFactory1D extends cern.colt.PersistentObject {
      */
     public IntMatrix1D append(IntMatrix1D A, IntMatrix1D B) {
         // concatenate
-        IntMatrix1D matrix = make(A.size() + B.size());
-        matrix.viewPart(0, A.size()).assign(A);
-        matrix.viewPart(A.size(), B.size()).assign(B);
+        IntMatrix1D matrix = make((int) (A.size() + B.size()));
+        matrix.viewPart(0, (int) A.size()).assign(A);
+        matrix.viewPart((int) A.size(), (int) B.size()).assign(B);
         return matrix;
     }
 
@@ -72,7 +78,7 @@ public class IntFactory1D extends cern.colt.PersistentObject {
      */
     public IntMatrix1D ascending(int size) {
         cern.jet.math.tint.IntFunctions F = cern.jet.math.tint.IntFunctions.intFunctions;
-        return descending(size).assign(F.chain(F.neg, F.minus(size)));
+        return descending(size).assign(IntFunctions.chain(IntFunctions.neg, IntFunctions.minus(size)));
     }
 
     /**
@@ -118,7 +124,7 @@ public class IntFactory1D extends cern.colt.PersistentObject {
         IntMatrix1D vector = make(size);
         size = 0;
         for (int i = 0; i < parts.length; i++) {
-            vector.viewPart(size, parts[i].size()).assign(parts[i]);
+            vector.viewPart(size, (int) parts[i].size()).assign(parts[i]);
             size += parts[i].size();
         }
 
@@ -180,7 +186,7 @@ public class IntFactory1D extends cern.colt.PersistentObject {
      * </pre>
      */
     public IntMatrix1D repeat(IntMatrix1D A, int repeat) {
-        int size = A.size();
+        int size = (int) A.size();
         IntMatrix1D matrix = make(repeat * size);
         for (int i = repeat; --i >= 0;) {
             matrix.viewPart(size * i, size).assign(A);
@@ -210,11 +216,12 @@ public class IntFactory1D extends cern.colt.PersistentObject {
 
         IntMatrix1D matrix = make(size);
 
-        int n = (int) Math.round(size * nonZeroFraction);
+        int n = Math.round(size * nonZeroFraction);
         if (n == 0)
             return matrix;
 
-        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
+        cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant sampler = new cern.jet.random.tdouble.sampling.DoubleRandomSamplingAssistant(
+                n, size, new cern.jet.random.tdouble.engine.DoubleMersenneTwister());
         for (int i = size; --i >= 0;) {
             if (sampler.sampleNextElement()) {
                 matrix.set(i, value);
@@ -234,7 +241,7 @@ public class IntFactory1D extends cern.colt.PersistentObject {
      * @return a new list.
      */
     public cern.colt.list.tint.IntArrayList toList(IntMatrix1D values) {
-        int size = values.size();
+        int size = (int) values.size();
         cern.colt.list.tint.IntArrayList list = new cern.colt.list.tint.IntArrayList(size);
         list.setSize(size);
         for (int i = size; --i >= 0;)

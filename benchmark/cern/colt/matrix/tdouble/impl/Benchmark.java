@@ -29,7 +29,8 @@ class Benchmark {
     /**
      * Runs a bench on matrices holding double elements.
      */
-    public static void benchmark(int runs, int size, String kind, boolean print, int initialCapacity, double minLoadFactor, double maxLoadFactor, double percentNonZero) {
+    public static void benchmark(int runs, int size, String kind, boolean print, int initialCapacity,
+            double minLoadFactor, double maxLoadFactor, double percentNonZero) {
         // certain loops need to be constructed so that the jitter can't
         // optimize them away and we get fantastic numbers.
         // this involves primarly read-loops

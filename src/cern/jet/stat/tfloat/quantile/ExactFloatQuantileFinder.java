@@ -22,6 +22,11 @@ import cern.colt.list.tfloat.FloatArrayList;
 // class ExactFloatQuantileFinder extends Object implements
 // FloatQuantileFinder {
 class ExactFloatQuantileFinder extends cern.colt.PersistentObject implements FloatQuantileFinder {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected FloatArrayList buffer;
 
     protected boolean isSorted;
@@ -86,6 +91,7 @@ class ExactFloatQuantileFinder extends cern.colt.PersistentObject implements Flo
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         ExactFloatQuantileFinder copy = (ExactFloatQuantileFinder) super.clone();
         if (this.buffer != null)
@@ -192,6 +198,7 @@ class ExactFloatQuantileFinder extends cern.colt.PersistentObject implements Flo
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         String s = this.getClass().getName();
         s = s.substring(s.lastIndexOf('.') + 1);

@@ -66,16 +66,16 @@ public abstract class DoubleMatrix1DTest extends TestCase {
         double result = A.aggregate(DoubleFunctions.plus, DoubleFunctions.square);
         assertEquals(expected, result, TOL);
     }
-    
+
     public void testAggregateDoubleDoubleFunctionDoubleFunctionIntArrayList() {
-       IntArrayList indexList = new IntArrayList();
-       for (int i = 0; i < SIZE; i++) {
-                indexList.add(i);
+        IntArrayList indexList = new IntArrayList();
+        for (int i = 0; i < SIZE; i++) {
+            indexList.add(i);
         }
         double expected = 0;
         for (int i = 0; i < SIZE; i++) {
-                double elem = A.getQuick(i);
-                expected += elem * elem;
+            double elem = A.getQuick(i);
+            expected += elem * elem;
         }
         double result = A.aggregate(DoubleFunctions.plus, DoubleFunctions.square, indexList);
         assertEquals(expected, result, TOL);
@@ -377,7 +377,7 @@ public abstract class DoubleMatrix1DTest extends TestCase {
     }
 
     public void testZDotProductDoubleMatrix1DIntInt() {
-        double product = A.zDotProduct(B, 5, B.size() - 10);
+        double product = A.zDotProduct(B, 5, (int) B.size() - 10);
         double expected = 0;
         for (int i = 5; i < SIZE - 5; i++) {
             expected += A.getQuick(i) * B.getQuick(i);
@@ -390,7 +390,7 @@ public abstract class DoubleMatrix1DTest extends TestCase {
         IntArrayList indexList = new IntArrayList();
         DoubleArrayList valueList = new DoubleArrayList();
         B.getNonZeros(indexList, valueList);
-        double product = A.zDotProduct(B, 5, B.size() - 10, indexList);
+        double product = A.zDotProduct(B, 5, (int) B.size() - 10, indexList);
         double expected = 0;
         for (int i = 5; i < SIZE - 5; i++) {
             expected += A.getQuick(i) * B.getQuick(i);

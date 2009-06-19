@@ -19,6 +19,11 @@ import cern.colt.list.tdouble.DoubleArrayList;
  * @version 1.0, 09/24/99
  */
 public class DoubleBuffer extends cern.colt.PersistentObject implements DoubleBufferConsumer {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected DoubleBufferConsumer target;
 
     protected double[] elements;

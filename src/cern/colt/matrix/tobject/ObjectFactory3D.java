@@ -36,6 +36,11 @@ import cern.colt.matrix.tobject.impl.SparseObjectMatrix3D;
  */
 public class ObjectFactory3D extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A factory producing dense matrices.
      */
     public static final ObjectFactory3D dense = new ObjectFactory3D();

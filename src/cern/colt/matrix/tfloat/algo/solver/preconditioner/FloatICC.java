@@ -24,8 +24,9 @@ import java.util.Arrays;
 
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
+import cern.colt.matrix.tfloat.algo.FloatProperty;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
-import cern.colt.matrix.tfloat.impl.RCFloatMatrix2D;
+import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
 
 /**
  * Incomplete Cholesky preconditioner without fill-in using a compressed row
@@ -36,7 +37,7 @@ public class FloatICC implements FloatPreconditioner {
     /**
      * Factorisation matrix
      */
-    private final RCFloatMatrix2D R;
+    private SparseRCFloatMatrix2D R;
 
     /**
      * Temporary vector for solving the factorised system
@@ -45,24 +46,21 @@ public class FloatICC implements FloatPreconditioner {
 
     private int[] diagind;
 
+    private final int n;
+
     /**
      * Sets up the ICC preconditioner
      * 
-     * @param R
-     *            Matrix to use internally. For best performance, its non-zero
-     *            pattern must conform to that of the system matrix
+     * @param n
+     *            Problem size (number of rows)
      */
-    public FloatICC(RCFloatMatrix2D R) {
-        if (R.rows() != R.columns())
-            throw new IllegalArgumentException("ICC only applies to square matrices");
-
-        this.R = R;
-        int n = R.rows();
+    public FloatICC(int n) {
+        this.n = n;
         y = new DenseFloatMatrix1D(n);
     }
 
     public FloatMatrix1D apply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -74,7 +72,7 @@ public class FloatICC implements FloatPreconditioner {
     }
 
     public FloatMatrix1D transApply(FloatMatrix1D b, FloatMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -82,8 +80,15 @@ public class FloatICC implements FloatPreconditioner {
     }
 
     public void setMatrix(FloatMatrix2D A) {
+        FloatProperty.DEFAULT.isSquare(A);
+        if (A.rows() != n) {
+            throw new IllegalArgumentException("A.rows() != n");
+        }
+        R = new SparseRCFloatMatrix2D(n, n);
         R.assign(A);
-
+        if (!R.hasColumnIndexesSorted()) {
+            R.sortColumnIndexes();
+        }
         factor();
     }
 
@@ -91,15 +96,15 @@ public class FloatICC implements FloatPreconditioner {
         int n = R.rows();
 
         // Internal CRS matrix storage
-        int[] colind = R.getColumnindexes().elements();
+        int[] colind = R.getColumnIndexes();
         int[] rowptr = R.getRowPointers();
-        float[] data = R.getValues().elements();
+        float[] data = R.getValues();
 
         // Temporary storage of a dense row
         float[] Rk = new float[n];
 
         // Find the indexes to the diagonal entries
-        diagind = findDiagonalindexes(n, colind, rowptr);
+        diagind = findDiagonalIndexes(n, colind, rowptr);
 
         // Go down along the main diagonal
         for (int k = 0; k < n; ++k) {
@@ -138,7 +143,7 @@ public class FloatICC implements FloatPreconditioner {
         }
     }
 
-    private int[] findDiagonalindexes(int m, int[] colind, int[] rowptr) {
+    private int[] findDiagonalIndexes(int m, int[] colind, int[] rowptr) {
         int[] diagind = new int[m];
 
         for (int k = 0; k < m; ++k) {
@@ -154,9 +159,9 @@ public class FloatICC implements FloatPreconditioner {
     private FloatMatrix1D upperSolve(FloatMatrix1D b, FloatMatrix1D x) {
         float[] bd = ((DenseFloatMatrix1D) b).elements();
         float[] xd = ((DenseFloatMatrix1D) x).elements();
-        int[] colind = R.getColumnindexes().elements();
+        int[] colind = R.getColumnIndexes();
         int[] rowptr = R.getRowPointers();
-        float[] data = R.getValues().elements();
+        float[] data = R.getValues();
         int rows = R.rows();
 
         for (int i = rows - 1; i >= 0; --i) {
@@ -176,9 +181,9 @@ public class FloatICC implements FloatPreconditioner {
         x.assign(b);
 
         float[] xd = ((DenseFloatMatrix1D) x).elements();
-        int[] colind = R.getColumnindexes().elements();
+        int[] colind = R.getColumnIndexes();
         int[] rowptr = R.getRowPointers();
-        float[] data = R.getValues().elements();
+        float[] data = R.getValues();
         int rows = R.rows();
 
         for (int i = 0; i < rows; ++i) {

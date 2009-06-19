@@ -61,7 +61,8 @@ public class DoubleDescriptive extends Object {
      * Returns the correlation of two data sequences. That is
      * <tt>covariance(data1,data2)/(standardDev1*standardDev2)</tt>.
      */
-    public static double correlation(DoubleArrayList data1, double standardDev1, DoubleArrayList data2, double standardDev2) {
+    public static double correlation(DoubleArrayList data1, double standardDev1, DoubleArrayList data2,
+            double standardDev2) {
         return covariance(data1, data2) / (standardDev1 * standardDev2);
     }
 
@@ -107,7 +108,7 @@ public class DoubleDescriptive extends Object {
             covariance += (x - mean1) * (y - mean2);
         }
 
-        return covariance / (double) (size - 1);
+        return covariance / (size - 1);
     }
 
     /**
@@ -368,7 +369,8 @@ public class DoubleDescriptive extends Object {
      * 
      * 
      */
-    public static void incrementalUpdateSumsOfPowers(DoubleArrayList data, int from, int to, int fromSumIndex, int toSumIndex, double[] sumOfPowers) {
+    public static void incrementalUpdateSumsOfPowers(DoubleArrayList data, int from, int to, int fromSumIndex,
+            int toSumIndex, double[] sumOfPowers) {
         int size = data.size();
         int lastIndex = toSumIndex - fromSumIndex;
         if (from > size || lastIndex + 1 > sumOfPowers.length)
@@ -503,11 +505,13 @@ public class DoubleDescriptive extends Object {
      *            </ul>
      * 
      */
-    public static void incrementalWeightedUpdate(DoubleArrayList data, DoubleArrayList weights, int from, int to, double[] inOut) {
+    public static void incrementalWeightedUpdate(DoubleArrayList data, DoubleArrayList weights, int from, int to,
+            double[] inOut) {
         int dataSize = data.size();
         checkRangeFromTo(from, to, dataSize);
         if (dataSize != weights.size())
-            throw new IllegalArgumentException("from=" + from + ", to=" + to + ", data.size()=" + dataSize + ", weights.size()=" + weights.size());
+            throw new IllegalArgumentException("from=" + from + ", to=" + to + ", data.size()=" + dataSize
+                    + ", weights.size()=" + weights.size());
 
         // read current values
         double sum = inOut[0];
@@ -907,7 +911,8 @@ public class DoubleDescriptive extends Object {
         int n = size;
         double s2 = sampleVariance; // (y-ymean)^2/(n-1)
         double m4 = moment4 * n; // (y-ymean)^4
-        return m4 * n * (n + 1) / ((n - 1) * (n - 2) * (n - 3) * s2 * s2) - 3.0 * (n - 1) * (n - 1) / ((n - 2) * (n - 3));
+        return m4 * n * (n + 1) / ((n - 1) * (n - 2) * (n - 3) * s2 * s2) - 3.0 * (n - 1) * (n - 1)
+                / ((n - 2) * (n - 3));
     }
 
     /**
@@ -1227,7 +1232,8 @@ public class DoubleDescriptive extends Object {
      * <tt>i = from .. to</tt>; optimized for common parameters like
      * <tt>c == 0.0</tt> and/or <tt>k == -2 .. 5</tt>.
      */
-    public static double sumOfPowerDeviations(final DoubleArrayList data, final int k, final double c, final int from, final int to) {
+    public static double sumOfPowerDeviations(final DoubleArrayList data, final int k, final double c, final int from,
+            final int to) {
         final double[] elements = data.elements();
         double sum = 0;
         double v;

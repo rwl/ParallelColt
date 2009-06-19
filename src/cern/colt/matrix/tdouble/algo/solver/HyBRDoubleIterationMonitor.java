@@ -34,7 +34,8 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         this.maxIter = maxIter;
         this.dtol = dtol;
     }
-    
+
+    @Override
     public boolean converged(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, x, iter);
@@ -43,6 +44,7 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         return convergedI(r, x);
     }
 
+    @Override
     public boolean converged(double r) throws IterativeSolverDoubleNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, iter);
@@ -50,7 +52,6 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         this.residual = r;
         return convergedI(r);
     }
-
 
     @Override
     protected boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException {
@@ -61,7 +62,8 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         // Check for divergence
         if (initR != -1.0) {
             if (r > dtol * initR)
-                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Divergence, this);
+                throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Divergence,
+                        this);
         }
         if (iter >= (maxIter + 1))
             throw new IterativeSolverDoubleNotConvergedException(DoubleNotConvergedException.Reason.Iterations, this);

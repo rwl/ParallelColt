@@ -27,6 +27,11 @@ import cern.colt.matrix.tobject.ObjectMatrix3D;
  */
 public class ObjectFormatter extends AbstractFormatter {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Constructs and returns a matrix formatter with alignment <tt>LEFT</tt>.
      */
     public ObjectFormatter() {
@@ -46,6 +51,7 @@ public class ObjectFormatter extends AbstractFormatter {
     /**
      * Converts a given cell to a String; no alignment considered.
      */
+    @Override
     protected String form(AbstractMatrix1D matrix, int index, Former formatter) {
         return this.form((ObjectMatrix1D) matrix, index, formatter);
     }
@@ -63,6 +69,7 @@ public class ObjectFormatter extends AbstractFormatter {
     /**
      * Returns a string representations of all cells; no alignment considered.
      */
+    @Override
     protected String[][] format(AbstractMatrix2D matrix) {
         return this.format((ObjectMatrix2D) matrix);
     }
@@ -137,6 +144,7 @@ public class ObjectFormatter extends AbstractFormatter {
      * @param matrix
      *            the matrix to convert.
      */
+    @Override
     protected String toString(AbstractMatrix2D matrix) {
         return this.toString((ObjectMatrix2D) matrix);
     }
@@ -148,7 +156,7 @@ public class ObjectFormatter extends AbstractFormatter {
      *            the matrix to convert.
      */
     public String toString(ObjectMatrix1D matrix) {
-        ObjectMatrix2D easy = matrix.like2D(1, matrix.size());
+        ObjectMatrix2D easy = matrix.like2D(1, (int) matrix.size());
         easy.viewRow(0).assign(matrix);
         return toString(easy);
     }
@@ -204,7 +212,8 @@ public class ObjectFormatter extends AbstractFormatter {
      *            The overall title of the matrix to be formatted.
      * @return the matrix converted to a string.
      */
-    public String toTitleString(ObjectMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName, String columnAxisName, String title) {
+    public String toTitleString(ObjectMatrix2D matrix, String[] rowNames, String[] columnNames, String rowAxisName,
+            String columnAxisName, String title) {
         if (matrix.size() == 0)
             return "Empty matrix";
         String oldFormat = this.format;
@@ -310,14 +319,16 @@ public class ObjectFormatter extends AbstractFormatter {
      *            The overall title of the matrix to be formatted.
      * @return the matrix converted to a string.
      */
-    public String toTitleString(ObjectMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames, String sliceAxisName, String rowAxisName, String columnAxisName, String title) {
+    public String toTitleString(ObjectMatrix3D matrix, String[] sliceNames, String[] rowNames, String[] columnNames,
+            String sliceAxisName, String rowAxisName, String columnAxisName, String title) {
         if (matrix.size() == 0)
             return "Empty matrix";
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < matrix.slices(); i++) {
             if (i != 0)
                 buf.append(sliceSeparator);
-            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title + "\n" + sliceAxisName + "=" + sliceNames[i]));
+            buf.append(toTitleString(matrix.viewSlice(i), rowNames, columnNames, rowAxisName, columnAxisName, title
+                    + "\n" + sliceAxisName + "=" + sliceNames[i]));
         }
         return buf.toString();
     }

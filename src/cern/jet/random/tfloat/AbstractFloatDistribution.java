@@ -67,7 +67,12 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  */
-public abstract class AbstractFloatDistribution extends cern.colt.PersistentObject implements cern.colt.function.tfloat.FloatFunction, cern.colt.function.tint.IntFunction {
+public abstract class AbstractFloatDistribution extends cern.colt.PersistentObject implements
+        cern.colt.function.tfloat.FloatFunction, cern.colt.function.tint.IntFunction {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected FloatRandomEngine randomGenerator;
 
     /**
@@ -102,6 +107,7 @@ public abstract class AbstractFloatDistribution extends cern.colt.PersistentObje
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         AbstractFloatDistribution copy = (AbstractFloatDistribution) super.clone();
         if (this.randomGenerator != null)
@@ -136,7 +142,7 @@ public abstract class AbstractFloatDistribution extends cern.colt.PersistentObje
      * necessary.
      */
     public int nextInt() {
-        return (int) Math.round(nextFloat());
+        return Math.round(nextFloat());
     }
 
     /**

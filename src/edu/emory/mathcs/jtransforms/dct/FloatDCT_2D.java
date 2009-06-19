@@ -649,7 +649,8 @@ public class FloatDCT_2D {
     }
 
     private void ddxt2d0_subth(final int isgn, final float[] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
 
         Future<?>[] futures = new Future[nthreads];
 
@@ -674,7 +675,8 @@ public class FloatDCT_2D {
     }
 
     private void ddxt2d0_subth(final int isgn, final float[][] a, final boolean scale) {
-        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils.getNumberOfThreads();
+        final int nthreads = ConcurrencyUtils.getNumberOfThreads() > rows ? rows : ConcurrencyUtils
+                .getNumberOfThreads();
 
         Future<?>[] futures = new Future[nthreads];
 

@@ -15,6 +15,11 @@ import cern.jet.stat.BufferSet;
  * computing approximate quantiles.
  */
 class DoubleBufferSet extends BufferSet {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected DoubleBuffer[] buffers;
 
     private boolean nextTriggerCalculationState; // tmp var only
@@ -169,10 +174,11 @@ class DoubleBufferSet extends BufferSet {
      * 
      * @return a deep copy of the receiver.
      */
+    @Override
     public Object clone() {
         DoubleBufferSet copy = (DoubleBufferSet) super.clone();
 
-        copy.buffers = (DoubleBuffer[]) copy.buffers.clone();
+        copy.buffers = copy.buffers.clone();
         for (int i = buffers.length; --i >= 0;) {
             copy.buffers[i] = (DoubleBuffer) copy.buffers[i].clone();
         }
@@ -435,6 +441,7 @@ class DoubleBufferSet extends BufferSet {
     /**
      * @return a String representation of the receiver
      */
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         for (int b = 0; b < this.b(); b++) {

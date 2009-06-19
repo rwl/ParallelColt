@@ -67,7 +67,12 @@ import cern.jet.random.tdouble.engine.DoubleRandomEngine;
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  */
-public abstract class AbstractDoubleDistribution extends cern.colt.PersistentObject implements cern.colt.function.tdouble.DoubleFunction, cern.colt.function.tint.IntFunction {
+public abstract class AbstractDoubleDistribution extends cern.colt.PersistentObject implements
+        cern.colt.function.tdouble.DoubleFunction, cern.colt.function.tint.IntFunction {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected DoubleRandomEngine randomGenerator;
 
     /**
@@ -102,6 +107,7 @@ public abstract class AbstractDoubleDistribution extends cern.colt.PersistentObj
      * 
      * @return a copy of the receiver.
      */
+    @Override
     public Object clone() {
         AbstractDoubleDistribution copy = (AbstractDoubleDistribution) super.clone();
         if (this.randomGenerator != null)

@@ -18,7 +18,13 @@ import cern.jet.stat.tdouble.DoubleDescriptive;
  * @author wolfgang.hoschek@cern.ch
  * @version 0.9, 03-Jul-99
  */
-public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements cern.colt.buffer.tdouble.DoubleBufferConsumer {
+public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements
+        cern.colt.buffer.tdouble.DoubleBufferConsumer {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
@@ -110,11 +116,13 @@ public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements c
      * of the same class or a subclass of this class and both have the same
      * size, minimum, maximum, sum and sumOfSquares.
      */
+    @Override
     public boolean equals(Object object) {
         if (!(object instanceof AbstractDoubleBin1D))
             return false;
         AbstractDoubleBin1D other = (AbstractDoubleBin1D) object;
-        return size() == other.size() && min() == other.min() && max() == other.max() && sum() == other.sum() && sumOfSquares() == other.sumOfSquares();
+        return size() == other.size() && min() == other.min() && max() == other.max() && sum() == other.sum()
+                && sumOfSquares() == other.sumOfSquares();
     }
 
     /**
@@ -178,6 +186,7 @@ public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements c
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(getClass().getName());
@@ -205,6 +214,7 @@ public abstract class AbstractDoubleBin1D extends AbstractDoubleBin implements c
      * operation to minimize the storage of the receiver. This default
      * implementation does nothing.
      */
+    @Override
     public synchronized void trimToSize() {
     }
 

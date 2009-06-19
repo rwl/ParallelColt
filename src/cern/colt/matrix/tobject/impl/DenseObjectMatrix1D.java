@@ -39,6 +39,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public class DenseObjectMatrix1D extends ObjectMatrix1D {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    /**
      * The elements of this matrix.
      */
     protected Object[] elements;
@@ -104,10 +108,12 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>values.length != size()</tt>.
      */
+    @Override
     public ObjectMatrix1D assign(Object[] values) {
         if (isNoView) {
             if (values.length != size)
-                throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()=" + size());
+                throw new IllegalArgumentException("Must have same number of cells: length=" + values.length
+                        + "size()=" + size());
             System.arraycopy(values, 0, this.elements, 0, values.length);
         } else {
             super.assign(values);
@@ -139,28 +145,25 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      * @return <tt>this</tt> (for convenience only).
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
+    @Override
     public ObjectMatrix1D assign(final cern.colt.function.tobject.ObjectFunction function) {
         if (elements == null)
             throw new InternalError();
 
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
                         // the general case x[i] = f(x[i])
-                        int idx = zero + startidx * stride;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elements[idx] = function.apply(elements[idx]);
                             idx += stride;
                         }
@@ -193,6 +196,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size() != other.size()</tt>.
      */
+    @Override
     public ObjectMatrix1D assign(ObjectMatrix1D source) {
         // overriden for performance only
         if (!(source instanceof DenseObjectMatrix1D)) {
@@ -219,23 +223,20 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
             throw new InternalError();
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride;
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elements[idx] = elemsOther[idxOther];
                             idx += stride;
                             idxOther += strideOther;
@@ -294,6 +295,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      *             if <tt>size() != y.size()</tt>.
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
+    @Override
     public ObjectMatrix1D assign(final ObjectMatrix1D y, final cern.colt.function.tobject.ObjectObjectFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseObjectMatrix1D)) {
@@ -304,26 +306,23 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
         final Object[] elemsOther = (Object[]) y.elements();
         if (elements == null || elemsOther == null)
             throw new InternalError();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
                         int idx;
                         int idxOther;
                         // the general case x[i] = f(x[i],y[i])
-                        idx = zero + startidx * stride;
-                        idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        idx = zero + firstIdx * stride;
+                        idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
                             idx += stride;
                             idxOther += strideOther;
@@ -348,6 +347,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
         return this;
     }
 
+    @Override
     public Object elements() {
         return elements;
     }
@@ -365,6 +365,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
+    @Override
     public Object getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements[index(index)];
@@ -375,6 +376,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
+    @Override
     protected boolean haveSharedCellsRaw(ObjectMatrix1D other) {
         if (other instanceof SelectedDenseObjectMatrix1D) {
             SelectedDenseObjectMatrix1D otherMatrix = (SelectedDenseObjectMatrix1D) other;
@@ -394,6 +396,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      * @param rank
      *            the rank of the element.
      */
+    @Override
     public long index(int rank) {
         // overriden for manual inlining only
         // return _offset(_rank(rank));
@@ -413,6 +416,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public ObjectMatrix1D like(int size) {
         return new DenseObjectMatrix1D(size);
     }
@@ -431,6 +435,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public ObjectMatrix2D like2D(int rows, int columns) {
         return new DenseObjectMatrix2D(rows, columns);
     }
@@ -449,6 +454,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int index, Object value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // elements[index(index)] = value;
@@ -462,6 +468,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size() != other.size()</tt>.
      */
+    @Override
     public void swap(ObjectMatrix1D other) {
         // overriden for performance only
         if (!(other instanceof DenseObjectMatrix1D)) {
@@ -476,23 +483,20 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
             throw new InternalError();
         final int zeroOther = (int) other.index(0);
         final int strideOther = other.stride();
-        int np = ConcurrencyUtils.getNumberOfThreads();
-        if ((np > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            Future<?>[] futures = new Future[np];
-            int k = size / np;
-            for (int j = 0; j < np; j++) {
-                final int startidx = j * k;
-                final int stopidx;
-                if (j == np - 1) {
-                    stopidx = size;
-                } else {
-                    stopidx = startidx + k;
-                }
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
                     public void run() {
-                        int idx = zero + startidx * stride;
-                        int idxOther = zeroOther + startidx * strideOther;
-                        for (int k = startidx; k < stopidx; k++) {
+                        int idx = zero + firstIdx * stride;
+                        int idxOther = zeroOther + firstIdx * strideOther;
+                        for (int k = firstIdx; k < lastIdx; k++) {
                             Object tmp = elements[idx];
                             elements[idx] = elemsOther[idxOther];
                             elemsOther[idxOther] = tmp;
@@ -526,6 +530,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>values.length < size()</tt>.
      */
+    @Override
     public void toArray(Object[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
@@ -542,6 +547,7 @@ public class DenseObjectMatrix1D extends ObjectMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected ObjectMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseObjectMatrix1D(this.elements, offsets);
     }

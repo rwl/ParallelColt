@@ -15,7 +15,8 @@ public class FloatHistogram1DContents {
 
     private float mean, rms;
 
-    public FloatHistogram1DContents(int[] entries, float[] heights, float[] errors, int nEntry, float sumWeight, float sumWeightSquared, float mean, float rms) {
+    public FloatHistogram1DContents(int[] entries, float[] heights, float[] errors, int nEntry, float sumWeight,
+            float sumWeightSquared, float mean, float rms) {
         this.entries = entries;
         this.heights = heights;
         this.errors = errors;

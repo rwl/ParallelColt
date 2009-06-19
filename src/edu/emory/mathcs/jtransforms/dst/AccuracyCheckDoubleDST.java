@@ -46,9 +46,11 @@ public class AccuracyCheckDoubleDST {
 
     //    private static int[] sizes1D = { 10158, 16384, 32768, 65536, 131072 };
 
-    private static int[] sizes1D = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 512, 1024, 1056, 2048, 8192, 10158, 16384, 32768, 65536, 131072 };
+    private static int[] sizes1D = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310,
+            512, 1024, 1056, 2048, 8192, 10158, 16384, 32768, 65536, 131072 };
 
-    private static int[] sizes2D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 511, 512, 1024 };
+    private static int[] sizes2D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 120, 128, 256, 310, 511,
+            512, 1024 };
 
     private static int[] sizes3D = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 32, 64, 100, 128 };
 
@@ -141,9 +143,11 @@ public class AccuracyCheckDoubleDST {
             dst3.inverse(a, true);
             err = computeRMSE(a, b);
             if (err > eps) {
-                System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+                System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = "
+                        + err);
             } else {
-                System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+                System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = "
+                        + err);
             }
             a = null;
             b = null;
@@ -163,9 +167,11 @@ public class AccuracyCheckDoubleDST {
             dst3.inverse(a, true);
             err = computeRMSE(a, b);
             if (err > eps) {
-                System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+                System.err.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = "
+                        + err);
             } else {
-                System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = " + err);
+                System.out.println("\tsize = " + sizes3D[i] + " x " + sizes3D[i] + " x " + sizes3D[i] + ";\t\terror = "
+                        + err);
             }
             a = null;
             b = null;

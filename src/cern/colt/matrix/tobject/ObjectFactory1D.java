@@ -36,6 +36,11 @@ import cern.colt.matrix.tobject.impl.SparseObjectMatrix1D;
  */
 public class ObjectFactory1D extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * A factory producing dense matrices.
      */
     public static final ObjectFactory1D dense = new ObjectFactory1D();
@@ -58,9 +63,9 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
      */
     public ObjectMatrix1D append(ObjectMatrix1D A, ObjectMatrix1D B) {
         // concatenate
-        ObjectMatrix1D matrix = make(A.size() + B.size());
-        matrix.viewPart(0, A.size()).assign(A);
-        matrix.viewPart(A.size(), B.size()).assign(B);
+        ObjectMatrix1D matrix = make((int) (A.size() + B.size()));
+        matrix.viewPart(0, (int) A.size()).assign(A);
+        matrix.viewPart((int) A.size(), (int) B.size()).assign(B);
         return matrix;
     }
 
@@ -79,7 +84,7 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
         ObjectMatrix1D vector = make(size);
         size = 0;
         for (int i = 0; i < parts.length; i++) {
-            vector.viewPart(size, parts[i].size()).assign(parts[i]);
+            vector.viewPart(size, (int) parts[i].size()).assign(parts[i]);
             size += parts[i].size();
         }
 
@@ -148,7 +153,7 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
      * </pre>
      */
     public ObjectMatrix1D repeat(ObjectMatrix1D A, int repeat) {
-        int size = A.size();
+        int size = (int) A.size();
         ObjectMatrix1D matrix = make(repeat * size);
         for (int i = repeat; --i >= 0;) {
             matrix.viewPart(size * i, size).assign(A);
@@ -166,7 +171,7 @@ public class ObjectFactory1D extends cern.colt.PersistentObject {
      * @return a new list.
      */
     public cern.colt.list.tobject.ObjectArrayList toList(ObjectMatrix1D values) {
-        int size = values.size();
+        int size = (int) values.size();
         cern.colt.list.tobject.ObjectArrayList list = new cern.colt.list.tobject.ObjectArrayList(size);
         list.setSize(size);
         for (int i = size; --i >= 0;)

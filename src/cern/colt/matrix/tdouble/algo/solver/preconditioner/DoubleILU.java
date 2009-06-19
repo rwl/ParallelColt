@@ -23,7 +23,7 @@ package cern.colt.matrix.tdouble.algo.solver.preconditioner;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.tdouble.impl.RCDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
 /**
  * ILU(0) preconditioner using a compressed row matrix as internal storage
@@ -33,7 +33,7 @@ public class DoubleILU implements DoublePreconditioner {
     /**
      * Factorisation matrix
      */
-    private final RCDoubleMatrix2D LU;
+    private SparseRCDoubleMatrix2D LU;
 
     /**
      * Temporary vector for solving the factorised system
@@ -42,24 +42,21 @@ public class DoubleILU implements DoublePreconditioner {
 
     private int[] diagind;
 
+    private final int n;
+
     /**
      * Sets up the ILU preconditioner
      * 
-     * @param LU
-     *            Matrix to use internally. For best performance, its non-zero
-     *            pattern must conform to that of the system matrix
+     * @param n
+     *            Problem size (number of rows)
      */
-    public DoubleILU(RCDoubleMatrix2D LU) {
-        if (LU.rows() != LU.columns())
-            throw new IllegalArgumentException("ILU only applies to square matrices");
-
-        this.LU = LU;
-        int n = LU.rows();
+    public DoubleILU(int n) {
+        this.n = n;
         y = new DenseDoubleMatrix1D(n);
     }
 
     public DoubleMatrix1D apply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -71,7 +68,7 @@ public class DoubleILU implements DoublePreconditioner {
     }
 
     public DoubleMatrix1D transApply(DoubleMatrix1D b, DoubleMatrix1D x) {
-        if(x == null) {
+        if (x == null) {
             x = b.like();
         }
 
@@ -83,21 +80,26 @@ public class DoubleILU implements DoublePreconditioner {
     }
 
     public void setMatrix(DoubleMatrix2D A) {
+        if (A.rows() != n) {
+            throw new IllegalArgumentException("A.rows() != n");
+        }
+        LU = new SparseRCDoubleMatrix2D(n, n);
         LU.assign(A);
-
+        if (!LU.hasColumnIndexesSorted()) {
+            LU.sortColumnIndexes();
+        }
         factor();
     }
 
     private void factor() {
-        int n = LU.rows();
 
         // Internal CRS matrix storage
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        double[] data = LU.getValues().elements();
+        double[] data = LU.getValues();
 
         // Find the indexes to the diagonal entries
-        diagind = findDiagonalindexes(n, colind, rowptr);
+        diagind = findDiagonalIndexes(n, colind, rowptr);
 
         // Go down along the main diagonal
         for (int k = 1; k < n; ++k)
@@ -126,7 +128,7 @@ public class DoubleILU implements DoublePreconditioner {
 
     }
 
-    private int[] findDiagonalindexes(int m, int[] colind, int[] rowptr) {
+    private int[] findDiagonalIndexes(int m, int[] colind, int[] rowptr) {
         int[] diagind = new int[m];
 
         for (int k = 0; k < m; ++k) {
@@ -142,9 +144,9 @@ public class DoubleILU implements DoublePreconditioner {
     private DoubleMatrix1D lowerUnitSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         double[] bd = ((DenseDoubleMatrix1D) b).elements();
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        double[] data = LU.getValues().elements();
+        double[] data = LU.getValues();
         int rows = LU.rows();
         for (int i = 0; i < rows; ++i) {
 
@@ -162,9 +164,9 @@ public class DoubleILU implements DoublePreconditioner {
     private DoubleMatrix1D loverUnitTransSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         x.assign(b);
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        double[] data = LU.getValues().elements();
+        double[] data = LU.getValues();
         int rows = LU.rows();
 
         for (int i = rows - 1; i >= 0; --i)
@@ -180,9 +182,9 @@ public class DoubleILU implements DoublePreconditioner {
     private DoubleMatrix1D upperSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         double[] bd = ((DenseDoubleMatrix1D) b).elements();
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        double[] data = LU.getValues().elements();
+        double[] data = LU.getValues();
         int rows = LU.rows();
         for (int i = rows - 1; i >= 0; --i) {
 
@@ -200,9 +202,9 @@ public class DoubleILU implements DoublePreconditioner {
     private DoubleMatrix1D upperTransSolve(DoubleMatrix1D b, DoubleMatrix1D x) {
         x.assign(b);
         double[] xd = ((DenseDoubleMatrix1D) x).elements();
-        int[] colind = LU.getColumnindexes().elements();
+        int[] colind = LU.getColumnIndexes();
         int[] rowptr = LU.getRowPointers();
-        double[] data = LU.getValues().elements();
+        double[] data = LU.getValues();
         int rows = LU.rows();
 
         for (int i = 0; i < rows; ++i) {

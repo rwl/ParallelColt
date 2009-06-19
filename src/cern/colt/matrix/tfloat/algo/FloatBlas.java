@@ -219,7 +219,8 @@ public interface FloatBlas {
      * @throws IllegalArgumentException
      *             if <tt>A == C || B == C</tt>.
      */
-    public void dgemm(boolean transposeA, boolean transposeB, float alpha, FloatMatrix2D A, FloatMatrix2D B, float beta, FloatMatrix2D C);
+    public void dgemm(boolean transposeA, boolean transposeB, float alpha, FloatMatrix2D A, FloatMatrix2D B,
+            float beta, FloatMatrix2D C);
 
     /**
      * Generalized linear algebraic matrix-vector multiply;
@@ -269,7 +270,7 @@ public interface FloatBlas {
 
     /**
      * Return the 2-norm; <tt>sqrt(x[0]^2 + x[1]^2 + ...)</tt>. In fact
-     * equivalent to <tt>Math.sqrt(Algebra.DEFAULT.norm2(x))</tt>.
+     * equivalent to <tt>(float)Math.sqrt(Algebra.DEFAULT.norm2(x))</tt>.
      * 
      * @param x
      *            the vector.
@@ -374,7 +375,8 @@ public interface FloatBlas {
      * @param y
      *            the second vector holding source and destination.
      */
-    public void dsymv(boolean isUpperTriangular, float alpha, FloatMatrix2D A, FloatMatrix1D x, float beta, FloatMatrix1D y);
+    public void dsymv(boolean isUpperTriangular, float alpha, FloatMatrix2D A, FloatMatrix1D x, float beta,
+            FloatMatrix1D y);
 
     /**
      * Triangular matrix-vector multiplication; <tt>x = A*x</tt> or <tt>x = A'*x</tt>.
@@ -394,7 +396,8 @@ public interface FloatBlas {
      * @param x
      *            the vector holding source and destination.
      */
-    public void dtrmv(boolean isUpperTriangular, boolean transposeA, boolean isUnitTriangular, FloatMatrix2D A, FloatMatrix1D x);
+    public void dtrmv(boolean isUpperTriangular, boolean transposeA, boolean isUnitTriangular, FloatMatrix2D A,
+            FloatMatrix1D x);
 
     /**
      * Returns the index of largest absolute value;

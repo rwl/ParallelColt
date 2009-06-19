@@ -52,6 +52,11 @@ import cern.colt.matrix.tint.IntMatrix2D;
  * @version 1.0, 09/24/99
  */
 class SelectedSparseIntMatrix2D extends IntMatrix2D {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     /*
      * The elements of the matrix.
      */
@@ -109,7 +114,8 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseIntMatrix2D(int rows, int columns, AbstractIntIntMap elements, int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedSparseIntMatrix2D(int rows, int columns, AbstractIntIntMap elements, int rowZero, int columnZero,
+            int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -121,6 +127,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
         this.isNoView = false;
     }
 
+    @Override
     public AbstractIntIntMap elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -141,12 +148,14 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
+    @Override
     public int getQuick(int row, int column) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
         // return elements.get(index(row,column));
         // manually inlined:
-        return elements.get(offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
+        return elements.get(offset + rowOffsets[rowZero + row * rowStride]
+                + columnOffsets[columnZero + column * columnStride]);
     }
 
     /**
@@ -158,6 +167,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
+    @Override
     public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
@@ -179,6 +189,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
+    @Override
     public IntMatrix2D like(int rows, int columns) {
         return new SparseIntMatrix2D(rows, columns);
     }
@@ -195,6 +206,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     public IntMatrix1D like1D(int size) {
         return new SparseIntMatrix1D(size);
     }
@@ -217,6 +229,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
+    @Override
     public void setQuick(int row, int column, int value) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
@@ -236,8 +249,9 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      * 
      * @return
      */
+    @Override
     public IntMatrix1D vectorize() {
-        SparseIntMatrix1D v = new SparseIntMatrix1D(size());
+        SparseIntMatrix1D v = new SparseIntMatrix1D((int) size());
         int idx = 0;
         for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
@@ -273,6 +287,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *             if <tt>column < 0 || column >= columns()</tt>.
      * @see #viewRow(int)
      */
+    @Override
     public IntMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -309,6 +324,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *             if <tt>row < 0 || row >= rows()</tt>.
      * @see #viewColumn(int)
      */
+    @Override
     public IntMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -328,6 +344,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -341,6 +358,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
+    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -355,6 +373,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
+    @Override
     protected boolean haveSharedCellsRaw(IntMatrix2D other) {
         if (other instanceof SelectedSparseIntMatrix2D) {
             SelectedSparseIntMatrix2D otherMatrix = (SelectedSparseIntMatrix2D) other;
@@ -383,6 +402,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
+    @Override
     protected IntMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -399,6 +419,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>(int)columns*rows > Integer.MAX_VALUE</tt>.
      */
+    @Override
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -409,6 +430,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
     /**
      * Self modifying version of viewDice().
      */
+    @Override
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -431,6 +453,7 @@ class SelectedSparseIntMatrix2D extends IntMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
+    @Override
     protected IntMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseIntMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }

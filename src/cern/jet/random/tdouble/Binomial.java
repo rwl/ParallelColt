@@ -39,6 +39,11 @@ import cern.jet.stat.tdouble.Probability;
  * @version 1.0, 09/24/99
  */
 public class Binomial extends AbstractDiscreteDistribution {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected int n;
 
     protected double p;
@@ -156,13 +161,13 @@ public class Binomial extends AbstractDiscreteDistribution {
                 ss = np * q; // variance
                 i = (int) (2.195 * Math.sqrt(ss) - 4.6 * q); // i = p1 - 0.5
                 xm = m + 0.5;
-                xl = (double) (m - i); // limit left
-                xr = (double) (m + i + 1L); // limit right
+                xl = (m - i); // limit left
+                xr = (m + i + 1L); // limit right
                 f = (rm - xl) / (rm - xl * par);
                 ll = f * (1.0 + 0.5 * f);
                 f = (xr - rm) / (xr * q);
                 lr = f * (1.0 + 0.5 * f);
-                c = 0.134 + 20.5 / (15.3 + (double) m); // parallelogram
+                c = 0.134 + 20.5 / (15.3 + m); // parallelogram
                 // height
                 p1 = i + 0.5;
                 p2 = p1 * (1.0 + c + c); // probabilities
@@ -185,7 +190,7 @@ public class Binomial extends AbstractDiscreteDistribution {
                     pk = p0;
                 } else {
                     U -= pk;
-                    pk = (double) (((n - K + 1) * par * pk) / (K * q));
+                    pk = (((n - K + 1) * par * pk) / (K * q));
                 }
             }
             return ((p > 0.5) ? (n - K) : K);
@@ -246,13 +251,16 @@ public class Binomial extends AbstractDiscreteDistribution {
                         p_prev = par;
 
                         nm = n - m + 1;
-                        ch = xm * Math.log((m + 1.0) / (pq * nm)) + DoubleArithmetic.stirlingCorrection(m + 1) + DoubleArithmetic.stirlingCorrection(nm);
+                        ch = xm * Math.log((m + 1.0) / (pq * nm)) + DoubleArithmetic.stirlingCorrection(m + 1)
+                                + DoubleArithmetic.stirlingCorrection(nm);
                     }
                     nK = n - K + 1;
 
                     // computation of log f(K) via Stirling's formula
                     // final acceptance-rejection test
-                    if (V <= ch + (n + 1.0) * Math.log((double) nm / (double) nK) + (K + 0.5) * Math.log(nK * pq / (K + 1.0)) - DoubleArithmetic.stirlingCorrection(K + 1) - DoubleArithmetic.stirlingCorrection(nK))
+                    if (V <= ch + (n + 1.0) * Math.log((double) nm / (double) nK) + (K + 0.5)
+                            * Math.log(nK * pq / (K + 1.0)) - DoubleArithmetic.stirlingCorrection(K + 1)
+                            - DoubleArithmetic.stirlingCorrection(nK))
                         break;
                 }
             }
@@ -263,6 +271,7 @@ public class Binomial extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
+    @Override
     public int nextInt() {
         return generateBinomial(n, p);
     }
@@ -291,7 +300,8 @@ public class Binomial extends AbstractDiscreteDistribution {
         if (k < 0)
             throw new IllegalArgumentException();
         int r = this.n - k;
-        return Math.exp(this.log_n - DoubleArithmetic.logFactorial(k) - DoubleArithmetic.logFactorial(r) + this.log_p * k + this.log_q * r);
+        return Math.exp(this.log_n - DoubleArithmetic.logFactorial(k) - DoubleArithmetic.logFactorial(r) + this.log_p
+                * k + this.log_q * r);
     }
 
     /**
@@ -335,6 +345,7 @@ public class Binomial extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
+    @Override
     public String toString() {
         return this.getClass().getName() + "(" + n + "," + p + ")";
     }

@@ -19,6 +19,11 @@ import cern.colt.list.tfloat.FloatArrayList;
  * @version 1.0, 09/24/99
  */
 public class FloatBuffer3D extends cern.colt.PersistentObject implements FloatBuffer3DConsumer {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     protected FloatBuffer3DConsumer target;
 
     protected float[] xElements;

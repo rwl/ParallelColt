@@ -26,6 +26,11 @@ package cern.colt.list;
 // java.io.Serializable {
 public abstract class AbstractCollection extends cern.colt.PersistentObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
@@ -65,6 +70,7 @@ public abstract class AbstractCollection extends cern.colt.PersistentObject {
      * Returns a string representation of the receiver, containing the String
      * representation of each element.
      */
+    @Override
     public String toString() {
         return toList().toString();
     }
