@@ -5,13 +5,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
 
     protected enum HyBRStoppingCondition {
-        FLAT_GCV_CURVE, MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS
+        FLAT_GCV_CURVE, MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS, PERFORMED_MAX_NUMBER_OF_ITERATIONS
     }
 
     protected HyBRStoppingCondition stoppingCondition;
     protected int maxIter;
     protected double dtol;
     protected double initR;
+    protected double regularizationParameter;
 
     /**
      * Constructor for HyBRDoubleIterationMonitor. Default is 100 iterations at
@@ -20,6 +21,7 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
     public HyBRDoubleIterationMonitor() {
         this.maxIter = 100;
         this.dtol = 1e+5;
+        this.stoppingCondition = HyBRStoppingCondition.PERFORMED_MAX_NUMBER_OF_ITERATIONS;
     }
 
     /**
@@ -33,6 +35,7 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
     public HyBRDoubleIterationMonitor(int maxIter, double dtol) {
         this.maxIter = maxIter;
         this.dtol = dtol;
+        this.stoppingCondition = HyBRStoppingCondition.PERFORMED_MAX_NUMBER_OF_ITERATIONS;
     }
 
     @Override
@@ -108,12 +111,45 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         return dtol;
     }
 
+    /**
+     * Returns the regularization parameter
+     * 
+     * @return regularization parameter
+     */
+    public double getRegularizationParameter() {
+        return regularizationParameter;
+    }
+
+    /**
+     * Sets the regularization parameter
+     * 
+     * @param regularizationParameter regularization parameter
+     */
+    public void setRegularizationParameter(double regularizationParameter) {
+        this.regularizationParameter = regularizationParameter;
+    }
+
+    /**
+     * Sets the stopping condition
+     * 
+     * @param stoppingCondition stopping condition
+     */
     public void setStoppingCondition(HyBRStoppingCondition stoppingCondition) {
         this.stoppingCondition = stoppingCondition;
     }
 
+    /**
+     * Returns the stopping condition
+     * 
+     * @return stopping condition
+     */
     public HyBRStoppingCondition getStoppingCondition() {
         return stoppingCondition;
+    }
+    
+    @Override
+    public int iterations() {
+        return Math.min(iter, maxIter);
     }
 
 }

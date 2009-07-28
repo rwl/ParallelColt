@@ -36,7 +36,12 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
 
     public WrapperFloatMatrix2D(FloatMatrix2D newContent) {
         if (newContent != null)
-            setUp(newContent.rows(), newContent.columns());
+            try {
+                setUp(newContent.rows(), newContent.columns());
+            } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+                if (!"matrix too large".equals(exc.getMessage()))
+                    throw exc;
+            }
         this.content = newContent;
     }
 

@@ -288,6 +288,28 @@ public class DoubleArithmetic extends DoubleConstants {
     }
 
     /**
+     * Instantly returns the factorial <tt>k!</tt>.
+     * 
+     * @param k
+     *            must hold <tt>k &gt;= 0</tt>.
+     */
+    static public double factorial(long k) {
+        int ki = (int)k;
+        if (ki < 0)
+            throw new IllegalArgumentException();
+
+        int length1 = longFactorials.length;
+        if (ki < length1)
+            return longFactorials[ki];
+
+        int length2 = doubleFactorials.length;
+        if (ki < length1 + length2)
+            return doubleFactorials[ki - length1];
+        else
+            return Double.POSITIVE_INFINITY;
+    }
+    
+    /**
      * Returns the largest <code>long &lt;= value</code>. <dt>Examples: <code>
      * 1.0 -> 1, 1.2 -> 1, 1.9 -> 1 <dt>
      * 2.0 -> 2, 2.2 -> 2, 2.9 -> 2 </code> <dt>This method is safer than using

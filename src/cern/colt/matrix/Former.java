@@ -31,6 +31,39 @@ public interface Former {
     String form(double value);
 
     /**
+     * Formats a float into a string (like sprintf in C).
+     * 
+     * @param value
+     *            the number to format
+     * @return the formatted string
+     * @exception IllegalArgumentException
+     *                if bad argument
+     */
+    String form(float value);
+    
+    /**
+     * Formats an int into a string (like sprintf in C).
+     * 
+     * @param value
+     *            the number to format
+     * @return the formatted string
+     * @exception IllegalArgumentException
+     *                if bad argument
+     */
+    String form(int value);
+    
+    /**
+     * Formats an long into a string (like sprintf in C).
+     * 
+     * @param value
+     *            the number to format
+     * @return the formatted string
+     * @exception IllegalArgumentException
+     *                if bad argument
+     */
+    String form(long value);
+    
+    /**
      * Formats a complex (double[]) into a string (like sprintf in C).
      * 
      * @param value
@@ -40,5 +73,17 @@ public interface Former {
      *                if bad argument
      */
     String form(double[] value);
+
+    /**
+     * Formats a complex (float[]) into a string (like sprintf in C).
+     * 
+     * @param value
+     *            the number to format
+     * @return the formatted string
+     * @exception IllegalArgumentException
+     *                if bad argument
+     */
+    String form(float[] value);
+
 
 }

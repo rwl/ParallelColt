@@ -45,6 +45,7 @@ import cern.colt.function.tdouble.DoubleDoubleFunction;
 import cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction;
 import cern.colt.function.tfloat.FloatFloatFunction;
 import cern.colt.function.tint.IntIntFunction;
+import cern.colt.function.tlong.LongLongFunction;
 import cern.colt.function.tobject.ObjectObjectFunction;
 
 /**
@@ -224,6 +225,37 @@ public class ConcurrencyUtils {
         return a;
     }
 
+    
+    /**
+     * Waits for all threads to complete computation and aggregates the result.
+     * 
+     * @param futures
+     *            handles to running threads
+     * @param aggr
+     *            an aggregation function
+     * @return the result of aggregation
+     */
+    public static long waitForCompletion(Future<?>[] futures, LongLongFunction aggr) {
+        int size = futures.length;
+        Long[] results = new Long[size];
+        long a = 0;
+        try {
+            for (int j = 0; j < size; j++) {
+                results[j] = (Long) futures[j].get();
+            }
+            a = results[0];
+            for (int j = 1; j < size; j++) {
+                a = aggr.apply(a, results[j]);
+            }
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return a;
+    }
+
+    
     /**
      * Waits for all threads to complete computation and aggregates the result.
      * 

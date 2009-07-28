@@ -300,6 +300,25 @@ public class SparseFloatMatrix3D extends FloatMatrix3D {
         else
             this.elements.put(index, value);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(slices).append(" x ").append(rows).append(" x ").append(columns)
+                .append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        for (int s = 0; s < slices; s++) {
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < columns; c++) {
+                    float elem = getQuick(s, r, c);
+                    if (elem != 0) {
+                        builder.append('(').append(s).append(',').append(r).append(',').append(c).append(')').append(
+                                '\t').append(elem).append('\n');
+                    }
+                }
+            }
+        }
+        return builder.toString();
+    }
 
     @Override
     public void trimToSize() {

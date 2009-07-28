@@ -73,9 +73,21 @@ public class FormerFactory {
                 return String.format(format, value);
             }
 
+            public String form(float value) {
+                return String.format(format, value);
+            }
+            
+            public String form(int value) {
+                return String.format(format, value);
+            }
+            
+            public String form(long value) {
+                return String.format(format, value);
+            }
+            
             public String form(double[] value) {
                 if (value[0] == 0 && value[1] == 0) {
-                    return "0.0";
+                    return "0";
                 }
                 if (value[1] == 0) {
                     return String.format(format, value[0]);
@@ -86,6 +98,19 @@ public class FormerFactory {
                 return String.format(format, value[0]) + " + " + String.format(format, value[1]);
             }
 
+            public String form(float[] value) {
+                if (value[0] == 0 && value[1] == 0) {
+                    return "0";
+                }
+                if (value[1] == 0) {
+                    return String.format(format, value[0]);
+                }
+                if (value[1] < 0) {
+                    return String.format(format, value[0]) + " - " + String.format(format, -value[1]);
+                }
+                return String.format(format, value[0]) + " + " + String.format(format, value[1]);
+            }
+            
         };
     }
 }

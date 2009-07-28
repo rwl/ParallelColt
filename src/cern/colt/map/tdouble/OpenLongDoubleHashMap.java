@@ -179,7 +179,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
 
         /*
          * if (debug) { for (int i=table.length; --i >= 0; ) { state[i] = FREE;
-         * table[i]= Longeger.MAX_VALUE; values[i]= Double.NaN; } }
+         * table[i]= Long.MAX_VALUE; values[i]= Double.NaN; } }
          */
 
         this.distinct = 0;
@@ -428,7 +428,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @param value
      *            the value to search for.
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
-     *         <tt>Longeger.MIN_VALUE</tt> if no such key exists.
+     *         <tt>Long.MIN_VALUE</tt> if no such key exists.
      */
     @Override
     public long keyOf(double value) {
@@ -621,7 +621,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
         this.state[i] = REMOVED;
         // this.values[i]=0; // delta
 
-        // if (debug) this.table[i]=Longeger.MAX_VALUE; // delta
+        // if (debug) this.table[i]=Long.MAX_VALUE; // delta
         // if (debug) this.values[i]=Double.NaN; // delta
         this.distinct--;
 

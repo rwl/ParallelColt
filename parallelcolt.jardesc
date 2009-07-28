@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="D:/workspace/ParallelColt/parallelcolt-0.8.jar"/>
+    <jar path="D:/workspace/ParallelColt/parallelcolt-0.8.1.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/ParallelColt/parallelcolt.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -15,5 +15,4 @@
         <javaElement handleIdentifier="=ParallelColt/test"/>
         <javaElement handleIdentifier="=ParallelColt/src"/>
     </selectedElements>
-    <fatjar builder="org.eclipse.jdt.ui.plain_jar_builder" launchConfig=""/>
 </jardesc>

@@ -222,6 +222,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                     f = new DenseDoubleMatrix1D(Vb.rows());
                     alpha = tikhonovSolver(Ub, sv, Vb, v, f);
                     GCV.add(GCVstopfun(alpha, Ub.viewRow(0), sv, beta, rows, columns));
+                    ((HyBRDoubleIterationMonitor) iter).setRegularizationParameter(alpha);
                     if (i > 1) {
                         if (Math.abs((GCV.getQuick(i - 1) - GCV.getQuick(i - 2))) / GCV.get(begReg - 2) < flatTol) {
                             V.zMult(f, x);
@@ -232,7 +233,6 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                                 A.zMult(x, work, -1, 1, false);
                                 ((HyBRDoubleIterationMonitor) iter).residual = alg.norm2(work);
                             }
-                            System.out.println("alpha = " + alpha);
                             return x;
                         } else if ((warning == true) && (GCV.size() > iterationsSave + 3)) {
                             for (int j = iterationsSave; j < GCV.size(); j++) {
@@ -250,7 +250,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                                     A.zMult(x, work, -1, 1, false);
                                     ((HyBRDoubleIterationMonitor) iter).residual = alg.norm2(work);
                                 }
-                                System.out.println("alpha = " + alphaSave);
+                                ((HyBRDoubleIterationMonitor) iter).setRegularizationParameter(alphaSave);
                                 return x;
 
                             } else {
@@ -281,7 +281,6 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                 }
             }
         }
-        System.out.println("alpha = " + alpha);
         return x;
 
     }

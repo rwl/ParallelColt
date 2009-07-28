@@ -43,7 +43,7 @@ package cern.jet.random.tdouble.engine;
 // edu.cornell.lassp.houle.RngPack.RandomSeedable implements
 // cern.colt.function.DoubleFunction, cern.colt.function.IntFunction {
 public abstract class DoubleRandomEngine extends cern.colt.PersistentObject implements
-        cern.colt.function.tdouble.DoubleFunction, cern.colt.function.tint.IntFunction {
+        cern.colt.function.tdouble.DoubleFunction, cern.colt.function.tint.IntFunction, cern.colt.function.tlong.LongFunction {
     /**
      * 
      */
@@ -74,6 +74,16 @@ public abstract class DoubleRandomEngine extends cern.colt.PersistentObject impl
         return nextInt();
     }
 
+    
+    /**
+     * Equivalent to <tt>nextLong()</tt>. This has the effect that random engines
+     * can now be used as function objects, returning a random number upon
+     * function evaluation.
+     */
+    public long apply(long dummy) {
+        return nextLong();
+    }
+    
     /**
      * Constructs and returns a new uniform random number engine seeded with the
      * current time. Currently this is

@@ -32,7 +32,12 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
 
     public WrapperFloatMatrix3D(FloatMatrix3D newContent) {
         if (newContent != null)
-            setUp(newContent.slices(), newContent.rows(), newContent.columns());
+            try {
+                setUp(newContent.slices(), newContent.rows(), newContent.columns());
+            } catch (IllegalArgumentException exc) { // we can hold slices*rows*columns>Integer.MAX_VALUE cells !
+                if (!"matrix too large".equals(exc.getMessage()))
+                    throw exc;
+            }
         this.content = newContent;
     }
 

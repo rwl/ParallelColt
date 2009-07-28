@@ -339,27 +339,19 @@ public class SparseFloatMatrix1D extends FloatMatrix1D {
             this.elements.put(i, value);
     }
 
-    /**
-     * Releases any superfluous memory created by explicitly putting zero values
-     * into cells formerly having non-zero values; An application can use this
-     * operation to minimize the storage of the receiver.
-     * <p>
-     * <b>Background:</b>
-     * <p>
-     * Cells that
-     * <ul>
-     * <li>are never set to non-zero values do not use any memory.
-     * <li>switch from zero to non-zero state do use memory.
-     * <li>switch back from non-zero to zero state also do use memory. However,
-     * their memory can be reclaimed by calling <tt>trimToSize()</tt>.
-     * </ul>
-     * A sequence like <tt>set(i,5); set(i,0);</tt> sets a cell to non-zero
-     * state and later back to zero state. Such as sequence generates obsolete
-     * memory that is automatically reclaimed from time to time or can manually
-     * be reclaimed by calling <tt>trimToSize()</tt>. Putting zeros into cells
-     * already containing zeros does not generate obsolete memory since no
-     * memory was allocated to them in the first place.
-     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("1 x ").append(size).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');        
+        for (int i = 0; i < size; i++) {
+           float elem = getQuick(i);
+           if(elem != 0) {
+            builder.append('(').append(i).append(')').append('\t').append(elem).append('\n');
+           }
+        }
+        return builder.toString();
+    }
+    
     @Override
     public void trimToSize() {
         this.elements.trimToSize();

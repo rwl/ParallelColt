@@ -675,6 +675,23 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         else
             this.elements.put(index, value);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
+                .append('\n');
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                float elem = getQuick(r, c);
+                if (elem != 0) {
+                    builder.append('(').append(r).append(',').append(c).append(')').append('\t').append(elem).append(
+                            '\n');
+                }
+            }
+        }
+        return builder.toString();
+    }
 
     @Override
     public void trimToSize() {

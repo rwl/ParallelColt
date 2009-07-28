@@ -179,7 +179,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
 
         /*
          * if (debug) { for (int i=table.length; --i >= 0; ) { state[i] = FREE;
-         * table[i]= Longeger.MAX_VALUE; values[i]= Float.NaN; } }
+         * table[i]= Long.MAX_VALUE; values[i]= Float.NaN; } }
          */
 
         this.distinct = 0;
@@ -428,7 +428,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
      * @param value
      *            the value to search for.
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
-     *         <tt>Longeger.MIN_VALUE</tt> if no such key exists.
+     *         <tt>Long.MIN_VALUE</tt> if no such key exists.
      */
     @Override
     public long keyOf(float value) {
@@ -621,7 +621,7 @@ public class OpenLongFloatHashMap extends AbstractLongFloatMap {
         this.state[i] = REMOVED;
         // this.values[i]=0; // delta
 
-        // if (debug) this.table[i]=Longeger.MAX_VALUE; // delta
+        // if (debug) this.table[i]=Long.MAX_VALUE; // delta
         // if (debug) this.values[i]=Float.NaN; // delta
         this.distinct--;
 

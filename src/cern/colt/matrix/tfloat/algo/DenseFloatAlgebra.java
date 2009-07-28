@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.Norm;
+import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
@@ -28,6 +29,7 @@ import cern.colt.matrix.tfloat.algo.decomposition.DenseFloatSingularValueDecompo
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix3D;
+import cern.colt.matrix.tfloat.impl.SparseCCFloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
@@ -318,9 +320,16 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
                 jk.viewRow(i).assign(ja).assign(IntFunctions.plus(jb.getQuick(i)));
             }
             FloatMatrix2D sk = multOuter(sa, sb, null);
+            if(X instanceof SparseCCFloatMatrix2D || Y instanceof SparseCCFloatMatrix2D) {
+                return new SparseCCFloatMatrix2D(rows_x * rows_y, columns_x * columns_y,
+                        (int[]) ik.vectorize().elements(), (int[]) jk.vectorize().elements(), (float[]) sk.viewDice()
+                                .vectorize().elements(), false, false, false);
+                }
+                else {
             return new SparseRCFloatMatrix2D(rows_x * rows_y, columns_x * columns_y, (int[]) ik.vectorize().elements(),
                     (int[]) jk.vectorize().elements(), (float[]) sk.viewDice().vectorize().elements(), false, false,
                     false);
+                }
 
         }
     }

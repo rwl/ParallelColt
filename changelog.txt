@@ -1,5 +1,11 @@
 Parallel Colt changelog
 
+0.8.1:	July 28, 2009
+	- Added cern.colt.map.tlong (hashmaps holding (long -> long)).
+	- Added cern.colt.matrix.tlong (matrices holding long elements).
+	- Performance improvements in sparse matrix-vector product (column-compressed and row-compressed matrices).
+	- Some refactoring and cosmetic changes. 
+
 0.8:	June 19, 2009
 	- Added JPlasma 1.0. 
 	- New, multithreaded versions of dense Cholesky and QR decompositions (JPlasma is used).

@@ -730,11 +730,7 @@ public class IOUtils {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < n1; i++) {
                 for (int j = 0; j < n2; j++) {
-                    if (Math.abs(x[i * n2 + j]) < 5e-5) {
-                        out.write("0\t");
-                    } else {
-                        out.write(String.format(format, x[i * n2 + j]) + "\t");
-                    }
+                    out.write(String.format(format, x[i * n2 + j]) + "\t");
                 }
                 out.newLine();
             }
@@ -755,11 +751,7 @@ public class IOUtils {
             BufferedWriter out = new BufferedWriter(new FileWriter(filename));
             for (int i = 0; i < x.length; i++) {
                 for (int j = 0; j < x[0].length; j++) {
-                    if (Math.abs(x[i][j]) < 5e-5) {
-                        out.write("0\t");
-                    } else {
-                        out.write(String.format(format, x[i][j]) + "\t");
-                    }
+                    out.write(String.format(format, x[i][j]) + "\t");
                 }
                 out.newLine();
             }
@@ -769,6 +761,27 @@ public class IOUtils {
         }
     }
 
+    /**
+     * Saves elements of <code>x</code> in a file <code>filename</code>,
+     * 
+     * @param x
+     * @param filename
+     */
+    public static void writeToFileReal_2D(String format, float[][] x, String filename) {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+            for (int i = 0; i < x.length; i++) {
+                for (int j = 0; j < x[0].length; j++) {
+                    out.write(String.format(format, x[i][j]) + "\t");
+                }
+                out.newLine();
+            }
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * Saves elements of <code>x</code> in a file <code>filename</code>,
      * assuming that it is 3D real array.

@@ -20,6 +20,7 @@ package cern.colt.matrix.tfloat.algo.solver;
 import optimization.FloatFmin;
 import optimization.FloatFmin_methods;
 import cern.colt.list.tfloat.FloatArrayList;
+import cern.colt.matrix.tdouble.algo.solver.HyBRDoubleIterationMonitor;
 import cern.colt.matrix.tdouble.algo.solver.HyBRInnerSolver;
 import cern.colt.matrix.tdouble.algo.solver.HyBRRegularizationMethod;
 import cern.colt.matrix.tfloat.FloatFactory2D;
@@ -223,6 +224,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                     }
                     f = new DenseFloatMatrix1D(Vb.rows());
                     alpha = tikhonovSolver(Ub, sv, Vb, v, f);
+                    ((HyBRFloatIterationMonitor) iter).setRegularizationParameter(alpha);
                     GCV.add(GCVstopfun(alpha, Ub.viewRow(0), sv, beta, rows, columns));
                     if (i > 1) {
                         if (Math.abs((GCV.getQuick(i - 1) - GCV.getQuick(i - 2))) / GCV.get(begReg - 2) < flatTol) {
@@ -234,7 +236,6 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                                 A.zMult(x, work, -1, 1, false);
                                 ((HyBRFloatIterationMonitor) iter).residual = alg.norm2(work);
                             }
-                            System.out.println("alpha = " + alpha);
                             return x;
                         } else if ((warning == true) && (GCV.size() > iterationsSave + 3)) {
                             for (int j = iterationsSave; j < GCV.size(); j++) {
@@ -252,7 +253,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                                     A.zMult(x, work, -1, 1, false);
                                     ((HyBRFloatIterationMonitor) iter).residual = alg.norm2(work);
                                 }
-                                System.out.println("alpha = " + alphaSave);
+                                ((HyBRFloatIterationMonitor) iter).setRegularizationParameter(alphaSave);
                                 return x;
 
                             } else {
@@ -283,7 +284,6 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                 }
             }
         }
-        System.out.println("alpha = " + alpha);
         return x;
 
     }

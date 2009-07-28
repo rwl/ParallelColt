@@ -681,16 +681,26 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     public void trimToSize() {
         Dcs_util.cs_sprealloc(dcs, 0);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        for (int i = 0; i < columns; i++) {
+            int high = dcs.p[i+1];
+            for (int j = dcs.p[i]; j < high; j++) {
+                builder.append('(').append(dcs.i[j]).append(',').append(i).append(')').append('\t').append(dcs.x[j]).append('\n');
+            }
+        }
+        return builder.toString();
+    }
+    
 
     @Override
     public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta,
             final boolean transposeA) {
-        int rowsA = rows;
-        int columnsA = columns;
-        if (transposeA) {
-            rowsA = columns;
-            columnsA = rows;
-        }
+        final int rowsA = transposeA ? columns : rows;
+        final int columnsA = transposeA ? rows : columns;
 
         boolean ignore = (z == null || transposeA);
         if (z == null)
@@ -720,41 +730,106 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         final double[] valuesA = dcs.x;
 
         int zidx = zeroZ;
-
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (!transposeA) {
             if ((!ignore) && (beta / alpha != 1.0)) {
                 z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(beta / alpha));
             }
-            for (int i = 0; i < columns; i++) {
-                int high = columnPointersA[i + 1];
-                double yElem = elementsY[zeroY + strideY * i];
-                for (int k = columnPointersA[i]; k < high; k++) {
-                    int j = rowIndexesA[k];
-                    elementsZ[zeroZ + strideZ * j] += valuesA[k] * yElem;
+
+            if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = 2;
+                Future<?>[] futures = new Future[nthreads];
+                final double[] result = new double[rowsA];
+                int k = columns / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstColumn = j * k;
+                    final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
+                    final int threadID = j;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                        public void run() {
+                            if (threadID == 0) {
+                                for (int i = firstColumn; i < lastColumn; i++) {
+                                    int high = columnPointersA[i + 1];
+                                    double yElem = elementsY[zeroY + strideY * i];
+                                    for (int k = columnPointersA[i]; k < high; k++) {
+                                        int j = rowIndexesA[k];
+                                        elementsZ[zeroZ + strideZ * j] += valuesA[k] * yElem;
+                                    }
+                                }
+                            } else {
+                                for (int i = firstColumn; i < lastColumn; i++) {
+                                    int high = columnPointersA[i + 1];
+                                    double yElem = elementsY[zeroY + strideY * i];
+                                    for (int k = columnPointersA[i]; k < high; k++) {
+                                        int j = rowIndexesA[k];
+                                        result[j] += valuesA[k] * yElem;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+                int rem = rowsA % 10;
+                for (int j = rem; j < rowsA; j += 10) {
+                    elementsZ[zeroZ + j * strideZ] += result[j];
+                    elementsZ[zeroZ + (j + 1) * strideZ] += result[j + 1];
+                    elementsZ[zeroZ + (j + 2) * strideZ] += result[j + 2];
+                    elementsZ[zeroZ + (j + 3) * strideZ] += result[j + 3];                    
+                    elementsZ[zeroZ + (j + 4) * strideZ] += result[j + 4];                    
+                    elementsZ[zeroZ + (j + 5) * strideZ] += result[j + 5];                    
+                    elementsZ[zeroZ + (j + 6) * strideZ] += result[j + 6];                    
+                    elementsZ[zeroZ + (j + 7) * strideZ] += result[j + 7];                    
+                    elementsZ[zeroZ + (j + 8) * strideZ] += result[j + 8];                    
+                    elementsZ[zeroZ + (j + 9) * strideZ] += result[j + 9];                    
+                }
+                for (int j = 0; j < rem; j++) {
+                    elementsZ[zeroZ + j * strideZ] += result[j];
+                }
+            } else {
+                for (int i = 0; i < columns; i++) {
+                    int high = columnPointersA[i + 1];
+                    double yElem = elementsY[zeroY + strideY * i];
+                    for (int k = columnPointersA[i]; k < high; k++) {
+                        int j = rowIndexesA[k];
+                        elementsZ[zeroZ + strideZ * j] += valuesA[k] * yElem;
+                    }
                 }
             }
             if (alpha != 1.0) {
                 z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(alpha));
             }
         } else {
-            int np = ConcurrencyUtils.getNumberOfThreads();
-            if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future<?>[] futures = new Future[np];
-                int k = columns / np;
-                for (int j = 0; j < np; j++) {
+            if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                Future<?>[] futures = new Future[nthreads];
+                int k = columns / nthreads;
+                for (int j = 0; j < nthreads; j++) {
                     final int firstColumn = j * k;
-                    final int lastColumn = (j == np - 1) ? columns : firstColumn + k;
+                    final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             int zidx = zeroZ + firstColumn * strideZ;
+                            int k = dcs.p[firstColumn];
                             for (int i = firstColumn; i < lastColumn; i++) {
-                                int high = dcs.p[i + 1];
                                 double sum = 0;
-                                for (int k = dcs.p[i]; k < high; k++) {
-                                    int j = rowIndexesA[k];
-                                    sum += valuesA[k] * elementsY[zeroY + strideY * j];
+                                int high = dcs.p[i + 1];
+                                for (; k + 10 < high; k += 10) {
+                                    int ind = k + 9;
+                                    sum += valuesA[ind] * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * dcs.i[ind--]];
                                 }
-                                elementsZ[zidx] = alpha * sum + elementsZ[zidx] * beta;
+                                for (; k < high; k++) {
+                                    sum += valuesA[k] * elementsY[dcs.i[k]];
+                                }
+                                elementsZ[zidx] = alpha * sum + beta * elementsZ[zidx];
                                 zidx += strideZ;
                             }
                         }
@@ -762,14 +837,27 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
                 }
                 ConcurrencyUtils.waitForCompletion(futures);
             } else {
+                int k = dcs.p[0];
                 for (int i = 0; i < columns; i++) {
-                    int high = dcs.p[i + 1];
                     double sum = 0;
-                    for (int k = dcs.p[i]; k < high; k++) {
-                        int j = rowIndexesA[k];
-                        sum += valuesA[k] * elementsY[zeroY + strideY * j];
+                    int high = dcs.p[i + 1];
+                    for (; k + 10 < high; k += 10) {
+                        int ind = k + 9;
+                        sum += valuesA[ind] * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * dcs.i[ind--]];
                     }
-                    elementsZ[zidx] = alpha * sum + elementsZ[zidx] * beta;
+                    for (; k < high; k++) {
+                        sum += valuesA[k] * elementsY[dcs.i[k]];
+                    }
+                    elementsZ[zidx] = alpha * sum + beta * elementsZ[zidx];
                     zidx += strideZ;
                 }
             }

@@ -36,7 +36,12 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
 
     public WrapperDoubleMatrix2D(DoubleMatrix2D newContent) {
         if (newContent != null)
+        try {
             setUp(newContent.rows(), newContent.columns());
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
         this.content = newContent;
     }
 

@@ -5,21 +5,23 @@ import cern.colt.matrix.tfloat.FloatMatrix1D;
 public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
 
     protected enum HyBRStoppingCondition {
-        FLAT_GCV_CURVE, MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS
+        FLAT_GCV_CURVE, MIN_OF_GCV_CURVE_WITHIN_WINDOW_OF_4_ITERATIONS, PERFORMED_MAX_NUMBER_OF_ITERATIONS
     }
 
     protected HyBRStoppingCondition stoppingCondition;
     protected int maxIter;
     protected float dtol;
     protected float initR;
+    protected float regularizationParameter;
 
     /**
      * Constructor for HyBRFloatIterationMonitor. Default is 100 iterations at
-     * most, and a divergence tolerance of 1e+3.
+     * most, and a divergence tolerance of 1e+5.
      */
     public HyBRFloatIterationMonitor() {
         this.maxIter = 100;
-        this.dtol = 1e+3f;
+        this.dtol = 1e+5f;
+        this.stoppingCondition = HyBRStoppingCondition.PERFORMED_MAX_NUMBER_OF_ITERATIONS;
     }
 
     /**
@@ -33,6 +35,7 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
     public HyBRFloatIterationMonitor(int maxIter, float dtol) {
         this.maxIter = maxIter;
         this.dtol = dtol;
+        this.stoppingCondition = HyBRStoppingCondition.PERFORMED_MAX_NUMBER_OF_ITERATIONS;
     }
 
     @Override
@@ -62,7 +65,8 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         // Check for divergence
         if (initR != -1.0) {
             if (r > dtol * initR)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Divergence, this);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Divergence,
+                        this);
         }
         if (iter >= (maxIter + 1))
             throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Iterations, this);
@@ -107,12 +111,45 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         return dtol;
     }
 
+    /**
+     * Returns the regularization parameter
+     * 
+     * @return regularization parameter
+     */
+    public float getRegularizationParameter() {
+        return regularizationParameter;
+    }
+
+    /**
+     * Sets the regularization parameter
+     * 
+     * @param regularizationParameter regularization parameter
+     */
+    public void setRegularizationParameter(float regularizationParameter) {
+        this.regularizationParameter = regularizationParameter;
+    }
+
+    /**
+     * Sets the stopping condition
+     * 
+     * @param stoppingCondition stopping condition
+     */
     public void setStoppingCondition(HyBRStoppingCondition stoppingCondition) {
         this.stoppingCondition = stoppingCondition;
     }
 
+    /**
+     * Returns the stopping condition
+     * 
+     * @return stopping condition
+     */
     public HyBRStoppingCondition getStoppingCondition() {
         return stoppingCondition;
+    }
+    
+    @Override
+    public int iterations() {
+        return Math.min(iter, maxIter);
     }
 
 }

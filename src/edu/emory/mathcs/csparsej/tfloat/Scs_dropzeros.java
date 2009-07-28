@@ -37,7 +37,8 @@ public class Scs_dropzeros {
     private static class Cs_nonzero implements Scs_ifkeep {
         @Override
         public boolean fkeep(int i, int j, float aij, Object other) {
-            return (aij != 0);
+            float eps = (float)Math.pow(2, -23);
+            return (Math.abs(aij) > eps);
         }
     }
 

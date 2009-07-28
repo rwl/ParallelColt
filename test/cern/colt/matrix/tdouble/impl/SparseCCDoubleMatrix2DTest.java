@@ -2,11 +2,13 @@ package cern.colt.matrix.tdouble.impl;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2DTest;
+import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class SparseCCDoubleMatrix2DTest extends DoubleMatrix2DTest {
 
     public SparseCCDoubleMatrix2DTest(String arg0) {
         super(arg0);
+        ConcurrencyUtils.setNumberOfThreads(2);
     }
 
     @Override

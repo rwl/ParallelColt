@@ -28,6 +28,7 @@ import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleSingularValueDecom
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix3D;
+import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
@@ -318,9 +319,16 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
                 jk.viewRow(i).assign(ja).assign(IntFunctions.plus(jb.getQuick(i)));
             }
             DoubleMatrix2D sk = multOuter(sa, sb, null);
-            return new SparseRCDoubleMatrix2D(rows_x * rows_y, columns_x * columns_y,
+            if(X instanceof SparseCCDoubleMatrix2D || Y instanceof SparseCCDoubleMatrix2D) {
+            return new SparseCCDoubleMatrix2D(rows_x * rows_y, columns_x * columns_y,
                     (int[]) ik.vectorize().elements(), (int[]) jk.vectorize().elements(), (double[]) sk.viewDice()
                             .vectorize().elements(), false, false, false);
+            }
+            else {
+                return new SparseRCDoubleMatrix2D(rows_x * rows_y, columns_x * columns_y,
+                        (int[]) ik.vectorize().elements(), (int[]) jk.vectorize().elements(), (double[]) sk.viewDice()
+                                .vectorize().elements(), false, false, false);                
+            }
 
         }
     }

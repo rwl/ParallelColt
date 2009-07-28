@@ -337,6 +337,36 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
     }
 
+    /**
+     * Constructs a matrix with given parameters. The arrays are not copied.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @param rowPointers
+     *            row pointers
+     * @param columnIndexes
+     *            column indexes
+     * @param values
+     *            numerical values
+     */
+    public SparseRCDoubleMatrix2D(int rows, int columns, int[] rowPointers, int[] columnIndexes, double[] values) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        if (rowPointers.length != rows + 1) {
+            throw new IllegalArgumentException("rowPointers.length != rows + 1");
+        }
+        this.rowPointers = rowPointers;
+        this.columnIndexes = columnIndexes;
+        this.values = values;
+    }
+
     @Override
     public DoubleMatrix2D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
@@ -714,11 +744,12 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
      */
     public void removeZeroes() {
         int nz = 0;
+        double eps = Math.pow(2, -52);
         for (int j = 0; j < rows; j++) {
             int p = rowPointers[j]; /* get current location of row j */
             rowPointers[j] = nz; /* record new location of row j */
             for (; p < rowPointers[j + 1]; p++) {
-                if (values[p] != 0) {
+                if (Math.abs(values[p]) > eps) {
                     values[nz] = values[p]; /* keep A(i,j) */
                     columnIndexes[nz++] = columnIndexes[p];
                 }
@@ -772,6 +803,21 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
 
     @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
+                .append('\n');
+        for (int i = 0; i < rows; i++) {
+            int high = rowPointers[i + 1];
+            for (int j = rowPointers[i]; j < high; j++) {
+                builder.append('(').append(i).append(',').append(columnIndexes[j]).append(')').append('\t').append(
+                        values[j]).append('\n');
+            }
+        }
+        return builder.toString();
+    }
+
+    @Override
     public void trimToSize() {
         realloc(0);
     }
@@ -779,12 +825,8 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     @Override
     public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta,
             final boolean transposeA) {
-        int rowsA = rows;
-        int columnsA = columns;
-        if (transposeA) {
-            rowsA = columns;
-            columnsA = rows;
-        }
+        final int rowsA = transposeA ? columns : rows;
+        final int columnsA = transposeA ? rows : columns;
 
         boolean ignore = (z == null || !transposeA);
         if (z == null)
@@ -808,22 +850,76 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         final double[] elementsY = yy.elements;
         final int strideY = yy.stride();
         final int zeroY = (int) y.index(0);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
 
         if (transposeA) {
             if ((!ignore) && (beta != 1.0))
                 z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(beta));
-            for (int i = 0; i < rows; i++) {
-                int high = rowPointers[i + 1];
-                double yElem = alpha * elementsY[zeroY + strideY * i];
-                for (int k = rowPointers[i]; k < high; k++) {
-                    int j = columnIndexes[k];
-                    elementsZ[zeroZ + strideZ * j] += values[k] * yElem;
+
+            if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = 2;
+                Future<?>[] futures = new Future[nthreads];
+                final double[] result = new double[rowsA];
+                int k = rows / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstRow = j * k;
+                    final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+                    final int threadID = j;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                        public void run() {
+                            if (threadID == 0) {
+                                for (int i = firstRow; i < lastRow; i++) {
+                                    int high = rowPointers[i + 1];
+                                    double yElem = alpha * elementsY[zeroY + strideY * i];
+                                    for (int k = rowPointers[i]; k < high; k++) {
+                                        int j = columnIndexes[k];
+                                        elementsZ[zeroZ + strideZ * j] += values[k] * yElem;
+                                    }
+                                }
+                            } else {
+                                for (int i = firstRow; i < lastRow; i++) {
+                                    int high = rowPointers[i + 1];
+                                    double yElem = alpha * elementsY[zeroY + strideY * i];
+                                    for (int k = rowPointers[i]; k < high; k++) {
+                                        int j = columnIndexes[k];
+                                        result[j] += values[k] * yElem;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+                int rem = rowsA % 10;
+                for (int j = rem; j < rowsA; j += 10) {
+                    elementsZ[zeroZ + j * strideZ] += result[j];
+                    elementsZ[zeroZ + (j + 1) * strideZ] += result[j + 1];
+                    elementsZ[zeroZ + (j + 2) * strideZ] += result[j + 2];
+                    elementsZ[zeroZ + (j + 3) * strideZ] += result[j + 3];
+                    elementsZ[zeroZ + (j + 4) * strideZ] += result[j + 4];
+                    elementsZ[zeroZ + (j + 5) * strideZ] += result[j + 5];
+                    elementsZ[zeroZ + (j + 6) * strideZ] += result[j + 6];
+                    elementsZ[zeroZ + (j + 7) * strideZ] += result[j + 7];
+                    elementsZ[zeroZ + (j + 8) * strideZ] += result[j + 8];
+                    elementsZ[zeroZ + (j + 9) * strideZ] += result[j + 9];
+                }
+                for (int j = 0; j < rem; j++) {
+                    elementsZ[zeroZ + j * strideZ] += result[j];
+                }
+            } else {
+                for (int i = 0; i < rows; i++) {
+                    int high = rowPointers[i + 1];
+                    double yElem = alpha * elementsY[zeroY + strideY * i];
+                    for (int k = rowPointers[i]; k < high; k++) {
+                        int j = columnIndexes[k];
+                        elementsZ[zeroZ + strideZ * j] += values[k] * yElem;
+                    }
                 }
             }
+
             return z;
         }
 
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, rows);
             Future<?>[] futures = new Future[nthreads];

@@ -294,7 +294,7 @@ public class IntFormatter extends AbstractFormatter {
      * Constructs and returns a matrix formatter with format <tt>"%G"</tt>.
      */
     public IntFormatter() {
-        this("%G");
+        this("%d");
     }
 
     /**

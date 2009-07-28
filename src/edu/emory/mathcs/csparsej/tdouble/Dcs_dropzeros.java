@@ -37,7 +37,8 @@ public class Dcs_dropzeros {
     private static class Cs_nonzero implements Dcs_ifkeep {
         @Override
         public boolean fkeep(int i, int j, double aij, Object other) {
-            return (aij != 0);
+            double eps = Math.pow(2, -52);
+            return (Math.abs(aij) > eps);
         }
     }
 
