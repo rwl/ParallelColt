@@ -2,7 +2,6 @@ package cern.colt.matrix.tdouble.impl;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2DTest;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class SparseRCDoubleMatrix2DTest extends DoubleMatrix2DTest {
 

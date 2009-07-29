@@ -4,8 +4,6 @@ package cern.colt.matrix.tdouble.impl;
 import java.util.Random;
 
 import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
-import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix2D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import edu.emory.mathcs.utils.IOUtils;
 
 /**

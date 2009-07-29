@@ -235,9 +235,10 @@ public class SparseFloatAlgebra {
         x.viewPart(0, (int) b.size()).assign(b);
         if (A.rows() == A.columns()) {
             lu(A, 0).solve(x);
+            return x;
         } else {
             qr(A, 0).solve(x);
-        }
-        return x;
+            return x.viewPart(0, A.columns()).copy();
+        }        
     }
 }

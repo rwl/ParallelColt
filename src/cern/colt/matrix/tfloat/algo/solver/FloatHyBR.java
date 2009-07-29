@@ -20,7 +20,6 @@ package cern.colt.matrix.tfloat.algo.solver;
 import optimization.FloatFmin;
 import optimization.FloatFmin_methods;
 import cern.colt.list.tfloat.FloatArrayList;
-import cern.colt.matrix.tdouble.algo.solver.HyBRDoubleIterationMonitor;
 import cern.colt.matrix.tdouble.algo.solver.HyBRInnerSolver;
 import cern.colt.matrix.tdouble.algo.solver.HyBRRegularizationMethod;
 import cern.colt.matrix.tfloat.FloatFactory2D;
@@ -179,7 +178,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
         FloatArrayList omegaList = new FloatArrayList(new float[begReg - 2]);
         FloatArrayList GCV = new FloatArrayList(new float[begReg - 2]);
         FloatMatrix2D U = new DenseFloatMatrix2D(1, (int) b.size());
-        FloatMatrix2D B = null;
+        FloatMatrix2D C = null;
         FloatMatrix2D V = null;
         DenseFloatSingularValueDecompositionDC svd;
         if (computeRnrm) {
@@ -201,9 +200,9 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
         for (iter.setFirst(); !iter.converged(rnrm, x); iter.next()) {
             lbd.apply();
             U = lbd.getU();
-            B = lbd.getC();
+            C = lbd.getC();
             V = lbd.getV();
-            v = new DenseFloatMatrix1D(V.columns() + 1);
+            v = new DenseFloatMatrix1D(C.columns() + 1);
             v.setQuick(0, beta);
             int i = iter.iterations();
             if (i >= 1) {
@@ -212,7 +211,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                 }
                 switch (inSolver) {
                 case TIKHONOV:
-                    svd = alg.svdDC(B);
+                    svd = alg.svdDC(C);
                     Ub = svd.getU();
                     sv = svd.getSingularValues();
                     Vb = svd.getV();
@@ -273,7 +272,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                     }
                     break;
                 case NONE:
-                    f = alg.solve(B, v);
+                    f = alg.solve(C, v);
                     break;
                 }
                 V.zMult(f, x);
@@ -667,6 +666,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                 } else {
                     C = factory.composeBidiagonal(C, alphaBeta);
                 }
+                counter++;
             }
         }
 

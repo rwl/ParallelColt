@@ -13,8 +13,6 @@ import java.util.concurrent.Future;
 
 import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tint.IntArrayList;
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;

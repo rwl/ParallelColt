@@ -15,7 +15,6 @@ import java.util.concurrent.Future;
 import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.Norm;
-import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
@@ -1107,7 +1106,7 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
         } else {
             FloatMatrix1D x = b.copy();
             qr(A).solve(x);
-            return x;
+            return x.viewPart(0, A.columns()).copy();
         }
     }
 
@@ -1123,7 +1122,7 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
         } else {
             FloatMatrix2D X = B.copy();
             qr(A).solve(X);
-            return X;
+            return X.viewPart(0, 0, X.rows(), A.columns()).copy();
         }
     }
 

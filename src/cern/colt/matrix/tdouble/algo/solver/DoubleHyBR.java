@@ -176,7 +176,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         DoubleArrayList omegaList = new DoubleArrayList(new double[begReg - 2]);
         DoubleArrayList GCV = new DoubleArrayList(new double[begReg - 2]);
         DoubleMatrix2D U = new DenseDoubleMatrix2D(1, (int) b.size());
-        DoubleMatrix2D B = null;
+        DoubleMatrix2D C = null;
         DoubleMatrix2D V = null;
         DenseDoubleSingularValueDecompositionDC svd;
         if (computeRnrm) {
@@ -198,9 +198,9 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         for (iter.setFirst(); !iter.converged(rnrm, x); iter.next()) {
             lbd.apply();
             U = lbd.getU();
-            B = lbd.getC();
+            C = lbd.getC();
             V = lbd.getV();
-            v = new DenseDoubleMatrix1D(V.columns() + 1);
+            v = new DenseDoubleMatrix1D(C.columns() + 1);
             v.setQuick(0, beta);
             int i = iter.iterations();
             if (i >= 1) {
@@ -209,7 +209,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                 }
                 switch (inSolver) {
                 case TIKHONOV:
-                    svd = alg.svdDC(B);
+                    svd = alg.svdDC(C);
                     Ub = svd.getU();
                     sv = svd.getSingularValues();
                     Vb = svd.getV();
@@ -270,7 +270,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                     }
                     break;
                 case NONE:
-                    f = alg.solve(B, v);
+                    f = alg.solve(C, v);
                     break;
                 }
                 V.zMult(f, x);
@@ -665,6 +665,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                 } else {
                     C = factory.composeBidiagonal(C, alphaBeta);
                 }
+                counter++;
             }
         }
 
