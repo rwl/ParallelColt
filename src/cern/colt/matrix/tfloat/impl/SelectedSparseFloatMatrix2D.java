@@ -128,7 +128,6 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
         this.isNoView = false;
     }
 
-    @Override
     public AbstractLongFloatMap elements() {
         return elements;
     }
@@ -149,14 +148,14 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public float getQuick(int row, int column) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
         // return elements.get(index(row,column));
         // manually inlined:
-        return elements.get(offset + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride]);
+        return elements.get((long) offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride]);
     }
 
     /**
@@ -168,11 +167,12 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    @Override
+
     public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
-        return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        return (long) this.offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
     }
 
     /**
@@ -191,7 +191,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public FloatMatrix2D like(int rows, int columns) {
         return new SparseFloatMatrix2D(rows, columns);
     }
@@ -208,7 +208,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public FloatMatrix1D like1D(int size) {
         return new SparseFloatMatrix1D(size);
     }
@@ -231,13 +231,14 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int row, int column, float value) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
         // int index = index(row,column);
         // manually inlined:
-        int index = offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
 
         if (value == 0)
             this.elements.removeKey(index);
@@ -251,7 +252,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      * 
      * @return
      */
-    @Override
+
     public FloatMatrix1D vectorize() {
         SparseFloatMatrix1D v = new SparseFloatMatrix1D((int) size());
         int idx = 0;
@@ -289,7 +290,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *             if <tt>column < 0 || column >= columns()</tt>.
      * @see #viewRow(int)
      */
-    @Override
+
     public FloatMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -326,7 +327,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *             if <tt>row < 0 || row >= rows()</tt>.
      * @see #viewColumn(int)
      */
-    @Override
+
     public FloatMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -346,7 +347,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -360,7 +361,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -375,7 +376,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FloatMatrix2D other) {
         if (other instanceof SelectedSparseFloatMatrix2D) {
             SelectedSparseFloatMatrix2D otherMatrix = (SelectedSparseFloatMatrix2D) other;
@@ -404,7 +405,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected FloatMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -419,9 +420,9 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      * @param columns
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
-     *             if <tt>(float)columns*rows > Integer.MAX_VALUE</tt>.
+     *             if <tt>(double)columns*rows > Integer.MAX_VALUE</tt>.
      */
-    @Override
+
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -432,7 +433,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
     /**
      * Self modifying version of viewDice().
      */
-    @Override
+
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -455,7 +456,7 @@ class SelectedSparseFloatMatrix2D extends FloatMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected FloatMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFloatMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }

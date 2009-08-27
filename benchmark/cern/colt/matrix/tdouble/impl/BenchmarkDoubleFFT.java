@@ -28,10 +28,10 @@ public class BenchmarkDoubleFFT {
             times[i] = t.millis() / niters;
             int N = sizes2D[i] * sizes2D[i];
             double p = (2.5 * N * log2(N)) / (t.nanos() / niters);
-            System.out.println("Average execution time for double precision getFft2() of size " + sizes2D[i] + " x " + sizes2D[i]
-                    + " : " + times[i] + " ms");
-            System.out.println("Performance of double precision getFft2() of size " + sizes2D[i] + " x " + sizes2D[i] + " : "
-                    + String.format("%.4f", p) + " gflops");
+            System.out.println("Average execution time for double precision getFft2() of size " + sizes2D[i] + " x "
+                    + sizes2D[i] + " : " + times[i] + " ms");
+            System.out.println("Performance of double precision getFft2() of size " + sizes2D[i] + " x " + sizes2D[i]
+                    + " : " + String.format("%.4f", p) + " gflops");
 
         }
     }
@@ -57,10 +57,10 @@ public class BenchmarkDoubleFFT {
             times[i] = t.millis() / niters;
             int N = sizes3D[i] * sizes3D[i] * sizes3D[i];
             double p = (2.5 * N * log2(N)) / (t.nanos() / niters);
-            System.out.println("Average execution time for double precision getFft3() of size " + sizes3D[i] + " x " + sizes3D[i]
-                    + " x " + sizes3D[i] + " : " + times[i] + " ms");
-            System.out.println("Performance of double precision getFft3() of size " + sizes3D[i] + " x " + sizes3D[i] + " x "
-                    + sizes3D[i] + " : " +  String.format("%.4f", p) + " gflops");
+            System.out.println("Average execution time for double precision getFft3() of size " + sizes3D[i] + " x "
+                    + sizes3D[i] + " x " + sizes3D[i] + " : " + times[i] + " ms");
+            System.out.println("Performance of double precision getFft3() of size " + sizes3D[i] + " x " + sizes3D[i]
+                    + " x " + sizes3D[i] + " : " + String.format("%.4f", p) + " gflops");
 
         }
     }

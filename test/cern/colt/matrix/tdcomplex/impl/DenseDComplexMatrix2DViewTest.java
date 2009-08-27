@@ -5,7 +5,6 @@ public class DenseDComplexMatrix2DViewTest extends DenseDComplexMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).viewDice();
         B = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).viewDice();

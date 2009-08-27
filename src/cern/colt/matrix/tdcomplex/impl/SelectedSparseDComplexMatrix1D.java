@@ -27,7 +27,7 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, double[]> elements;
+    protected ConcurrentHashMap<Long, double[]> elements;
 
     /**
      * The offsets of visible indexes of this matrix.
@@ -55,7 +55,7 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
      *            the offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseDComplexMatrix1D(int size, ConcurrentHashMap<Integer, double[]> elements, int zero,
+    protected SelectedSparseDComplexMatrix1D(int size, ConcurrentHashMap<Long, double[]> elements, int zero,
             int stride, int[] offsets, int offset) {
         setUp(size, zero, stride);
 
@@ -73,29 +73,26 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
      * @param indexes
      *            The indexes of the cells that shall be visible.
      */
-    protected SelectedSparseDComplexMatrix1D(ConcurrentHashMap<Integer, double[]> elements, int[] offsets) {
+    protected SelectedSparseDComplexMatrix1D(ConcurrentHashMap<Long, double[]> elements, int[] offsets) {
         this(offsets.length, elements, 0, 1, offsets, 0);
     }
 
-    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
 
-    @Override
     public double[] getQuick(int index) {
-        return elements.get(offset + offsets[zero + index * stride]);
+        return elements.get((long) offset + (long) offsets[zero + index * stride]);
     }
 
-    @Override
-    public ConcurrentHashMap<Integer, double[]> elements() {
+    public ConcurrentHashMap<Long, double[]> elements() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DComplexMatrix1D other) {
         if (other instanceof SelectedSparseDComplexMatrix1D) {
             SelectedSparseDComplexMatrix1D otherMatrix = (SelectedSparseDComplexMatrix1D) other;
@@ -107,30 +104,25 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
-        return offset + offsets[zero + rank * stride];
+        return (long) offset + (long) offsets[zero + rank * stride];
     }
 
-    @Override
     public DComplexMatrix1D like(int size) {
         return new SparseDComplexMatrix1D(size);
     }
 
-    @Override
     public DComplexMatrix2D like2D(int rows, int columns) {
         return new SparseDComplexMatrix2D(rows, columns);
     }
 
-    @Override
-    public DComplexMatrix2D reshape(int rows, int cols) {
+    public DComplexMatrix2D reshape(int rows, int columns) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
-    public DComplexMatrix3D reshape(int slices, int rows, int cols) {
+    public DComplexMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
@@ -148,9 +140,9 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, double[] value) {
-        int i = offset + offsets[zero + index * stride];
+        long i = (long) offset + (long) offsets[zero + index * stride];
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(i);
         else
@@ -171,9 +163,9 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, double re, double im) {
-        int i = offset + offsets[zero + index * stride];
+        long i = (long) offset + (long) offsets[zero + index * stride];
         if (re == 0 && im == 0)
             this.elements.remove(i);
         else
@@ -186,7 +178,7 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
-    @Override
+
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -200,17 +192,15 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected DComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseDComplexMatrix1D(this.elements, offsets);
     }
 
-    @Override
     public DoubleMatrix1D getImaginaryPart() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
     public DoubleMatrix1D getRealPart() {
         throw new IllegalAccessError("This method is not supported.");
     }

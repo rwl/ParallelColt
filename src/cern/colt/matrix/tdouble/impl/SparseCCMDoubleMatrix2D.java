@@ -40,39 +40,32 @@ public class SparseCCMDoubleMatrix2D extends WrapperDoubleMatrix2D {
             elements[i] = new SparseDoubleMatrix1D(rows);
     }
 
-    @Override
     public SparseDoubleMatrix1D[] elements() {
         return elements;
     }
 
-    @Override
-    public synchronized double getQuick(int row, int column) {
+    public double getQuick(int row, int column) {
         return elements[column].getQuick(row);
     }
 
-    @Override
-    public synchronized void setQuick(int row, int column, double value) {
+    public void setQuick(int row, int column, double value) {
         elements[column].setQuick(row, value);
     }
 
-    @Override
     public void trimToSize() {
         for (int c = 0; c < columns; c++) {
             elements[c].trimToSize();
         }
     }
 
-    @Override
     public SparseDoubleMatrix1D viewColumn(int column) {
         return elements[column];
     }
 
-    @Override
     protected DoubleMatrix2D getContent() {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new SparseCCMDoubleMatrix2D(rows, columns);
     }

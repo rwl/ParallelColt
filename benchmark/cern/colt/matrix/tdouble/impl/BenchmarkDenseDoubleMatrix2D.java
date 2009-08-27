@@ -83,105 +83,7 @@ public class BenchmarkDenseDoubleMatrix2D {
         viewTimes = new double[BenchmarkMatrixKernel.NTHREADS.length];
     }
 
-    @Test
-    public void testZMultDoubleMatrix2DDoubleMatrix2D() {
-        int oldNiters = BenchmarkMatrixKernel.NITERS;
-        BenchmarkMatrixKernel.NITERS = 10;
-        /* No view */
-        DoubleMatrix2D A = new DenseDoubleMatrix2D(a_2d);
-        DoubleMatrix2D B = new DenseDoubleMatrix2D(b_2d);
-        B = B.viewDice().copy();
-        DoubleMatrix2D C = new DenseDoubleMatrix2D(BenchmarkMatrixKernel.MATRIX_SIZE_2D[0],
-                BenchmarkMatrixKernel.MATRIX_SIZE_2D[0]);
-        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
-            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
-
-            // warm-up
-            A.zMult(B, C);
-            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                C.assign(0);
-                t.reset().start();
-                A.zMult(B, C);
-                t.stop();
-                noViewTimes[i] += t.millis();
-            }
-            noViewTimes[i] /= BenchmarkMatrixKernel.NITERS;
-        }
-        /* View */
-        A = new DenseDoubleMatrix2D(a_2d);
-        DoubleMatrix2D Av = A.viewDice();
-        B = new DenseDoubleMatrix2D(b_2d);
-        B = B.viewDice().copy();
-        DoubleMatrix2D Bv = B.viewDice();
-        C = new DenseDoubleMatrix2D(BenchmarkMatrixKernel.MATRIX_SIZE_2D[1], BenchmarkMatrixKernel.MATRIX_SIZE_2D[1]);
-        DoubleMatrix2D Cv = C.viewDice();
-        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
-            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
-            // warm-up
-            Av.zMult(Bv, Cv);
-            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                Cv.assign(0);
-                t.reset().start();
-                Av.zMult(Bv, Cv);
-                t.stop();
-                viewTimes[i] += t.millis();
-            }
-            viewTimes[i] /= BenchmarkMatrixKernel.NITERS;
-        }
-        String method = "zMult(DoubleMatrix2D, DoubleMatrix2D)";
-        BenchmarkMatrixKernel.writeMatrixBenchmarkResultsToFile(outputFile, method, BenchmarkMatrixKernel.NTHREADS,
-                noViewTimes, viewTimes);
-        BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes,
-                viewTimes);
-        BenchmarkMatrixKernel.NITERS = oldNiters;
-    }
-
-    @Test
-    public void testZMultDoubleMatrix1DDoubleMatrix1D() {
-        /* No view */
-        DoubleMatrix2D A = new DenseDoubleMatrix2D(a_2d);
-        DoubleMatrix1D y = new DenseDoubleMatrix1D(A.columns());
-        for (int i = 0; i < y.size(); i++) {
-            y.set(i, Math.random());
-        }
-        DoubleMatrix1D z = new DenseDoubleMatrix1D(A.rows());
-        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
-            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
-
-            // warm-up
-            A.zMult(y, z);
-            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                z.assign(0);
-                t.reset().start();
-                A.zMult(y, z);
-                t.stop();
-                noViewTimes[i] += t.millis();
-            }
-            noViewTimes[i] /= BenchmarkMatrixKernel.NITERS;
-        }
-        /* View */
-        DoubleMatrix2D Av = new DenseDoubleMatrix2D(BenchmarkMatrixKernel.MATRIX_SIZE_2D[1],
-                BenchmarkMatrixKernel.MATRIX_SIZE_2D[0]).viewDice().assign(a_2d);
-        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
-            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
-            // warm-up
-            Av.zMult(y, z);
-            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
-                z.assign(0);
-                t.reset().start();
-                Av.zMult(y, z);
-                t.stop();
-                viewTimes[i] += t.millis();
-            }
-            viewTimes[i] /= BenchmarkMatrixKernel.NITERS;
-        }
-        String method = "zMult(DoubleMatrix1D, DoubleMatrix1D)";
-        BenchmarkMatrixKernel.writeMatrixBenchmarkResultsToFile(outputFile, method, BenchmarkMatrixKernel.NTHREADS,
-                noViewTimes, viewTimes);
-        BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes,
-                viewTimes);
-
-    }
+   
 
     @Test
     public void testAggregateDoubleDoubleFunctionDoubleFunction() {
@@ -2487,6 +2389,106 @@ public class BenchmarkDenseDoubleMatrix2D {
         BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes,
                 viewTimes);
         BenchmarkMatrixKernel.NITERS = oldNiters;
+    }
+    
+    @Test
+    public void testZMultDoubleMatrix2DDoubleMatrix2D() {
+        int oldNiters = BenchmarkMatrixKernel.NITERS;
+        BenchmarkMatrixKernel.NITERS = 10;
+        /* No view */
+        DoubleMatrix2D A = new DenseDoubleMatrix2D(a_2d);
+        DoubleMatrix2D B = new DenseDoubleMatrix2D(b_2d);
+        B = B.viewDice().copy();
+        DoubleMatrix2D C = new DenseDoubleMatrix2D(BenchmarkMatrixKernel.MATRIX_SIZE_2D[0],
+                BenchmarkMatrixKernel.MATRIX_SIZE_2D[0]);
+        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
+            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
+
+            // warm-up
+            A.zMult(B, C);
+            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
+                C.assign(0);
+                t.reset().start();
+                A.zMult(B, C);
+                t.stop();
+                noViewTimes[i] += t.millis();
+            }
+            noViewTimes[i] /= BenchmarkMatrixKernel.NITERS;
+        }
+        /* View */
+        A = new DenseDoubleMatrix2D(a_2d);
+        DoubleMatrix2D Av = A.viewDice();
+        B = new DenseDoubleMatrix2D(b_2d);
+        B = B.viewDice().copy();
+        DoubleMatrix2D Bv = B.viewDice();
+        C = new DenseDoubleMatrix2D(BenchmarkMatrixKernel.MATRIX_SIZE_2D[1], BenchmarkMatrixKernel.MATRIX_SIZE_2D[1]);
+        DoubleMatrix2D Cv = C.viewDice();
+        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
+            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
+            // warm-up
+            Av.zMult(Bv, Cv);
+            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
+                Cv.assign(0);
+                t.reset().start();
+                Av.zMult(Bv, Cv);
+                t.stop();
+                viewTimes[i] += t.millis();
+            }
+            viewTimes[i] /= BenchmarkMatrixKernel.NITERS;
+        }
+        String method = "zMult(DoubleMatrix2D, DoubleMatrix2D)";
+        BenchmarkMatrixKernel.writeMatrixBenchmarkResultsToFile(outputFile, method, BenchmarkMatrixKernel.NTHREADS,
+                noViewTimes, viewTimes);
+        BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes,
+                viewTimes);
+        BenchmarkMatrixKernel.NITERS = oldNiters;
+    }
+
+    @Test
+    public void testZMultDoubleMatrix1DDoubleMatrix1D() {
+        /* No view */
+        DoubleMatrix2D A = new DenseDoubleMatrix2D(a_2d);
+        DoubleMatrix1D y = new DenseDoubleMatrix1D(A.columns());
+        for (int i = 0; i < y.size(); i++) {
+            y.set(i, Math.random());
+        }
+        DoubleMatrix1D z = new DenseDoubleMatrix1D(A.rows());
+        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
+            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
+
+            // warm-up
+            A.zMult(y, z);
+            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
+                z.assign(0);
+                t.reset().start();
+                A.zMult(y, z);
+                t.stop();
+                noViewTimes[i] += t.millis();
+            }
+            noViewTimes[i] /= BenchmarkMatrixKernel.NITERS;
+        }
+        /* View */
+        DoubleMatrix2D Av = new DenseDoubleMatrix2D(BenchmarkMatrixKernel.MATRIX_SIZE_2D[1],
+                BenchmarkMatrixKernel.MATRIX_SIZE_2D[0]).viewDice().assign(a_2d);
+        for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
+            ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
+            // warm-up
+            Av.zMult(y, z);
+            for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
+                z.assign(0);
+                t.reset().start();
+                Av.zMult(y, z);
+                t.stop();
+                viewTimes[i] += t.millis();
+            }
+            viewTimes[i] /= BenchmarkMatrixKernel.NITERS;
+        }
+        String method = "zMult(DoubleMatrix1D, DoubleMatrix1D)";
+        BenchmarkMatrixKernel.writeMatrixBenchmarkResultsToFile(outputFile, method, BenchmarkMatrixKernel.NTHREADS,
+                noViewTimes, viewTimes);
+        BenchmarkMatrixKernel.displayMatrixBenchmarkResults(method, BenchmarkMatrixKernel.NTHREADS, noViewTimes,
+                viewTimes);
+
     }
 
 }

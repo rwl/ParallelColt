@@ -71,7 +71,7 @@ public class Scs_lu {
         for (i = 0; i < n; i++)
             pinv[i] = -1; /* no rows pivotal yet */
         for (k = 0; k <= n; k++)
-            Lp[k] = 0; /* no cols of L yet */
+            Lp[k] = 0; /* no columns of L yet */
         lnz = unz = 0;
         for (k = 0; k < n; k++) /* compute L(:,k) and U(:,k) */
         {

@@ -9,7 +9,6 @@ public class DoubleBiCGstabTest extends DoubleIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new DoubleBiCGstab(x);
         M = solver.getPreconditioner(); //identity preconditioner

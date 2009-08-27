@@ -5,7 +5,6 @@ public class SparseFComplexMatrix2DViewTest extends SparseFComplexMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFComplexMatrix2D(NCOLUMNS, NROWS).viewDice();
         B = new SparseFComplexMatrix2D(NCOLUMNS, NROWS).viewDice();

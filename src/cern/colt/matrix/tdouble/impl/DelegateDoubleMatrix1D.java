@@ -49,42 +49,34 @@ class DelegateDoubleMatrix1D extends DoubleMatrix1D {
         this.content = newContent;
     }
 
-    @Override
-    public double getQuick(int index) {
+    public synchronized double getQuick(int index) {
         return content.getQuick(row, index);
     }
 
-    @Override
     public DoubleMatrix1D like(int size) {
         return content.like1D(size);
     }
 
-    @Override
     public DoubleMatrix2D like2D(int rows, int columns) {
         return content.like(rows, columns);
     }
 
-    @Override
-    public void setQuick(int index, double value) {
+    public synchronized void setQuick(int index, double value) {
         content.setQuick(row, index, value);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
-    public DoubleMatrix2D reshape(int rows, int cols) {
+    public DoubleMatrix2D reshape(int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public DoubleMatrix3D reshape(int slices, int rows, int cols) {
+    public DoubleMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     protected DoubleMatrix1D viewSelectionLike(int[] offsets) {
         throw new InternalError(); // should never get called
     }

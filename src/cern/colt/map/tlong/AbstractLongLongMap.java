@@ -11,7 +11,7 @@ package cern.colt.map.tlong;
 import cern.colt.function.tlong.LongLongProcedure;
 import cern.colt.function.tlong.LongProcedure;
 import cern.colt.list.tlong.LongArrayList;
-import cern.colt.map.tdouble.AbstractDoubleMap;
+import cern.colt.map.AbstractMap;
 
 /**
  * Abstract base class for hash maps holding (key,value) associations of type
@@ -29,7 +29,7 @@ import cern.colt.map.tdouble.AbstractDoubleMap;
  * @version 1.0, 09/24/99
  * @see java.util.HashMap
  */
-public abstract class AbstractLongLongMap extends AbstractDoubleMap {
+public abstract class AbstractLongLongMap extends AbstractMap {
     /**
      * 
      */
@@ -147,7 +147,7 @@ public abstract class AbstractLongLongMap extends AbstractDoubleMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -327,7 +327,8 @@ public abstract class AbstractLongLongMap extends AbstractDoubleMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    public void pairsMatching(final LongLongProcedure condition, final LongArrayList keyList, final LongArrayList valueList) {
+    public void pairsMatching(final LongLongProcedure condition, final LongArrayList keyList,
+            final LongArrayList valueList) {
         keyList.clear();
         valueList.clear();
 
@@ -438,7 +439,7 @@ public abstract class AbstractLongLongMap extends AbstractDoubleMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
-    @Override
+
     public String toString() {
         LongArrayList theKeys = keys();
         // theKeys.sort();

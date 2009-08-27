@@ -143,7 +143,7 @@ public class BitMatrix extends cern.colt.PersistentObject {
      * 
      * @return a clone of this bit matrix.
      */
-    @Override
+
     public Object clone() {
         BitMatrix clone = (BitMatrix) super.clone();
         if (this.bits != null)
@@ -213,7 +213,7 @@ public class BitMatrix extends cern.colt.PersistentObject {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof BitMatrix))
             return false;
@@ -386,7 +386,7 @@ public class BitMatrix extends cern.colt.PersistentObject {
     /**
      * Returns a hash code value for the receiver.
      */
-    @Override
+
     public int hashCode() {
         return toBitVector().hashCode();
     }
@@ -611,7 +611,7 @@ public class BitMatrix extends cern.colt.PersistentObject {
     /**
      * Returns a (very crude) string representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return toBitVector().toString();
     }

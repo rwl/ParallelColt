@@ -72,7 +72,8 @@ public class FloatStatistic extends Object {
      */
     public static final VectorVectorFunction EUCLID = new VectorVectorFunction() {
         public final float apply(FloatMatrix1D a, FloatMatrix1D b) {
-            return (float) Math.sqrt(a.aggregate(b, FloatFunctions.plus, FloatFunctions.chain(FloatFunctions.square, FloatFunctions.minus)));
+            return (float) Math.sqrt(a.aggregate(b, FloatFunctions.plus, FloatFunctions.chain(FloatFunctions.square,
+                    FloatFunctions.minus)));
         }
     };
 
@@ -82,7 +83,8 @@ public class FloatStatistic extends Object {
      */
     public static final VectorVectorFunction BRAY_CURTIS = new VectorVectorFunction() {
         public final float apply(FloatMatrix1D a, FloatMatrix1D b) {
-            return a.aggregate(b, FloatFunctions.plus, FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.minus)) / a.aggregate(b, FloatFunctions.plus, FloatFunctions.plus);
+            return a.aggregate(b, FloatFunctions.plus, FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.minus))
+                    / a.aggregate(b, FloatFunctions.plus, FloatFunctions.plus);
         }
     };
 
@@ -594,15 +596,15 @@ public class FloatStatistic extends Object {
     public static hep.aida.tfloat.FloatIHistogram1D[][] histogram(final hep.aida.tfloat.FloatIHistogram1D[][] histo,
             final FloatMatrix2D matrix, final int m, final int n) {
         int rows = matrix.rows();
-        int cols = matrix.columns();
+        int columns = matrix.columns();
         if (m >= rows) {
             throw new IllegalArgumentException("Parameter m must be smaller than the number of rows in the matrix");
         }
-        if (n >= cols) {
+        if (n >= columns) {
             throw new IllegalArgumentException("Parameter n must be smaller than the number of columns in the matrix");
         }
         final int row_size = rows / m;
-        final int col_size = cols / n;
+        final int col_size = columns / n;
         final int[] height = new int[m];
         final int[] width = new int[n];
         for (int r = 0; r < m - 1; r++) {
@@ -612,10 +614,10 @@ public class FloatStatistic extends Object {
         for (int c = 0; c < n - 1; c++) {
             width[c] = col_size;
         }
-        width[n - 1] = cols - (n - 1) * col_size;
+        width[n - 1] = columns - (n - 1) * col_size;
 
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, m);
             Future<?>[] futures = new Future[nthreads];
             int k = m / nthreads;
@@ -748,13 +750,13 @@ public class FloatStatistic extends Object {
         if (randomGenerator == null)
             randomGenerator = new cern.jet.random.tfloat.engine.FloatMersenneTwister((int) System.currentTimeMillis());
 
-        int ncols = Math.round(matrix.size() * fraction);
-        int max = ncols;
+        int ncolumns = Math.round(matrix.size() * fraction);
+        int max = ncolumns;
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
 
         // sample
-        int n = ncols;
+        int n = ncolumns;
         int N = (int) matrix.size();
         cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
@@ -854,8 +856,8 @@ public class FloatStatistic extends Object {
             randomGenerator = new cern.jet.random.tfloat.engine.FloatMersenneTwister((int) System.currentTimeMillis());
 
         int nrows = Math.round(matrix.rows() * rowFraction);
-        int ncols = Math.round(matrix.columns() * columnFraction);
-        int max = Math.max(nrows, ncols);
+        int ncolumns = Math.round(matrix.columns() * columnFraction);
+        int max = Math.max(nrows, ncolumns);
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
 
@@ -868,7 +870,7 @@ public class FloatStatistic extends Object {
             selectedRows[i] = (int) selected[i];
 
         // sample columns
-        n = ncols;
+        n = ncolumns;
         N = matrix.columns();
         cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
@@ -936,8 +938,8 @@ public class FloatStatistic extends Object {
 
         int nslices = Math.round(matrix.slices() * sliceFraction);
         int nrows = Math.round(matrix.rows() * rowFraction);
-        int ncols = Math.round(matrix.columns() * columnFraction);
-        int max = Math.max(nslices, Math.max(nrows, ncols));
+        int ncolumns = Math.round(matrix.columns() * columnFraction);
+        int max = Math.max(nslices, Math.max(nrows, ncolumns));
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
 
@@ -958,7 +960,7 @@ public class FloatStatistic extends Object {
             selectedRows[i] = (int) selected[i];
 
         // sample columns
-        n = ncols;
+        n = ncolumns;
         N = matrix.columns();
         cern.jet.random.tfloat.sampling.FloatRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];

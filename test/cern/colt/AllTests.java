@@ -6,6 +6,8 @@ import cern.colt.matrix.tdcomplex.AllDComplexMatrixTests;
 import cern.colt.matrix.tdouble.AllDoubleMatrixTests;
 import cern.colt.matrix.tfcomplex.AllFComplexMatrixTests;
 import cern.colt.matrix.tfloat.AllFloatMatrixTests;
+import cern.colt.matrix.tint.AllIntMatrixTests;
+import cern.colt.matrix.tlong.AllLongMatrixTests;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class AllTests {
@@ -20,6 +22,8 @@ public class AllTests {
         suite.addTest(AllDComplexMatrixTests.suite());
         suite.addTest(AllFloatMatrixTests.suite());
         suite.addTest(AllFComplexMatrixTests.suite());
+        suite.addTest(AllLongMatrixTests.suite());
+        suite.addTest(AllIntMatrixTests.suite());
         return suite;
     }
 

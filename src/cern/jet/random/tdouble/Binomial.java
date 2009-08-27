@@ -271,7 +271,7 @@ public class Binomial extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public int nextInt() {
         return generateBinomial(n, p);
     }
@@ -345,7 +345,7 @@ public class Binomial extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + n + "," + p + ")";
     }

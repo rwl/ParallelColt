@@ -37,47 +37,38 @@ public class WrapperFloatMatrix1D extends FloatMatrix1D {
         this.content = newContent;
     }
 
-    @Override
     protected FloatMatrix1D getContent() {
         return this.content;
     }
 
-    @Override
-    public float getQuick(int index) {
+    public synchronized float getQuick(int index) {
         return content.getQuick(index);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
     public FloatMatrix1D like(int size) {
         return content.like(size);
     }
 
-    @Override
     public FloatMatrix2D like2D(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
-    @Override
-    public FloatMatrix2D reshape(int rows, int cols) {
+    public FloatMatrix2D reshape(int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public FloatMatrix3D reshape(int slices, int rows, int cols) {
+    public FloatMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public void setQuick(int index, float value) {
+    public synchronized void setQuick(int index, float value) {
         content.setQuick(index, value);
     }
 
-    @Override
     public FloatMatrix1D viewFlip() {
         FloatMatrix1D view = new WrapperFloatMatrix1D(this) {
             /**
@@ -85,30 +76,25 @@ public class WrapperFloatMatrix1D extends FloatMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int index) {
+            public synchronized float getQuick(int index) {
                 return content.getQuick(size - 1 - index);
             }
 
-            @Override
-            public void setQuick(int index, float value) {
+            public synchronized void setQuick(int index, float value) {
                 content.setQuick(size - 1 - index, value);
             }
 
-            @Override
-            public float get(int index) {
+            public synchronized float get(int index) {
                 return content.get(size - 1 - index);
             }
 
-            @Override
-            public void set(int index, float value) {
+            public synchronized void set(int index, float value) {
                 content.set(size - 1 - index, value);
             }
         };
         return view;
     }
 
-    @Override
     public FloatMatrix1D viewPart(final int index, int width) {
         checkRange(index, width);
         WrapperFloatMatrix1D view = new WrapperFloatMatrix1D(this) {
@@ -117,23 +103,19 @@ public class WrapperFloatMatrix1D extends FloatMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int i) {
+            public synchronized float getQuick(int i) {
                 return content.getQuick(index + i);
             }
 
-            @Override
-            public void setQuick(int i, float value) {
+            public synchronized void setQuick(int i, float value) {
                 content.setQuick(index + i, value);
             }
 
-            @Override
-            public float get(int i) {
+            public synchronized float get(int i) {
                 return content.get(index + i);
             }
 
-            @Override
-            public void set(int i, float value) {
+            public synchronized void set(int i, float value) {
                 content.set(index + i, value);
             }
         };
@@ -141,7 +123,6 @@ public class WrapperFloatMatrix1D extends FloatMatrix1D {
         return view;
     }
 
-    @Override
     public FloatMatrix1D viewSelection(int[] indexes) {
         // check for "all"
         if (indexes == null) {
@@ -159,23 +140,19 @@ public class WrapperFloatMatrix1D extends FloatMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int i) {
+            public synchronized float getQuick(int i) {
                 return content.getQuick(idx[i]);
             }
 
-            @Override
-            public void setQuick(int i, float value) {
+            public synchronized void setQuick(int i, float value) {
                 content.setQuick(idx[i], value);
             }
 
-            @Override
-            public float get(int i) {
+            public synchronized float get(int i) {
                 return content.get(idx[i]);
             }
 
-            @Override
-            public void set(int i, float value) {
+            public synchronized void set(int i, float value) {
                 content.set(idx[i], value);
             }
         };
@@ -183,12 +160,10 @@ public class WrapperFloatMatrix1D extends FloatMatrix1D {
         return view;
     }
 
-    @Override
     protected FloatMatrix1D viewSelectionLike(int[] offsets) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     public FloatMatrix1D viewStrides(final int _stride) {
         if (stride <= 0)
             throw new IndexOutOfBoundsException("illegal stride: " + stride);
@@ -198,23 +173,19 @@ public class WrapperFloatMatrix1D extends FloatMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int index) {
+            public synchronized float getQuick(int index) {
                 return content.getQuick(index * _stride);
             }
 
-            @Override
-            public void setQuick(int index, float value) {
+            public synchronized void setQuick(int index, float value) {
                 content.setQuick(index * _stride, value);
             }
 
-            @Override
-            public float get(int index) {
+            public synchronized float get(int index) {
                 return content.get(index * _stride);
             }
 
-            @Override
-            public void set(int index, float value) {
+            public synchronized void set(int index, float value) {
                 content.set(index * _stride, value);
             }
         };

@@ -56,7 +56,7 @@ public class BreitWignerMeanSquare extends BreitWigner {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         BreitWignerMeanSquare copy = (BreitWignerMeanSquare) super.clone();
         if (this.uniform != null)
@@ -71,7 +71,7 @@ public class BreitWignerMeanSquare extends BreitWigner {
      * @param cut
      *            </tt>cut==Double.NEGATIVE_INFINITY</tt> indicates "don't cut".
      */
-    @Override
+
     public double nextDouble(double mean, double gamma, double cut) {
         if (gamma == 0.0)
             return mean;

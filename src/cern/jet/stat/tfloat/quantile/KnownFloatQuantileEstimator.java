@@ -138,7 +138,7 @@ class KnownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected FloatBuffer[] buffersToCollapse() {
         int minLevel = bufferSet._getMinLevelOfFullOrPartialBuffers();
         return bufferSet._getFullOrPartialBuffersWithLevel(minLevel);
@@ -148,7 +148,7 @@ class KnownFloatQuantileEstimator extends FloatQuantileEstimator {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns, and its memory requirements will be close to zero.
      */
-    @Override
+
     public void clear() {
         super.clear();
         this.beta = 1.0f;
@@ -167,7 +167,7 @@ class KnownFloatQuantileEstimator extends FloatQuantileEstimator {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         KnownFloatQuantileEstimator copy = (KnownFloatQuantileEstimator) super.clone();
         if (this.samplingAssistant != null)
@@ -178,7 +178,7 @@ class KnownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected void newBuffer() {
         int numberOfEmptyBuffers = this.bufferSet._getNumberOfEmptyBuffers();
         // FloatBuffer[] emptyBuffers = this.bufferSet._getEmptyBuffers();
@@ -203,14 +203,14 @@ class KnownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected void postCollapse(FloatBuffer[] toCollapse) {
         this.weHadMoreThanOneEmptyBuffer = false;
     }
 
     /**
      */
-    @Override
+
     protected FloatArrayList preProcessPhis(FloatArrayList phis) {
         if (beta > 1.0) {
             phis = phis.copy();
@@ -231,7 +231,7 @@ class KnownFloatQuantileEstimator extends FloatQuantileEstimator {
      *            sorted ascending.
      * @return the approximate quantile elements.
      */
-    @Override
+
     public FloatArrayList quantileElements(FloatArrayList phis) {
         /*
          * The KNOWN quantile finder reads off quantiles from FULL buffers only.
@@ -312,7 +312,7 @@ class KnownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected boolean sampleNextElement() {
         if (samplingAssistant == null)
             return true;

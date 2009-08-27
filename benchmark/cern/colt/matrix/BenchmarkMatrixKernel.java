@@ -25,13 +25,13 @@ public class BenchmarkMatrixKernel {
 
     public static int MATRIX_SIZE_1D = (int) Math.pow(2, 19);
 
-    public static int[] MATRIX_SIZE_2D = new int[] { (int) Math.pow(2, 10), (int) Math.pow(2, 10) };
+    public static int[] MATRIX_SIZE_2D = new int[] { (int) Math.pow(2, 12), (int) Math.pow(2, 12) };
 
     public static int[] MATRIX_SIZE_3D = new int[] { (int) Math.pow(2, 7), (int) Math.pow(2, 7), (int) Math.pow(2, 7) };
 
-    public static int[] NTHREADS = new int[] { 1, 2 };
+    public static int[] NTHREADS = new int[] { 1, 2, 4, 8 };
 
-    public static int NITERS = 100;
+    public static int NITERS = 20;
 
     private static String settingsFileName1D = "settings1D.txt";
 

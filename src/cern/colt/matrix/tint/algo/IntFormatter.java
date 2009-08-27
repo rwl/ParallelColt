@@ -318,7 +318,7 @@ public class IntFormatter extends AbstractFormatter {
     /**
      * Converts a given cell to a String; no alignment considered.
      */
-    @Override
+
     protected String form(AbstractMatrix1D matrix, int index, Former formatter) {
         return this.form((IntMatrix1D) matrix, index, formatter);
     }
@@ -336,7 +336,7 @@ public class IntFormatter extends AbstractFormatter {
     /**
      * Returns a string representations of all cells; no alignment considered.
      */
-    @Override
+
     protected String[][] format(AbstractMatrix2D matrix) {
         return this.format((IntMatrix2D) matrix);
     }
@@ -358,7 +358,7 @@ public class IntFormatter extends AbstractFormatter {
     /**
      * Returns the number of characters before the decimal point.
      */
-    @Override
+
     protected int lead(String s) {
         if (alignment.equals(DECIMAL))
             return indexOfDecimalPoint(s);
@@ -468,7 +468,7 @@ public class IntFormatter extends AbstractFormatter {
      * @param matrix
      *            the matrix to convert.
      */
-    @Override
+
     protected String toString(AbstractMatrix2D matrix) {
         return this.toString((IntMatrix2D) matrix);
     }

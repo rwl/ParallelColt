@@ -256,7 +256,7 @@ public class DenseDoubleSingularValueDecompositionDC {
      * 
      * </pre>
      */
-    @Override
+
     public String toString() {
         StringBuffer buf = new StringBuffer();
         String unknown = "Illegal operation or error: ";

@@ -4,7 +4,6 @@ import cern.colt.matrix.tfloat.FloatMatrix1D;
 
 public class MRNSDFloatIterationMonitor extends DefaultFloatIterationMonitor {
 
-    @Override
     protected boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException {
         // Store initial residual
         if (isFirst())
@@ -25,7 +24,6 @@ public class MRNSDFloatIterationMonitor extends DefaultFloatIterationMonitor {
         return false;
     }
 
-    @Override
     protected boolean convergedI(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         return convergedI(r);
     }

@@ -105,7 +105,6 @@ public class Dcs_demo {
     /* true for off-diagonal entries */
     private static class Dropdiag implements Dcs_ifkeep {
 
-        @Override
         public boolean fkeep(int i, int j, double aij, Object other) {
             return (i != j);
         }

@@ -9,7 +9,6 @@ public class FloatGMRESTest extends FloatIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new FloatGMRES(x);
         M = solver.getPreconditioner(); //identity preconditioner

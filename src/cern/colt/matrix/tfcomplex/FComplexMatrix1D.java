@@ -665,7 +665,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -807,11 +807,11 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * 
      * @param rows
      *            number of rows
-     * @param cols
+     * @param columns
      *            number of columns
      * @return new 2D matrix with columns being the elements of this matrix.
      */
-    public abstract FComplexMatrix2D reshape(int rows, int cols);
+    public abstract FComplexMatrix2D reshape(int rows, int columns);
 
     /**
      * Returns new FloatMatrix3D of size slices x rows x columns, whose elements
@@ -819,11 +819,11 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * 
      * @param rows
      *            number of rows
-     * @param cols
+     * @param columns
      *            number of columns
      * @return new 2D matrix with columns being the elements of this matrix.
      */
-    public abstract FComplexMatrix3D reshape(int slices, int rows, int cols);
+    public abstract FComplexMatrix3D reshape(int slices, int rows, int columns);
 
     /**
      * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
@@ -1015,7 +1015,7 @@ public abstract class FComplexMatrix1D extends AbstractMatrix1D {
      * 
      * @return a string representation of the matrix.
      */
-    @Override
+
     public String toString() {
         return toString("%.4f");
     }

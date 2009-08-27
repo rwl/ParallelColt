@@ -87,7 +87,8 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * @return the aggregated measure.
      * @see cern.jet.math.tlong.LongFunctions
      */
-    public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr, final cern.colt.function.tlong.LongFunction f) {
+    public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
+            final cern.colt.function.tlong.LongFunction f) {
         if (size() == 0)
             throw new IllegalArgumentException("size == 0");
         long a = 0;
@@ -469,7 +470,7 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      * 
      */
-    public LongMatrix2D assign(final cern.colt.function.tlong.LongProcedure cond, final int value) {
+    public LongMatrix2D assign(final cern.colt.function.tlong.LongProcedure cond, final long value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, rows);
@@ -653,7 +654,7 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
 
         return this;
     }
-    
+
     /**
      * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
      * is required to have the form <tt>values[row][column]</tt> and have
@@ -910,14 +911,14 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
         if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, rows);
             Future<?>[] futures = new Future[nthreads];
-            Long[] results = new Long[nthreads];
+            Integer[] results = new Integer[nthreads];
             int k = rows / nthreads;
             for (int j = 0; j < nthreads; j++) {
                 final int firstRow = j * k;
                 final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
 
-                futures[j] = ConcurrencyUtils.submit(new Callable<Long>() {
-                    public Long call() throws Exception {
+                futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
+                    public Integer call() throws Exception {
                         int cardinality = 0;
                         for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
@@ -925,13 +926,13 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
                                     cardinality++;
                             }
                         }
-                        return Long.valueOf(cardinality);
+                        return cardinality;
                     }
                 });
             }
             try {
                 for (int j = 0; j < nthreads; j++) {
-                    results[j] = (Long) futures[j].get();
+                    results[j] = (Integer) futures[j].get();
                 }
                 cardinality = results[0].intValue();
                 for (int j = 1; j < nthreads; j++) {
@@ -981,7 +982,7 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * @return <tt>true</tt> if all cells are equal to the given value,
      *         <tt>false</tt> otherwise.
      */
-    public boolean equals(int value) {
+    public boolean equals(long value) {
         return cern.colt.matrix.tlong.algo.LongProperty.DEFAULT.equals(this, value);
     }
 
@@ -997,7 +998,7 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1242,10 +1243,10 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of rows and columns. For example,
      * if the receiver is an instance of type <tt>DenseLongMatrix2D</tt> the new
-     * matrix must also be of type <tt>DenseLongMatrix2D</tt>, if the receiver is
-     * an instance of type <tt>SparseLongMatrix2D</tt> the new matrix must also
-     * be of type <tt>SparseLongMatrix2D</tt>, etc. In general, the new matrix
-     * should have internal parametrization as similar as possible.
+     * matrix must also be of type <tt>DenseLongMatrix2D</tt>, if the receiver
+     * is an instance of type <tt>SparseLongMatrix2D</tt> the new matrix must
+     * also be of type <tt>SparseLongMatrix2D</tt>, etc. In general, the new
+     * matrix should have internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1256,11 +1257,12 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type <tt>DenseLongMatrix2D</tt>
-     * the new matrix must also be of type <tt>DenseLongMatrix2D</tt>, if the
-     * receiver is an instance of type <tt>SparseLongMatrix2D</tt> the new matrix
-     * must also be of type <tt>SparseLongMatrix2D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * example, if the receiver is an instance of type
+     * <tt>DenseLongMatrix2D</tt> the new matrix must also be of type
+     * <tt>DenseLongMatrix2D</tt>, if the receiver is an instance of type
+     * <tt>SparseLongMatrix2D</tt> the new matrix must also be of type
+     * <tt>SparseLongMatrix2D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -1274,9 +1276,9 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseLongMatrix2D</tt> the new matrix
-     * must be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an instance
-     * of type <tt>SparseLongMatrix2D</tt> the new matrix must be of type
-     * <tt>SparseLongMatrix1D</tt>, etc.
+     * must be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix2D</tt> the new matrix must be of
+     * type <tt>SparseLongMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -1287,8 +1289,8 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseLongMatrix2D</tt> the new matrix must be of type
-     * <tt>DenseLongMatrix1D</tt>, if the receiver is an instance of type
+     * instance of type <tt>DenseLongMatrix2D</tt> the new matrix must be of
+     * type <tt>DenseLongMatrix1D</tt>, if the receiver is an instance of type
      * <tt>SparseLongMatrix2D</tt> the new matrix must be of type
      * <tt>SparseLongMatrix1D</tt>, etc.
      * 
@@ -1349,13 +1351,13 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
                     results[j] = (long[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                rowLocation = (int)results[0][1];
-                columnLocation = (int)results[0][2];
+                rowLocation = (int) results[0][1];
+                columnLocation = (int) results[0][2];
                 for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        rowLocation = (int)results[j][1];
-                        columnLocation = (int)results[j][2];
+                        rowLocation = (int) results[j][1];
+                        columnLocation = (int) results[j][2];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1428,13 +1430,13 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
                     results[j] = (long[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                rowLocation = (int)results[0][1];
-                columnLocation = (int)results[0][2];
+                rowLocation = (int) results[0][1];
+                columnLocation = (int) results[0][2];
                 for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        rowLocation = (int)results[j][1];
-                        columnLocation = (int)results[j][2];
+                        rowLocation = (int) results[j][1];
+                        columnLocation = (int) results[j][2];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1551,7 +1553,7 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * 
      * @see cern.colt.matrix.tlong.algo.LongFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tlong.algo.LongFormatter().toString(this);
     }
@@ -1948,8 +1950,8 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * Sorts the matrix rows into ascending order, according to the <i>natural
      * ordering</i> of the matrix values in the given column. This sort is
      * guaranteed to be <i>stable</i>. For further information, see
-     * {@link cern.colt.matrix.tlong.algo.LongSorting#sort(LongMatrix2D,int)}. For
-     * more advanced sorting functionality, see
+     * {@link cern.colt.matrix.tlong.algo.LongSorting#sort(LongMatrix2D,int)}.
+     * For more advanced sorting functionality, see
      * {@link cern.colt.matrix.tlong.algo.LongSorting}.
      * 
      * @return a new sorted vector (matrix) view.
@@ -2009,7 +2011,7 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
      */
-    public LongMatrix1D zMult(final LongMatrix1D y, LongMatrix1D z, final int alpha, final int beta,
+    public LongMatrix1D zMult(final LongMatrix1D y, LongMatrix1D z, final long alpha, final long beta,
             final boolean transposeA) {
         if (transposeA)
             return viewDice().zMult(y, z, alpha, beta, false);
@@ -2089,7 +2091,7 @@ public abstract class LongMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>A == C || B == C</tt>.
      */
-    public LongMatrix2D zMult(final LongMatrix2D B, LongMatrix2D C, final int alpha, final int beta,
+    public LongMatrix2D zMult(final LongMatrix2D B, LongMatrix2D C, final long alpha, final long beta,
             final boolean transposeA, final boolean transposeB) {
         if (transposeA)
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);

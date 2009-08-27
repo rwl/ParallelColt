@@ -65,7 +65,7 @@ public abstract class AbstractFloatBin extends cern.colt.PersistentObject {
      * returns true if the other object is a bin and has the same size, value,
      * error and center.
      */
-    @Override
+
     public boolean equals(Object otherObj) {
         if (!(otherObj instanceof AbstractFloatBin))
             return false;
@@ -133,7 +133,7 @@ public abstract class AbstractFloatBin extends cern.colt.PersistentObject {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(getClass().getName());

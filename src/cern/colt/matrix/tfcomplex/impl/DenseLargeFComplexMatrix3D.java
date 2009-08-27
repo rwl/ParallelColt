@@ -50,18 +50,15 @@ public class DenseLargeFComplexMatrix3D extends WrapperFComplexMatrix3D {
         elements = new float[slices][rows][2 * columns];
     }
 
-    @Override
     public float[] getQuick(int slice, int row, int column) {
         return new float[] { elements[slice][row][2 * column], elements[slice][row][2 * column + 1] };
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float[] value) {
         elements[slice][row][2 * column] = value[0];
         elements[slice][row][2 * column + 1] = value[1];
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float re, float im) {
         elements[slice][row][2 * column] = re;
         elements[slice][row][2 * column + 1] = im;
@@ -71,7 +68,7 @@ public class DenseLargeFComplexMatrix3D extends WrapperFComplexMatrix3D {
      * Computes the 2D discrete Fourier transform (DFT) of each slice of this
      * matrix.
      */
-    @Override
+
     public void fft2Slices() {
         if (fft2Slices == null) {
             fft2Slices = new FloatFFT_2D(rows, columns);
@@ -110,7 +107,7 @@ public class DenseLargeFComplexMatrix3D extends WrapperFComplexMatrix3D {
     /**
      * Computes the 3D discrete Fourier transform (DFT) of this matrix.
      */
-    @Override
+
     public void fft3() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -128,7 +125,7 @@ public class DenseLargeFComplexMatrix3D extends WrapperFComplexMatrix3D {
      * @param scale
      *            if true then scaling is performed
      */
-    @Override
+
     public void ifft2Slices(final boolean scale) {
         if (fft2Slices == null) {
             fft2Slices = new FloatFFT_2D(rows, columns);
@@ -171,7 +168,7 @@ public class DenseLargeFComplexMatrix3D extends WrapperFComplexMatrix3D {
      * @param scale
      *            if true then scaling is performed
      */
-    @Override
+
     public void ifft3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -182,17 +179,14 @@ public class DenseLargeFComplexMatrix3D extends WrapperFComplexMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public float[][][] elements() {
         return elements;
     }
 
-    @Override
     protected FComplexMatrix3D getContent() {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D like(int slices, int rows, int columns) {
         return new DenseLargeFComplexMatrix3D(slices, rows, columns);
     }

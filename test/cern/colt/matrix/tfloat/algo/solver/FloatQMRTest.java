@@ -9,7 +9,6 @@ public class FloatQMRTest extends FloatIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new FloatQMR(x);
         M = solver.getPreconditioner(); //identity preconditioner

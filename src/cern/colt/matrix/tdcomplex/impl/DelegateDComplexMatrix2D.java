@@ -69,8 +69,7 @@ class DelegateDComplexMatrix2D extends DComplexMatrix2D {
         this.content = newContent;
     }
 
-    @Override
-    public double[] getQuick(int row, int column) {
+    public synchronized double[] getQuick(int row, int column) {
         switch (axis) {
         case 0:
             return content.getQuick(index, row, column);
@@ -83,13 +82,11 @@ class DelegateDComplexMatrix2D extends DComplexMatrix2D {
         }
     }
 
-    @Override
     public DComplexMatrix2D like(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
-    @Override
-    public void setQuick(int row, int column, double[] value) {
+    public synchronized void setQuick(int row, int column, double[] value) {
         switch (axis) {
         case 0:
             content.setQuick(index, row, column, value);
@@ -105,8 +102,7 @@ class DelegateDComplexMatrix2D extends DComplexMatrix2D {
         }
     }
 
-    @Override
-    public void setQuick(int row, int column, double re, double im) {
+    public synchronized void setQuick(int row, int column, double re, double im) {
         switch (axis) {
         case 0:
             content.setQuick(index, row, column, re, im);
@@ -122,33 +118,27 @@ class DelegateDComplexMatrix2D extends DComplexMatrix2D {
         }
     }
 
-    @Override
     public DComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         return new WrapperDComplexMatrix2D(this).viewColumn(column);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
     protected DComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     public DComplexMatrix1D like1D(int size) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     protected DComplexMatrix1D like1D(int size, int zero, int stride) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     public DComplexMatrix1D vectorize() {
         DComplexMatrix1D v = new DenseDComplexMatrix1D(rows * columns);
         int idx = 0;
@@ -160,7 +150,6 @@ class DelegateDComplexMatrix2D extends DComplexMatrix2D {
         return v;
     }
 
-    @Override
     public DoubleMatrix2D getImaginaryPart() {
         switch (axis) {
         case 0:
@@ -174,7 +163,6 @@ class DelegateDComplexMatrix2D extends DComplexMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix2D getRealPart() {
         switch (axis) {
         case 0:

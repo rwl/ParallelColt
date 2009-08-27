@@ -118,7 +118,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      *            a function object taking as argument the current association's
      *            value.
      */
-    @Override
+
     public void assign(cern.colt.function.tdouble.DoubleFunction function) {
         // specialization for speed
         if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
@@ -148,7 +148,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @param other
      *            the other map to be copied into the receiver.
      */
-    @Override
+
     public void assign(AbstractLongDoubleMap other) {
         if (!(other instanceof OpenLongDoubleHashMap)) {
             super.assign(other);
@@ -171,7 +171,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * Removes all (key,value) associations from the receiver. Implicitly calls
      * <tt>trimToSize()</tt>.
      */
-    @Override
+
     public void clear() {
         new ByteArrayList(this.state).fillFromToWith(0, this.state.length - 1, FREE);
         // new DoubleArrayList(values).fillFromToWith(0, state.length-1, 0); //
@@ -192,7 +192,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         OpenLongDoubleHashMap copy = (OpenLongDoubleHashMap) super.clone();
         copy.table = copy.table.clone();
@@ -206,7 +206,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified key.
      */
-    @Override
+
     public boolean containsKey(long key) {
         return indexOfKey(key) >= 0;
     }
@@ -216,7 +216,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified value.
      */
-    @Override
+
     public boolean containsValue(double value) {
         return indexOfValue(value) >= 0;
     }
@@ -235,7 +235,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @param minCapacity
      *            the desired minimum capacity.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         if (table.length < minCapacity) {
             int newCapacity = nextPrime(minCapacity);
@@ -259,7 +259,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEachKey(LongProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -280,7 +280,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEachPair(final LongDoubleProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -301,7 +301,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @return the value associated with the specified key; <tt>0</tt> if no
      *         such key is present.
      */
-    @Override
+
     public double get(long key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -430,7 +430,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
      *         <tt>Long.MIN_VALUE</tt> if no such key exists.
      */
-    @Override
+
     public long keyOf(double value) {
         // returns the first key found; there may be more matching keys,
         // however.
@@ -452,7 +452,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @param list
      *            the list to be filled, can have any size.
      */
-    @Override
+
     public void keys(LongArrayList list) {
         list.setSize(distinct);
         long[] elements = list.elements();
@@ -492,7 +492,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    @Override
+
     public void pairsMatching(final LongDoubleProcedure condition, final LongArrayList keyList,
             final DoubleArrayList valueList) {
         keyList.clear();
@@ -518,7 +518,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      *         <tt>false</tt> if the receiver did already contain such a key -
      *         the new value has now replaced the formerly associated value.
      */
-    @Override
+
     public boolean put(long key, double value) {
         int i = indexOfInsertion(key);
         if (i < 0) { // already contained
@@ -610,7 +610,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @return <tt>true</tt> if the receiver contained the specified key,
      *         <tt>false</tt> otherwise.
      */
-    @Override
+
     public boolean removeKey(long key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -654,7 +654,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      */
-    @Override
+
     protected void setUp(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         int capacity = initialCapacity;
         super.setUp(capacity, minLoadFactor, maxLoadFactor);
@@ -693,7 +693,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * Releases any superfluous internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
-    @Override
+
     public void trimToSize() {
         // * 1.2 because open addressing's performance exponentially degrades
         // beyond that point
@@ -716,7 +716,7 @@ public class OpenLongDoubleHashMap extends AbstractLongDoubleMap {
      * @param list
      *            the list to be filled, can have any size.
      */
-    @Override
+
     public void values(DoubleArrayList list) {
         list.setSize(distinct);
         double[] elements = list.elements();

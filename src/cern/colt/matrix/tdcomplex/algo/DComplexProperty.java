@@ -21,8 +21,8 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 /**
  * Tests matrices for equality.
  * <p>
- * Except where explicitly indicated, all methods involving equality tests
- * (<tt>==</tt>) allow for numerical instability, to a degree specified upon
+ * Except where explicitly indicated, all methods involving equality tests (
+ * <tt>==</tt>) allow for numerical instability, to a degree specified upon
  * instance construction and returned by method {@link #tolerance()}. The public
  * static final variable <tt>DEFAULT</tt> represents a default Property object
  * with a tolerance of <tt>1.0E-9</tt>. The public static final variable

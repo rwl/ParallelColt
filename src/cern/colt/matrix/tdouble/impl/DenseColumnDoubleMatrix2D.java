@@ -207,7 +207,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f) {
         if (size() == 0)
             return Double.NaN;
@@ -252,7 +251,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return a;
     }
 
-    @Override
     public double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f, final DoubleProcedure cond) {
         if (size() == 0)
             return Double.NaN;
@@ -310,7 +308,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return a;
     }
 
-    @Override
     public double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f, final IntArrayList rowList,
             final IntArrayList columnList) {
         if (size() == 0)
@@ -352,7 +349,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return a;
     }
 
-    @Override
     public double aggregate(final DoubleMatrix2D other, final DoubleDoubleFunction aggr, final DoubleDoubleFunction f) {
         if (!(other instanceof DenseColumnDoubleMatrix2D)) {
             return super.aggregate(other, aggr, f);
@@ -412,7 +408,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return a;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleFunction function) {
         if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
             double multiplicator = ((cern.jet.math.tdouble.DoubleMult) function).multiplicator;
@@ -481,7 +476,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleProcedure cond, final DoubleFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -528,7 +522,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleProcedure cond, final double value) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -575,7 +568,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final double value) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -613,7 +605,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final double[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " rows()*columns()="
@@ -661,7 +652,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final double[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "columns()="
@@ -711,7 +701,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof DenseColumnDoubleMatrix2D)) {
@@ -781,7 +770,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D y, final DoubleDoubleFunction function) {
         if (function instanceof cern.jet.math.tdouble.DoublePlusMultSecond) {
             double multiplicator = ((cern.jet.math.tdouble.DoublePlusMultSecond) function).multiplicator;
@@ -1041,7 +1029,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D y, final DoubleDoubleFunction function, IntArrayList rowList,
             IntArrayList columnList) {
         checkShape(y);
@@ -1094,7 +1081,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final float[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*columns()="
@@ -1138,7 +1124,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1474,7 +1459,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public double[] elements() {
         return elements;
     }
@@ -1523,7 +1507,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1912,7 +1895,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return C;
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList rowList, final IntArrayList columnList,
             final DoubleArrayList valueList) {
         rowList.clear();
@@ -1933,7 +1915,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public void getNonZeros(final IntArrayList rowList, final IntArrayList columnList, final DoubleArrayList valueList) {
         rowList.clear();
         columnList.clear();
@@ -1953,7 +1934,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList rowList, final IntArrayList columnList,
             final DoubleArrayList valueList) {
         rowList.clear();
@@ -1974,7 +1954,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public double getQuick(int row, int column) {
         return elements[rowZero + row * rowStride + columnZero + column * columnStride];
     }
@@ -2319,22 +2298,18 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public long index(int row, int column) {
         return rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new DenseColumnDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public DoubleMatrix1D like1D(int size) {
         return new DenseDoubleMatrix1D(size);
     }
 
-    @Override
     public double[] getMaxLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
@@ -2413,7 +2388,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return new double[] { maxValue, rowLocation, columnLocation };
     }
 
-    @Override
     public double[] getMinLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
@@ -2492,12 +2466,10 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return new double[] { minValue, rowLocation, columnLocation };
     }
 
-    @Override
     public void setQuick(int row, int column, double value) {
         elements[rowZero + row * rowStride + columnZero + column * columnStride] = value;
     }
 
-    @Override
     public double[][] toArray() {
         final double[][] values = new double[rows][columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -2536,7 +2508,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return values;
     }
 
-    @Override
     public DoubleMatrix1D vectorize() {
         final int size = (int) size();
         DoubleMatrix1D v = new DenseDoubleMatrix1D(size);
@@ -2589,7 +2560,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return v;
     }
 
-    @Override
     public DoubleMatrix1D zMult(final DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta,
             final boolean transposeA) {
         if (z == null) {
@@ -2613,7 +2583,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return z;
     }
 
-    @Override
     public DoubleMatrix2D zMult(final DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, final double beta,
             final boolean transposeA, final boolean transposeB) {
         final int rowsA = transposeA ? columns : rows;
@@ -2659,7 +2628,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return C;
     }
 
-    @Override
     public double zSum() {
         double sum = 0;
         if (elements == null)
@@ -2711,7 +2679,6 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return sum;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix2D other) {
         if (other instanceof SelectedDenseColumnDoubleMatrix2D) {
             SelectedDenseColumnDoubleMatrix2D otherMatrix = (SelectedDenseColumnDoubleMatrix2D) other;
@@ -2723,12 +2690,10 @@ public class DenseColumnDoubleMatrix2D extends DoubleMatrix2D {
         return false;
     }
 
-    @Override
     protected DoubleMatrix1D like1D(int size, int zero, int stride) {
         return new DenseDoubleMatrix1D(size, this.elements, zero, stride, true);
     }
 
-    @Override
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseColumnDoubleMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }

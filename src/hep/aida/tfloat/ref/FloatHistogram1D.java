@@ -87,7 +87,6 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
         this(title, new FloatFixedAxis(bins, min, max));
     }
 
-    @Override
     public int allEntries() // perhaps to be deleted (default
     // impl. in
     // superclass sufficient)
@@ -147,13 +146,8 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
             Future<?>[] futures = new Future[nthreads];
             int k = rows / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == nthreads - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
@@ -164,8 +158,8 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
                         float sumWeight_loc = 0;
                         float sumWeightSquared_loc = 0;
                         float mean_loc = 0, rms_loc = 0;
-                        int idx = zero + startrow * rowStride;
-                        for (int r = startrow; r < stoprow; r++) {
+                        int idx = zero + firstRow * rowStride;
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int i = idx, c = 0; c < columns; c++) {
                                 int bin = map(xAxis.coordToIndex(data[i]));
                                 entries_loc[bin]++;
@@ -224,17 +218,12 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
             Future<?>[] futures = new Future[nthreads];
             int k = rows / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == nthreads - 1) {
-                    stoprow = rows;
-                } else {
-                    stoprow = startrow + k;
-                }
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        int idx = zero + startrow * rowStride;
+                        int idx = zero + firstRow * rowStride;
                         float[] errors_loc = new float[errors.length];
                         float[] heights_loc = new float[heights.length];
                         int[] entries_loc = new int[entries.length];
@@ -242,7 +231,7 @@ public class FloatHistogram1D extends FloatAbstractHistogram1D implements FloatI
                         float sumWeight_loc = 0;
                         float sumWeightSquared_loc = 0;
                         float mean_loc = 0, rms_loc = 0;
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int i = idx, c = 0; c < columns; c++) {
                                 int bin = map(xAxis.coordToIndex(data[i]));
                                 int widx = r * columns + c;

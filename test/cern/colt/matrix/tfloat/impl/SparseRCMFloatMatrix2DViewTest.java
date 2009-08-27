@@ -6,7 +6,6 @@ public class SparseRCMFloatMatrix2DViewTest extends SparseRCMFloatMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseRCMFloatMatrix2D(NCOLUMNS, NROWS).viewDice();
         B = new SparseRCMFloatMatrix2D(NCOLUMNS, NROWS).viewDice();

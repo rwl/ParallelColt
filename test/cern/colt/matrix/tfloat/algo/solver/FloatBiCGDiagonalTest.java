@@ -11,7 +11,6 @@ public class FloatBiCGDiagonalTest extends FloatBiCGTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new FloatDiagonal(A.rows());

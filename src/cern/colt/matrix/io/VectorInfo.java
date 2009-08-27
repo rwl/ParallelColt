@@ -157,7 +157,7 @@ public class VectorInfo {
      *      %%MatrixMarket vector coordinate real
      * </pre>
      */
-    @Override
+
     public String toString() {
         StringBuilder buf = new StringBuilder();
 

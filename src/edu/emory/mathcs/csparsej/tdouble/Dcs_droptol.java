@@ -35,7 +35,7 @@ import edu.emory.mathcs.csparsej.tdouble.Dcs_common.Dcs;
 public class Dcs_droptol {
 
     private static class Cs_tol implements Dcs_ifkeep {
-        @Override
+
         public boolean fkeep(int i, int j, double aij, Object other) {
             return (Math.abs(aij) > (Double) other);
         }

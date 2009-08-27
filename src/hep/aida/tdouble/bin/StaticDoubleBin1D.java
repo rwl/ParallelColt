@@ -78,7 +78,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
      * @param element
      *            element to be appended.
      */
-    @Override
+
     public synchronized void add(double element) {
         // prototyping implementation; inefficient; TODO
         this.addAllOf(new DoubleArrayList(new double[] { element }));
@@ -109,7 +109,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
-    @Override
+
     public synchronized void addAllOfFromTo(DoubleArrayList list, int from, int to) {
         // if (this.arguments == null) setUpCache();
         synchronized (arguments) {
@@ -135,7 +135,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns.
      */
-    @Override
+
     public synchronized void clear() {
         clearAllMeasures();
         this.size = 0;
@@ -158,7 +158,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
      * the elements can be obtained via <tt>elements()</tt> methods.
      * 
      */
-    @Override
+
     public synchronized boolean isRebinnable() {
         return false;
     }
@@ -166,7 +166,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
     /**
      * Returns the maximum.
      */
-    @Override
+
     public synchronized double max() {
         return this.max;
     }
@@ -174,7 +174,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
     /**
      * Returns the minimum.
      */
-    @Override
+
     public synchronized double min() {
         return this.min;
     }
@@ -184,7 +184,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
      * 
      * @return the number of elements contained in the receiver.
      */
-    @Override
+
     public synchronized int size() {
         return this.size;
     }
@@ -192,7 +192,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
     /**
      * Returns the sum of all elements, which is <tt>Sum( x[i] )</tt>.
      */
-    @Override
+
     public synchronized double sum() {
         return this.sum;
     }
@@ -200,7 +200,7 @@ public class StaticDoubleBin1D extends AbstractDoubleBin1D {
     /**
      * Returns the sum of squares, which is <tt>Sum( x[i] * x[i] )</tt>.
      */
-    @Override
+
     public synchronized double sumOfSquares() {
         return this.sum_xx;
     }

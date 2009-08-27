@@ -215,7 +215,6 @@ public class DoubleQMR extends AbstractDoubleIterativeSolver {
         return x;
     }
 
-    @Override
     public void setPreconditioner(DoublePreconditioner M) {
         super.setPreconditioner(M);
         M1 = M;

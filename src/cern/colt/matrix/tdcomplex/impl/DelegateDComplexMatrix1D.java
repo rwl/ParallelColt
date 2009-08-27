@@ -48,57 +48,46 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
         this.content = newContent;
     }
 
-    @Override
-    public double[] getQuick(int index) {
+    public synchronized double[] getQuick(int index) {
         return content.getQuick(row, index);
     }
 
-    @Override
     public DComplexMatrix1D like(int size) {
         return content.like1D(size);
     }
 
-    @Override
     public DComplexMatrix2D like2D(int rows, int columns) {
         return content.like(rows, columns);
     }
 
-    @Override
-    public void setQuick(int index, double[] value) {
+    public synchronized void setQuick(int index, double[] value) {
         content.setQuick(row, index, value);
     }
 
-    @Override
-    public void setQuick(int index, double re, double im) {
+    public synchronized void setQuick(int index, double re, double im) {
         content.setQuick(row, index, re, im);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
-    public DComplexMatrix2D reshape(int rows, int cols) {
+    public DComplexMatrix2D reshape(int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public DComplexMatrix3D reshape(int slices, int rows, int cols) {
+    public DComplexMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     protected DComplexMatrix1D viewSelectionLike(int[] offsets) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     public DoubleMatrix1D getImaginaryPart() {
         return content.viewRow(row).getImaginaryPart();
     }
 
-    @Override
     public DoubleMatrix1D getRealPart() {
         return content.viewRow(row).getRealPart();
     }

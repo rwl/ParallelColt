@@ -107,7 +107,7 @@ public abstract class AbstractFloatDistribution extends cern.colt.PersistentObje
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         AbstractFloatDistribution copy = (AbstractFloatDistribution) super.clone();
         if (this.randomGenerator != null)

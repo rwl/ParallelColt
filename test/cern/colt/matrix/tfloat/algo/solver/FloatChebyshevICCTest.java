@@ -11,7 +11,6 @@ public class FloatChebyshevICCTest extends FloatChebyshevTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new FloatICC(A.rows());

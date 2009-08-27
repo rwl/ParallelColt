@@ -33,14 +33,13 @@ public class BenchmarkSparseRCFloatMatrix2D {
         SparseRCFloatMatrix2D A = null;
         File file = new File(fileName);
         try {
-            A = new SparseFloatMatrix2D(new MatrixVectorReader(new FileReader(file)))
-                    .getRowCompressed(false);
+            A = new SparseFloatMatrix2D(new MatrixVectorReader(new FileReader(file))).getRowCompressed(false);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Benchmark of SparseRCFloatMatrix2D (" + file.getName() + ")");       
+        System.out.println("Benchmark of SparseRCFloatMatrix2D (" + file.getName() + ")");
         int rows = A.rows();
         int nnz = A.cardinality();
         FloatMatrix1D x = FloatFactory1D.dense.make(rows, 1);

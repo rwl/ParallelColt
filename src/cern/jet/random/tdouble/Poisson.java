@@ -121,7 +121,7 @@ public class Poisson extends AbstractDiscreteDistribution {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         Poisson copy = (Poisson) super.clone();
         if (this.pp != null)
@@ -136,7 +136,7 @@ public class Poisson extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public int nextInt() {
         return nextInt(this.mean);
     }
@@ -389,7 +389,7 @@ public class Poisson extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + mean + ")";
     }

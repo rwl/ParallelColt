@@ -27,7 +27,7 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, float[]> elements;
+    protected ConcurrentHashMap<Long, float[]> elements;
 
     /**
      * The offsets of visible indexes of this matrix.
@@ -55,8 +55,8 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
      *            the offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseFComplexMatrix1D(int size, ConcurrentHashMap<Integer, float[]> elements, int zero,
-            int stride, int[] offsets, int offset) {
+    protected SelectedSparseFComplexMatrix1D(int size, ConcurrentHashMap<Long, float[]> elements, int zero, int stride,
+            int[] offsets, int offset) {
         setUp(size, zero, stride);
 
         this.elements = elements;
@@ -73,21 +73,18 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
      * @param indexes
      *            The indexes of the cells that shall be visible.
      */
-    protected SelectedSparseFComplexMatrix1D(ConcurrentHashMap<Integer, float[]> elements, int[] offsets) {
+    protected SelectedSparseFComplexMatrix1D(ConcurrentHashMap<Long, float[]> elements, int[] offsets) {
         this(offsets.length, elements, 0, 1, offsets, 0);
     }
 
-    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
 
-    @Override
     public float[] getQuick(int index) {
-        return elements.get(offset + offsets[zero + index * stride]);
+        return elements.get((long) offset + (long) offsets[zero + index * stride]);
     }
 
-    @Override
     public ConcurrentHashMap<Integer, float[]> elements() {
         throw new IllegalAccessError("This method is not supported.");
     }
@@ -95,7 +92,7 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedSparseFComplexMatrix1D) {
             SelectedSparseFComplexMatrix1D otherMatrix = (SelectedSparseFComplexMatrix1D) other;
@@ -107,30 +104,25 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
-        return offset + offsets[zero + rank * stride];
+        return (long) offset + (long) offsets[zero + rank * stride];
     }
 
-    @Override
     public FComplexMatrix1D like(int size) {
         return new SparseFComplexMatrix1D(size);
     }
 
-    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new SparseFComplexMatrix2D(rows, columns);
     }
 
-    @Override
-    public FComplexMatrix2D reshape(int rows, int cols) {
+    public FComplexMatrix2D reshape(int rows, int columns) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
-    public FComplexMatrix3D reshape(int slices, int rows, int cols) {
+    public FComplexMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
@@ -148,9 +140,9 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, float[] value) {
-        int i = offset + offsets[zero + index * stride];
+        long i = (long) offset + (long) offsets[zero + index * stride];
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(i);
         else
@@ -171,9 +163,9 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, float re, float im) {
-        int i = offset + offsets[zero + index * stride];
+        long i = (long) offset + (long) offsets[zero + index * stride];
         if (re == 0 && im == 0)
             this.elements.remove(i);
         else
@@ -186,7 +178,7 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
-    @Override
+
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -200,17 +192,15 @@ class SelectedSparseFComplexMatrix1D extends FComplexMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected FComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseFComplexMatrix1D(this.elements, offsets);
     }
 
-    @Override
     public FloatMatrix1D getImaginaryPart() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
     public FloatMatrix1D getRealPart() {
         throw new IllegalAccessError("This method is not supported.");
     }

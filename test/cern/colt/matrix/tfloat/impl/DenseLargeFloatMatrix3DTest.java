@@ -11,7 +11,6 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseLargeFloatMatrix3D(NSLICES, NROWS, NCOLUMNS);
         B = new DenseLargeFloatMatrix3D(NSLICES, NROWS, NCOLUMNS);
@@ -21,9 +20,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
         FloatMatrix3D Acopy = A.copy();
         ((WrapperFloatMatrix3D) A).dct3(true);
         ((WrapperFloatMatrix3D) A).idct3(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -34,9 +33,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
         FloatMatrix3D Acopy = A.copy();
         ((WrapperFloatMatrix3D) A).dst3(true);
         ((WrapperFloatMatrix3D) A).idst3(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -47,9 +46,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
         FloatMatrix3D Acopy = A.copy();
         ((WrapperFloatMatrix3D) A).dht3();
         ((WrapperFloatMatrix3D) A).idht3(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -90,9 +89,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
         FloatMatrix3D Acopy = A.copy();
         ((WrapperFloatMatrix3D) A).dct2Slices(true);
         ((WrapperFloatMatrix3D) A).idct2Slices(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -103,9 +102,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
         FloatMatrix3D Acopy = A.copy();
         ((WrapperFloatMatrix3D) A).dst2Slices(true);
         ((WrapperFloatMatrix3D) A).idst2Slices(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -116,9 +115,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
         FloatMatrix3D Acopy = A.copy();
         ((WrapperFloatMatrix3D) A).dht2Slices();
         ((WrapperFloatMatrix3D) A).idht2Slices(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -128,9 +127,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
     public void testGetFft3() {
         FComplexMatrix3D Ac = ((WrapperFloatMatrix3D) A).getFft3();
         ((DenseLargeFComplexMatrix3D) Ac).ifft3(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     float[] elem = Ac.getQuick(s, r, c);
                     assertEquals(A.getQuick(s, r, c), elem[0], TOL);
                     assertEquals(0, elem[1], TOL);
@@ -142,9 +141,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
     public void testGetIfft3() {
         FComplexMatrix3D Ac = ((WrapperFloatMatrix3D) A).getIfft3(true);
         ((DenseLargeFComplexMatrix3D) Ac).fft3();
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     float[] elem = Ac.getQuick(s, r, c);
                     assertEquals(A.getQuick(s, r, c), elem[0], TOL);
                     assertEquals(0, elem[1], TOL);
@@ -156,9 +155,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
     public void testGetFft2Slices() {
         FComplexMatrix3D Ac = ((WrapperFloatMatrix3D) A).getFft2Slices();
         ((DenseLargeFComplexMatrix3D) Ac).ifft2Slices(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     float[] elem = Ac.getQuick(s, r, c);
                     assertEquals(A.getQuick(s, r, c), elem[0], TOL);
                     assertEquals(0, elem[1], TOL);
@@ -170,9 +169,9 @@ public class DenseLargeFloatMatrix3DTest extends FloatMatrix3DTest {
     public void testGetIfft2Slices() {
         FComplexMatrix3D Ac = ((WrapperFloatMatrix3D) A).getIfft2Slices(true);
         ((DenseLargeFComplexMatrix3D) Ac).fft2Slices();
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     float[] elem = Ac.getQuick(s, r, c);
                     assertEquals(A.getQuick(s, r, c), elem[0], TOL);
                     assertEquals(0, elem[1], TOL);

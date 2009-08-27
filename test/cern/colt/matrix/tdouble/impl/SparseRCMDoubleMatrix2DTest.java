@@ -8,7 +8,6 @@ public class SparseRCMDoubleMatrix2DTest extends DoubleMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseRCMDoubleMatrix2D(NROWS, NCOLUMNS);
         B = new SparseRCMDoubleMatrix2D(NROWS, NCOLUMNS);

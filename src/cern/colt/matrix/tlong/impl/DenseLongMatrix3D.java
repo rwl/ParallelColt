@@ -170,7 +170,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         this.isNoView = !isView;
     }
 
-    @Override
     public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongFunction f) {
         if (size() == 0)
@@ -219,7 +218,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return a;
     }
 
-    @Override
     public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongFunction f, final cern.colt.function.tlong.LongProcedure cond) {
         if (size() == 0)
@@ -280,7 +278,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return a;
     }
 
-    @Override
     public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongFunction f, final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList) {
@@ -331,7 +328,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return a;
     }
 
-    @Override
     public long aggregate(final LongMatrix3D other, final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongLongFunction f) {
         if (!(other instanceof DenseLongMatrix3D)) {
@@ -396,7 +392,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return a;
     }
 
-    @Override
     public LongMatrix3D assign(final cern.colt.function.tlong.LongFunction function) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -440,7 +435,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public LongMatrix3D assign(final long value) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -483,7 +477,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public LongMatrix3D assign(final long[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length
@@ -535,7 +528,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public LongMatrix3D assign(final int[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length
@@ -583,7 +575,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public LongMatrix3D assign(final long[][][] values) {
         if (values.length != slices)
             throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
@@ -702,7 +693,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public LongMatrix3D assign(final cern.colt.function.tlong.LongProcedure cond,
             final cern.colt.function.tlong.LongFunction f) {
         final int zero = (int) index(0, 0, 0);
@@ -755,8 +745,7 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
-    public LongMatrix3D assign(final cern.colt.function.tlong.LongProcedure cond, final int value) {
+    public LongMatrix3D assign(final cern.colt.function.tlong.LongProcedure cond, final long value) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
@@ -807,7 +796,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public LongMatrix3D assign(LongMatrix3D source) {
         // overriden for performance only
         if (!(source instanceof DenseLongMatrix3D)) {
@@ -886,7 +874,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         }
     }
 
-    @Override
     public LongMatrix3D assign(final LongMatrix3D y, final cern.colt.function.tlong.LongLongFunction function) {
         if (!(y instanceof DenseLongMatrix3D)) {
             super.assign(y, function);
@@ -946,7 +933,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public LongMatrix3D assign(final LongMatrix3D y, final cern.colt.function.tlong.LongLongFunction function,
             final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList) {
         if (!(y instanceof DenseLongMatrix3D)) {
@@ -998,7 +984,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         final int zero = (int) index(0, 0, 0);
@@ -1061,12 +1046,10 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return cardinality;
     }
 
-    @Override
     public long[] elements() {
         return elements;
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList, final LongArrayList valueList) {
         sliceList.clear();
@@ -1094,7 +1077,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
 
     }
 
-    @Override
     public void getNonZeros(final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList,
             final LongArrayList valueList) {
         sliceList.clear();
@@ -1122,7 +1104,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList, final LongArrayList valueList) {
         sliceList.clear();
@@ -1150,23 +1131,23 @@ public class DenseLongMatrix3D extends LongMatrix3D {
 
     }
 
-    @Override
     public long getQuick(int slice, int row, int column) {
         return elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
                 * columnStride];
     }
 
-    @Override
     public long index(int slice, int row, int column) {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     public LongMatrix3D like(int slices, int rows, int columns) {
         return new DenseLongMatrix3D(slices, rows, columns);
     }
 
-    @Override
+    public LongMatrix2D like2D(int rows, int columns) {
+        return new DenseLongMatrix2D(rows, columns);
+    }
+
     public long[] getMaxLocation() {
         final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
@@ -1252,7 +1233,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return new long[] { maxValue, slice_loc, row_loc, col_loc };
     }
 
-    @Override
     public long[] getMinLocation() {
         final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
@@ -1338,12 +1318,10 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return new long[] { minValue, slice_loc, row_loc, col_loc };
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, long value) {
         elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride] = value;
     }
 
-    @Override
     public long[][][] toArray() {
         final long[][][] values = new long[slices][rows][columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1391,7 +1369,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return values;
     }
 
-    @Override
     public LongMatrix1D vectorize() {
         LongMatrix1D v = new DenseLongMatrix1D((int) size());
         int length = rows * columns;
@@ -1401,7 +1378,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return v;
     }
 
-    @Override
     public long zSum() {
         long sum = 0;
         final int zero = (int) index(0, 0, 0);
@@ -1456,7 +1432,6 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return sum;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(LongMatrix3D other) {
         if (other instanceof SelectedDenseLongMatrix3D) {
             SelectedDenseLongMatrix3D otherMatrix = (SelectedDenseLongMatrix3D) other;
@@ -1468,12 +1443,10 @@ public class DenseLongMatrix3D extends LongMatrix3D {
         return false;
     }
 
-    @Override
     protected LongMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new DenseLongMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride, true);
     }
 
-    @Override
     protected LongMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseLongMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

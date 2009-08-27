@@ -153,7 +153,7 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      *            the value to be filled into the cells.
      * @return <tt>this</tt> (for convenience only).
      */
-    @Override
+
     public DoubleMatrix1D assign(double value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -166,7 +166,7 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
     /**
      * Returns the number of cells having non-zero values.
      */
-    @Override
+
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -179,7 +179,7 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      * 
      * @return the elements
      */
-    @Override
+
     public AbstractLongDoubleMap elements() {
         return elements;
     }
@@ -198,7 +198,7 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      * @param minCapacity
      *            the desired minimum number of non-zero cells.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
@@ -216,12 +216,12 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
-    public double getQuick(int index) {
+
+    public synchronized double getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return this.elements.get(index(index));
         // manually inlined:
-        return elements.get(zero + index * stride);
+        return elements.get((long) zero + (long) index * (long) stride);
     }
 
     /**
@@ -232,11 +232,11 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // overriden for manual inlining only
         // return _offset(_rank(rank));
-        return zero + rank * stride;
+        return (long) zero + (long) rank * (long) stride;
     }
 
     /**
@@ -252,7 +252,7 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public DoubleMatrix1D like(int size) {
         return new SparseDoubleMatrix1D(size);
     }
@@ -271,19 +271,18 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public DoubleMatrix2D like2D(int rows, int columns) {
         return new SparseDoubleMatrix2D(rows, columns);
     }
 
-    @Override
-    public DoubleMatrix2D reshape(int rows, int cols) {
-        if (rows * cols != size) {
-            throw new IllegalArgumentException("rows*cols != size");
+    public DoubleMatrix2D reshape(int rows, int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
         }
-        DoubleMatrix2D M = new SparseDoubleMatrix2D(rows, cols);
+        DoubleMatrix2D M = new SparseDoubleMatrix2D(rows, columns);
         int idx = 0;
-        for (int c = 0; c < cols; c++) {
+        for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
                 double elem = getQuick(idx++);
                 if (elem != 0) {
@@ -294,15 +293,14 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
         return M;
     }
 
-    @Override
-    public DoubleMatrix3D reshape(int slices, int rows, int cols) {
-        if (slices * rows * cols != size) {
-            throw new IllegalArgumentException("slices*rows*cols != size");
+    public DoubleMatrix3D reshape(int slices, int rows, int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
         }
-        DoubleMatrix3D M = new SparseDoubleMatrix3D(slices, rows, cols);
+        DoubleMatrix3D M = new SparseDoubleMatrix3D(slices, rows, columns);
         int idx = 0;
         for (int s = 0; s < slices; s++) {
-            for (int c = 0; c < cols; c++) {
+            for (int c = 0; c < columns; c++) {
                 for (int r = 0; r < rows; r++) {
                     double elem = getQuick(idx++);
                     if (elem != 0) {
@@ -328,32 +326,30 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public synchronized void setQuick(int index, double value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
         // manually inlined:
-        int i = zero + index * stride;
+        long i = (long) zero + (long) index * (long) stride;
         if (value == 0)
             this.elements.removeKey(i);
         else
             this.elements.put(i, value);
     }
 
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("1 x ").append(size).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');        
+        builder.append("1 x ").append(size).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
         for (int i = 0; i < size; i++) {
-           double elem = getQuick(i);
-           if(elem != 0) {
-            builder.append('(').append(i).append(')').append('\t').append(elem).append('\n');
-           }
+            double elem = getQuick(i);
+            if (elem != 0) {
+                builder.append('(').append(i).append(')').append('\t').append(elem).append('\n');
+            }
         }
         return builder.toString();
     }
-    
-    @Override
+
     public void trimToSize() {
         this.elements.trimToSize();
     }
@@ -361,7 +357,7 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DoubleMatrix1D other) {
         if (other instanceof SelectedSparseDoubleMatrix1D) {
             SelectedSparseDoubleMatrix1D otherMatrix = (SelectedSparseDoubleMatrix1D) other;
@@ -380,7 +376,7 @@ public class SparseDoubleMatrix1D extends DoubleMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected DoubleMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseDoubleMatrix1D(this.elements, offsets);
     }

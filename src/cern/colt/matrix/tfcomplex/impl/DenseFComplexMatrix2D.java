@@ -102,7 +102,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
      *            a real matrix whose elements become a real part of this matrix
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public DenseFComplexMatrix2D(FloatMatrix2D realPart) {
@@ -120,7 +120,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public DenseFComplexMatrix2D(int rows, int columns) {
@@ -152,7 +152,7 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
      * 
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             or flip's are illegal.
      */
     public DenseFComplexMatrix2D(int rows, int columns, float[] elements, int rowZero, int columnZero, int rowStride,
@@ -162,7 +162,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         this.isNoView = isNoView;
     }
 
-    @Override
     public float[] aggregate(final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
             final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
         float[] b = new float[2];
@@ -213,7 +212,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return a;
     }
 
-    @Override
     public float[] aggregate(final FComplexMatrix2D other,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
@@ -282,7 +280,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return a;
     }
 
-    @Override
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -364,7 +361,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond,
             final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
         final int zero = (int) index(0, 0);
@@ -418,7 +414,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -468,7 +463,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final cern.colt.function.tfcomplex.FComplexRealFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -563,7 +557,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final FComplexMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof DenseFComplexMatrix2D)) {
@@ -637,7 +630,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final FComplexMatrix2D y,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction function) {
         // overriden for performance only
@@ -806,7 +798,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final float re, final float im) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -846,7 +837,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final float[] values) {
         if (values.length != rows * 2 * columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()="
@@ -895,7 +885,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assign(final float[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
@@ -986,7 +975,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assignImaginary(final FloatMatrix2D other) {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
@@ -1036,7 +1024,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D assignReal(final FloatMatrix2D other) {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
@@ -1086,7 +1073,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1224,7 +1210,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         }
     }
 
-    @Override
     public FComplexMatrix2D forEachNonZero(final cern.colt.function.tfcomplex.IntIntFComplexFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1276,7 +1261,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D getConjugateTranspose() {
         FComplexMatrix2D transpose = this.viewDice().copy();
         final float[] elemsOther = ((DenseFComplexMatrix2D) transpose).elements;
@@ -1319,12 +1303,10 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return transpose;
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
 
-    @Override
     public FloatMatrix2D getImaginaryPart() {
         final DenseFloatMatrix2D Im = new DenseFloatMatrix2D(rows, columns);
         final float[] elemsOther = Im.elements();
@@ -1373,7 +1355,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return Im;
     }
 
-    @Override
     public void getNonZeros(final IntArrayList rowList, final IntArrayList columnList,
             final ArrayList<float[]> valueList) {
         rowList.clear();
@@ -1397,13 +1378,11 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
 
     }
 
-    @Override
     public float[] getQuick(int row, int column) {
         int idx = rowZero + row * rowStride + columnZero + column * columnStride;
         return new float[] { elements[idx], elements[idx + 1] };
     }
 
-    @Override
     public FloatMatrix2D getRealPart() {
         final DenseFloatMatrix2D R = new DenseFloatMatrix2D(rows, columns);
         final float[] elemsOther = R.elements();
@@ -1546,31 +1525,26 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         }
     }
 
-    @Override
     public FComplexMatrix2D like(int rows, int columns) {
         return new DenseFComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public FComplexMatrix1D like1D(int size) {
         return new DenseFComplexMatrix1D(size);
     }
 
-    @Override
     public void setQuick(int row, int column, float re, float im) {
         int idx = rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = re;
         elements[idx + 1] = im;
     }
 
-    @Override
     public void setQuick(int row, int column, float[] value) {
         int idx = rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = value[0];
         elements[idx + 1] = value[1];
     }
 
-    @Override
     public float[][] toArray() {
         final float[][] values = new float[rows][2 * columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1611,7 +1585,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return values;
     }
 
-    @Override
     public FComplexMatrix1D vectorize() {
         final FComplexMatrix1D v = new DenseFComplexMatrix1D((int) size());
         final int zero = (int) index(0, 0);
@@ -1661,7 +1634,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return v;
     }
 
-    @Override
     public FComplexMatrix1D zMult(final FComplexMatrix1D y, FComplexMatrix1D z, final float[] alpha,
             final float[] beta, boolean transposeA) {
         if (transposeA)
@@ -1769,36 +1741,35 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return zz;
     }
 
-    @Override
     public FComplexMatrix2D zMult(final FComplexMatrix2D B, FComplexMatrix2D C, final float[] alpha,
             final float[] beta, final boolean transposeA, final boolean transposeB) {
         final int rowsA = rows;
-        final int colsA = columns;
+        final int columnsA = columns;
         final int rowsB = B.rows();
-        final int colsB = B.columns();
-        final int rowsC = transposeA ? colsA : rowsA;
-        final int colsC = transposeB ? rowsB : colsB;
+        final int columnsB = B.columns();
+        final int rowsC = transposeA ? columnsA : rowsA;
+        final int columnsC = transposeB ? rowsB : columnsB;
 
         if (C == null)
-            C = new DenseFComplexMatrix2D(rowsC, colsC);
+            C = new DenseFComplexMatrix2D(rowsC, columnsC);
 
         if (transposeA)
             return getConjugateTranspose().zMult(B, C, alpha, beta, false, transposeB);
         if (transposeB)
             return this.zMult(B.getConjugateTranspose(), C, alpha, beta, transposeA, false);
-        if (B.rows() != colsA)
+        if (B.rows() != columnsA)
             throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
                     + B.toStringShort());
-        if (C.rows() != rowsA || C.columns() != colsB)
+        if (C.rows() != rowsA || C.columns() != columnsB)
             throw new IllegalArgumentException("Incompatibe result matrix: " + toStringShort() + ", "
                     + B.toStringShort() + ", " + C.toStringShort());
         if (this == C || B == C)
             throw new IllegalArgumentException("Matrices must not be identical");
-        long flops = 2L * rowsA * colsA * colsB;
+        long flops = 2L * rowsA * columnsA * columnsB;
         int noOfTasks = (int) Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each
         /* thread should process at least 30000 flops */
-        boolean splitB = (colsB >= noOfTasks);
-        int width = splitB ? colsB : rowsA;
+        boolean splitB = (columnsB >= noOfTasks);
+        int width = splitB ? columnsB : rowsA;
         noOfTasks = Math.min(width, noOfTasks);
 
         if (noOfTasks < 2) {
@@ -1815,13 +1786,13 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
             if (splitB) {
                 // split B along columns into blocks
                 AA = this;
-                BB = B.viewPart(0, offset, colsA, span);
+                BB = B.viewPart(0, offset, columnsA, span);
                 CC = C.viewPart(0, offset, rowsA, span);
             } else {
                 // split A along rows into blocks
-                AA = this.viewPart(offset, 0, span, colsA);
+                AA = this.viewPart(offset, 0, span, columnsA);
                 BB = B;
-                CC = C.viewPart(offset, 0, span, colsB);
+                CC = C.viewPart(offset, 0, span, columnsB);
             }
 
             subTasks[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -1971,7 +1942,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return C;
     }
 
-    @Override
     public float[] zSum() {
         float[] sum = new float[2];
         final int zero = (int) index(0, 0);
@@ -2026,7 +1996,6 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return sum;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(FComplexMatrix2D other) {
         if (other instanceof SelectedDenseFComplexMatrix2D) {
             SelectedDenseFComplexMatrix2D otherMatrix = (SelectedDenseFComplexMatrix2D) other;
@@ -2038,17 +2007,14 @@ public class DenseFComplexMatrix2D extends FComplexMatrix2D {
         return false;
     }
 
-    @Override
     public long index(int row, int column) {
         return rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     protected FComplexMatrix1D like1D(int size, int zero, int stride) {
         return new DenseFComplexMatrix1D(size, this.elements, zero, stride, false);
     }
 
-    @Override
     protected FComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseFComplexMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }

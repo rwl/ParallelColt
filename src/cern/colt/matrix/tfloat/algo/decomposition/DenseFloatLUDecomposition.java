@@ -143,7 +143,7 @@ public class DenseFloatLUDecomposition implements java.io.Serializable {
      * 
      * </pre>
      */
-    @Override
+
     public String toString() {
         return quick.toString();
     }

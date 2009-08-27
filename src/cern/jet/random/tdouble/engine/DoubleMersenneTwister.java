@@ -215,7 +215,7 @@ public class DoubleMersenneTwister extends DoubleRandomEngine {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         DoubleMersenneTwister clone = (DoubleMersenneTwister) super.clone();
         clone.mt = this.mt.clone();
@@ -268,7 +268,7 @@ public class DoubleMersenneTwister extends DoubleRandomEngine {
      * interval <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> (including
      * <tt>Integer.MIN_VALUE</tt> and <tt>Integer.MAX_VALUE</tt>).
      */
-    @Override
+
     public int nextInt() {
         /* Each single bit including the sign bit will be random */
         if (mti == N)

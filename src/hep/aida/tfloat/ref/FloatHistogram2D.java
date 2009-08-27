@@ -100,7 +100,6 @@ public class FloatHistogram2D extends FloatAbstractHistogram2D implements FloatI
 
     }
 
-    @Override
     public int allEntries() {
         return nEntry;
     }
@@ -124,7 +123,6 @@ public class FloatHistogram2D extends FloatAbstractHistogram2D implements FloatI
         return sumWeight * sumWeight / sumWeightSquared;
     }
 
-    @Override
     public void fill(float x, float y) {
         // int xBin = xAxis.getBin(x);
         // int yBin = xAxis.getBin(y);
@@ -169,7 +167,7 @@ public class FloatHistogram2D extends FloatAbstractHistogram2D implements FloatI
      * <b>Note 2</b>indexY1 and indexY2 may include the use of under and over
      * flow bins <b>Note 3</b>There is no note 3 (yet)
      */
-    @Override
+
     protected FloatIHistogram1D internalSliceX(String title, int indexY1, int indexY2) {
         // Attention: our internal definition of bins has been choosen
         // so that this works properly even if the indeces passed in include
@@ -205,7 +203,7 @@ public class FloatHistogram2D extends FloatAbstractHistogram2D implements FloatI
      * <b>Note 2</b>indexX1 and indexX2 may include the use of under and over
      * flow bins <b>Note 3</b>There is no note 3 (yet)
      */
-    @Override
+
     protected FloatIHistogram1D internalSliceY(String title, int indexX1, int indexX2) {
         // Attention: our internal definition of bins has been choosen
         // so that this works properly even if the indeces passed in include
@@ -284,7 +282,6 @@ public class FloatHistogram2D extends FloatAbstractHistogram2D implements FloatI
         rmsY = Float.NaN;
     }
 
-    @Override
     public float sumAllBinHeights() {
         return sumWeight;
     }

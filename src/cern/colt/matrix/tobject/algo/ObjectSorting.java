@@ -68,12 +68,11 @@ public class ObjectSorting extends cern.colt.PersistentObject {
 
         // quicksort with
         // mergesort
-        @Override
+
         protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
             cern.colt.Sorting.mergeSort(a, fromIndex, toIndex, c);
         }
 
-        @Override
         protected void runSort(int fromIndex, int toIndex, IntComparator c, cern.colt.Swapper swapper) {
             cern.colt.GenericSorting.mergeSort(fromIndex, toIndex, c, swapper);
         }

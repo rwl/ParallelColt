@@ -78,9 +78,9 @@ package optimization;
  *<li>colvraxpy_f77
  *<li>coldot_f77
  *<li>colvdot_f77
- *<li>colscal_f77
+ *<li>columnscal_f77
  *<li>dscalp_f77
- *<li>colswap_f77
+ *<li>columnswap_f77
  *<li>colnrm2_f77
  *<li>dnrm2p_f77
  *<li>dcopyp_f77
@@ -1142,7 +1142,7 @@ public class Blas_f77 extends Object {
      * 
      */
 
-    public static void colscal_f77(int nrow, double a, double x[][], int begin, int j) {
+    public static void columnscal_f77(int nrow, double a, double x[][], int begin, int j) {
 
         int i, m, mpbegin, end;
 
@@ -1245,7 +1245,7 @@ public class Blas_f77 extends Object {
      * 
      */
 
-    public static void colswap_f77(int n, double x[][], int j1, int j2) {
+    public static void columnswap_f77(int n, double x[][], int j1, int j2) {
 
         double temp;
         int i, m;

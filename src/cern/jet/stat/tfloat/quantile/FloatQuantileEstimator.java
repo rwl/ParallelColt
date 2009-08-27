@@ -148,7 +148,7 @@ abstract class FloatQuantileEstimator extends cern.colt.PersistentObject impleme
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         FloatQuantileEstimator copy = (FloatQuantileEstimator) super.clone();
         if (this.bufferSet != null) {
@@ -301,7 +301,7 @@ abstract class FloatQuantileEstimator extends cern.colt.PersistentObject impleme
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         String s = this.getClass().getName();
         s = s.substring(s.lastIndexOf('.') + 1);

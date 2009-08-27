@@ -12,7 +12,6 @@ public class DoubleBiCGAMGTest extends DoubleBiCGTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new DoubleAMG();

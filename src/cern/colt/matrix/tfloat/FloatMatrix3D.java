@@ -1005,7 +1005,7 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1527,7 +1527,7 @@ public abstract class FloatMatrix3D extends AbstractMatrix3D {
      * 
      * @see cern.colt.matrix.tfloat.algo.FloatFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tfloat.algo.FloatFormatter().toString(this);
     }

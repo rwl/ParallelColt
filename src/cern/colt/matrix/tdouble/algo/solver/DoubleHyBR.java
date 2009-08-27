@@ -285,7 +285,6 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
 
     }
 
-    @Override
     protected void checkSizes(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x) {
         if (b.size() != A.rows())
             throw new IllegalArgumentException("b.size() != A.rows()");

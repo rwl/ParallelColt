@@ -121,6 +121,135 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
         }
         return a;
     }
+    
+    /**
+     * Applies a function to each cell that satisfies a condition and aggregates
+     * the results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param cond
+     *            a condition.
+     * @return the aggregated measure.
+     */
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f, final cern.colt.function.tobject.ObjectProcedure cond) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        Object a = null;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object elem = getQuick(firstRow, 0);
+                        Object a = 0;
+                        if (cond.apply(elem) == true) {
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        int d = 1;
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = d; c < columns; c++) {
+                                elem = getQuick(r, c);
+                                if (cond.apply(elem) == true) {
+                                    a = aggr.apply(a, f.apply(elem));
+                                }
+                            }
+                            d = 0;
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            Object elem = getQuick(0, 0);
+            if (cond.apply(elem) == true) {
+                a = aggr.apply(a, f.apply(elem));
+            }
+            int d = 1; // first cell already done
+            for (int r = 0; r < rows; r++) {
+                for (int c = d; c < columns; c++) {
+                    elem = getQuick(r, c);
+                    if (cond.apply(elem) == true) {
+                        a = aggr.apply(a, f.apply(elem));
+                    }
+                }
+                d = 0;
+            }
+        }
+        return a;
+    }
+
+    /**
+     * 
+     * Applies a function to all cells with a given indexes and aggregates the
+     * results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param rowList
+     *            row indexes.
+     * @param columnList
+     *            column indexes.
+     * 
+     * @return the aggregated measure.
+     */
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f, final IntArrayList rowList, final IntArrayList columnList) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        final int size = rowList.size();
+        final int[] rowElements = rowList.elements();
+        final int[] columnElements = columnList.elements();
+        Object a = 0;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object a = f.apply(getQuick(rowElements[firstIdx], columnElements[firstIdx]));
+                        Object elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            elem = getQuick(rowElements[i], columnElements[i]);
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            Object elem;
+            a = f.apply(getQuick(rowElements[0], columnElements[0]));
+            for (int i = 1; i < size; i++) {
+                elem = getQuick(rowElements[i], columnElements[i]);
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
+
 
     /**
      * Applies a function to each corresponding cell of two matrices and
@@ -172,7 +301,7 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
         checkShape(other);
         if (size() == 0)
             return null;
-        Object a = 0;
+        Object a = null;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, rows);
@@ -329,6 +458,161 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
         }
         return this;
     }
+    
+    /**
+     * Assigns the result of a function to all cells that satisfy a condition.
+     * 
+     * @param cond
+     *            a condition.
+     * 
+     * @param f
+     *            a function object.
+     * @return <tt>this</tt> (for convenience only).
+     */
+    public ObjectMatrix2D assign(final cern.colt.function.tobject.ObjectProcedure cond,
+            final cern.colt.function.tobject.ObjectFunction f) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        Object elem;
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = 0; c < columns; c++) {
+                                elem = getQuick(r, c);
+                                if (cond.apply(elem) == true) {
+                                    setQuick(r, c, f.apply(elem));
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Object elem;
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < columns; c++) {
+                    elem = getQuick(r, c);
+                    if (cond.apply(elem) == true) {
+                        setQuick(r, c, f.apply(elem));
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Assigns a value to all cells that satisfy a condition.
+     * 
+     * @param cond
+     *            a condition.
+     * 
+     * @param value
+     *            a value.
+     * @return <tt>this</tt> (for convenience only).
+     * 
+     */
+    public ObjectMatrix2D assign(final cern.colt.function.tobject.ObjectProcedure cond, final Object value) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        Object elem;
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = 0; c < columns; c++) {
+                                elem = getQuick(r, c);
+                                if (cond.apply(elem) == true) {
+                                    setQuick(r, c, value);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Object elem;
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < columns; c++) {
+                    elem = getQuick(r, c);
+                    if (cond.apply(elem) == true) {
+                        setQuick(r, c, value);
+                    }
+                }
+            }
+        }
+        return this;
+    }
+    
+    /**
+     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
+     * is required to have the form <tt>values[row*column]</tt> and elements
+     * have to be stored in a row-wise order.
+     * <p>
+     * The values are copied. So subsequent changes in <tt>values</tt> are not
+     * reflected in the matrix, and vice-versa.
+     * 
+     * @param values
+     *            the values to be filled into the cells.
+     * @return <tt>this</tt> (for convenience only).
+     * @throws IllegalArgumentException
+     *             if <tt>values.length != rows()*columns()</tt>.
+     */
+    public ObjectMatrix2D assign(final Object[] values) {
+        if (values.length != rows * columns)
+            throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*columns()="
+                    + rows() * columns());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        int idx = firstRow * columns;
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = 0; c < columns; c++) {
+                                setQuick(r, c, values[idx++]);
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+
+            int idx = 0;
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < columns; c++) {
+                    setQuick(r, c, values[idx++]);
+                }
+            }
+        }
+
+        return this;
+    }
 
     /**
      * Replaces all cell values of the receiver with the values of another
@@ -390,29 +674,7 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
     /**
      * Assigns the result of a function to each cell;
      * <tt>x[row,col] = function(x[row,col],y[row,col])</tt>.
-     * <p>
-     * <b>Example:</b>
      * 
-     * <pre>
-     * 	 // assign x[row,col] = x[row,col]&lt;sup&gt;y[row,col]&lt;/sup&gt;
-     * 	 m1 = 2 x 2 matrix 
-     * 	 0 1 
-     * 	 2 3
-     * 
-     * 	 m2 = 2 x 2 matrix 
-     * 	 0 2 
-     * 	 4 6
-     * 
-     * 	 m1.assign(m2, cern.jet.math.Functions.pow);
-     * 	 --&gt;
-     * 	 m1 == 2 x 2 matrix
-     * 	 1   1 
-     * 	 16 729
-     * 
-     * </pre>
-     * 
-     * For further examples, see the <a
-     * href="package-summary.html#FunctionObjects">package doc</a>.
      * 
      * @param y
      *            the secondary matrix to operate on.
@@ -458,6 +720,61 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
         }
         return this;
     }
+    
+    /**
+     * Assigns the result of a function to all cells with a given indexes
+     * 
+     * @param y
+     *            the secondary matrix to operate on.
+     * @param function
+     *            a function object taking as first argument the current cell's
+     *            value of <tt>this</tt>, and as second argument the current
+     *            cell's value of <tt>y</tt>,
+     * @param rowList
+     *            row indexes.
+     * @param columnList
+     *            column indexes.
+     * 
+     * @return <tt>this</tt> (for convenience only).
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
+     */
+    public ObjectMatrix2D assign(final ObjectMatrix2D y, final cern.colt.function.tobject.ObjectObjectFunction function,
+            IntArrayList rowList, IntArrayList columnList) {
+        checkShape(y);
+        final int size = rowList.size();
+        final int[] rowElements = rowList.elements();
+        final int[] columnElements = columnList.elements();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            setQuick(rowElements[i], columnElements[i], function.apply(getQuick(rowElements[i],
+                                    columnElements[i]), y.getQuick(rowElements[i], columnElements[i])));
+                        }
+                    }
+
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                setQuick(rowElements[i], columnElements[i], function.apply(getQuick(rowElements[i], columnElements[i]),
+                        y.getQuick(rowElements[i], columnElements[i])));
+            }
+        }
+        return this;
+    }
+
 
     /**
      * Sets all cells to the state specified by <tt>value</tt>.
@@ -578,7 +895,7 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
-    @Override
+
     public boolean equals(Object otherObj) { // delta
         return equals(otherObj, true);
     }
@@ -634,6 +951,62 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
 
         return true;
 
+    }
+    
+    /**
+     * Assigns the result of a function to each <i>non-zero</i> cell;
+     * <tt>x[row,col] = function(x[row,col])</tt>. Use this method for fast
+     * special-purpose iteration. If you want to modify another matrix instead
+     * of <tt>this</tt> (i.e. work in read-only mode), simply return the input
+     * value unchanged.
+     * 
+     * Parameters to function are as follows: <tt>first==row</tt>,
+     * <tt>second==column</tt>, <tt>third==nonZeroValue</tt>.
+     * 
+     * @param function
+     *            a function object taking as argument the current non-zero
+     *            cell's row, column and value.
+     * @return <tt>this</tt> (for convenience only).
+     */
+    public ObjectMatrix2D forEachNonZero(final cern.colt.function.tobject.IntIntObjectFunction function) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = 0; c < columns; c++) {
+                                Object value = getQuick(r, c);
+                                if (value != null) {
+                                    Object a = function.apply(r, c, value);
+                                    if (a != value)
+                                        setQuick(r, c, a);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < columns; c++) {
+                    Object value = getQuick(r, c);
+                    if (value != null) {
+                        Object a = function.apply(r, c, value);
+                        if (a != value)
+                            setQuick(r, c, a);
+                    }
+                }
+            }
+        }
+        return this;
     }
 
     /**
@@ -907,10 +1280,18 @@ public abstract class ObjectMatrix2D extends AbstractMatrix2D {
      * 
      * @see cern.colt.matrix.tobject.algo.ObjectFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tobject.algo.ObjectFormatter().toString(this);
     }
+    
+    /**
+     * Returns a vector obtained by stacking the columns of the matrix on top of
+     * one another.
+     * 
+     * @return a vector of columns of this matrix.
+     */
+    public abstract ObjectMatrix1D vectorize();
 
     /**
      * Constructs and returns a new view equal to the receiver. The view is a

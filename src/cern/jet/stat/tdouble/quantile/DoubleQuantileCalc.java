@@ -128,15 +128,13 @@ class DoubleQuantileCalc extends Object {
 
             while (h <= maxHeight && // skip heights until x<=0
                     (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1)))
-                            - (Math.round(binomial(b + h - 3, h - 3)))
-                            + (Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
+                            - (Math.round(binomial(b + h - 3, h - 3))) + (Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
                 h++;
             }
             // from now on x is monotonically growing...
             while (h <= maxHeight && // skip heights until x>0
                     (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1)))
-                            - (Math.round(binomial(b + h - 3, h - 3)))
-                            + (Math.round(binomial(b + h - 3, h - 2))) - c <= 0.0) {
+                            - (Math.round(binomial(b + h - 3, h - 3))) + (Math.round(binomial(b + h - 3, h - 2))) - c <= 0.0) {
                 h++;
             }
             h--; // go back to last height
@@ -145,8 +143,7 @@ class DoubleQuantileCalc extends Object {
             int hMax;
             if (h >= maxHeight
                     && (h - 2) * ((double) Math.round(binomial(b + h - 2, h - 1)))
-                            - (Math.round(binomial(b + h - 3, h - 3)))
-                            + (Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
+                            - (Math.round(binomial(b + h - 3, h - 3))) + (Math.round(binomial(b + h - 3, h - 2))) - c > 0.0) {
                 hMax = Integer.MIN_VALUE;
             } else {
                 hMax = h;

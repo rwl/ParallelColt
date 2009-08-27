@@ -79,7 +79,7 @@ public class NegativeBinomial extends AbstractDiscreteDistribution {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         NegativeBinomial copy = (NegativeBinomial) super.clone();
         if (this.poisson != null)
@@ -94,7 +94,7 @@ public class NegativeBinomial extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public int nextInt() {
         return nextInt(n, p);
     }
@@ -166,7 +166,7 @@ public class NegativeBinomial extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + n + "," + p + ")";
     }

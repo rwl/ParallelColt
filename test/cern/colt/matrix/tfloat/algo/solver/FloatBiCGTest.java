@@ -9,7 +9,6 @@ public class FloatBiCGTest extends FloatIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new FloatBiCG(x);
         M = solver.getPreconditioner(); //identity preconditioner

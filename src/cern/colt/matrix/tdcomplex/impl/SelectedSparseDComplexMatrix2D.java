@@ -27,7 +27,7 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, double[]> elements;
+    protected ConcurrentHashMap<Long, double[]> elements;
 
     /**
      * The offsets of the visible cells of this matrix.
@@ -66,7 +66,7 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseDComplexMatrix2D(int rows, int columns, ConcurrentHashMap<Integer, double[]> elements,
+    protected SelectedSparseDComplexMatrix2D(int rows, int columns, ConcurrentHashMap<Long, double[]> elements,
             int rowZero, int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets,
             int offset) {
         // be sure parameters are valid, we do not check...
@@ -91,29 +91,25 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseDComplexMatrix2D(ConcurrentHashMap<Integer, double[]> elements, int[] rowOffsets,
+    protected SelectedSparseDComplexMatrix2D(ConcurrentHashMap<Long, double[]> elements, int[] rowOffsets,
             int[] columnOffsets, int offset) {
         this(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
     }
 
-    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
 
-    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
 
-    @Override
     public double[] getQuick(int row, int column) {
-        return elements.get(offset + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride]);
+        return elements.get((long) offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride]);
     }
 
-    @Override
-    public ConcurrentHashMap<Integer, double[]> elements() {
+    public ConcurrentHashMap<Long, double[]> elements() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
@@ -127,7 +123,7 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DComplexMatrix2D other) {
         if (other instanceof SelectedSparseDComplexMatrix2D) {
             SelectedSparseDComplexMatrix2D otherMatrix = (SelectedSparseDComplexMatrix2D) other;
@@ -139,31 +135,28 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
         return false;
     }
 
-    @Override
     public long index(int row, int column) {
-        return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        return (long) this.offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
     }
 
-    @Override
     public DComplexMatrix2D like(int rows, int columns) {
         return new SparseDComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public DComplexMatrix1D like1D(int size) {
         return new SparseDComplexMatrix1D(size);
     }
 
-    @Override
     protected DComplexMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
         // properly.
     }
 
-    @Override
     public void setQuick(int row, int column, double[] value) {
-        int index = offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
 
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(index);
@@ -171,14 +164,13 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
             this.elements.put(index, value);
     }
 
-    @Override
     public DComplexMatrix1D vectorize() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
     public void setQuick(int row, int column, double re, double im) {
-        int index = offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
 
         if (re == 0 && im == 0)
             this.elements.remove(index);
@@ -187,7 +179,6 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
 
     }
 
-    @Override
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -195,7 +186,6 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
         this.offset = 0;
     }
 
-    @Override
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -209,7 +199,6 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -221,7 +210,6 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
                 viewOffset);
     }
 
-    @Override
     public DComplexMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -233,17 +221,14 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
                 viewOffset);
     }
 
-    @Override
     protected DComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseDComplexMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }
 
-    @Override
     public DoubleMatrix2D getImaginaryPart() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
     public DoubleMatrix2D getRealPart() {
         throw new IllegalAccessError("This method is not supported.");
     }

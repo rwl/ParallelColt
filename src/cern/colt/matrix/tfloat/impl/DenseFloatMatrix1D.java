@@ -112,7 +112,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         this.isNoView = !isView;
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f) {
         if (size == 0)
@@ -148,7 +147,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return a;
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f, final IntArrayList indexList) {
         if (size() == 0)
@@ -193,7 +191,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return a;
     }
 
-    @Override
     public float aggregate(final FloatMatrix1D other, final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFloatFunction f) {
         if (!(other instanceof DenseFloatMatrix1D)) {
@@ -242,7 +239,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return a;
     }
 
-    @Override
     public FloatMatrix1D assign(final cern.colt.function.tfloat.FloatFunction function) {
         final float multiplicator;
         if (function instanceof cern.jet.math.tfloat.FloatMult) {
@@ -302,7 +298,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return this;
     }
 
-    @Override
     public FloatMatrix1D assign(final cern.colt.function.tfloat.FloatProcedure cond,
             final cern.colt.function.tfloat.FloatFunction function) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -339,7 +334,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return this;
     }
 
-    @Override
     public FloatMatrix1D assign(final cern.colt.function.tfloat.FloatProcedure cond, final float value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -375,7 +369,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return this;
     }
 
-    @Override
     public FloatMatrix1D assign(final float value) {
         final float[] elems = this.elements;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -407,7 +400,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return this;
     }
 
-    @Override
     public FloatMatrix1D assign(final float[] values) {
         if (values.length != size)
             throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
@@ -446,7 +438,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return this;
     }
 
-    @Override
     public FloatMatrix1D assign(FloatMatrix1D source) {
         // overriden for performance only
         if (!(source instanceof DenseFloatMatrix1D)) {
@@ -510,7 +501,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return this;
     }
 
-    @Override
     public FloatMatrix1D assign(final FloatMatrix1D y, final cern.colt.function.tfloat.FloatFloatFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseFloatMatrix1D)) {
@@ -677,7 +667,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -790,7 +779,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
@@ -880,7 +868,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return c;
     }
 
-    @Override
     public void getNonZeros(final IntArrayList indexList, final FloatArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -927,7 +914,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList indexList, final FloatArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -974,7 +960,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         }
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList indexList, final FloatArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -1021,7 +1006,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         }
     }
 
-    @Override
     public float[] getMaxLocation() {
         int location = 0;
         float maxValue = 0;
@@ -1082,7 +1066,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return new float[] { maxValue, location };
     }
 
-    @Override
     public float[] getMinLocation() {
         int location = 0;
         float minValue = 0;
@@ -1143,7 +1126,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return new float[] { minValue, location };
     }
 
-    @Override
     public float getQuick(int index) {
         return elements[zero + index * stride];
     }
@@ -1247,17 +1229,14 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public FloatMatrix1D like(int size) {
         return new DenseFloatMatrix1D(size);
     }
 
-    @Override
     public FloatMatrix2D like2D(int rows, int columns) {
         return new DenseFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public FloatMatrix2D reshape(final int rows, final int columns) {
         if (rows * columns != size) {
             throw new IllegalArgumentException("rows*columns != size");
@@ -1307,7 +1286,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return M;
     }
 
-    @Override
     public FloatMatrix3D reshape(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != size) {
             throw new IllegalArgumentException("slices*rows*columns != size");
@@ -1362,12 +1340,10 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return M;
     }
 
-    @Override
     public void setQuick(int index, float value) {
         elements[zero + index * stride] = value;
     }
 
-    @Override
     public void swap(final FloatMatrix1D other) {
         // overriden for performance only
         if (!(other instanceof DenseFloatMatrix1D)) {
@@ -1418,7 +1394,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         }
     }
 
-    @Override
     public void toArray(float[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
@@ -1428,7 +1403,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
             super.toArray(values);
     }
 
-    @Override
     public float zDotProduct(FloatMatrix1D y, int from, int length) {
         if (!(y instanceof DenseFloatMatrix1D)) {
             return super.zDotProduct(y, from, length);
@@ -1512,7 +1486,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return sum;
     }
 
-    @Override
     public float zSum() {
         float sum = 0;
         final float[] elems = this.elements;
@@ -1562,7 +1535,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return sum;
     }
 
-    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int index = zero;
@@ -1576,7 +1548,6 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return cardinality;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
         if (other instanceof SelectedDenseFloatMatrix1D) {
             SelectedDenseFloatMatrix1D otherMatrix = (SelectedDenseFloatMatrix1D) other;
@@ -1588,12 +1559,10 @@ public class DenseFloatMatrix1D extends FloatMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
-    @Override
     protected FloatMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseFloatMatrix1D(this.elements, offsets);
     }

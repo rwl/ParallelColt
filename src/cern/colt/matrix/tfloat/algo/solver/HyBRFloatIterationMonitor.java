@@ -38,7 +38,6 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         this.stoppingCondition = HyBRStoppingCondition.PERFORMED_MAX_NUMBER_OF_ITERATIONS;
     }
 
-    @Override
     public boolean converged(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, x, iter);
@@ -47,7 +46,6 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         return convergedI(r, x);
     }
 
-    @Override
     public boolean converged(float r) throws IterativeSolverFloatNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, iter);
@@ -56,7 +54,6 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         return convergedI(r);
     }
 
-    @Override
     protected boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException {
         // Store initial residual
         if (isFirst())
@@ -65,8 +62,7 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         // Check for divergence
         if (initR != -1.0) {
             if (r > dtol * initR)
-                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Divergence,
-                        this);
+                throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Divergence, this);
         }
         if (iter >= (maxIter + 1))
             throw new IterativeSolverFloatNotConvergedException(FloatNotConvergedException.Reason.Iterations, this);
@@ -77,17 +73,14 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
         return false;
     }
 
-    @Override
     protected boolean convergedI(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         return convergedI(r);
     }
 
-    @Override
     public int getMaxIterations() {
         return maxIter;
     }
 
-    @Override
     public void setMaxIterations(int maxIter) {
         this.maxIter = maxIter;
     }
@@ -123,7 +116,8 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
     /**
      * Sets the regularization parameter
      * 
-     * @param regularizationParameter regularization parameter
+     * @param regularizationParameter
+     *            regularization parameter
      */
     public void setRegularizationParameter(float regularizationParameter) {
         this.regularizationParameter = regularizationParameter;
@@ -132,7 +126,8 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
     /**
      * Sets the stopping condition
      * 
-     * @param stoppingCondition stopping condition
+     * @param stoppingCondition
+     *            stopping condition
      */
     public void setStoppingCondition(HyBRStoppingCondition stoppingCondition) {
         this.stoppingCondition = stoppingCondition;
@@ -146,8 +141,7 @@ public class HyBRFloatIterationMonitor extends AbstractFloatIterationMonitor {
     public HyBRStoppingCondition getStoppingCondition() {
         return stoppingCondition;
     }
-    
-    @Override
+
     public int iterations() {
         return Math.min(iter, maxIter);
     }

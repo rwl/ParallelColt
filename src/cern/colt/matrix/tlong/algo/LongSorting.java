@@ -13,6 +13,7 @@ import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tlong.LongMatrix1D;
 import cern.colt.matrix.tlong.LongMatrix2D;
 import cern.colt.matrix.tlong.LongMatrix3D;
+import cern.colt.matrix.tlong.impl.DenseLongMatrix1D;
 
 /**
  * Matrix quicksorts and mergesorts. Use idioms like
@@ -66,12 +67,10 @@ public class LongSorting extends cern.colt.PersistentObject {
          */
         private static final long serialVersionUID = 1L;
 
-        @Override
         protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
             cern.colt.Sorting.mergeSort(a, fromIndex, toIndex, c);
         }
 
-        @Override
         protected void runSort(int fromIndex, int toIndex, IntComparator c, cern.colt.Swapper swapper) {
             cern.colt.GenericSorting.mergeSort(fromIndex, toIndex, c, swapper);
         }
@@ -84,32 +83,6 @@ public class LongSorting extends cern.colt.PersistentObject {
     protected LongSorting() {
     }
 
-    /**
-     * Compare two values, one of which is assumed to be Long.NaN
-     */
-    private static final int compareNaN(int a, int b) {
-        if (a != a) {
-            if (b != b)
-                return 0; // NaN equals NaN
-            else
-                return 1; // e.g. NaN > 5
-        }
-        return -1; // e.g. 5 < NaN
-    }
-
-    /**
-     * Compare two values, one of which is assumed to be Long.NaN
-     */
-    private static final int compareNaN(long a, long b) {
-        if (a != a) {
-            if (b != b)
-                return 0; // NaN equals NaN
-            else
-                return 1; // e.g. NaN > 5
-        }
-        return -1; // e.g. 5 < NaN
-    }
-    
     protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
         cern.colt.Sorting.parallelQuickSort(a, fromIndex, toIndex, c);
     }
@@ -145,29 +118,7 @@ public class LongSorting extends cern.colt.PersistentObject {
      *         matrix is left unaffected.</b>
      */
     public LongMatrix1D sort(final LongMatrix1D vector) {
-        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
-        // instead of matrix itself
-        for (int i = indexes.length; --i >= 0;)
-            indexes[i] = i;
-
-        final int[] velems = (int[]) vector.elements();
-        final int zero = (int) vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                long av = velems[idxa];
-                long bv = velems[idxb];
-                if (av != av || bv != bv)
-                    return compareNaN(av, bv); // swap NaNs to the end
-                return av < bv ? -1 : (av == bv ? 0 : 1);
-            }
-        };
-
-        runSort(indexes, 0, indexes.length, comp);
-
-        return vector.viewSelection(indexes);
+        return vector.viewSelection(sortIndex(vector));
     }
 
     /**
@@ -181,21 +132,29 @@ public class LongSorting extends cern.colt.PersistentObject {
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
-
-        final int[] velems = (int[]) vector.elements();
-        final int zero = (int) vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                int av = velems[idxa];
-                int bv = velems[idxb];
-                if (av != av || bv != bv)
-                    return compareNaN(av, bv); // swap NaNs to the end
-                return av < bv ? -1 : (av == bv ? 0 : 1);
-            }
-        };
+        IntComparator comp = null;
+        if (vector instanceof DenseLongMatrix1D) {
+            final long[] velems = (long[]) vector.elements();
+            final int zero = (int) vector.index(0);
+            final int stride = vector.stride();
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    int idxa = zero + a * stride;
+                    int idxb = zero + b * stride;
+                    long av = velems[idxa];
+                    long bv = velems[idxb];
+                    return av < bv ? -1 : (av == bv ? 0 : 1);
+                }
+            };
+        } else {
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    long av = vector.getQuick(a);
+                    long bv = vector.getQuick(b);
+                    return av < bv ? -1 : (av == bv ? 0 : 1);
+                }
+            };
+        }
 
         runSort(indexes, 0, indexes.length, comp);
 
@@ -232,24 +191,7 @@ public class LongSorting extends cern.colt.PersistentObject {
      *         vector (matrix) is left unaffected.</b>
      */
     public LongMatrix1D sort(final LongMatrix1D vector, final cern.colt.function.tlong.LongComparator c) {
-        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
-        // instead of matrix itself
-        for (int i = indexes.length; --i >= 0;)
-            indexes[i] = i;
-
-        final long[] velems = (long[]) vector.elements();
-        final int zero = (int) vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                return c.compare(velems[idxa], velems[idxb]);
-            }
-        };
-        runSort(indexes, 0, indexes.length, comp);
-
-        return vector.viewSelection(indexes);
+        return vector.viewSelection(sortIndex(vector, c));
     }
 
     /**
@@ -265,17 +207,25 @@ public class LongSorting extends cern.colt.PersistentObject {
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
-
-        final int[] velems = (int[]) vector.elements();
-        final int zero = (int) vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                return c.compare(velems[idxa], velems[idxb]);
-            }
-        };
+        IntComparator comp = null;
+        if (vector instanceof DenseLongMatrix1D) {
+            final long[] velems = (long[]) vector.elements();
+            final int zero = (int) vector.index(0);
+            final int stride = vector.stride();
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    int idxa = zero + a * stride;
+                    int idxb = zero + b * stride;
+                    return c.compare(velems[idxa], velems[idxb]);
+                }
+            };
+        } else {
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    return c.compare(vector.getQuick(a), vector.getQuick(b));
+                }
+            };
+        }
 
         runSort(indexes, 0, indexes.length, comp);
 
@@ -382,8 +332,6 @@ public class LongSorting extends cern.colt.PersistentObject {
             public int compare(int x, int y) {
                 long a = aggregates[x];
                 long b = aggregates[y];
-                if (a != a || b != b)
-                    return compareNaN(a, b); // swap NaNs to the end
                 return a < b ? -1 : (a == b) ? 0 : 1;
             }
         };
@@ -471,8 +419,6 @@ public class LongSorting extends cern.colt.PersistentObject {
             public int compare(int a, int b) {
                 long av = col.getQuick(a);
                 long bv = col.getQuick(b);
-                if (av != av || bv != bv)
-                    return compareNaN(av, bv); // swap NaNs to the end
                 return av < bv ? -1 : (av == bv ? 0 : 1);
             }
         };
@@ -590,8 +536,6 @@ public class LongSorting extends cern.colt.PersistentObject {
             public int compare(int a, int b) {
                 long av = sliceView.getQuick(a);
                 long bv = sliceView.getQuick(b);
-                if (av != av || bv != bv)
-                    return compareNaN(av, bv); // swap NaNs to the end
                 return av < bv ? -1 : (av == bv ? 0 : 1);
             }
         };

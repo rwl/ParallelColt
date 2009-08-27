@@ -11,7 +11,7 @@ package cern.colt.map.tint;
 import cern.colt.function.tint.IntIntProcedure;
 import cern.colt.function.tint.IntProcedure;
 import cern.colt.list.tint.IntArrayList;
-import cern.colt.map.tdouble.AbstractDoubleMap;
+import cern.colt.map.AbstractMap;
 
 /**
  * Abstract base class for hash maps holding (key,value) associations of type
@@ -29,7 +29,7 @@ import cern.colt.map.tdouble.AbstractDoubleMap;
  * @version 1.0, 09/24/99
  * @see java.util.HashMap
  */
-public abstract class AbstractIntIntMap extends AbstractDoubleMap {
+public abstract class AbstractIntIntMap extends AbstractMap {
     /**
      * 
      */
@@ -121,19 +121,19 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      * 
      * <pre>
      * m1.forEachPair(
-     * 	new IntIntProcedure() {
-     * 		public boolean apply(int key, int value) {
-     * 			return m2.containsKey(key) &amp;&amp; m2.get(key) == value;
-     * 		}
-     * 	}
+     *  new IntIntProcedure() {
+     *      public boolean apply(int key, int value) {
+     *          return m2.containsKey(key) &amp;&amp; m2.get(key) == value;
+     *      }
+     *  }
      * )
      * &amp;&amp;
      * m2.forEachPair(
-     * 	new IntIntProcedure() {
-     * 		public boolean apply(int key, int value) {
-     * 			return m1.containsKey(key) &amp;&amp; m1.get(key) == value;
-     * 		}
-     * 	}
+     *  new IntIntProcedure() {
+     *      public boolean apply(int key, int value) {
+     *          return m1.containsKey(key) &amp;&amp; m1.get(key) == value;
+     *      }
+     *  }
      * );
      * </pre>
      * 
@@ -147,7 +147,7 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -229,7 +229,7 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      * @param value
      *            the value to search for.
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
-     *         <tt>Integer.MIN_VALUE</tt> if no such key exists.
+     *         <tt>Int.MIN_VALUE</tt> if no such key exists.
      */
     public int keyOf(final int value) {
         final int[] foundKey = new int[1];
@@ -312,10 +312,10 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      * <b>Example:</b> <br>
      * 
      * <pre>
-     * 	 IntIntProcedure condition = new IntIntProcedure() { // match even keys only
-     * 	 public boolean apply(int key, int value) { return key%2==0; }
-     * 	 }
-     * 	 keys = (8,7,6), values = (1,2,2) --&gt; keyList = (6,8), valueList = (2,1)
+     *   IntIntProcedure condition = new IntIntProcedure() { // match even keys only
+     *   public boolean apply(int key, int value) { return key%2==0; }
+     *   }
+     *   keys = (8,7,6), values = (1,2,2) --&gt; keyList = (6,8), valueList = (2,1)
      * &lt;/tt&gt;
      * </pre>
      * 
@@ -438,7 +438,7 @@ public abstract class AbstractIntIntMap extends AbstractDoubleMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
-    @Override
+
     public String toString() {
         IntArrayList theKeys = keys();
         // theKeys.sort();

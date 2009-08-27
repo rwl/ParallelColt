@@ -71,7 +71,7 @@ public class DoubleRandomSamplingAssistant extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         DoubleRandomSamplingAssistant copy = (DoubleRandomSamplingAssistant) super.clone();
         copy.sampler = (DoubleRandomSampler) this.sampler.clone();

@@ -129,7 +129,7 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public SparseFloatMatrix2D(int rows, int columns) {
@@ -159,7 +159,7 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      *             .
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public SparseFloatMatrix2D(int rows, int columns, int initialCapacity, float minLoadFactor, float maxLoadFactor) {
@@ -298,7 +298,7 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             or flip's are illegal.
      */
     protected SparseFloatMatrix2D(int rows, int columns, AbstractLongFloatMap elements, int rowZero, int columnZero,
@@ -313,7 +313,6 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         this.isNoView = false;
     }
 
-    @Override
     public FloatMatrix2D assign(cern.colt.function.tfloat.FloatFunction function) {
         if (this.isNoView && function instanceof cern.jet.math.tfloat.FloatMult) { // x[i] = mult*x[i]
             this.elements.assign(function);
@@ -323,7 +322,6 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(float value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -333,7 +331,6 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(FloatMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof SparseFloatMatrix2D)) {
@@ -351,7 +348,6 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return super.assign(source);
     }
 
-    @Override
     public FloatMatrix2D assign(final FloatMatrix2D y, cern.colt.function.tfloat.FloatFloatFunction function) {
         if (!this.isNoView)
             return super.assign(y, function);
@@ -368,9 +364,7 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
                     return value;
                 }
             });
-        }
-
-        if (function == cern.jet.math.tfloat.FloatFunctions.mult) { // x[i] = x[i] * y[i]
+        } else if (function == cern.jet.math.tfloat.FloatFunctions.mult) { // x[i] = x[i] * y[i]
             this.elements.forEachPair(new cern.colt.function.tfloat.LongFloatProcedure() {
                 public boolean apply(long key, float value) {
                     int i = (int) (key / columns);
@@ -381,10 +375,7 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
                     return true;
                 }
             });
-        }
-
-        if (function == cern.jet.math.tfloat.FloatFunctions.div) { // x[i] = x[i] /
-            // y[i]
+        } else if (function == cern.jet.math.tfloat.FloatFunctions.div) { // x[i] = x[i] /  y[i]
             this.elements.forEachPair(new cern.colt.function.tfloat.LongFloatProcedure() {
                 public boolean apply(long key, float value) {
                     int i = (int) (key / columns);
@@ -395,6 +386,8 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
                     return true;
                 }
             });
+        } else {
+            super.assign(y, function);
         }
         return this;
 
@@ -514,7 +507,6 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -616,17 +608,14 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return A;
     }
 
-    @Override
     public AbstractLongFloatMap elements() {
         return elements;
     }
 
-    @Override
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
 
-    @Override
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
         if (this.isNoView) {
             this.elements.forEachPair(new cern.colt.function.tfloat.LongFloatProcedure() {
@@ -645,38 +634,32 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
-    public float getQuick(int row, int column) {
-        return this.elements.get(rowZero + (long) row * (long) rowStride + columnZero + (long) column
+    public synchronized float getQuick(int row, int column) {
+        return this.elements.get((long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column
                 * (long) columnStride);
     }
 
-    @Override
     public long index(int row, int column) {
-        return rowZero + (long) row * (long) rowStride + columnZero + (long) column * (long) columnStride;
+        return (long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new SparseFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         return new SparseFloatMatrix1D(size);
     }
 
-    @Override
     public synchronized void setQuick(int row, int column, float value) {
-        long index = rowZero + (long) row * (long) rowStride + columnZero + (long) column
+        long index = (long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column
                 * (long) columnStride;
         if (value == 0)
             this.elements.removeKey(index);
         else
             this.elements.put(index, value);
     }
-    
-    @Override
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
@@ -693,28 +676,23 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return builder.toString();
     }
 
-    @Override
     public void trimToSize() {
         this.elements.trimToSize();
     }
 
-    @Override
     public FloatMatrix1D vectorize() {
         SparseFloatMatrix1D v = new SparseFloatMatrix1D((int) size());
         int idx = 0;
         for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
                 float elem = getQuick(r, c);
-                if (elem != 0) {
-                    v.setQuick(idx++, elem);
-                }
+                v.setQuick(idx++, elem);
             }
         }
         return v;
     }
 
-    @Override
-    public FloatMatrix1D zMult(FloatMatrix1D y, FloatMatrix1D z, float alpha, float beta, final boolean transposeA) {
+    public FloatMatrix1D zMult(FloatMatrix1D y, FloatMatrix1D z, final float alpha, float beta, final boolean transposeA) {
         int rowsA = rows;
         int columnsA = columns;
         if (transposeA) {
@@ -736,7 +714,7 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
                     + z.toStringShort());
 
         if (!ignore)
-            z.assign(cern.jet.math.tfloat.FloatFunctions.mult(beta / alpha));
+            z.assign(cern.jet.math.tfloat.FloatFunctions.mult(beta));
 
         DenseFloatMatrix1D zz = (DenseFloatMatrix1D) z;
         final float[] elementsZ = zz.elements;
@@ -760,17 +738,14 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
                     i = j;
                     j = tmp;
                 }
-                elementsZ[zeroZ + strideZ * i] += value * elementsY[zeroY + strideY * j];
+                elementsZ[zeroZ + strideZ * i] += alpha * value * elementsY[zeroY + strideY * j];
                 return true;
             }
         });
 
-        if (alpha != 1)
-            z.assign(cern.jet.math.tfloat.FloatFunctions.mult(alpha));
         return z;
     }
 
-    @Override
     public FloatMatrix2D zMult(FloatMatrix2D B, FloatMatrix2D C, final float alpha, float beta,
             final boolean transposeA, boolean transposeB) {
         if (!(this.isNoView)) {
@@ -878,7 +853,6 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(FloatMatrix2D other) {
         if (other instanceof SelectedSparseFloatMatrix2D) {
             SelectedSparseFloatMatrix2D otherMatrix = (SelectedSparseFloatMatrix2D) other;
@@ -890,12 +864,10 @@ public class SparseFloatMatrix2D extends FloatMatrix2D {
         return false;
     }
 
-    @Override
     protected FloatMatrix1D like1D(int size, int offset, int stride) {
         return new SparseFloatMatrix1D(size, this.elements, offset, stride);
     }
 
-    @Override
     protected FloatMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFloatMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }

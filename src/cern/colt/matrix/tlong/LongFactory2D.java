@@ -34,8 +34,9 @@ import cern.jet.math.tlong.LongFunctions;
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Appending rows and columns </i></td>
- * <td>Use methods {@link #appendColumns(LongMatrix2D,LongMatrix2D) appendColumns}, {@link #appendColumns(LongMatrix2D,LongMatrix2D) appendRows} and
- * {@link #repeat(LongMatrix2D,int,int) repeat} to append rows and columns.</td>
+ * <td>Use methods {@link #appendColumns(LongMatrix2D,LongMatrix2D)
+ * appendColumns}, {@link #appendColumns(LongMatrix2D,LongMatrix2D) appendRows}
+ * and {@link #repeat(LongMatrix2D,int,int) repeat} to append rows and columns.</td>
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> General block matrices </i></td>
@@ -51,7 +52,8 @@ import cern.jet.math.tlong.LongFunctions;
  * </tr>
  * <tr align="left" valign="top">
  * <td><i> Diagonal block matrices </i></td>
- * <td>Use method {@link #composeDiagonal(LongMatrix2D,LongMatrix2D,LongMatrix2D)
+ * <td>Use method
+ * {@link #composeDiagonal(LongMatrix2D,LongMatrix2D,LongMatrix2D)
  * composeDiagonal} to work with diagonal block matrices.</td>
  * </tr>
  * <tr align="left" valign="top">
@@ -233,7 +235,8 @@ public class LongFactory2D extends cern.colt.PersistentObject {
      */
     public LongMatrix2D ascending(int rows, int columns) {
         cern.jet.math.tlong.LongFunctions F = cern.jet.math.tlong.LongFunctions.longFunctions;
-        return descending(rows, columns).assign(LongFunctions.chain(LongFunctions.neg, LongFunctions.minus(columns * rows)));
+        return descending(rows, columns).assign(
+                LongFunctions.chain(LongFunctions.neg, LongFunctions.minus(columns * rows)));
     }
 
     /**
@@ -376,7 +379,7 @@ public class LongFactory2D extends cern.colt.PersistentObject {
      * 
      * </td>
      * <td><tt>IllegalArgumentException<br>
-     A[0,1].cols != A[2,1].cols<br>
+     A[0,1].columns != A[2,1].columns<br>
      (2 != 3)</tt></td>
      * </tr>
      * </table>

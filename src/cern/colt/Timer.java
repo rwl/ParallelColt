@@ -189,7 +189,7 @@ public class Timer {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return "Time=" + String.format("%.4f", this.elapsedTime()) + " secs";
 

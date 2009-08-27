@@ -8,7 +8,6 @@ public class DenseFComplexMatrix3DTest extends FComplexMatrix3DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseFComplexMatrix3D(NSLICES, NROWS, NCOLUMNS);
         B = new DenseFComplexMatrix3D(NSLICES, NROWS, NCOLUMNS);
@@ -18,9 +17,9 @@ public class DenseFComplexMatrix3DTest extends FComplexMatrix3DTest {
         FComplexMatrix3D Acopy = A.copy();
         ((DenseFComplexMatrix3D) A).fft3();
         ((DenseFComplexMatrix3D) A).ifft3(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -31,9 +30,9 @@ public class DenseFComplexMatrix3DTest extends FComplexMatrix3DTest {
         FComplexMatrix3D Acopy = A.copy();
         ((DenseFComplexMatrix3D) A).fft2Slices();
         ((DenseFComplexMatrix3D) A).ifft2Slices(true);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Acopy.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }

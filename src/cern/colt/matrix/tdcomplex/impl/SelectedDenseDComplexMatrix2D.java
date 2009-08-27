@@ -111,17 +111,14 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         this.isNoView = false;
     }
 
-    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
 
-    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
 
-    @Override
     public double[] getQuick(int row, int column) {
         int idxr = rowZero + row * rowStride;
         int idxc = columnZero + column * columnStride;
@@ -129,7 +126,6 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
                 elements[offset + rowOffsets[idxr] + columnOffsets[idxc] + 1] };
     }
 
-    @Override
     public double[] elements() {
         throw new IllegalAccessError("This method is not supported.");
 
@@ -145,7 +141,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DComplexMatrix2D other) {
         if (other instanceof SelectedDenseDComplexMatrix2D) {
             SelectedDenseDComplexMatrix2D otherMatrix = (SelectedDenseDComplexMatrix2D) other;
@@ -157,29 +153,24 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return false;
     }
 
-    @Override
     public long index(int row, int column) {
         return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
     }
 
-    @Override
     public DComplexMatrix2D like(int rows, int columns) {
         return new DenseDComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public DComplexMatrix1D like1D(int size) {
         return new DenseDComplexMatrix1D(size);
     }
 
-    @Override
     protected DComplexMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
         // properly.
     }
 
-    @Override
     public void setQuick(int row, int column, double[] value) {
         int idxr = rowZero + row * rowStride;
         int idxc = columnZero + column * columnStride;
@@ -187,12 +178,10 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         elements[offset + rowOffsets[idxr] + columnOffsets[idxc] + 1] = value[1];
     }
 
-    @Override
     public DComplexMatrix1D vectorize() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
     public void setQuick(int row, int column, double re, double im) {
         int idxr = rowZero + row * rowStride;
         int idxc = columnZero + column * columnStride;
@@ -200,7 +189,6 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         elements[offset + rowOffsets[idxr] + columnOffsets[idxc] + 1] = im;
     }
 
-    @Override
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -208,7 +196,6 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         this.offset = 0;
     }
 
-    @Override
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -220,7 +207,6 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -231,7 +217,6 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return new SelectedDenseDComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets, viewOffset);
     }
 
-    @Override
     public DComplexMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -242,12 +227,10 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return new SelectedDenseDComplexMatrix1D(viewSize, this.elements, viewZero, viewStride, viewOffsets, viewOffset);
     }
 
-    @Override
     protected DComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDComplexMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }
 
-    @Override
     public DoubleMatrix2D getRealPart() {
         final DenseDoubleMatrix2D R = new DenseDoubleMatrix2D(rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -283,7 +266,6 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
         return R;
     }
 
-    @Override
     public DoubleMatrix2D getImaginaryPart() {
         final DenseDoubleMatrix2D Im = new DenseDoubleMatrix2D(rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

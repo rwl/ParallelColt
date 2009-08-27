@@ -114,7 +114,7 @@ public class SparseDoubleAlgebra {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         return new SparseDoubleAlgebra(property.tolerance());
     }
@@ -141,7 +141,7 @@ public class SparseDoubleAlgebra {
      * @return the LU-decomposition of the given matrix
      */
     public SparseDoubleLUDecomposition lu(DoubleMatrix2D matrix, int order) {
-        return new SparseDoubleLUDecomposition(matrix, order);
+        return new SparseDoubleLUDecomposition(matrix, order, true);
     }
 
     /**
@@ -239,6 +239,6 @@ public class SparseDoubleAlgebra {
         } else {
             qr(A, 0).solve(x);
             return x.viewPart(0, A.columns()).copy();
-        }        
+        }
     }
 }

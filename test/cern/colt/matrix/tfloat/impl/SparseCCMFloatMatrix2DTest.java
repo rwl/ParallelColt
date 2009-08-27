@@ -8,7 +8,6 @@ public class SparseCCMFloatMatrix2DTest extends FloatMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseCCMFloatMatrix2D(NROWS, NCOLUMNS);
         B = new SparseCCMFloatMatrix2D(NROWS, NCOLUMNS);

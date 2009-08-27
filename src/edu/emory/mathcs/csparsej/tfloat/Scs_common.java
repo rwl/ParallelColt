@@ -190,7 +190,7 @@ public class Scs_common {
         public int[] r;
 
         /**
-         * size nb+1, block k is cols s[k] to s[k+1]-1 in A(p,q)
+         * size nb+1, block k is columns s[k] to s[k+1]-1 in A(p,q)
          */
         public int[] s;
 

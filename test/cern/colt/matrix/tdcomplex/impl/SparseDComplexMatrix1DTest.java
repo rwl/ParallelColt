@@ -8,7 +8,6 @@ public class SparseDComplexMatrix1DTest extends DComplexMatrix1DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseDComplexMatrix1D(SIZE);
         B = new SparseDComplexMatrix1D(SIZE);

@@ -116,4 +116,13 @@ public class HashFunctions extends Object {
     public static int hash(boolean value) {
         return value ? 1231 : 1237;
     }
+
+    /**
+     * Returns a hashcode for the specified value.
+     * 
+     * @return a hash code value for the specified value.
+     */
+    public static int hash(byte value) {
+        return value;
+    }
 }

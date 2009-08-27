@@ -32,7 +32,7 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, double[]> elements;
+    protected ConcurrentHashMap<Long, double[]> elements;
 
     /**
      * Constructs a matrix with a copy of the given values. <tt>values</tt> is
@@ -69,7 +69,7 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
      */
     public SparseDComplexMatrix2D(int rows, int columns) {
         setUp(rows, columns);
-        this.elements = new ConcurrentHashMap<Integer, double[]>(rows * (columns / 1000));
+        this.elements = new ConcurrentHashMap<Long, double[]>(rows * (columns / 1000));
     }
 
     /**
@@ -96,14 +96,13 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
      *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             or flip's are illegal.
      */
-    protected SparseDComplexMatrix2D(int rows, int columns, ConcurrentHashMap<Integer, double[]> elements, int rowZero,
+    protected SparseDComplexMatrix2D(int rows, int columns, ConcurrentHashMap<Long, double[]> elements, int rowZero,
             int columnZero, int rowStride, int columnStride) {
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
         this.elements = elements;
         this.isNoView = false;
     }
 
-    @Override
     public DComplexMatrix2D assign(double[] value) {
         // overriden for performance only
         if (this.isNoView && value[0] == 0 && value[1] == 0)
@@ -113,7 +112,6 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(DComplexMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof SparseDComplexMatrix2D)) {
@@ -132,7 +130,6 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
         return super.assign(source);
     }
 
-    @Override
     public DComplexMatrix2D assign(final DComplexMatrix2D y,
             cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction function) {
         if (!this.isNoView)
@@ -140,9 +137,9 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
 
         checkShape(y);
 
-        if (function instanceof cern.jet.math.tdcomplex.DComplexPlusMult) {
+        if (function instanceof cern.jet.math.tdcomplex.DComplexPlusMultSecond) {
             // x[i] = x[i] + alpha*y[i]
-            final double[] alpha = ((cern.jet.math.tdcomplex.DComplexPlusMult) function).multiplicator;
+            final double[] alpha = ((cern.jet.math.tdcomplex.DComplexPlusMultSecond) function).multiplicator;
             if (alpha[0] == 0 && alpha[1] == 1)
                 return this; // nothing to do
             y.forEachNonZero(new cern.colt.function.tdcomplex.IntIntDComplexFunction() {
@@ -156,7 +153,6 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
         return super.assign(y, function);
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -164,9 +160,9 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
             return super.cardinality();
     }
 
-    @Override
-    public double[] getQuick(int row, int column) {
-        double[] elem = this.elements.get(rowZero + row * rowStride + columnZero + column * columnStride);
+    public synchronized double[] getQuick(int row, int column) {
+        double[] elem = this.elements.get((long) rowZero + (long) row * (long) rowStride + (long) columnZero
+                + (long) column * (long) columnStride);
         if (elem != null) {
             return new double[] { elem[0], elem[1] };
         } else {
@@ -174,8 +170,7 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
         }
     }
 
-    @Override
-    public ConcurrentHashMap<Integer, double[]> elements() {
+    public ConcurrentHashMap<Long, double[]> elements() {
         return elements;
     }
 
@@ -188,7 +183,7 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DComplexMatrix2D other) {
         if (other instanceof SelectedSparseDComplexMatrix2D) {
             SelectedSparseDComplexMatrix2D otherMatrix = (SelectedSparseDComplexMatrix2D) other;
@@ -200,36 +195,31 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
         return false;
     }
 
-    @Override
     public long index(int row, int column) {
-        return rowZero + row * rowStride + columnZero + column * columnStride;
+        return (long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
     }
 
-    @Override
     public DComplexMatrix2D like(int rows, int columns) {
         return new SparseDComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public DComplexMatrix1D like1D(int size) {
         return new SparseDComplexMatrix1D(size);
     }
 
-    @Override
     protected DComplexMatrix1D like1D(int size, int offset, int stride) {
         return new SparseDComplexMatrix1D(size, this.elements, offset, stride);
     }
 
-    @Override
-    public void setQuick(int row, int column, double[] value) {
-        int index = rowZero + row * rowStride + columnZero + column * columnStride;
+    public synchronized void setQuick(int row, int column, double[] value) {
+        long index = (long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column
+                * (long) columnStride;
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(index);
         else
             this.elements.put(index, value);
     }
 
-    @Override
     public DComplexMatrix1D vectorize() {
         final SparseDComplexMatrix1D v = new SparseDComplexMatrix1D((int) size());
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -270,9 +260,9 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
         return v;
     }
 
-    @Override
-    public void setQuick(int row, int column, double re, double im) {
-        int index = rowZero + row * rowStride + columnZero + column * columnStride;
+    public synchronized void setQuick(int row, int column, double re, double im) {
+        long index = (long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column
+                * (long) columnStride;
         if (re == 0 && im == 0)
             this.elements.remove(index);
         else
@@ -280,12 +270,10 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
 
     }
 
-    @Override
     protected DComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseDComplexMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }
 
-    @Override
     public DoubleMatrix2D getImaginaryPart() {
         final DoubleMatrix2D Im = new SparseDoubleMatrix2D(rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -318,7 +306,6 @@ public class SparseDComplexMatrix2D extends DComplexMatrix2D {
         return Im;
     }
 
-    @Override
     public DoubleMatrix2D getRealPart() {
         final DoubleMatrix2D Re = new SparseDoubleMatrix2D(rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

@@ -91,7 +91,7 @@ public class ExactDoubleQuantileFinder extends cern.colt.PersistentObject implem
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         ExactDoubleQuantileFinder copy = (ExactDoubleQuantileFinder) super.clone();
         if (this.buffer != null)
@@ -198,7 +198,7 @@ public class ExactDoubleQuantileFinder extends cern.colt.PersistentObject implem
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         String s = this.getClass().getName();
         s = s.substring(s.lastIndexOf('.') + 1);

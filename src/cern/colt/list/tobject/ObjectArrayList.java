@@ -166,7 +166,7 @@ public class ObjectArrayList extends AbstractList {
      * @param length
      *            number of dummies to be inserted.
      */
-    @Override
+
     protected void beforeInsertDummies(int index, int length) {
         if (index > size || index < 0)
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
@@ -301,7 +301,7 @@ public class ObjectArrayList extends AbstractList {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         ObjectArrayList v = (ObjectArrayList) super.clone();
         v.elements = elements.clone();
@@ -418,7 +418,7 @@ public class ObjectArrayList extends AbstractList {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
-    @Override
+
     public boolean equals(Object otherObj) { // delta
         return equals(otherObj, true);
     }
@@ -737,7 +737,7 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void mergeSortFromTo(int from, int to) {
         if (size == 0)
             return;
@@ -844,7 +844,7 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void quickSortFromTo(int from, int to) {
         if (size == 0)
             return;
@@ -936,7 +936,7 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void removeFromTo(int from, int to) {
         checkRangeFromTo(from, to, size);
         int numMoved = size - to - 1;
@@ -1080,7 +1080,7 @@ public class ObjectArrayList extends AbstractList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
-    @Override
+
     public void replaceFromWith(int from, java.util.Collection other) {
         checkRange(from, size);
         java.util.Iterator e = other.iterator();
@@ -1130,7 +1130,7 @@ public class ObjectArrayList extends AbstractList {
      * Reverses the elements of the receiver. Last becomes first, second last
      * becomes second first, and so on.
      */
-    @Override
+
     public void reverse() {
         Object tmp;
         int limit = size / 2;
@@ -1178,6 +1178,22 @@ public class ObjectArrayList extends AbstractList {
     public void setQuick(int index, Object element) {
         elements[index] = element;
     }
+    
+    /**
+     * Sets the size of the receiver without modifying it otherwise. This method
+     * should not release or allocate new memory but simply set some instance
+     * variable like <tt>size</tt>.
+     * 
+     * If your subclass overrides and delegates size changing methods to some
+     * other object, you must make sure that those overriding methods not only
+     * update the size of the delegate but also of this class. For example:
+     * public DatabaseList extends AbstractLongList { ... public void
+     * removeFromTo(int from,int to) { myDatabase.removeFromTo(from,to);
+     * this.setSizeRaw(size-(to-from+1)); } }
+     */
+    public void setSizeRaw(int newSize) {
+        size = newSize;
+    }
 
     /**
      * Randomly permutes the part of the receiver between <code>from</code>
@@ -1192,7 +1208,7 @@ public class ObjectArrayList extends AbstractList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void shuffleFromTo(int from, int to) {
         if (size == 0)
             return;
@@ -1218,7 +1234,7 @@ public class ObjectArrayList extends AbstractList {
      * 
      * @return the number of elements contained in the receiver.
      */
-    @Override
+
     public int size() {
         return size;
     }
@@ -1278,7 +1294,7 @@ public class ObjectArrayList extends AbstractList {
      * Returns a <code>java.util.ArrayList</code> containing all the elements in
      * the receiver.
      */
-    @Override
+
     public java.util.ArrayList toList() {
         int mySize = size();
         Object[] theElements = elements;
@@ -1292,7 +1308,7 @@ public class ObjectArrayList extends AbstractList {
      * Returns a string representation of the receiver, containing the String
      * representation of each element.
      */
-    @Override
+
     public String toString() {
         return cern.colt.Arrays.toString(partFromTo(0, size() - 1).elements());
     }
@@ -1302,7 +1318,7 @@ public class ObjectArrayList extends AbstractList {
      * Releases any superfluos internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
-    @Override
+
     public void trimToSize() {
         elements = cern.colt.Arrays.trimToCapacity(elements, size());
     }

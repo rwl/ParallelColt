@@ -6,7 +6,6 @@ public class DiagonalFloatMatrix2DViewTest extends DiagonalFloatMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         DINDEX = 3;
         A = new DiagonalFloatMatrix2D(NCOLUMNS, NROWS, -DINDEX);

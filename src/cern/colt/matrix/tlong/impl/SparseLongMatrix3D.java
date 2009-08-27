@@ -15,14 +15,14 @@ import cern.colt.matrix.tlong.LongMatrix2D;
 import cern.colt.matrix.tlong.LongMatrix3D;
 
 /**
- * Sparse hashed 3-d matrix holding <tt>int</tt> elements. First see the <a
+ * Sparse hashed 3-d matrix holding <tt>long</tt> elements. First see the <a
  * href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
  * Note that this implementation is not synchronized. Uses a
- * {@link cern.colt.map.tlong.OpenLongLongHashMap}, which is a compact and
+ * {@link cern.colt.map.tlong.OpenIntLongHashMap}, which is a compact and
  * performant hashing technique.
  * <p>
  * <b>Memory requirements:</b>
@@ -83,7 +83,7 @@ import cern.colt.matrix.tlong.LongMatrix3D;
  * </pre>
  * 
  * @see cern.colt.map
- * @see cern.colt.map.tlong.OpenLongLongHashMap
+ * @see cern.colt.map.tlong.OpenIntLongHashMap
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  * 
@@ -136,7 +136,7 @@ public class SparseLongMatrix3D extends LongMatrix3D {
      * @param columns
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
-     *             if <tt>(int)slices*columns*rows > Long.MAX_VALUE</tt>.
+     *             if <tt>(long)slices*columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
@@ -147,7 +147,8 @@ public class SparseLongMatrix3D extends LongMatrix3D {
     /**
      * Constructs a matrix with a given number of slices, rows and columns using
      * memory as specified. All entries are initially <tt>0</tt>. For details
-     * related to memory usage see {@link cern.colt.map.tlong.OpenLongLongHashMap}.
+     * related to memory usage see
+     * {@link cern.colt.map.tlong.OpenIntLongHashMap}.
      * 
      * @param slices
      *            the number of slices the matrix shall have.
@@ -168,13 +169,18 @@ public class SparseLongMatrix3D extends LongMatrix3D {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      * @throws IllegalArgumentException
-     *             if <tt>(int)columns*rows > Long.MAX_VALUE</tt>.
+     *             if <tt>(double)columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
     public SparseLongMatrix3D(int slices, int rows, int columns, int initialCapacity, double minLoadFactor,
             double maxLoadFactor) {
-        setUp(slices, rows, columns);
+        try {
+            setUp(slices, rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold slices*rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
         this.elements = new OpenLongLongHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
     }
 
@@ -205,18 +211,22 @@ public class SparseLongMatrix3D extends LongMatrix3D {
      *            the number of elements between two columns, i.e.
      *            <tt>index(k,i,j+1)-index(k,i,j)</tt>.
      * @throws IllegalArgumentException
-     *             if <tt>(int)slices*columns*rows > Long.MAX_VALUE</tt>.
+     *             if <tt>(long)slices*columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
     protected SparseLongMatrix3D(int slices, int rows, int columns, AbstractLongLongMap elements, int sliceZero,
             int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
-        setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
+        try {
+            setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
+        } catch (IllegalArgumentException exc) { // we can hold slices*rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
         this.elements = elements;
         this.isNoView = false;
     }
 
-    @Override
     public LongMatrix3D assign(long value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -226,7 +236,6 @@ public class SparseLongMatrix3D extends LongMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -234,42 +243,41 @@ public class SparseLongMatrix3D extends LongMatrix3D {
             return super.cardinality();
     }
 
-    @Override
     public AbstractLongLongMap elements() {
         return elements;
     }
 
-    @Override
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
 
-    @Override
-    public long getQuick(int slice, int row, int column) {
+    public synchronized long getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
         // IndexOutOfBoundsException("slice:"+slice+", row:"+row+",
         // column:"+column);
         // return elements.get(index(slice,row,column));
         // manually inlined:
-        return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
-                * columnStride);
+        return elements.get((long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride);
     }
 
-    @Override
     public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
         // manually inlined:
-        return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        return (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row * (long) rowStride
+                + (long) columnZero + (long) column * (long) columnStride;
     }
 
-    @Override
     public LongMatrix3D like(int slices, int rows, int columns) {
         return new SparseLongMatrix3D(slices, rows, columns);
     }
 
-    @Override
+    public LongMatrix2D like2D(int rows, int columns) {
+        return new SparseLongMatrix2D(rows, columns);
+    }
+
     public synchronized void setQuick(int slice, int row, int column, long value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -277,24 +285,45 @@ public class SparseLongMatrix3D extends LongMatrix3D {
         // column:"+column);
         // int index = index(slice,row,column);
         // manually inlined:
-        int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        long index = (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
         if (value == 0)
             this.elements.removeKey(index);
         else
             this.elements.put(index, value);
     }
 
-    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(slices).append(" x ").append(rows).append(" x ").append(columns)
+                .append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        for (int s = 0; s < slices; s++) {
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < columns; c++) {
+                    long elem = getQuick(s, r, c);
+                    if (elem != 0) {
+                        builder.append('(').append(s).append(',').append(r).append(',').append(c).append(')').append(
+                                '\t').append(elem).append('\n');
+                    }
+                }
+            }
+        }
+        return builder.toString();
+    }
+
     public void trimToSize() {
         this.elements.trimToSize();
     }
 
-    @Override
     public LongMatrix1D vectorize() {
-        throw new IllegalArgumentException("This method is not supported.");
+        LongMatrix1D v = new SparseLongMatrix1D((int) size());
+        int length = rows * columns;
+        for (int s = 0; s < slices; s++) {
+            v.viewPart(s * length, length).assign(viewSlice(s).vectorize());
+        }
+        return v;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(LongMatrix3D other) {
         if (other instanceof SelectedSparseLongMatrix3D) {
             SelectedSparseLongMatrix3D otherMatrix = (SelectedSparseLongMatrix3D) other;
@@ -306,12 +335,10 @@ public class SparseLongMatrix3D extends LongMatrix3D {
         return false;
     }
 
-    @Override
     protected LongMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new SparseLongMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
 
-    @Override
     protected LongMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseLongMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

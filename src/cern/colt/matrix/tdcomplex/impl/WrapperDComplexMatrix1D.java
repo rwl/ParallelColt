@@ -32,122 +32,99 @@ public class WrapperDComplexMatrix1D extends DComplexMatrix1D {
         this.content = newContent;
     }
 
-    @Override
     protected DComplexMatrix1D getContent() {
         return this.content;
     }
 
-    @Override
-    public double[] getQuick(int index) {
+    public synchronized double[] getQuick(int index) {
         return content.getQuick(index);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
     public DComplexMatrix1D like(int size) {
         return content.like(size);
     }
 
-    @Override
     public DComplexMatrix2D like2D(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
-    @Override
-    public DComplexMatrix2D reshape(int rows, int cols) {
+    public DComplexMatrix2D reshape(int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public DComplexMatrix3D reshape(int slices, int rows, int cols) {
+    public DComplexMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public void setQuick(int index, double[] value) {
+    public synchronized void setQuick(int index, double[] value) {
         content.setQuick(index, value);
     }
 
-    @Override
-    public void setQuick(int index, double re, double im) {
+    public synchronized void setQuick(int index, double re, double im) {
         content.setQuick(index, re, im);
     }
 
-    @Override
     public DComplexMatrix1D viewFlip() {
         WrapperDComplexMatrix1D view = new WrapperDComplexMatrix1D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int index) {
+            public synchronized double[] getQuick(int index) {
                 return content.getQuick(size - 1 - index);
             }
 
-            @Override
-            public void setQuick(int index, double[] value) {
+            public synchronized void setQuick(int index, double[] value) {
                 content.setQuick(size - 1 - index, value);
             }
 
-            @Override
-            public void setQuick(int index, double re, double im) {
+            public synchronized void setQuick(int index, double re, double im) {
                 content.setQuick(size - 1 - index, re, im);
             }
 
-            @Override
-            public double[] get(int index) {
+            public synchronized double[] get(int index) {
                 return content.get(size - 1 - index);
             }
 
-            @Override
-            public void set(int index, double[] value) {
+            public synchronized void set(int index, double[] value) {
                 content.set(size - 1 - index, value);
             }
 
-            @Override
-            public void set(int index, double re, double im) {
+            public synchronized void set(int index, double re, double im) {
                 content.set(size - 1 - index, re, im);
             }
         };
         return view;
     }
 
-    @Override
     public DComplexMatrix1D viewPart(final int index, int width) {
         checkRange(index, width);
         WrapperDComplexMatrix1D view = new WrapperDComplexMatrix1D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int i) {
+            public synchronized double[] getQuick(int i) {
                 return content.getQuick(index + i);
             }
 
-            @Override
-            public void setQuick(int i, double[] value) {
+            public synchronized void setQuick(int i, double[] value) {
                 content.setQuick(index + i, value);
             }
 
-            @Override
-            public void setQuick(int i, double re, double im) {
+            public synchronized void setQuick(int i, double re, double im) {
                 content.setQuick(index + i, re, im);
             }
 
-            @Override
-            public double[] get(int i) {
+            public synchronized double[] get(int i) {
                 return content.get(index + i);
             }
 
-            @Override
-            public void set(int i, double[] value) {
+            public synchronized void set(int i, double[] value) {
                 content.set(index + i, value);
             }
 
-            @Override
-            public void set(int i, double re, double im) {
+            public synchronized void set(int i, double re, double im) {
                 content.set(index + i, re, im);
             }
         };
@@ -155,7 +132,6 @@ public class WrapperDComplexMatrix1D extends DComplexMatrix1D {
         return view;
     }
 
-    @Override
     public DComplexMatrix1D viewSelection(int[] indexes) {
         // check for "all"
         if (indexes == null) {
@@ -170,33 +146,27 @@ public class WrapperDComplexMatrix1D extends DComplexMatrix1D {
         WrapperDComplexMatrix1D view = new WrapperDComplexMatrix1D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int i) {
+            public synchronized double[] getQuick(int i) {
                 return content.getQuick(idx[i]);
             }
 
-            @Override
-            public void setQuick(int i, double[] value) {
+            public synchronized void setQuick(int i, double[] value) {
                 content.setQuick(idx[i], value);
             }
 
-            @Override
-            public void setQuick(int i, double re, double im) {
+            public synchronized void setQuick(int i, double re, double im) {
                 content.setQuick(idx[i], re, im);
             }
 
-            @Override
-            public double[] get(int i) {
+            public synchronized double[] get(int i) {
                 return content.get(idx[i]);
             }
 
-            @Override
-            public void set(int i, double[] value) {
+            public synchronized void set(int i, double[] value) {
                 content.set(idx[i], value);
             }
 
-            @Override
-            public void set(int i, double re, double im) {
+            public synchronized void set(int i, double re, double im) {
                 content.set(idx[i], re, im);
             }
         };
@@ -204,45 +174,37 @@ public class WrapperDComplexMatrix1D extends DComplexMatrix1D {
         return view;
     }
 
-    @Override
     protected DComplexMatrix1D viewSelectionLike(int[] offsets) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     public DComplexMatrix1D viewStrides(final int _stride) {
         if (stride <= 0)
             throw new IndexOutOfBoundsException("illegal stride: " + stride);
         WrapperDComplexMatrix1D view = new WrapperDComplexMatrix1D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int index) {
+            public synchronized double[] getQuick(int index) {
                 return content.getQuick(index * _stride);
             }
 
-            @Override
-            public void setQuick(int index, double[] value) {
+            public synchronized void setQuick(int index, double[] value) {
                 content.setQuick(index * _stride, value);
             }
 
-            @Override
-            public void setQuick(int index, double re, double im) {
+            public synchronized void setQuick(int index, double re, double im) {
                 content.setQuick(index * _stride, re, im);
             }
 
-            @Override
-            public double[] get(int index) {
+            public synchronized double[] get(int index) {
                 return content.get(index * _stride);
             }
 
-            @Override
-            public void set(int index, double[] value) {
+            public synchronized void set(int index, double[] value) {
                 content.set(index * _stride, value);
             }
 
-            @Override
-            public void set(int index, double re, double im) {
+            public synchronized void set(int index, double re, double im) {
                 content.set(index * _stride, re, im);
             }
 
@@ -252,12 +214,10 @@ public class WrapperDComplexMatrix1D extends DComplexMatrix1D {
         return view;
     }
 
-    @Override
     public DoubleMatrix1D getImaginaryPart() {
         return content.getImaginaryPart();
     }
 
-    @Override
     public DoubleMatrix1D getRealPart() {
         return content.getRealPart();
     }

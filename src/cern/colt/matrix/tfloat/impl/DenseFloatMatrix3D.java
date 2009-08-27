@@ -171,7 +171,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         this.isNoView = !isView;
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f) {
         if (size() == 0)
@@ -220,7 +219,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return a;
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f, final cern.colt.function.tfloat.FloatProcedure cond) {
         if (size() == 0)
@@ -281,7 +279,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return a;
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f, final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList) {
@@ -332,7 +329,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return a;
     }
 
-    @Override
     public float aggregate(final FloatMatrix3D other, final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFloatFunction f) {
         if (!(other instanceof DenseFloatMatrix3D)) {
@@ -397,7 +393,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return a;
     }
 
-    @Override
     public FloatMatrix3D assign(final cern.colt.function.tfloat.FloatFunction function) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -440,7 +435,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public FloatMatrix3D assign(final cern.colt.function.tfloat.FloatProcedure cond,
             final cern.colt.function.tfloat.FloatFunction f) {
         final int zero = (int) index(0, 0, 0);
@@ -492,7 +486,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public FloatMatrix3D assign(final cern.colt.function.tfloat.FloatProcedure cond, final float value) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -543,7 +536,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public FloatMatrix3D assign(final float value) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -585,7 +577,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public FloatMatrix3D assign(final float[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length
@@ -644,7 +635,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public FloatMatrix3D assign(final float[][][] values) {
         if (values.length != slices)
             throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
@@ -777,7 +767,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public FloatMatrix3D assign(FloatMatrix3D source) {
         // overriden for performance only
         if (!(source instanceof DenseFloatMatrix3D)) {
@@ -863,7 +852,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         }
     }
 
-    @Override
     public FloatMatrix3D assign(final FloatMatrix3D y, final cern.colt.function.tfloat.FloatFloatFunction function) {
         if (!(y instanceof DenseFloatMatrix3D)) {
             super.assign(y, function);
@@ -922,7 +910,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public FloatMatrix3D assign(final FloatMatrix3D y, final cern.colt.function.tfloat.FloatFloatFunction function,
             final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList) {
         if (!(y instanceof DenseFloatMatrix3D)) {
@@ -974,7 +961,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         final int zero = (int) index(0, 0, 0);
@@ -1210,7 +1196,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
@@ -1488,7 +1473,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return C;
     }
 
-    @Override
     public float[] getMaxLocation() {
         final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
@@ -1573,7 +1557,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return new float[] { maxValue, slice_loc, row_loc, col_loc };
     }
 
-    @Override
     public float[] getMinLocation() {
         final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
@@ -1658,7 +1641,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return new float[] { minValue, slice_loc, row_loc, col_loc };
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList, final FloatArrayList valueList) {
         sliceList.clear();
@@ -1686,7 +1668,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
     }
 
-    @Override
     public void getNonZeros(final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList,
             final FloatArrayList valueList) {
         sliceList.clear();
@@ -1714,7 +1695,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList, final FloatArrayList valueList) {
         sliceList.clear();
@@ -1742,7 +1722,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
 
     }
 
-    @Override
     public float getQuick(int slice, int row, int column) {
         return elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
                 * columnStride];
@@ -2000,27 +1979,22 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public long index(int slice, int row, int column) {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     public FloatMatrix3D like(int slices, int rows, int columns) {
         return new DenseFloatMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public FloatMatrix2D like2D(int rows, int columns) {
         return new DenseFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float value) {
         elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride] = value;
     }
 
-    @Override
     public float[][][] toArray() {
         final float[][][] values = new float[slices][rows][columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -2067,7 +2041,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return values;
     }
 
-    @Override
     public FloatMatrix1D vectorize() {
         FloatMatrix1D v = new DenseFloatMatrix1D((int) size());
         int length = rows * columns;
@@ -2077,7 +2050,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return v;
     }
 
-    @Override
     public void zAssign27Neighbors(FloatMatrix3D B, cern.colt.function.tfloat.Float27Function function) {
         // overridden for performance only
         if (!(B instanceof DenseFloatMatrix3D)) {
@@ -2215,7 +2187,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         }
     }
 
-    @Override
     public float zSum() {
         float sum = 0;
         final int zero = (int) index(0, 0, 0);
@@ -2269,7 +2240,6 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return sum;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(FloatMatrix3D other) {
         if (other instanceof SelectedDenseFloatMatrix3D) {
             SelectedDenseFloatMatrix3D otherMatrix = (SelectedDenseFloatMatrix3D) other;
@@ -2281,12 +2251,10 @@ public class DenseFloatMatrix3D extends FloatMatrix3D {
         return false;
     }
 
-    @Override
     protected FloatMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new DenseFloatMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride, true);
     }
 
-    @Override
     protected FloatMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseFloatMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

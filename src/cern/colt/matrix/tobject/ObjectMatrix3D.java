@@ -129,6 +129,144 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
         }
         return a;
     }
+    
+    /**
+     * Applies a function to each cell that satisfies a condition and aggregates
+     * the results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param cond
+     *            a condition.
+     * @return the aggregated measure.
+     */
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f, final cern.colt.function.tobject.ObjectProcedure cond) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        Object a = null;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object elem = getQuick(firstSlice, 0, 0);
+                        Object a = 0;
+                        if (cond.apply(elem) == true) {
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        int d = 1;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = d; c < columns; c++) {
+                                    elem = getQuick(s, r, c);
+                                    if (cond.apply(elem) == true) {
+                                        a = aggr.apply(a, f.apply(elem));
+                                    }
+                                    d = 0;
+                                }
+                            }
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            Object elem = getQuick(0, 0, 0);
+            if (cond.apply(elem) == true) {
+                a = aggr.apply(a, f.apply(elem));
+            }
+            int d = 1;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = d; c < columns; c++) {
+                        elem = getQuick(s, r, c);
+                        if (cond.apply(elem) == true) {
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        d = 0;
+                    }
+                }
+            }
+        }
+        return a;
+    }
+
+    /**
+     * Applies a function to all cells with a given indexes and aggregates the
+     * results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param sliceList
+     *            slice indexes.
+     * @param rowList
+     *            row indexes.
+     * @param columnList
+     *            column indexes.
+     * @return the aggregated measure.
+     */
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f, final IntArrayList sliceList, final IntArrayList rowList,
+            final IntArrayList columnList) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        if (sliceList.size() == 0 || rowList.size() == 0 || columnList.size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        final int size = sliceList.size();
+        final int[] sliceElements = sliceList.elements();
+        final int[] rowElements = rowList.elements();
+        final int[] columnElements = columnList.elements();
+        Object a = null;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object a = f.apply(getQuick(sliceElements[firstIdx], rowElements[firstIdx],
+                                columnElements[firstIdx]));
+                        Object elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            elem = getQuick(sliceElements[i], rowElements[i], columnElements[i]);
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            a = f.apply(getQuick(sliceElements[0], rowElements[0], columnElements[0]));
+            Object elem;
+            for (int i = 1; i < size; i++) {
+                elem = getQuick(sliceElements[i], rowElements[i], columnElements[i]);
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
+
 
     /**
      * Applies a function to each corresponding cell of two matrices and
@@ -226,6 +364,117 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
         }
         return a;
     }
+    
+    /**
+     * Assigns the result of a function to all cells that satisfy a condition.
+     * 
+     * @param cond
+     *            a condition.
+     * 
+     * @param f
+     *            a function object.
+     * @return <tt>this</tt> (for convenience only).
+     */
+    public ObjectMatrix3D assign(final cern.colt.function.tobject.ObjectProcedure cond,
+            final cern.colt.function.tobject.ObjectFunction f) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        Object elem;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    elem = getQuick(s, r, c);
+                                    if (cond.apply(elem) == true) {
+                                        setQuick(s, r, c, f.apply(elem));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Object elem;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        elem = getQuick(s, r, c);
+                        if (cond.apply(elem) == true) {
+                            setQuick(s, r, c, f.apply(elem));
+                        }
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Assigns a value to all cells that satisfy a condition.
+     * 
+     * @param cond
+     *            a condition.
+     * 
+     * @param value
+     *            a value.
+     * @return <tt>this</tt> (for convenience only).
+     * 
+     */
+    public ObjectMatrix3D assign(final cern.colt.function.tobject.ObjectProcedure cond, final Object value) {
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        Object elem;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    elem = getQuick(s, r, c);
+                                    if (cond.apply(elem) == true) {
+                                        setQuick(s, r, c, value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Object elem;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        elem = getQuick(s, r, c);
+                        if (cond.apply(elem) == true) {
+                            setQuick(s, r, c, value);
+                        }
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
 
     /**
      * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
@@ -297,6 +546,59 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
                                 + currentRow.length + "columns()=" + columns());
                     for (int c = 0; c < columns; c++) {
                         setQuick(s, r, c, currentRow[c]);
+                    }
+                }
+            }
+        }
+        return this;
+    }
+    
+    /**
+     * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
+     * is required to have the form <tt>values[slice*row*column]</tt>.
+     * <p>
+     * The values are copied. So subsequent changes in <tt>values</tt> are not
+     * reflected in the matrix, and vice-versa.
+     * 
+     * @param values
+     *            the values to be filled into the cells.
+     * @return <tt>this</tt> (for convenience only).
+     * @throws IllegalArgumentException
+     *             if <tt>values.length != slices()*rows()*columns()</tt>
+     */
+    public ObjectMatrix3D assign(final Object[] values) {
+        if (values.length != slices * rows * columns)
+            throw new IllegalArgumentException("Must have same length: length=" + values.length
+                    + "slices()*rows()*columns()=" + slices() * rows() * columns());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        int idx = firstSlice * rows * columns;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = 0; c < columns; c++) {
+                                    setQuick(s, r, c, values[idx++]);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            int idx = 0;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < columns; c++) {
+                        setQuick(s, r, c, values[idx++]);
                     }
                 }
             }
@@ -502,6 +804,64 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
 
         return this;
     }
+    
+    /**
+     * Assigns the result of a function to all cells with a given indexes
+     * 
+     * @param y
+     *            the secondary matrix to operate on.
+     * @param function
+     *            a function object taking as first argument the current cell's
+     *            value of <tt>this</tt>, and as second argument the current
+     *            cell's value of <tt>y</tt>, *
+     * @param sliceList
+     *            slice indexes.
+     * @param rowList
+     *            row indexes.
+     * @param columnList
+     *            column indexes.
+     * @return <tt>this</tt> (for convenience only).
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>slices() != other.slices() || rows() != other.rows() || columns() != other.columns()</tt>
+     */
+    public ObjectMatrix3D assign(final ObjectMatrix3D y, final cern.colt.function.tobject.ObjectObjectFunction function,
+            final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList) {
+        checkShape(y);
+        int size = sliceList.size();
+        final int[] sliceElements = sliceList.elements();
+        final int[] rowElements = rowList.elements();
+        final int[] columnElements = columnList.elements();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            setQuick(sliceElements[i], rowElements[i], columnElements[i], function.apply(getQuick(
+                                    sliceElements[i], rowElements[i], columnElements[i]), y.getQuick(sliceElements[i],
+                                    rowElements[i], columnElements[i])));
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                setQuick(sliceElements[i], rowElements[i], columnElements[i], function.apply(getQuick(sliceElements[i],
+                        rowElements[i], columnElements[i]), y.getQuick(sliceElements[i], rowElements[i],
+                        columnElements[i])));
+            }
+        }
+        return this;
+    }
+
 
     /**
      * Sets all cells to the state specified by <tt>value</tt>.
@@ -628,7 +988,7 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
-    @Override
+
     public boolean equals(Object otherObj) { // delta
         return equals(otherObj, true);
     }
@@ -840,6 +1200,23 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      */
     public abstract ObjectMatrix3D like(int slices, int rows, int columns);
 
+    
+    /**
+     * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
+     * type</i>, sharing the same cells. For example, if the receiver is an
+     * instance of type <tt>DenseDoubleMatrix3D</tt> the new matrix must also be
+     * of type <tt>DenseDoubleMatrix2D</tt>, if the receiver is an instance of
+     * type <tt>SparseDoubleMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseDoubleMatrix2D</tt>, etc.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @return a new matrix of the corresponding dynamic type.
+     */
+    public abstract ObjectMatrix2D like2D(int rows, int columns);
+    
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
@@ -967,10 +1344,18 @@ public abstract class ObjectMatrix3D extends AbstractMatrix3D {
      * 
      * @see cern.colt.matrix.tobject.algo.ObjectFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tobject.algo.ObjectFormatter().toString(this);
     }
+    
+    /**
+     * Returns a vector obtained by stacking the columns of the matrix on top of
+     * one another.
+     * 
+     * @return a vector of columns of this matrix.
+     */
+    public abstract ObjectMatrix1D vectorize();
 
     /**
      * Constructs and returns a new view equal to the receiver. The view is a

@@ -313,7 +313,7 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public int nextInt() {
         return nextInt(this.my_N, this.my_s, this.my_n, this.randomGenerator);
     }
@@ -410,7 +410,7 @@ public class HyperGeometric extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + my_N + "," + my_s + "," + my_n + ")";
     }

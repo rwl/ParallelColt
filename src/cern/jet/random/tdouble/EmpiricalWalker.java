@@ -200,7 +200,7 @@ public class EmpiricalWalker extends AbstractDiscreteDistribution {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         EmpiricalWalker copy = (EmpiricalWalker) super.clone();
         if (this.cdf != null)
@@ -215,7 +215,7 @@ public class EmpiricalWalker extends AbstractDiscreteDistribution {
     /**
      * Returns a random integer <tt>k</tt> with probability <tt>pdf(k)</tt>.
      */
-    @Override
+
     public int nextInt() {
         int c = 0;
         double u, f;
@@ -422,7 +422,7 @@ public class EmpiricalWalker extends AbstractDiscreteDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         String interpolation = null;
         return this.getClass().getName() + "(" + ((cdf != null) ? cdf.length : 0) + ")";

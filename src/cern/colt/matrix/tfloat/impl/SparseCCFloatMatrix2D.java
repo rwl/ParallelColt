@@ -134,7 +134,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
     /*
      * Internal storage.
      */
-    protected Scs dcs;
+    protected Scs scs;
 
     protected boolean rowIndexesSorted = false;
 
@@ -172,7 +172,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
             if (!"matrix too large".equals(exc.getMessage()))
                 throw exc;
         }
-        this.dcs = dcs;
+        this.scs = dcs;
     }
 
     /**
@@ -211,7 +211,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
             if (!"matrix too large".equals(exc.getMessage()))
                 throw exc;
         }
-        dcs = Scs_util.cs_spalloc(rows, columns, nzmax, true, false);
+        scs = Scs_util.cs_spalloc(rows, columns, nzmax, true, false);
     }
 
     /**
@@ -250,11 +250,11 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         }
 
         int nz = Math.max(rowIndexes.length, 1);
-        dcs = Scs_util.cs_spalloc(rows, columns, nz, true, false);
+        scs = Scs_util.cs_spalloc(rows, columns, nz, true, false);
         int[] w = new int[columns];
-        int[] Cp = dcs.p;
-        int[] Ci = dcs.i;
-        float[] Cx = dcs.x;
+        int[] Cp = scs.p;
+        int[] Ci = scs.i;
+        float[] Cx = scs.x;
         for (int k = 0; k < nz; k++)
             w[columnIndexes[k]]++;
         Scs_cumsum.cs_cumsum(Cp, w, columns);
@@ -265,15 +265,15 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
                 Cx[p] = value;
         }
         if (removeDuplicates) {
-            if (!Scs_dupl.cs_dupl(dcs)) { //remove duplicates
+            if (!Scs_dupl.cs_dupl(scs)) { //remove duplicates
                 throw new IllegalArgumentException("Exception occured in cs_dupl()!");
             }
         }
         if (sortRowIndexes) {
             //sort row indexes
-            dcs = Scs_transpose.cs_transpose(dcs, true);
-            dcs = Scs_transpose.cs_transpose(dcs, true);
-            if (dcs == null) {
+            scs = Scs_transpose.cs_transpose(scs, true);
+            scs = Scs_transpose.cs_transpose(scs, true);
+            if (scs == null) {
                 throw new IllegalArgumentException("Exception occured in cs_transpose()!");
             }
             rowIndexesSorted = true;
@@ -316,11 +316,11 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
             throw new IllegalArgumentException("rowIndexes.length != values.length");
         }
         int nz = Math.max(rowIndexes.length, 1);
-        dcs = Scs_util.cs_spalloc(rows, columns, nz, true, false);
+        scs = Scs_util.cs_spalloc(rows, columns, nz, true, false);
         int[] w = new int[columns];
-        int[] Cp = dcs.p;
-        int[] Ci = dcs.i;
-        float[] Cx = dcs.x;
+        int[] Cp = scs.p;
+        int[] Ci = scs.i;
+        float[] Cx = scs.x;
         for (int k = 0; k < nz; k++)
             w[columnIndexes[k]]++;
         Scs_cumsum.cs_cumsum(Cp, w, columns);
@@ -331,25 +331,24 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
                 Cx[p] = values[k];
         }
         if (removeZeroes) {
-            Scs_dropzeros.cs_dropzeros(dcs); //remove zeroes
+            Scs_dropzeros.cs_dropzeros(scs); //remove zeroes
         }
         if (removeDuplicates) {
-            if (!Scs_dupl.cs_dupl(dcs)) { //remove duplicates
+            if (!Scs_dupl.cs_dupl(scs)) { //remove duplicates
                 throw new IllegalArgumentException("Exception occured in cs_dupl()!");
             }
         }
         //sort row indexes
         if (sortRowIndexes) {
-            dcs = Scs_transpose.cs_transpose(dcs, true);
-            dcs = Scs_transpose.cs_transpose(dcs, true);
-            if (dcs == null) {
+            scs = Scs_transpose.cs_transpose(scs, true);
+            scs = Scs_transpose.cs_transpose(scs, true);
+            if (scs == null) {
                 throw new IllegalArgumentException("Exception occured in cs_transpose()!");
             }
             rowIndexesSorted = true;
         }
     }
 
-    @Override
     public FloatMatrix2D assign(final cern.colt.function.tfloat.FloatFunction function) {
         if (function instanceof cern.jet.math.tfloat.FloatMult) { // x[i] = mult*x[i]
             final float alpha = ((cern.jet.math.tfloat.FloatMult) function).multiplicator;
@@ -360,7 +359,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
             if (alpha != alpha)
                 return assign(alpha); // the funny definition of isNaN(). This should better not happen.
 
-            final float[] valuesE = dcs.x;
+            final float[] valuesE = scs.x;
             int nz = cardinality();
             for (int j = 0; j < nz; j++) {
                 valuesE[j] *= alpha;
@@ -375,22 +374,20 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(float value) {
         if (value == 0) {
-            Arrays.fill(dcs.i, 0);
-            Arrays.fill(dcs.p, 0);
-            Arrays.fill(dcs.x, 0);
+            Arrays.fill(scs.i, 0);
+            Arrays.fill(scs.p, 0);
+            Arrays.fill(scs.x, 0);
         } else {
             int nnz = cardinality();
             for (int i = 0; i < nnz; i++) {
-                dcs.x[i] = value;
+                scs.x[i] = value;
             }
         }
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(FloatMatrix2D source) {
         if (source == this)
             return this; // nothing to do
@@ -398,21 +395,21 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
 
         if (source instanceof SparseCCFloatMatrix2D) {
             SparseCCFloatMatrix2D other = (SparseCCFloatMatrix2D) source;
-            System.arraycopy(other.getColumnPointers(), 0, this.dcs.p, 0, columns + 1);
+            System.arraycopy(other.getColumnPointers(), 0, this.scs.p, 0, columns + 1);
             int nzmax = other.getRowIndexes().length;
-            if (dcs.nzmax < nzmax) {
-                dcs.i = new int[nzmax];
-                dcs.x = new float[nzmax];
+            if (scs.nzmax < nzmax) {
+                scs.i = new int[nzmax];
+                scs.x = new float[nzmax];
             }
-            System.arraycopy(other.getRowIndexes(), 0, this.dcs.i, 0, nzmax);
-            System.arraycopy(other.getValues(), 0, this.dcs.x, 0, nzmax);
+            System.arraycopy(other.getRowIndexes(), 0, this.scs.i, 0, nzmax);
+            System.arraycopy(other.getValues(), 0, this.scs.x, 0, nzmax);
             rowIndexesSorted = other.rowIndexesSorted;
         } else if (source instanceof SparseRCFloatMatrix2D) {
             SparseRCFloatMatrix2D other = ((SparseRCFloatMatrix2D) source).getTranspose();
-            this.dcs.p = other.getRowPointers();
-            this.dcs.i = other.getColumnIndexes();
-            this.dcs.x = other.getValues();
-            this.dcs.nzmax = this.dcs.x.length;
+            this.scs.p = other.getRowPointers();
+            this.scs.i = other.getColumnIndexes();
+            this.scs.x = other.getValues();
+            this.scs.nzmax = this.scs.x.length;
             rowIndexesSorted = true;
         } else {
             assign(0);
@@ -426,13 +423,12 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final FloatMatrix2D y, cern.colt.function.tfloat.FloatFloatFunction function) {
         checkShape(y);
 
         if ((y instanceof SparseCCFloatMatrix2D) && (function == cern.jet.math.tfloat.FloatFunctions.plus)) { // x[i] = x[i] + y[i] 
             SparseCCFloatMatrix2D yy = (SparseCCFloatMatrix2D) y;
-            dcs = Scs_add.cs_add(dcs, yy.dcs, 1, 1);
+            scs = Scs_add.cs_add(scs, yy.scs, 1, 1);
             return this;
         }
 
@@ -463,9 +459,9 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         }
 
         if (function == cern.jet.math.tfloat.FloatFunctions.mult) { // x[i] = x[i] * y[i]
-            final int[] rowIndexesA = dcs.i;
-            final int[] columnPointersA = dcs.p;
-            final float[] valuesA = dcs.x;
+            final int[] rowIndexesA = scs.i;
+            final int[] columnPointersA = scs.p;
+            final float[] valuesA = scs.x;
             for (int j = columns; --j >= 0;) {
                 int low = columnPointersA[j];
                 for (int k = columnPointersA[j + 1]; --k >= low;) {
@@ -479,9 +475,9 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         }
 
         if (function == cern.jet.math.tfloat.FloatFunctions.div) { // x[i] = x[i] / y[i]
-            final int[] rowIndexesA = dcs.i;
-            final int[] columnPointersA = dcs.p;
-            final float[] valuesA = dcs.x;
+            final int[] rowIndexesA = scs.i;
+            final int[] columnPointersA = scs.p;
+            final float[] valuesA = scs.x;
 
             for (int j = columns; --j >= 0;) {
                 int low = columnPointersA[j];
@@ -497,21 +493,18 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         return super.assign(y, function);
     }
 
-    @Override
     public int cardinality() {
-        return dcs.p[columns];
+        return scs.p[columns];
     }
 
-    @Override
     public Scs elements() {
-        return dcs;
+        return scs;
     }
 
-    @Override
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
-        final int[] rowIndexesA = dcs.i;
-        final int[] columnPointersA = dcs.p;
-        final float[] valuesA = dcs.x;
+        final int[] rowIndexesA = scs.i;
+        final int[] columnPointersA = scs.p;
+        final float[] valuesA = scs.x;
 
         for (int j = columns; --j >= 0;) {
             int low = columnPointersA[j];
@@ -531,7 +524,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return column pointers
      */
     public int[] getColumnPointers() {
-        return dcs.p;
+        return scs.p;
     }
 
     /**
@@ -552,13 +545,12 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         return dense;
     }
 
-    @Override
     public synchronized float getQuick(int row, int column) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-        int k = searchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
+        int k = searchFromTo(scs.i, row, scs.p[column], scs.p[column + 1] - 1);
         float v = 0;
         if (k >= 0)
-            v = dcs.x[k];
+            v = scs.x[k];
         return v;
     }
 
@@ -570,7 +562,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return this matrix in a row-compressed form
      */
     public SparseRCFloatMatrix2D getRowCompressed() {
-        Scs dcst = Scs_transpose.cs_transpose(dcs, true);
+        Scs dcst = Scs_transpose.cs_transpose(scs, true);
         SparseRCFloatMatrix2D rc = new SparseRCFloatMatrix2D(rows, columns);
         rc.columnIndexes = dcst.i;
         rc.rowPointers = dcst.p;
@@ -585,7 +577,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return row indexes
      */
     public int[] getRowIndexes() {
-        return dcs.i;
+        return scs.i;
     }
 
     /**
@@ -596,9 +588,9 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the transpose of this matrix
      */
     public SparseCCFloatMatrix2D getTranspose() {
-        Scs dcst = Scs_transpose.cs_transpose(dcs, true);
+        Scs dcst = Scs_transpose.cs_transpose(scs, true);
         SparseCCFloatMatrix2D tr = new SparseCCFloatMatrix2D(columns, rows);
-        tr.dcs = dcst;
+        tr.scs = dcst;
         return tr;
     }
 
@@ -608,7 +600,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return numerical values
      */
     public float[] getValues() {
-        return dcs.x;
+        return scs.x;
     }
 
     /**
@@ -620,26 +612,23 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         return rowIndexesSorted;
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new SparseCCFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         return new SparseFloatMatrix1D(size);
     }
 
-    @Override
     public synchronized void setQuick(int row, int column, float value) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-        int k = searchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
+        int k = searchFromTo(scs.i, row, scs.p[column], scs.p[column + 1] - 1);
 
         if (k >= 0) { // found
             if (value == 0)
                 remove(column, k);
             else
-                dcs.x[k] = value;
+                scs.x[k] = value;
             return;
         }
 
@@ -653,9 +642,9 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * Sorts row indexes
      */
     public void sortRowIndexes() {
-        dcs = Scs_transpose.cs_transpose(dcs, true);
-        dcs = Scs_transpose.cs_transpose(dcs, true);
-        if (dcs == null) {
+        scs = Scs_transpose.cs_transpose(scs, true);
+        scs = Scs_transpose.cs_transpose(scs, true);
+        if (scs == null) {
             throw new IllegalArgumentException("Exception occured in cs_transpose()!");
         }
         rowIndexesSorted = true;
@@ -665,7 +654,7 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * Removes (sums) duplicate entries (if any}
      */
     public void removeDuplicates() {
-        if (!Scs_dupl.cs_dupl(dcs)) { //remove duplicates
+        if (!Scs_dupl.cs_dupl(scs)) { //remove duplicates
             throw new IllegalArgumentException("Exception occured in cs_dupl()!");
         }
     }
@@ -674,28 +663,27 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
      * Removes zero entries (if any)
      */
     public void removeZeroes() {
-        Scs_dropzeros.cs_dropzeros(dcs); //remove zeroes
+        Scs_dropzeros.cs_dropzeros(scs); //remove zeroes
     }
-    
-    @Override
+
+    public void trimToSize() {
+        Scs_util.cs_sprealloc(scs, 0);
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
+                .append('\n');
         for (int i = 0; i < columns; i++) {
-            int high = dcs.p[i+1];
-            for (int j = dcs.p[i]; j < high; j++) {
-                builder.append('(').append(dcs.i[j]).append(',').append(i).append(')').append('\t').append(dcs.x[j]).append('\n');
+            int high = scs.p[i + 1];
+            for (int j = scs.p[i]; j < high; j++) {
+                builder.append('(').append(scs.i[j]).append(',').append(i).append(')').append('\t').append(scs.x[j])
+                        .append('\n');
             }
         }
         return builder.toString();
     }
 
-    @Override
-    public void trimToSize() {
-        Scs_util.cs_sprealloc(dcs, 0);
-    }
-
-    @Override
     public FloatMatrix1D zMult(FloatMatrix1D y, FloatMatrix1D z, final float alpha, final float beta,
             final boolean transposeA) {
         final int rowsA = transposeA ? columns : rows;
@@ -724,25 +712,25 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         final int strideY = yy.stride();
         final int zeroY = (int) yy.index(0);
 
-        final int[] rowIndexesA = dcs.i;
-        final int[] columnPointersA = dcs.p;
-        final float[] valuesA = dcs.x;
+        final int[] rowIndexesA = scs.i;
+        final int[] columnPointersA = scs.p;
+        final float[] valuesA = scs.x;
 
         int zidx = zeroZ;
-        int np = ConcurrencyUtils.getNumberOfThreads();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if (!transposeA) {
             if ((!ignore) && (beta / alpha != 1.0)) {
                 z.assign(cern.jet.math.tfloat.FloatFunctions.mult(beta / alpha));
             }
 
-            if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                np = 2;
-                Future<?>[] futures = new Future[np];
+            if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = 2;
+                Future<?>[] futures = new Future[nthreads];
                 final float[] result = new float[rowsA];
-                int k = columns / np;
-                for (int j = 0; j < np; j++) {
+                int k = columns / nthreads;
+                for (int j = 0; j < nthreads; j++) {
                     final int firstColumn = j * k;
-                    final int lastColumn = (j == np - 1) ? columns : firstColumn + k;
+                    final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
                     final int threadID = j;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
@@ -774,13 +762,13 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
                     elementsZ[zeroZ + j * strideZ] += result[j];
                     elementsZ[zeroZ + (j + 1) * strideZ] += result[j + 1];
                     elementsZ[zeroZ + (j + 2) * strideZ] += result[j + 2];
-                    elementsZ[zeroZ + (j + 3) * strideZ] += result[j + 3];                    
-                    elementsZ[zeroZ + (j + 4) * strideZ] += result[j + 4];                    
-                    elementsZ[zeroZ + (j + 5) * strideZ] += result[j + 5];                    
-                    elementsZ[zeroZ + (j + 6) * strideZ] += result[j + 6];                    
-                    elementsZ[zeroZ + (j + 7) * strideZ] += result[j + 7];                    
-                    elementsZ[zeroZ + (j + 8) * strideZ] += result[j + 8];                    
-                    elementsZ[zeroZ + (j + 9) * strideZ] += result[j + 9];                    
+                    elementsZ[zeroZ + (j + 3) * strideZ] += result[j + 3];
+                    elementsZ[zeroZ + (j + 4) * strideZ] += result[j + 4];
+                    elementsZ[zeroZ + (j + 5) * strideZ] += result[j + 5];
+                    elementsZ[zeroZ + (j + 6) * strideZ] += result[j + 6];
+                    elementsZ[zeroZ + (j + 7) * strideZ] += result[j + 7];
+                    elementsZ[zeroZ + (j + 8) * strideZ] += result[j + 8];
+                    elementsZ[zeroZ + (j + 9) * strideZ] += result[j + 9];
                 }
                 for (int j = 0; j < rem; j++) {
                     elementsZ[zeroZ + j * strideZ] += result[j];
@@ -799,34 +787,34 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
                 z.assign(cern.jet.math.tfloat.FloatFunctions.mult(alpha));
             }
         } else {
-            if ((np > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-                Future<?>[] futures = new Future[np];
-                int k = columns / np;
-                for (int j = 0; j < np; j++) {
+            if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                Future<?>[] futures = new Future[nthreads];
+                int k = columns / nthreads;
+                for (int j = 0; j < nthreads; j++) {
                     final int firstColumn = j * k;
-                    final int lastColumn = (j == np - 1) ? columns : firstColumn + k;
+                    final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
                         public void run() {
                             int zidx = zeroZ + firstColumn * strideZ;
-                            int k = dcs.p[firstColumn];
+                            int k = scs.p[firstColumn];
                             for (int i = firstColumn; i < lastColumn; i++) {
                                 float sum = 0;
-                                int high = dcs.p[i + 1];
+                                int high = scs.p[i + 1];
                                 for (; k + 10 < high; k += 10) {
                                     int ind = k + 9;
-                                    sum += valuesA[ind] * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                            * elementsY[zeroY + strideY * dcs.i[ind--]];
+                                    sum += valuesA[ind] * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                            * elementsY[zeroY + strideY * scs.i[ind--]];
                                 }
                                 for (; k < high; k++) {
-                                    sum += valuesA[k] * elementsY[dcs.i[k]];
+                                    sum += valuesA[k] * elementsY[scs.i[k]];
                                 }
                                 elementsZ[zidx] = alpha * sum + beta * elementsZ[zidx];
                                 zidx += strideZ;
@@ -836,25 +824,25 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
                 }
                 ConcurrencyUtils.waitForCompletion(futures);
             } else {
-                int k = dcs.p[0];
+                int k = scs.p[0];
                 for (int i = 0; i < columns; i++) {
                     float sum = 0;
-                    int high = dcs.p[i + 1];
+                    int high = scs.p[i + 1];
                     for (; k + 10 < high; k += 10) {
                         int ind = k + 9;
-                        sum += valuesA[ind] * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]] + valuesA[ind]
-                                * elementsY[zeroY + strideY * dcs.i[ind--]];
+                        sum += valuesA[ind] * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]] + valuesA[ind]
+                                * elementsY[zeroY + strideY * scs.i[ind--]];
                     }
                     for (; k < high; k++) {
-                        sum += valuesA[k] * elementsY[dcs.i[k]];
+                        sum += valuesA[k] * elementsY[scs.i[k]];
                     }
                     elementsZ[zidx] = alpha * sum + beta * elementsZ[zidx];
                     zidx += strideZ;
@@ -864,7 +852,6 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         return z;
     }
 
-    @Override
     public FloatMatrix2D zMult(FloatMatrix2D B, FloatMatrix2D C, final float alpha, float beta,
             final boolean transposeA, boolean transposeB) {
         int rowsA = rows;
@@ -916,9 +903,9 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
                 BB = (DenseFloatMatrix2D) B;
             }
             DenseFloatMatrix2D CC = (DenseFloatMatrix2D) C;
-            int[] columnPointersA = AA.dcs.p;
-            int[] rowIndexesA = AA.dcs.i;
-            float[] valuesA = AA.dcs.x;
+            int[] columnPointersA = AA.scs.p;
+            int[] rowIndexesA = AA.scs.i;
+            float[] valuesA = AA.scs.x;
 
             int zeroB = (int) BB.index(0, 0);
             int rowStrideB = BB.rowStride();
@@ -956,8 +943,8 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
                 BB = BB.getTranspose();
             }
             SparseCCFloatMatrix2D CC = (SparseCCFloatMatrix2D) C;
-            CC.dcs = Scs_multiply.cs_multiply(AA.dcs, BB.dcs);
-            if (CC.dcs == null) {
+            CC.scs = Scs_multiply.cs_multiply(AA.scs, BB.scs);
+            if (CC.scs == null) {
                 throw new IllegalArgumentException("Exception occured in cs_multiply()");
             }
             if (alpha != 1.0) {
@@ -975,12 +962,11 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
             for (int i = rowsA; --i >= 0;)
                 Crows[i] = C.viewRow(i);
 
-            final cern.jet.math.tfloat.FloatPlusMultSecond fun = cern.jet.math.tfloat.FloatPlusMultSecond
-                    .plusMult(0);
+            final cern.jet.math.tfloat.FloatPlusMultSecond fun = cern.jet.math.tfloat.FloatPlusMultSecond.plusMult(0);
 
-            final int[] rowIndexesA = dcs.i;
-            final int[] columnPointersA = dcs.p;
-            final float[] valuesA = dcs.x;
+            final int[] rowIndexesA = scs.i;
+            final int[] columnPointersA = scs.p;
+            final float[] valuesA = scs.x;
             for (int i = columns; --i >= 0;) {
                 int low = columnPointersA[i];
                 for (int k = columnPointersA[i + 1]; --k >= low;) {
@@ -996,35 +982,34 @@ public class SparseCCFloatMatrix2D extends WrapperFloatMatrix2D {
         return C;
     }
 
-    @Override
     protected FloatMatrix2D getContent() {
         return this;
     }
 
     protected void insert(int row, int column, int index, float value) {
-        IntArrayList rowIndexes = new IntArrayList(dcs.i);
-        rowIndexes.setSizeRaw(dcs.p[columns]);
-        FloatArrayList values = new FloatArrayList(dcs.x);
-        values.setSizeRaw(dcs.p[columns]);
+        IntArrayList rowIndexes = new IntArrayList(scs.i);
+        rowIndexes.setSizeRaw(scs.p[columns]);
+        FloatArrayList values = new FloatArrayList(scs.x);
+        values.setSizeRaw(scs.p[columns]);
         rowIndexes.beforeInsert(index, row);
         values.beforeInsert(index, value);
-        for (int i = dcs.p.length; --i > column;)
-            dcs.p[i]++;
-        dcs.i = rowIndexes.elements();
-        dcs.x = values.elements();
-        dcs.nzmax = rowIndexes.elements().length;
+        for (int i = scs.p.length; --i > column;)
+            scs.p[i]++;
+        scs.i = rowIndexes.elements();
+        scs.x = values.elements();
+        scs.nzmax = rowIndexes.elements().length;
     }
 
     protected void remove(int column, int index) {
-        IntArrayList rowIndexes = new IntArrayList(dcs.i);
-        FloatArrayList values = new FloatArrayList(dcs.x);
+        IntArrayList rowIndexes = new IntArrayList(scs.i);
+        FloatArrayList values = new FloatArrayList(scs.x);
         rowIndexes.remove(index);
         values.remove(index);
-        for (int i = dcs.p.length; --i > column;)
-            dcs.p[i]--;
-        dcs.i = rowIndexes.elements();
-        dcs.x = values.elements();
-        dcs.nzmax = rowIndexes.elements().length;
+        for (int i = scs.p.length; --i > column;)
+            scs.p[i]--;
+        scs.i = rowIndexes.elements();
+        scs.x = values.elements();
+        scs.nzmax = rowIndexes.elements().length;
     }
 
     private static int searchFromTo(int[] list, int key, int from, int to) {

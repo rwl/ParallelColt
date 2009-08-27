@@ -11,7 +11,6 @@ public class FloatIRILUTTest extends FloatIRTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new FloatILUT(A.rows());

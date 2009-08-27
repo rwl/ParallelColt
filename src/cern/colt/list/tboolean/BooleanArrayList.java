@@ -69,7 +69,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @param element
      *            element to be appended to this list.
      */
-    @Override
+
     public void add(boolean element) {
         // overridden for performance only.
         if (size == elements.length) {
@@ -92,7 +92,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                index is out of range (
      *                <tt>index &lt; 0 || index &gt; size()</tt>).
      */
-    @Override
+
     public void beforeInsert(int index, boolean element) {
         // overridden for performance only.
         if (index > size || index < 0)
@@ -108,7 +108,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         // overridden for performance only.
         BooleanArrayList clone = new BooleanArrayList(elements.clone());
@@ -167,7 +167,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * 
      * @return the elements currently stored.
      */
-    @Override
+
     public boolean[] elements() {
         return elements;
     }
@@ -186,7 +186,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *            the new elements to be stored.
      * @return the receiver itself.
      */
-    @Override
+
     public AbstractBooleanList elements(boolean[] elements) {
         this.elements = elements;
         this.size = elements.length;
@@ -201,7 +201,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @param minCapacity
      *            the desired minimum capacity.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         elements = cern.colt.Arrays.ensureCapacity(elements, minCapacity);
     }
@@ -217,7 +217,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
-    @Override
+
     public boolean equals(Object otherObj) { // delta
         // overridden for performance only.
         if (!(otherObj instanceof BooleanArrayList))
@@ -249,7 +249,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @return <tt>false</tt> if the procedure stopped before all elements where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEach(BooleanProcedure procedure) {
         // overridden for performance only.
         boolean[] theElements = elements;
@@ -270,7 +270,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
-    @Override
+
     public boolean get(int index) {
         // overridden for performance only.
         if (index >= size || index < 0)
@@ -289,7 +289,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @param index
      *            index of element to return.
      */
-    @Override
+
     public boolean getQuick(int index) {
         return elements[index];
     }
@@ -313,7 +313,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public int indexOfFromTo(boolean element, int from, int to) {
         // overridden for performance only.
         if (size == 0)
@@ -348,7 +348,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public int lastIndexOfFromTo(boolean element, int from, int to) {
         // overridden for performance only.
         if (size == 0)
@@ -380,7 +380,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void mergeSortFromTo(int from, int to) {
         countSortFromTo(from, to);
     }
@@ -399,7 +399,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public AbstractBooleanList partFromTo(int from, int to) {
         if (size == 0)
             return new BooleanArrayList(0);
@@ -427,7 +427,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void quickSortFromTo(int from, int to) {
         countSortFromTo(from, to);
     }
@@ -441,7 +441,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @return <code>true</code> if the receiver changed as a result of the
      *         call.
      */
-    @Override
+
     public boolean removeAll(AbstractBooleanList other) {
         // overridden for performance only.
         if (!(other instanceof BooleanArrayList))
@@ -507,7 +507,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @param otherFrom
      *            position of first element within other list to be copied.
      */
-    @Override
+
     public void replaceFromToWithFrom(int from, int to, AbstractBooleanList other, int otherFrom) {
         // overridden for performance only.
         if (!(other instanceof BooleanArrayList)) {
@@ -533,7 +533,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @return <code>true</code> if the receiver changed as a result of the
      *         call.
      */
-    @Override
+
     public boolean retainAll(AbstractBooleanList other) {
         // overridden for performance only.
         if (!(other instanceof BooleanArrayList))
@@ -582,7 +582,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * Reverses the elements of the receiver. Last becomes first, second last
      * becomes second first, and so on.
      */
-    @Override
+
     public void reverse() {
         // overridden for performance only.
         boolean tmp;
@@ -609,7 +609,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
-    @Override
+
     public void set(int index, boolean element) {
         // overridden for performance only.
         if (index >= size || index < 0)
@@ -630,7 +630,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * @param element
      *            element to be stored at the specified position.
      */
-    @Override
+
     public void setQuick(int index, boolean element) {
         elements[index] = element;
     }
@@ -648,7 +648,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void shuffleFromTo(int from, int to) {
         // overridden for performance only.
         if (size == 0) {
@@ -685,7 +685,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void sortFromTo(int from, int to) {
         countSortFromTo(from, to);
     }
@@ -695,7 +695,7 @@ public class BooleanArrayList extends AbstractBooleanList {
      * Releases any superfluos internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
-    @Override
+
     public void trimToSize() {
         elements = cern.colt.Arrays.trimToCapacity(elements, size());
     }

@@ -121,7 +121,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         elements = new float[dlength];
     }
 
-    @Override
     public FloatMatrix2D assign(final cern.colt.function.tfloat.FloatFunction function) {
         if (function instanceof cern.jet.math.tfloat.FloatMult) { // x[i] = mult*x[i]
             final float alpha = ((cern.jet.math.tfloat.FloatMult) function).multiplicator;
@@ -142,14 +141,12 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(float value) {
         for (int i = dlength; --i >= 0;)
             elements[i] = value;
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final float[] values) {
         if (values.length != dlength)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " dlength=" + dlength);
@@ -159,17 +156,12 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
             Future<?>[] futures = new Future[nthreads];
             int k = dlength / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == nthreads - 1) {
-                    stoprow = dlength;
-                } else {
-                    stoprow = startrow + k;
-                }
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? dlength : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             elements[r] = values[r];
                         }
                     }
@@ -184,7 +176,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final float[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
@@ -207,7 +198,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(FloatMatrix2D source) {
         // overriden for performance only
         if (source == this)
@@ -227,7 +217,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix2D assign(final FloatMatrix2D y, final cern.colt.function.tfloat.FloatFloatFunction function) {
         checkShape(y);
         if (y instanceof DiagonalFloatMatrix2D) {
@@ -248,37 +237,32 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
                 Future<?>[] futures = new Future[nthreads];
                 int k = dlength / nthreads;
                 for (int j = 0; j < nthreads; j++) {
-                    final int startrow = j * k;
-                    final int stoprow;
-                    if (j == nthreads - 1) {
-                        stoprow = dlength;
-                    } else {
-                        stoprow = startrow + k;
-                    }
+                    final int firstRow = j * k;
+                    final int lastRow = (j == nthreads - 1) ? dlength : firstRow + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
                             if (function instanceof cern.jet.math.tfloat.FloatPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
                                 final float alpha = ((cern.jet.math.tfloat.FloatPlusMultSecond) function).multiplicator;
                                 if (alpha == 1) {
-                                    for (int j = startrow; j < stoprow; j++) {
+                                    for (int j = firstRow; j < lastRow; j++) {
                                         elements[j] += otherElements[j];
                                     }
                                 } else {
-                                    for (int j = startrow; j < stoprow; j++) {
+                                    for (int j = firstRow; j < lastRow; j++) {
                                         elements[j] = elements[j] + alpha * otherElements[j];
                                     }
                                 }
                             } else if (function == cern.jet.math.tfloat.FloatFunctions.mult) { // x[i] = x[i] * y[i]
-                                for (int j = startrow; j < stoprow; j++) {
+                                for (int j = firstRow; j < lastRow; j++) {
                                     elements[j] = elements[j] * otherElements[j];
                                 }
                             } else if (function == cern.jet.math.tfloat.FloatFunctions.div) { // x[i] = x[i] /  y[i]
-                                for (int j = startrow; j < stoprow; j++) {
+                                for (int j = firstRow; j < lastRow; j++) {
                                     elements[j] = elements[j] / otherElements[j];
                                 }
                             } else {
-                                for (int j = startrow; j < stoprow; j++) {
+                                for (int j = firstRow; j < lastRow; j++) {
                                     elements[j] = function.apply(elements[j], otherElements[j]);
                                 }
                             }
@@ -318,7 +302,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -363,12 +346,10 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return cardinality;
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
 
-    @Override
     public boolean equals(float value) {
         float epsilon = cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.tolerance();
         for (int r = 0; r < dlength; r++) {
@@ -383,7 +364,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return true;
     }
 
-    @Override
     public boolean equals(Object obj) {
         if (obj instanceof DiagonalFloatMatrix2D) {
             DiagonalFloatMatrix2D other = (DiagonalFloatMatrix2D) obj;
@@ -416,7 +396,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
         for (int j = dlength; --j >= 0;) {
             float value = elements[j];
@@ -445,7 +424,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return dindex;
     }
 
-    @Override
     public float[] getMaxLocation() {
         int location = 0;
         float maxValue = 0;
@@ -517,7 +495,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return new float[] { maxValue, rowLocation, columnLocation };
     }
 
-    @Override
     public float[] getMinLocation() {
         int location = 0;
         float minValue = 0;
@@ -589,7 +566,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         return new float[] { minValue, rowLocation, columnLocation };
     }
 
-    @Override
     public float getQuick(int row, int column) {
         if (dindex >= 0) {
             if (column < dindex) {
@@ -614,17 +590,14 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new SparseFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         return new SparseFloatMatrix1D(size);
     }
 
-    @Override
     public void setQuick(int row, int column, float value) {
         if (dindex >= 0) {
             if (column < dindex) {
@@ -649,7 +622,6 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix1D zMult(FloatMatrix1D y, FloatMatrix1D z, float alpha, float beta, final boolean transposeA) {
         int rowsA = rows;
         int columnsA = columns;
@@ -671,8 +643,8 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
                     + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", "
                     + z.toStringShort());
 
-        if ((!ignore) && ((beta / alpha) != 1))
-            z.assign(cern.jet.math.tfloat.FloatFunctions.mult(beta / alpha));
+        if ((!ignore) && ((beta) != 1))
+            z.assign(cern.jet.math.tfloat.FloatFunctions.mult(beta));
 
         DenseFloatMatrix1D zz = (DenseFloatMatrix1D) z;
         final float[] elementsZ = zz.elements;
@@ -689,31 +661,28 @@ public class DiagonalFloatMatrix2D extends WrapperFloatMatrix2D {
         if (!transposeA) {
             if (dindex >= 0) {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[zeroZ + strideZ * i] += elements[i] * elementsY[dindex + zeroY + strideY * i];
+                    elementsZ[zeroZ + strideZ * i] += alpha * elements[i] * elementsY[dindex + zeroY + strideY * i];
                 }
             } else {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[-dindex + zeroZ + strideZ * i] += elements[i] * elementsY[zeroY + strideY * i];
+                    elementsZ[-dindex + zeroZ + strideZ * i] += alpha * elements[i] * elementsY[zeroY + strideY * i];
                 }
             }
         } else {
             if (dindex >= 0) {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[dindex + zeroZ + strideZ * i] += elements[i] * elementsY[zeroY + strideY * i];
+                    elementsZ[dindex + zeroZ + strideZ * i] += alpha * elements[i] * elementsY[zeroY + strideY * i];
                 }
             } else {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[zeroZ + strideZ * i] += elements[i] * elementsY[-dindex + zeroY + strideY * i];
+                    elementsZ[zeroZ + strideZ * i] += alpha * elements[i] * elementsY[-dindex + zeroY + strideY * i];
                 }
             }
 
         }
-        if (alpha != 1)
-            z.assign(cern.jet.math.tfloat.FloatFunctions.mult(alpha));
         return z;
     }
 
-    @Override
     protected FloatMatrix2D getContent() {
         return this;
     }

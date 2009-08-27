@@ -185,7 +185,7 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public SparseRCFloatMatrix2D(int rows, int columns) {
@@ -204,7 +204,7 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
      *            maximum number of nonzero elements
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public SparseRCFloatMatrix2D(int rows, int columns, int nzmax) {
@@ -336,7 +336,7 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
             sortColumnIndexes();
         }
     }
-    
+
     /**
      * Constructs a matrix with given parameters. The arrays are not copied.
      * 
@@ -359,16 +359,14 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
             if (!"matrix too large".equals(exc.getMessage()))
                 throw exc;
         }
-        if(rowPointers.length != rows + 1) {
+        if (rowPointers.length != rows + 1) {
             throw new IllegalArgumentException("rowPointers.length != rows + 1");
         }
         this.rowPointers = rowPointers;
         this.columnIndexes = columnIndexes;
         this.values = values;
     }
-    
 
-    @Override
     public FloatMatrix2D assign(final cern.colt.function.tfloat.FloatFunction function) {
         if (function instanceof cern.jet.math.tfloat.FloatMult) { // x[i] = mult*x[i]
             final float alpha = ((cern.jet.math.tfloat.FloatMult) function).multiplicator;
@@ -393,7 +391,6 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(float value) {
         if (value == 0) {
             Arrays.fill(rowPointers, 0);
@@ -408,7 +405,6 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(FloatMatrix2D source) {
         if (source == this)
             return this; // nothing to do
@@ -443,7 +439,6 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final FloatMatrix2D y, cern.colt.function.tfloat.FloatFloatFunction function) {
         checkShape(y);
         if ((y instanceof SparseRCFloatMatrix2D) && (function == cern.jet.math.tfloat.FloatFunctions.plus)) { // x[i] = x[i] + y[i] 
@@ -567,12 +562,10 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
 
     }
 
-    @Override
     public int cardinality() {
         return rowPointers[rows];
     }
 
-    @Override
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
 
         for (int i = rows; --i >= 0;) {
@@ -598,10 +591,10 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
     public SparseCCFloatMatrix2D getColumnCompressed() {
         SparseRCFloatMatrix2D tr = getTranspose();
         SparseCCFloatMatrix2D cc = new SparseCCFloatMatrix2D(rows, columns);
-        cc.dcs.i = tr.columnIndexes;
-        cc.dcs.p = tr.rowPointers;
-        cc.dcs.x = tr.values;
-        cc.dcs.nzmax = tr.values.length;
+        cc.scs.i = tr.columnIndexes;
+        cc.scs.p = tr.rowPointers;
+        cc.scs.x = tr.values;
+        cc.scs.nzmax = tr.values.length;
         cc.rowIndexesSorted = true;
         return cc;
     }
@@ -633,7 +626,6 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         return dense;
     }
 
-    @Override
     public synchronized float getQuick(int row, int column) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
         int k = searchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
@@ -704,12 +696,10 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         return columnIndexesSorted;
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new SparseRCFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         return new SparseFloatMatrix1D(size);
     }
@@ -745,7 +735,7 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
      */
     public void removeZeroes() {
         int nz = 0;
-        float eps = (float)Math.pow(2, -23);
+        float eps = (float) Math.pow(2, -23);
         for (int j = 0; j < rows; j++) {
             int p = rowPointers[j]; /* get current location of row j */
             rowPointers[j] = nz; /* record new location of row j */
@@ -759,7 +749,6 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         rowPointers[rows] = nz; /* finalize A */
     }
 
-    @Override
     public synchronized void setQuick(int row, int column, float value) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
         int k = searchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
@@ -802,26 +791,25 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         //        System.arraycopy(T.rowPointers, 0, this.rowPointers, 0, T.rowPointers.length);
         //        System.arraycopy(T.values, 0, this.values, 0, T.values.length);
     }
-    
-    @Override
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
+                .append('\n');
         for (int i = 0; i < rows; i++) {
-            int high = rowPointers[i+1];
+            int high = rowPointers[i + 1];
             for (int j = rowPointers[i]; j < high; j++) {
-                builder.append('(').append(i).append(',').append(columnIndexes[j]).append(')').append('\t').append(values[j]).append('\n');
+                builder.append('(').append(i).append(',').append(columnIndexes[j]).append(')').append('\t').append(
+                        values[j]).append('\n');
             }
         }
         return builder.toString();
     }
 
-    @Override
     public void trimToSize() {
         realloc(0);
     }
 
-    @Override
     public FloatMatrix1D zMult(FloatMatrix1D y, FloatMatrix1D z, final float alpha, final float beta,
             final boolean transposeA) {
         final int rowsA = transposeA ? columns : rows;
@@ -915,7 +903,7 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
                     }
                 }
             }
-            
+
             return z;
         }
 
@@ -1035,7 +1023,6 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         return z;
     }
 
-    @Override
     public FloatMatrix2D zMult(FloatMatrix2D B, FloatMatrix2D C, final float alpha, float beta,
             final boolean transposeA, boolean transposeB) {
         int rowsA = rows;
@@ -1229,7 +1216,6 @@ public class SparseRCFloatMatrix2D extends WrapperFloatMatrix2D {
         values = valuesNew;
     }
 
-    @Override
     protected FloatMatrix2D getContent() {
         return this;
     }

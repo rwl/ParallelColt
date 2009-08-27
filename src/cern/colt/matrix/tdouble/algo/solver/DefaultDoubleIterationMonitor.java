@@ -161,7 +161,6 @@ public class DefaultDoubleIterationMonitor extends AbstractDoubleIterationMonito
         return dtol;
     }
 
-    @Override
     protected boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException {
         // Store initial residual
         if (isFirst())
@@ -183,7 +182,6 @@ public class DefaultDoubleIterationMonitor extends AbstractDoubleIterationMonito
         return false;
     }
 
-    @Override
     protected boolean convergedI(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
         return convergedI(r);
     }

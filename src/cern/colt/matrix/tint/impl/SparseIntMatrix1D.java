@@ -8,8 +8,8 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tint.impl;
 
-import cern.colt.map.tint.AbstractIntIntMap;
-import cern.colt.map.tint.OpenIntIntHashMap;
+import cern.colt.map.tlong.AbstractLongIntMap;
+import cern.colt.map.tlong.OpenLongIntHashMap;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix3D;
@@ -68,7 +68,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntIntMap elements;
+    protected AbstractLongIntMap elements;
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
@@ -99,7 +99,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
     /**
      * Constructs a matrix with a given number of parameters. All entries are
      * initially <tt>0</tt>. For details related to memory usage see
-     * {@link cern.colt.map.tint.OpenIntIntHashMap}.
+     * {@link cern.colt.map.tlong.OpenLongIntHashMap}.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -120,7 +120,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      */
     public SparseIntMatrix1D(int size, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         setUp(size);
-        this.elements = new OpenIntIntHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
+        this.elements = new OpenLongIntHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
     }
 
     /**
@@ -138,7 +138,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    protected SparseIntMatrix1D(int size, AbstractIntIntMap elements, int offset, int stride) {
+    protected SparseIntMatrix1D(int size, AbstractLongIntMap elements, int offset, int stride) {
         setUp(size, offset, stride);
         this.elements = elements;
         this.isNoView = false;
@@ -151,7 +151,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      *            the value to be filled into the cells.
      * @return <tt>this</tt> (for convenience only).
      */
-    @Override
+
     public IntMatrix1D assign(int value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -164,7 +164,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
     /**
      * Returns the number of cells having non-zero values.
      */
-    @Override
+
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -172,25 +172,13 @@ public class SparseIntMatrix1D extends IntMatrix1D {
             return super.cardinality();
     }
 
-    public void dct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the elements of this matrix.
      * 
      * @return the elements
      */
-    @Override
-    public AbstractIntIntMap elements() {
+
+    public AbstractLongIntMap elements() {
         return elements;
     }
 
@@ -208,7 +196,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      * @param minCapacity
      *            the desired minimum number of non-zero cells.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
@@ -226,12 +214,12 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
-    public int getQuick(int index) {
+
+    public synchronized int getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return this.elements.get(index(index));
         // manually inlined:
-        return elements.get(zero + index * stride);
+        return elements.get((long) zero + (long) index * (long) stride);
     }
 
     /**
@@ -242,11 +230,11 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // overriden for manual inlining only
         // return _offset(_rank(rank));
-        return zero + rank * stride;
+        return (long) zero + (long) rank * (long) stride;
     }
 
     /**
@@ -262,7 +250,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public IntMatrix1D like(int size) {
         return new SparseIntMatrix1D(size);
     }
@@ -281,19 +269,45 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public IntMatrix2D like2D(int rows, int columns) {
         return new SparseIntMatrix2D(rows, columns);
     }
 
-    @Override
-    public IntMatrix2D reshape(int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+    public IntMatrix2D reshape(int rows, int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
+        }
+        IntMatrix2D M = new SparseIntMatrix2D(rows, columns);
+        int idx = 0;
+        for (int c = 0; c < columns; c++) {
+            for (int r = 0; r < rows; r++) {
+                int elem = getQuick(idx++);
+                if (elem != 0) {
+                    M.setQuick(r, c, elem);
+                }
+            }
+        }
+        return M;
     }
 
-    @Override
-    public IntMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+    public IntMatrix3D reshape(int slices, int rows, int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
+        }
+        IntMatrix3D M = new SparseIntMatrix3D(slices, rows, columns);
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < columns; c++) {
+                for (int r = 0; r < rows; r++) {
+                    int elem = getQuick(idx++);
+                    if (elem != 0) {
+                        M.setQuick(s, r, c, elem);
+                    }
+                }
+            }
+        }
+        return M;
     }
 
     /**
@@ -310,40 +324,30 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public synchronized void setQuick(int index, int value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
         // manually inlined:
-        int i = zero + index * stride;
+        long i = (long) zero + (long) index * (long) stride;
         if (value == 0)
             this.elements.removeKey(i);
         else
             this.elements.put(i, value);
     }
 
-    /**
-     * Releases any superfluous memory created by explicitly putting zero values
-     * into cells formerly having non-zero values; An application can use this
-     * operation to minimize the storage of the receiver.
-     * <p>
-     * <b>Background:</b>
-     * <p>
-     * Cells that
-     * <ul>
-     * <li>are never set to non-zero values do not use any memory.
-     * <li>switch from zero to non-zero state do use memory.
-     * <li>switch back from non-zero to zero state also do use memory. However,
-     * their memory can be reclaimed by calling <tt>trimToSize()</tt>.
-     * </ul>
-     * A sequence like <tt>set(i,5); set(i,0);</tt> sets a cell to non-zero
-     * state and later back to zero state. Such as sequence generates obsolete
-     * memory that is automatically reclaimed from time to time or can manually
-     * be reclaimed by calling <tt>trimToSize()</tt>. Putting zeros into cells
-     * already containing zeros does not generate obsolete memory since no
-     * memory was allocated to them in the first place.
-     */
-    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("1 x ").append(size).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        for (int i = 0; i < size; i++) {
+            int elem = getQuick(i);
+            if (elem != 0) {
+                builder.append('(').append(i).append(')').append('\t').append(elem).append('\n');
+            }
+        }
+        return builder.toString();
+    }
+
     public void trimToSize() {
         this.elements.trimToSize();
     }
@@ -351,7 +355,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(IntMatrix1D other) {
         if (other instanceof SelectedSparseIntMatrix1D) {
             SelectedSparseIntMatrix1D otherMatrix = (SelectedSparseIntMatrix1D) other;
@@ -370,7 +374,7 @@ public class SparseIntMatrix1D extends IntMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected IntMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseIntMatrix1D(this.elements, offsets);
     }

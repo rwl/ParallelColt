@@ -12,7 +12,6 @@ public class DoubleChebyshevTest extends DoubleIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         // Get the extremal eigenvalues
         DenseDoubleEigenvalueDecomposition evd = DenseDoubleAlgebra.DEFAULT.eig(A);

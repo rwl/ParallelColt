@@ -69,8 +69,7 @@ class DelegateFComplexMatrix2D extends FComplexMatrix2D {
         this.content = newContent;
     }
 
-    @Override
-    public float[] getQuick(int row, int column) {
+    public synchronized float[] getQuick(int row, int column) {
         switch (axis) {
         case 0:
             return content.getQuick(index, row, column);
@@ -83,13 +82,11 @@ class DelegateFComplexMatrix2D extends FComplexMatrix2D {
         }
     }
 
-    @Override
     public FComplexMatrix2D like(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
-    @Override
-    public void setQuick(int row, int column, float[] value) {
+    public synchronized void setQuick(int row, int column, float[] value) {
         switch (axis) {
         case 0:
             content.setQuick(index, row, column, value);
@@ -105,8 +102,7 @@ class DelegateFComplexMatrix2D extends FComplexMatrix2D {
         }
     }
 
-    @Override
-    public void setQuick(int row, int column, float re, float im) {
+    public synchronized void setQuick(int row, int column, float re, float im) {
         switch (axis) {
         case 0:
             content.setQuick(index, row, column, re, im);
@@ -122,33 +118,27 @@ class DelegateFComplexMatrix2D extends FComplexMatrix2D {
         }
     }
 
-    @Override
     public FComplexMatrix1D viewColumn(int column) {
         checkColumn(column);
         return new WrapperFComplexMatrix2D(this).viewColumn(column);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
     protected FComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     public FComplexMatrix1D like1D(int size) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     protected FComplexMatrix1D like1D(int size, int zero, int stride) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     public FComplexMatrix1D vectorize() {
         FComplexMatrix1D v = new DenseFComplexMatrix1D(rows * columns);
         int idx = 0;
@@ -160,7 +150,6 @@ class DelegateFComplexMatrix2D extends FComplexMatrix2D {
         return v;
     }
 
-    @Override
     public FloatMatrix2D getImaginaryPart() {
         switch (axis) {
         case 0:
@@ -174,7 +163,6 @@ class DelegateFComplexMatrix2D extends FComplexMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix2D getRealPart() {
         switch (axis) {
         case 0:

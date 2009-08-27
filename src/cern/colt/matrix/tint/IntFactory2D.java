@@ -233,7 +233,8 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      */
     public IntMatrix2D ascending(int rows, int columns) {
         cern.jet.math.tint.IntFunctions F = cern.jet.math.tint.IntFunctions.intFunctions;
-        return descending(rows, columns).assign(IntFunctions.chain(IntFunctions.neg, IntFunctions.minus(columns * rows)));
+        return descending(rows, columns).assign(
+                IntFunctions.chain(IntFunctions.neg, IntFunctions.minus(columns * rows)));
     }
 
     /**
@@ -376,7 +377,7 @@ public class IntFactory2D extends cern.colt.PersistentObject {
      * 
      * </td>
      * <td><tt>IllegalArgumentException<br>
-     A[0,1].cols != A[2,1].cols<br>
+     A[0,1].columns != A[2,1].columns<br>
      (2 != 3)</tt></td>
      * </tr>
      * </table>

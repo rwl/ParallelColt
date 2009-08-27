@@ -12,7 +12,7 @@ import cern.colt.function.tlong.LongProcedure;
 import cern.colt.function.tobject.LongObjectProcedure;
 import cern.colt.list.tlong.LongArrayList;
 import cern.colt.list.tobject.ObjectArrayList;
-import cern.colt.map.tdouble.AbstractDoubleMap;
+import cern.colt.map.AbstractMap;
 
 /**
  * Abstract base class for hash maps holding (key,value) associations of type
@@ -30,7 +30,7 @@ import cern.colt.map.tdouble.AbstractDoubleMap;
  * @version 1.0, 09/24/99
  * @see java.util.HashMap
  */
-public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
+public abstract class AbstractLongObjectMap extends AbstractMap {
     /**
      * 
      */
@@ -115,7 +115,7 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -410,7 +410,7 @@ public abstract class AbstractLongObjectMap extends AbstractDoubleMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
-    @Override
+
     public String toString() {
         LongArrayList theKeys = keys();
         theKeys.sort();

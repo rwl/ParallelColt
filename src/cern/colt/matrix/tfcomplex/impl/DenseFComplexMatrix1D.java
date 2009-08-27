@@ -117,7 +117,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         this.isNoView = isNoView;
     }
 
-    @Override
     public float[] aggregate(final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
             final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
         float[] b = new float[2];
@@ -160,7 +159,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return a;
     }
 
-    @Override
     public float[] aggregate(final FComplexMatrix1D other,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
@@ -218,7 +216,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return a;
     }
 
-    @Override
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
         if (this.elements == null)
             throw new InternalError();
@@ -285,7 +282,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond,
             final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -332,7 +328,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -375,7 +370,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assign(final cern.colt.function.tfcomplex.FComplexRealFunction function) {
         if (this.elements == null)
             throw new InternalError();
@@ -454,7 +448,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assign(FComplexMatrix1D source) {
         if (!(source instanceof DenseFComplexMatrix1D)) {
             return super.assign(source);
@@ -516,7 +509,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assign(FComplexMatrix1D y,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction function) {
         if (!(y instanceof DenseFComplexMatrix1D)) {
@@ -716,7 +708,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assign(final float re, final float im) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -749,7 +740,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assign(float[] values) {
         if (isNoView) {
             if (values.length != 2 * size)
@@ -761,7 +751,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assignImaginary(final FloatMatrix1D other) {
         if (!(other instanceof DenseFloatMatrix1D)) {
             return super.assignImaginary(other);
@@ -803,7 +792,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public FComplexMatrix1D assignReal(final FloatMatrix1D other) {
         if (!(other instanceof DenseFloatMatrix1D)) {
             return super.assignReal(other);
@@ -866,12 +854,10 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
 
-    @Override
     public FloatMatrix1D getImaginaryPart() {
         final DenseFloatMatrix1D Im = new DenseFloatMatrix1D(size);
         final float[] elemsOther = Im.elements();
@@ -910,7 +896,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return Im;
     }
 
-    @Override
     public void getNonZeros(final IntArrayList indexList, final ArrayList<float[]> valueList) {
         indexList.clear();
         valueList.clear();
@@ -929,13 +914,11 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         }
     }
 
-    @Override
     public float[] getQuick(int index) {
         int idx = zero + index * stride;
         return new float[] { elements[idx], elements[idx + 1] };
     }
 
-    @Override
     public FloatMatrix1D getRealPart() {
         final DenseFloatMatrix1D R = new DenseFloatMatrix1D(size);
         final float[] elemsOther = R.elements();
@@ -998,17 +981,14 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public FComplexMatrix1D like(int size) {
         return new DenseFComplexMatrix1D(size);
     }
 
-    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new DenseFComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public FComplexMatrix2D reshape(final int rows, final int columns) {
         if (rows * columns != size) {
             throw new IllegalArgumentException("rows*columns != size");
@@ -1060,7 +1040,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return M;
     }
 
-    @Override
     public FComplexMatrix3D reshape(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != size) {
             throw new IllegalArgumentException("slices*rows*columns != size");
@@ -1117,21 +1096,18 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return M;
     }
 
-    @Override
     public void setQuick(int index, float re, float im) {
         int idx = zero + index * stride;
         this.elements[idx] = re;
         this.elements[idx + 1] = im;
     }
 
-    @Override
     public void setQuick(int index, float[] value) {
         int idx = zero + index * stride;
         this.elements[idx] = value[0];
         this.elements[idx + 1] = value[1];
     }
 
-    @Override
     public void swap(FComplexMatrix1D other) {
         if (!(other instanceof DenseFComplexMatrix1D)) {
             super.swap(other);
@@ -1191,7 +1167,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         }
     }
 
-    @Override
     public void toArray(float[] values) {
         if (values.length < 2 * size)
             throw new IllegalArgumentException("values too small");
@@ -1201,7 +1176,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
             super.toArray(values);
     }
 
-    @Override
     public float[] zDotProduct(final FComplexMatrix1D y, final int from, int length) {
         int size = (int) size();
         if (from < 0 || length <= 0)
@@ -1273,7 +1247,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return sum;
     }
 
-    @Override
     public float[] zSum() {
         float[] sum = new float[2];
         if (this.elements == null)
@@ -1325,7 +1298,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return sum;
     }
 
-    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int idx = zero;
@@ -1339,7 +1311,6 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return cardinality;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedDenseFComplexMatrix1D) {
             SelectedDenseFComplexMatrix1D otherMatrix = (SelectedDenseFComplexMatrix1D) other;
@@ -1351,12 +1322,10 @@ public class DenseFComplexMatrix1D extends FComplexMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
-    @Override
     protected FComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseFComplexMatrix1D(this.elements, offsets);
     }

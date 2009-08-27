@@ -11,7 +11,6 @@ public class FloatIRSSORTest extends FloatIRTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         float omega = (float) Math.random() + 1;

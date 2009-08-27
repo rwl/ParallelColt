@@ -33,14 +33,13 @@ public class BenchmarkSparseRCDoubleMatrix2D {
         SparseRCDoubleMatrix2D A = null;
         File file = new File(fileName);
         try {
-            A = new SparseDoubleMatrix2D(new MatrixVectorReader(new FileReader(file)))
-                    .getRowCompressed(false);
+            A = new SparseDoubleMatrix2D(new MatrixVectorReader(new FileReader(file))).getRowCompressed(false);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Benchmark of SparseRCDoubleMatrix2D (" + file.getName() + ")");       
+        System.out.println("Benchmark of SparseRCDoubleMatrix2D (" + file.getName() + ")");
         int rows = A.rows();
         int nnz = A.cardinality();
         DoubleMatrix1D x = DoubleFactory1D.dense.make(rows, 1);
@@ -56,7 +55,8 @@ public class BenchmarkSparseRCDoubleMatrix2D {
             }
             t.stop();
             double time = t.nanos() / 1000.0 / (double) niters;
-            System.out.println("\t\tAverage execution time of mat-vec-mult = " + t.millis() / (double) niters + " milliseconds");
+            System.out.println("\t\tAverage execution time of mat-vec-mult = " + t.millis() / (double) niters
+                    + " milliseconds");
             System.out.println("\t\tPerformance of mat-vec-mult = " + (2 * nnz) / time + " megaFLOPS");
             y = A.zMult(x, null, 1, 0, true); //warm-up
             y = A.zMult(x, null, 1, 0, true); //warm-up
@@ -66,7 +66,8 @@ public class BenchmarkSparseRCDoubleMatrix2D {
             }
             t.stop();
             time = t.nanos() / 1000.0 / (double) niters;
-            System.out.println("\t\tAverage execution time of mat-trans-vec-mult = " + t.millis() / (double) niters + " milliseconds");
+            System.out.println("\t\tAverage execution time of mat-trans-vec-mult = " + t.millis() / (double) niters
+                    + " milliseconds");
             System.out.println("\t\tPerformance of mat-trans-vec-mult = " + (2 * nnz) / time + " megaFLOPS");
         }
     }

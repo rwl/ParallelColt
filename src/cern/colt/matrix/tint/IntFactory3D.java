@@ -66,7 +66,8 @@ public class IntFactory3D extends cern.colt.PersistentObject {
      */
     public IntMatrix3D ascending(int slices, int rows, int columns) {
         cern.jet.math.tint.IntFunctions F = cern.jet.math.tint.IntFunctions.intFunctions;
-        return descending(slices, rows, columns).assign(IntFunctions.chain(IntFunctions.neg, IntFunctions.minus(slices * rows * columns)));
+        return descending(slices, rows, columns).assign(
+                IntFunctions.chain(IntFunctions.neg, IntFunctions.minus(slices * rows * columns)));
     }
 
     /**

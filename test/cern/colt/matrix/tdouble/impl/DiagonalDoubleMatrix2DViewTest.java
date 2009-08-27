@@ -6,7 +6,6 @@ public class DiagonalDoubleMatrix2DViewTest extends DiagonalDoubleMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         DINDEX = 3;
         A = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX);

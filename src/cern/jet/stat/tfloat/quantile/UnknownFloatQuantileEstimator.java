@@ -94,7 +94,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected FloatBuffer[] buffersToCollapse() {
         FloatBuffer[] fullBuffers = bufferSet._getFullOrPartialBuffers();
 
@@ -114,7 +114,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns, and its memory requirements will be close to zero.
      */
-    @Override
+
     public synchronized void clear() {
         super.clear();
         this.currentTreeHeight = 1;
@@ -126,7 +126,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         UnknownFloatQuantileEstimator copy = (UnknownFloatQuantileEstimator) super.clone();
         if (this.sampler != null)
@@ -137,7 +137,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected void newBuffer() {
         currentBufferToFill = bufferSet._getFirstEmptyBuffer();
         if (currentBufferToFill == null)
@@ -150,7 +150,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected void postCollapse(FloatBuffer[] toCollapse) {
         if (toCollapse.length == bufferSet.b()) { // delta for unknown finder
             currentTreeHeight++;
@@ -170,7 +170,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
      *            sorted ascending.
      * @return the approximate quantile elements.
      */
-    @Override
+
     public FloatArrayList quantileElements(FloatArrayList phis) {
         if (precomputeEpsilon <= 0.0)
             return super.quantileElements(phis);
@@ -201,7 +201,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected boolean sampleNextElement() {
         return sampler.sampleNextElement();
     }
@@ -222,7 +222,7 @@ class UnknownFloatQuantileEstimator extends FloatQuantileEstimator {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
         buf.setLength(buf.length() - 1);

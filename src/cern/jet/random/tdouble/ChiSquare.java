@@ -80,7 +80,7 @@ public class ChiSquare extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public double nextDouble() {
         return nextDouble(this.freedom);
     }
@@ -195,7 +195,7 @@ public class ChiSquare extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + freedom + ")";
     }

@@ -91,7 +91,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dct2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -110,7 +110,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dctColumns(final boolean scale) {
         if (dctColumns == null) {
             dctColumns = new FloatDCT_1D(rows);
@@ -157,7 +157,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dctRows(final boolean scale) {
         if (dctRows == null) {
             dctRows = new FloatDCT_1D(columns);
@@ -194,7 +194,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * Computes the 2D discrete Hartley transform (DHT) of this matrix.
      * 
      */
-    @Override
+
     public void dht2() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -210,7 +210,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * matrix.
      * 
      */
-    @Override
+
     public void dhtColumns() {
         if (dhtColumns == null) {
             dhtColumns = new FloatDHT_1D(rows);
@@ -253,7 +253,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * Computes the discrete Hartley transform (DHT) of each row of this matrix.
      * 
      */
-    @Override
+
     public void dhtRows() {
         if (dhtRows == null) {
             dhtRows = new FloatDHT_1D(columns);
@@ -293,7 +293,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dst2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -312,7 +312,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dstColumns(final boolean scale) {
         if (dstColumns == null) {
             dstColumns = new FloatDST_1D(rows);
@@ -358,7 +358,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dstRows(final boolean scale) {
         if (dstRows == null) {
             dstRows = new FloatDST_1D(columns);
@@ -423,7 +423,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *             power of 2 number.
      * 
      */
-    @Override
+
     public void fft2() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -441,7 +441,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the 2D discrete Fourier transform (DFT) of this matrix.
      * 
      */
-    @Override
+
     public DenseLargeFComplexMatrix2D getFft2() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -484,7 +484,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the discrete Fourier transform (DFT) of each column of this
      *         matrix.
      */
-    @Override
+
     public DenseLargeFComplexMatrix2D getFftColumns() {
         if (fftColumns == null) {
             fftColumns = new FloatFFT_1D(rows);
@@ -535,7 +535,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * 
      * @return the discrete Fourier transform (DFT) of each row of this matrix.
      */
-    @Override
+
     public DenseLargeFComplexMatrix2D getFftRows() {
         if (fftRows == null) {
             fftRows = new FloatFFT_1D(columns);
@@ -585,7 +585,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the 2D inverse of the discrete Fourier transform (IDFT) of this
      *         matrix.
      */
-    @Override
+
     public DenseLargeFComplexMatrix2D getIfft2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -628,7 +628,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the inverse of the discrete Fourier transform (IDFT) of each
      *         column of this matrix.
      */
-    @Override
+
     public DenseLargeFComplexMatrix2D getIfftColumns(final boolean scale) {
         if (fftColumns == null) {
             fftColumns = new FloatFFT_1D(rows);
@@ -679,7 +679,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      * @return the inverse of the discrete Fourier transform (IDFT) of each row
      *         of this matrix.
      */
-    @Override
+
     public DenseLargeFComplexMatrix2D getIfftRows(final boolean scale) {
         if (fftRows == null) {
             fftRows = new FloatFFT_1D(columns);
@@ -722,7 +722,6 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
         return C;
     }
 
-    @Override
     public float getQuick(int row, int column) {
         return elements[row][column];
     }
@@ -735,7 +734,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idct2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -754,7 +753,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idctColumns(final boolean scale) {
         if (dctColumns == null) {
             dctColumns = new FloatDCT_1D(rows);
@@ -801,7 +800,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idctRows(final boolean scale) {
         if (dctRows == null) {
             dctRows = new FloatDCT_1D(columns);
@@ -842,7 +841,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idht2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -861,7 +860,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idhtColumns(final boolean scale) {
         if (dhtColumns == null) {
             dhtColumns = new FloatDHT_1D(rows);
@@ -908,7 +907,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idhtRows(final boolean scale) {
         if (dhtRows == null) {
             dhtRows = new FloatDHT_1D(columns);
@@ -949,7 +948,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idst2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -968,7 +967,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idstColumns(final boolean scale) {
         if (dstColumns == null) {
             dstColumns = new FloatDST_1D(rows);
@@ -1015,7 +1014,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idstRows(final boolean scale) {
         if (dstRows == null) {
             dstRows = new FloatDST_1D(columns);
@@ -1082,7 +1081,7 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void ifft2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -1093,27 +1092,22 @@ public class DenseLargeFloatMatrix2D extends WrapperFloatMatrix2D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public void setQuick(int row, int column, float value) {
         elements[row][column] = value;
     }
 
-    @Override
     public float[][] elements() {
         return elements;
     }
 
-    @Override
     protected FloatMatrix2D getContent() {
         return this;
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new DenseLargeFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         return new DenseFloatMatrix1D(size);
     }

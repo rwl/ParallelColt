@@ -9,7 +9,6 @@ public class DoubleQMRTest extends DoubleIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new DoubleQMR(x);
         M = solver.getPreconditioner(); //identity preconditioner

@@ -11,7 +11,6 @@ public class DoubleQMRICCTest extends DoubleQMRTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new DoubleICC(A.rows());

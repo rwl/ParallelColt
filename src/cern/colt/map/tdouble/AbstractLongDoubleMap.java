@@ -14,6 +14,7 @@ import cern.colt.function.tdouble.LongDoubleProcedure;
 import cern.colt.function.tlong.LongProcedure;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tlong.LongArrayList;
+import cern.colt.map.AbstractMap;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -32,7 +33,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @version 1.0, 09/24/99
  * @see java.util.HashMap
  */
-public abstract class AbstractLongDoubleMap extends AbstractDoubleMap {
+public abstract class AbstractLongDoubleMap extends AbstractMap {
     /**
      * 
      */
@@ -150,7 +151,7 @@ public abstract class AbstractLongDoubleMap extends AbstractDoubleMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -464,7 +465,7 @@ public abstract class AbstractLongDoubleMap extends AbstractDoubleMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
-    @Override
+
     public String toString() {
         LongArrayList theKeys = keys();
         String tmp = theKeys.toString() + "\n";

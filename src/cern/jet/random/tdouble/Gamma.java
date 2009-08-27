@@ -93,7 +93,7 @@ public class Gamma extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public double nextDouble() {
         return nextDouble(alpha, lambda);
     }
@@ -289,7 +289,7 @@ public class Gamma extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + alpha + "," + lambda + ")";
     }

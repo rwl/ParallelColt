@@ -114,7 +114,7 @@ public class SparseFloatAlgebra {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         return new SparseFloatAlgebra(property.tolerance());
     }
@@ -141,7 +141,7 @@ public class SparseFloatAlgebra {
      * @return the LU-decomposition of the given matrix
      */
     public SparseFloatLUDecomposition lu(FloatMatrix2D matrix, int order) {
-        return new SparseFloatLUDecomposition(matrix, order);
+        return new SparseFloatLUDecomposition(matrix, order, true);
     }
 
     /**
@@ -239,6 +239,6 @@ public class SparseFloatAlgebra {
         } else {
             qr(A, 0).solve(x);
             return x.viewPart(0, A.columns()).copy();
-        }        
+        }
     }
 }

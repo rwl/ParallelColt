@@ -228,7 +228,6 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         this.isNoView = false;
     }
 
-    @Override
     public DoubleMatrix3D assign(double value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -238,7 +237,6 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -246,47 +244,41 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
             return super.cardinality();
     }
 
-    @Override
     public AbstractLongDoubleMap elements() {
         return elements;
     }
 
-    @Override
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
 
-    @Override
-    public double getQuick(int slice, int row, int column) {
+    public synchronized double getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
         // IndexOutOfBoundsException("slice:"+slice+", row:"+row+",
         // column:"+column);
         // return elements.get(index(slice,row,column));
         // manually inlined:
-        return elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
-                * columnStride);
+        return elements.get((long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride);
     }
 
-    @Override
     public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
         // manually inlined:
-        return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        return (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row * (long) rowStride
+                + (long) columnZero + (long) column * (long) columnStride;
     }
 
-    @Override
     public DoubleMatrix3D like(int slices, int rows, int columns) {
         return new SparseDoubleMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public DoubleMatrix2D like2D(int rows, int columns) {
         return new SparseDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public synchronized void setQuick(int slice, int row, int column, double value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -294,14 +286,14 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         // column:"+column);
         // int index = index(slice,row,column);
         // manually inlined:
-        int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        long index = (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
         if (value == 0)
             this.elements.removeKey(index);
         else
             this.elements.put(index, value);
     }
 
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(slices).append(" x ").append(rows).append(" x ").append(columns)
@@ -320,12 +312,10 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         return builder.toString();
     }
 
-    @Override
     public void trimToSize() {
         this.elements.trimToSize();
     }
 
-    @Override
     public DoubleMatrix1D vectorize() {
         DoubleMatrix1D v = new SparseDoubleMatrix1D((int) size());
         int length = rows * columns;
@@ -335,7 +325,6 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         return v;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix3D other) {
         if (other instanceof SelectedSparseDoubleMatrix3D) {
             SelectedSparseDoubleMatrix3D otherMatrix = (SelectedSparseDoubleMatrix3D) other;
@@ -347,12 +336,10 @@ public class SparseDoubleMatrix3D extends DoubleMatrix3D {
         return false;
     }
 
-    @Override
     protected DoubleMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new SparseDoubleMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
 
-    @Override
     protected DoubleMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseDoubleMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

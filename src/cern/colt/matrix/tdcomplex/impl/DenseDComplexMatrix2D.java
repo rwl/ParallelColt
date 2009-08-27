@@ -162,7 +162,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         this.isNoView = isNoView;
     }
 
-    @Override
     public double[] aggregate(final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr,
             final cern.colt.function.tdcomplex.DComplexDComplexFunction f) {
         double[] b = new double[2];
@@ -213,7 +212,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return a;
     }
 
-    @Override
     public double[] aggregate(final DComplexMatrix2D other,
             final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction aggr,
             final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction f) {
@@ -282,7 +280,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return a;
     }
 
-    @Override
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexDComplexFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -364,7 +361,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond,
             final cern.colt.function.tdcomplex.DComplexDComplexFunction function) {
         final int zero = (int) index(0, 0);
@@ -418,7 +414,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexProcedure cond, final double[] value) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -468,7 +463,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final cern.colt.function.tdcomplex.DComplexRealFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -563,7 +557,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final DComplexMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof DenseDComplexMatrix2D)) {
@@ -637,7 +630,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final DComplexMatrix2D y,
             final cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction function) {
         // overriden for performance only
@@ -806,7 +798,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final double re, final double im) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -846,7 +837,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final double[] values) {
         if (values.length != rows * 2 * columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()="
@@ -895,7 +885,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final double[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
@@ -986,7 +975,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assign(final float[] values) {
         if (values.length != rows * 2 * columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*2*columns()="
@@ -1034,7 +1022,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assignImaginary(final DoubleMatrix2D other) {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
@@ -1084,7 +1071,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D assignReal(final DoubleMatrix2D other) {
         checkShape(other);
         final int columnStrideOther = other.columnStride();
@@ -1134,7 +1120,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1272,7 +1257,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         }
     }
 
-    @Override
     public DComplexMatrix2D forEachNonZero(final cern.colt.function.tdcomplex.IntIntDComplexFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1324,7 +1308,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return this;
     }
 
-    @Override
     public DComplexMatrix2D getConjugateTranspose() {
         DComplexMatrix2D transpose = this.viewDice().copy();
         final double[] elemsOther = ((DenseDComplexMatrix2D) transpose).elements;
@@ -1367,12 +1350,10 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return transpose;
     }
 
-    @Override
     public double[] elements() {
         return elements;
     }
 
-    @Override
     public DoubleMatrix2D getImaginaryPart() {
         final DenseDoubleMatrix2D Im = new DenseDoubleMatrix2D(rows, columns);
         final double[] elemsOther = Im.elements();
@@ -1421,7 +1402,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return Im;
     }
 
-    @Override
     public void getNonZeros(final IntArrayList rowList, final IntArrayList columnList,
             final ArrayList<double[]> valueList) {
         rowList.clear();
@@ -1445,13 +1425,11 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
     }
 
-    @Override
     public double[] getQuick(int row, int column) {
         int idx = rowZero + row * rowStride + columnZero + column * columnStride;
         return new double[] { elements[idx], elements[idx + 1] };
     }
 
-    @Override
     public DoubleMatrix2D getRealPart() {
         final DenseDoubleMatrix2D R = new DenseDoubleMatrix2D(rows, columns);
         final double[] elemsOther = R.elements();
@@ -1594,31 +1572,26 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         }
     }
 
-    @Override
     public DComplexMatrix2D like(int rows, int columns) {
         return new DenseDComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public DComplexMatrix1D like1D(int size) {
         return new DenseDComplexMatrix1D(size);
     }
 
-    @Override
     public void setQuick(int row, int column, double re, double im) {
         int idx = rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = re;
         elements[idx + 1] = im;
     }
 
-    @Override
     public void setQuick(int row, int column, double[] value) {
         int idx = rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = value[0];
         elements[idx + 1] = value[1];
     }
 
-    @Override
     public double[][] toArray() {
         final double[][] values = new double[rows][2 * columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1659,7 +1632,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return values;
     }
 
-    @Override
     public DComplexMatrix1D vectorize() {
         final DComplexMatrix1D v = new DenseDComplexMatrix1D((int) size());
         final int zero = (int) index(0, 0);
@@ -1709,7 +1681,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return v;
     }
 
-    @Override
     public DComplexMatrix1D zMult(final DComplexMatrix1D y, DComplexMatrix1D z, final double[] alpha,
             final double[] beta, boolean transposeA) {
         if (transposeA)
@@ -1817,36 +1788,35 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return zz;
     }
 
-    @Override
     public DComplexMatrix2D zMult(final DComplexMatrix2D B, DComplexMatrix2D C, final double[] alpha,
             final double[] beta, final boolean transposeA, final boolean transposeB) {
         final int rowsA = rows;
-        final int colsA = columns;
+        final int columnsA = columns;
         final int rowsB = B.rows();
-        final int colsB = B.columns();
-        final int rowsC = transposeA ? colsA : rowsA;
-        final int colsC = transposeB ? rowsB : colsB;
+        final int columnsB = B.columns();
+        final int rowsC = transposeA ? columnsA : rowsA;
+        final int columnsC = transposeB ? rowsB : columnsB;
 
         if (C == null)
-            C = new DenseDComplexMatrix2D(rowsC, colsC);
+            C = new DenseDComplexMatrix2D(rowsC, columnsC);
 
         if (transposeA)
             return getConjugateTranspose().zMult(B, C, alpha, beta, false, transposeB);
         if (transposeB)
             return this.zMult(B.getConjugateTranspose(), C, alpha, beta, transposeA, false);
-        if (B.rows() != colsA)
+        if (B.rows() != columnsA)
             throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
                     + B.toStringShort());
-        if (C.rows() != rowsA || C.columns() != colsB)
+        if (C.rows() != rowsA || C.columns() != columnsB)
             throw new IllegalArgumentException("Incompatibe result matrix: " + toStringShort() + ", "
                     + B.toStringShort() + ", " + C.toStringShort());
         if (this == C || B == C)
             throw new IllegalArgumentException("Matrices must not be identical");
-        long flops = 2L * rowsA * colsA * colsB;
+        long flops = 2L * rowsA * columnsA * columnsB;
         int noOfTasks = (int) Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each
         /* thread should process at least 30000 flops */
-        boolean splitB = (colsB >= noOfTasks);
-        int width = splitB ? colsB : rowsA;
+        boolean splitB = (columnsB >= noOfTasks);
+        int width = splitB ? columnsB : rowsA;
         noOfTasks = Math.min(width, noOfTasks);
 
         if (noOfTasks < 2) {
@@ -1863,13 +1833,13 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
             if (splitB) {
                 // split B along columns into blocks
                 AA = this;
-                BB = B.viewPart(0, offset, colsA, span);
+                BB = B.viewPart(0, offset, columnsA, span);
                 CC = C.viewPart(0, offset, rowsA, span);
             } else {
                 // split A along rows into blocks
-                AA = this.viewPart(offset, 0, span, colsA);
+                AA = this.viewPart(offset, 0, span, columnsA);
                 BB = B;
-                CC = C.viewPart(offset, 0, span, colsB);
+                CC = C.viewPart(offset, 0, span, columnsB);
             }
 
             subTasks[i] = ConcurrencyUtils.submit(new Runnable() {
@@ -2019,7 +1989,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return C;
     }
 
-    @Override
     public double[] zSum() {
         double[] sum = new double[2];
         final int zero = (int) index(0, 0);
@@ -2074,7 +2043,6 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return sum;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(DComplexMatrix2D other) {
         if (other instanceof SelectedDenseDComplexMatrix2D) {
             SelectedDenseDComplexMatrix2D otherMatrix = (SelectedDenseDComplexMatrix2D) other;
@@ -2086,17 +2054,14 @@ public class DenseDComplexMatrix2D extends DComplexMatrix2D {
         return false;
     }
 
-    @Override
     public long index(int row, int column) {
         return rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     protected DComplexMatrix1D like1D(int size, int zero, int stride) {
         return new DenseDComplexMatrix1D(size, this.elements, zero, stride, false);
     }
 
-    @Override
     protected DComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDComplexMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }

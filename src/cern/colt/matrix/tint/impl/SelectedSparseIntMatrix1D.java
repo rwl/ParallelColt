@@ -8,7 +8,7 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tint.impl;
 
-import cern.colt.map.tint.AbstractIntIntMap;
+import cern.colt.map.tlong.AbstractLongIntMap;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix3D;
@@ -59,7 +59,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntIntMap elements;
+    protected AbstractLongIntMap elements;
 
     /**
      * The offsets of visible indexes of this matrix.
@@ -79,7 +79,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      * @param indexes
      *            The indexes of the cells that shall be visible.
      */
-    protected SelectedSparseIntMatrix1D(AbstractIntIntMap elements, int[] offsets) {
+    protected SelectedSparseIntMatrix1D(AbstractLongIntMap elements, int[] offsets) {
         this(offsets.length, elements, 0, 1, offsets, 0);
     }
 
@@ -99,7 +99,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      *            the offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseIntMatrix1D(int size, AbstractIntIntMap elements, int zero, int stride, int[] offsets,
+    protected SelectedSparseIntMatrix1D(int size, AbstractLongIntMap elements, int zero, int stride, int[] offsets,
             int offset) {
         setUp(size, zero, stride);
 
@@ -109,8 +109,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
         this.isNoView = false;
     }
 
-    @Override
-    public AbstractIntIntMap elements() {
+    public AbstractLongIntMap elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
@@ -127,12 +126,12 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
+
     public int getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements.get(index(index));
         // manually inlined:
-        return elements.get(offset + offsets[zero + index * stride]);
+        return elements.get((long) offset + (long) offsets[zero + index * stride]);
     }
 
     /**
@@ -143,11 +142,11 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
-        return offset + offsets[zero + rank * stride];
+        return (long) offset + (long) offsets[zero + rank * stride];
     }
 
     /**
@@ -163,7 +162,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public IntMatrix1D like(int size) {
         return new SparseIntMatrix1D(size);
     }
@@ -182,18 +181,16 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public IntMatrix2D like2D(int rows, int columns) {
         return new SparseIntMatrix2D(rows, columns);
     }
 
-    @Override
-    public IntMatrix2D reshape(int rows, int cols) {
+    public IntMatrix2D reshape(int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public IntMatrix3D reshape(int slices, int rows, int cols) {
+    public IntMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
@@ -211,12 +208,12 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, int value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
         // manually inlined:
-        int i = offset + offsets[zero + index * stride];
+        long i = (long) offset + (long) offsets[zero + index * stride];
         if (value == 0)
             this.elements.removeKey(i);
         else
@@ -232,7 +229,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
@@ -240,7 +237,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(IntMatrix1D other) {
         if (other instanceof SelectedSparseIntMatrix1D) {
             SelectedSparseIntMatrix1D otherMatrix = (SelectedSparseIntMatrix1D) other;
@@ -258,7 +255,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
-    @Override
+
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -272,7 +269,7 @@ class SelectedSparseIntMatrix1D extends IntMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected IntMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseIntMatrix1D(this.elements, offsets);
     }

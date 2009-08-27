@@ -11,7 +11,6 @@ public class DoubleChebyshevDiagonalTest extends DoubleChebyshevTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new DoubleDiagonal(A.rows());

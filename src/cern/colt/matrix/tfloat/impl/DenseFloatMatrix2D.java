@@ -113,7 +113,7 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public DenseFloatMatrix2D(int rows, int columns) {
@@ -144,7 +144,7 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
      *            if true then a matrix view is constructed
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             or flip's are illegal.
      */
     public DenseFloatMatrix2D(int rows, int columns, float[] elements, int rowZero, int columnZero, int rowStride,
@@ -201,7 +201,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f) {
         if (size() == 0)
@@ -247,7 +246,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return a;
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f, final cern.colt.function.tfloat.FloatProcedure cond) {
         if (size() == 0)
@@ -304,7 +302,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return a;
     }
 
-    @Override
     public float aggregate(final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFunction f, final IntArrayList rowList, final IntArrayList columnList) {
         if (size() == 0)
@@ -348,7 +345,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return a;
     }
 
-    @Override
     public float aggregate(final FloatMatrix2D other, final cern.colt.function.tfloat.FloatFloatFunction aggr,
             final cern.colt.function.tfloat.FloatFloatFunction f) {
         if (!(other instanceof DenseFloatMatrix2D)) {
@@ -403,7 +399,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return a;
     }
 
-    @Override
     public FloatMatrix2D assign(final cern.colt.function.tfloat.FloatFunction function) {
         final float[] elems = this.elements;
         if (elems == null)
@@ -486,7 +481,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final cern.colt.function.tfloat.FloatProcedure cond,
             final cern.colt.function.tfloat.FloatFunction function) {
         final int zero = (int) index(0, 0);
@@ -534,7 +528,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final cern.colt.function.tfloat.FloatProcedure cond, final float value) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -581,7 +574,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final float value) {
         final float[] elems = this.elements;
         final int zero = (int) index(0, 0);
@@ -620,7 +612,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final float[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " rows()*columns()="
@@ -669,7 +660,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final float[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
@@ -758,7 +748,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final FloatMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof DenseFloatMatrix2D)) {
@@ -830,7 +819,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final FloatMatrix2D y, final cern.colt.function.tfloat.FloatFloatFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseFloatMatrix2D)) {
@@ -1043,7 +1031,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public FloatMatrix2D assign(final FloatMatrix2D y, final cern.colt.function.tfloat.FloatFloatFunction function,
             IntArrayList rowList, IntArrayList columnList) {
         checkShape(y);
@@ -1091,7 +1078,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1442,7 +1428,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
@@ -1495,7 +1480,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public FloatMatrix2D forEachNonZero(final cern.colt.function.tfloat.IntIntFloatFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1861,7 +1845,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return C;
     }
 
-    @Override
     public float[] getMaxLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
@@ -1936,7 +1919,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return new float[] { maxValue, rowLocation, columnLocation };
     }
 
-    @Override
     public float[] getMinLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
@@ -2011,7 +1993,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return new float[] { minValue, rowLocation, columnLocation };
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList rowList, final IntArrayList columnList,
             final FloatArrayList valueList) {
         rowList.clear();
@@ -2032,7 +2013,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public void getNonZeros(final IntArrayList rowList, final IntArrayList columnList, final FloatArrayList valueList) {
         rowList.clear();
         columnList.clear();
@@ -2052,7 +2032,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList rowList, final IntArrayList columnList,
             final FloatArrayList valueList) {
         rowList.clear();
@@ -2073,7 +2052,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public float getQuick(int row, int column) {
         return elements[rowZero + row * rowStride + columnZero + column * columnStride];
     }
@@ -2437,27 +2415,22 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public long index(int row, int column) {
         return rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new DenseFloatMatrix2D(rows, columns);
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         return new DenseFloatMatrix1D(size);
     }
 
-    @Override
     public void setQuick(int row, int column, float value) {
         elements[rowZero + row * rowStride + columnZero + column * columnStride] = value;
     }
 
-    @Override
     public float[][] toArray() {
         final float[][] values = new float[rows][columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -2498,7 +2471,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return values;
     }
 
-    @Override
     public FloatMatrix1D vectorize() {
         final DenseFloatMatrix1D v = new DenseFloatMatrix1D((int) size());
         final int zero = (int) index(0, 0);
@@ -2545,7 +2517,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return v;
     }
 
-    @Override
     public void zAssign8Neighbors(FloatMatrix2D B, cern.colt.function.tfloat.Float9Function function) {
         // 1. using only 4-5 out of the 9 cells in "function" is *not* the
         // limiting factor for performance.
@@ -2625,7 +2596,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
 
     }
 
-    @Override
     public FloatMatrix1D zMult(final FloatMatrix1D y, FloatMatrix1D z, final float alpha, final float beta,
             final boolean transposeA) {
         if (transposeA)
@@ -2698,7 +2668,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return z;
     }
 
-    @Override
     public FloatMatrix2D zMult(final FloatMatrix2D B, FloatMatrix2D C, final float alpha, final float beta,
             final boolean transposeA, final boolean transposeB) {
         final int rowsA = rows;
@@ -2794,7 +2763,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return C;
     }
 
-    @Override
     public float zSum() {
         float sum = 0;
         if (elements == null)
@@ -2949,7 +2917,6 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return C;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(FloatMatrix2D other) {
         if (other instanceof SelectedDenseFloatMatrix2D) {
             SelectedDenseFloatMatrix2D otherMatrix = (SelectedDenseFloatMatrix2D) other;
@@ -2961,12 +2928,10 @@ public class DenseFloatMatrix2D extends FloatMatrix2D {
         return false;
     }
 
-    @Override
     protected FloatMatrix1D like1D(int size, int zero, int stride) {
         return new DenseFloatMatrix1D(size, this.elements, zero, stride, true);
     }
 
-    @Override
     protected FloatMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseFloatMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }

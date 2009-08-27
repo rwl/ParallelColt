@@ -48,7 +48,7 @@ public class Dcs_amd {
 
     /* keep off-diagonal entries; drop diagonal entries */
     private static class Cs_diag implements Dcs_ifkeep {
-        @Override
+
         public boolean fkeep(int i, int j, double aij, Object other) {
             return (i != j);
         }

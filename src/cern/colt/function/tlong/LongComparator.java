@@ -29,9 +29,9 @@ package cern.colt.function.tlong;
  */
 public interface LongComparator {
     /**
-     * Compares its two arguments for order. Returns a negative long, zero,
-     * or a positive long as the first argument is less than, equal to, or
-     * greater than the second.
+     * Compares its two arguments for order. Returns a negative long, zero, or a
+     * positive long as the first argument is less than, equal to, or greater
+     * than the second.
      * <p>
      * 
      * The implementor must ensure that <tt>sgn(compare(x, y)) ==
@@ -51,8 +51,8 @@ public interface LongComparator {
      * <p>
      * 
      * 
-     * @return a negative long, zero, or a positive long as the first
-     *         argument is less than, equal to, or greater than the second.
+     * @return a negative long, zero, or a positive long as the first argument
+     *         is less than, equal to, or greater than the second.
      */
     int compare(long o1, long o2);
 

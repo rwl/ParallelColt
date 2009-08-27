@@ -79,7 +79,7 @@ public class WeightedDoubleRandomSampler extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         WeightedDoubleRandomSampler copy = (WeightedDoubleRandomSampler) super.clone();
         copy.generator = (DoubleUniform) this.generator.clone();

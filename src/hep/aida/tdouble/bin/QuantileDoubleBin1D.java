@@ -86,7 +86,7 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * 
  * <table width="75%" border="1" cellpadding="6" cellspacing="0" align="center">
  * <tr align="center" valign="middle">
- * <td width="20%" nowrap colspan="13" bgcolor="#33CC66"><font
+ * <td width="20%" nowrap columnspan="13" bgcolor="#33CC66"><font
  * color="#000000"></font> <div align="center"><font color="#000000"
  * size="5">Required main memory [MB]</font></div></td>
  * </tr>
@@ -99,7 +99,7 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * <td width="6%" nowrap rowspan="2" bgcolor="#FF9966"><font
  * color="#000000">delta</font></td>
  * <td width="1%" nowrap rowspan="31">&nbsp;</td>
- * <td nowrap colspan="4" bgcolor="#FF9966"><font color="#000000">N
+ * <td nowrap columnspan="4" bgcolor="#FF9966"><font color="#000000">N
  * unknown</font></td>
  * <td width="1%" nowrap align="center" valign="middle" bgcolor="#C0C0C0" rowspan="31">
  * <font color="#000000"></font><font color="#000000"></font><font
@@ -121,7 +121,7 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * color="#000000"></font><font color="#000000"></font><font
  * color="#000000"></font><font color="#000000"></font><font
  * color="#000000"></font></td>
- * <td nowrap colspan="4" bgcolor="#FF9966"><font color="#000000">N known</font>
+ * <td nowrap columnspan="4" bgcolor="#FF9966"><font color="#000000">N known</font>
  * </td>
  * </tr>
  * <tr align="center" valign="middle">
@@ -143,10 +143,10 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * color="#000000">N<sub>max</sub>=10<sup>8</sup></font></td>
  * </tr>
  * <tr align="center" valign="middle">
- * <td nowrap bgcolor="#C0C0C0" colspan="3"><font color="#000000"></font> <div
+ * <td nowrap bgcolor="#C0C0C0" columnspan="3"><font color="#000000"></font> <div
  * align="center"></div> <font color="#000000"></font></td>
- * <td nowrap colspan="4">&nbsp;</td>
- * <td nowrap colspan="4">&nbsp;</td>
+ * <td nowrap columnspan="4">&nbsp;</td>
+ * <td nowrap columnspan="4">&nbsp;</td>
  * </tr>
  * <tr align="center" valign="middle">
  * <td width="7%" nowrap bgcolor="#FFCCCC"><font color="#000000">any</font></td>
@@ -240,10 +240,10 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * <td width="19%" nowrap bgcolor="#66CCFF"><font color="#000000">63.6</font></td>
  * </tr>
  * <tr align="center" valign="middle">
- * <td nowrap bgcolor="#C0C0C0" colspan="3"><font color="#000000"></font><font
+ * <td nowrap bgcolor="#C0C0C0" columnspan="3"><font color="#000000"></font><font
  * color="#000000"></font><font color="#000000"></font></td>
- * <td nowrap colspan="4">&nbsp;</td>
- * <td nowrap colspan="4">&nbsp;</td>
+ * <td nowrap columnspan="4">&nbsp;</td>
+ * <td nowrap columnspan="4">&nbsp;</td>
  * </tr>
  * <tr align="center" valign="middle">
  * <td width="7%" nowrap bgcolor="#FFCCCC" rowspan="8"><font
@@ -359,10 +359,10 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * <td width="19%" nowrap bgcolor="#66CCFF"><font color="#000000">11.6</font></td>
  * </tr>
  * <tr align="center" valign="middle">
- * <td nowrap bgcolor="#C0C0C0" colspan="3"><font color="#000000"></font><font
+ * <td nowrap bgcolor="#C0C0C0" columnspan="3"><font color="#000000"></font><font
  * color="#000000"></font><font color="#000000"></font></td>
- * <td nowrap colspan="4">&nbsp;</td>
- * <td nowrap colspan="4">&nbsp;</td>
+ * <td nowrap columnspan="4">&nbsp;</td>
+ * <td nowrap columnspan="4">&nbsp;</td>
  * </tr>
  * <tr align="center" valign="middle">
  * <td width="7%" nowrap align="center" valign="middle" bgcolor="#FFCCCC" rowspan="8">
@@ -478,9 +478,9 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * <td width="19%" nowrap bgcolor="#66CCFF"><font color="#000000">11.6</font></td>
  * </tr>
  * <tr align="center" valign="middle">
- * <td width="19%" nowrap align="center" valign="middle" colspan="3">&nbsp;</td>
- * <td width="34%" nowrap colspan="4">&nbsp;</td>
- * <td width="45%" nowrap colspan="4">&nbsp;</td>
+ * <td width="19%" nowrap align="center" valign="middle" columnspan="3">&nbsp;</td>
+ * <td width="34%" nowrap columnspan="4">&nbsp;</td>
+ * <td width="45%" nowrap columnspan="4">&nbsp;</td>
  * </tr>
  * <tr align="center" valign="middle">
  * <td width="7%" nowrap align="center" valign="middle" bgcolor="#FF9966" rowspan="2">
@@ -507,13 +507,13 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * color="#000000">N<sub>max</sub>=10<sup>8</sup></font></td>
  * </tr>
  * <tr align="center" valign="middle">
- * <td nowrap colspan="4" bgcolor="#FF9966"><font color="#000000">N
+ * <td nowrap columnspan="4" bgcolor="#FF9966"><font color="#000000">N
  * unknown</font></td>
- * <td nowrap colspan="4" bgcolor="#FF9966"><font color="#000000">N known</font>
+ * <td nowrap columnspan="4" bgcolor="#FF9966"><font color="#000000">N known</font>
  * </td>
  * </tr>
  * <tr align="center" valign="middle">
- * <td width="20%" nowrap align="center" valign="middle" colspan="13" bgcolor="#33CC66">
+ * <td width="20%" nowrap align="center" valign="middle" columnspan="13" bgcolor="#33CC66">
  * <font color="#000000" size="5">Required main memory [MB]</font></td>
  * </tr>
  * </table>
@@ -583,7 +583,7 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * </div> <center>
  * <table border cellpadding="6" cellspacing="0" align="center" * width="623">
  * <tr valign="middle">
- * <td align="center" height="50" colspan="9" bgcolor="#33CC66" nowrap><font
+ * <td align="center" height="50" columnspan="9" bgcolor="#33CC66" nowrap><font
  * size="5">Performance</font></td>
  * </tr>
  * <tr valign="middle">
@@ -594,11 +594,11 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * <td align="center" width="32" height="100" rowspan="2" bgcolor="#FF9966" nowrap>
  * Delta</td>
  * <td align="center" width="1" height="150" rowspan="7" nowrap>&nbsp;</td>
- * <td align="center" height="50" colspan="2" bgcolor="#33CC66" nowrap><font
+ * <td align="center" height="50" columnspan="2" bgcolor="#33CC66" nowrap><font
  * size="5">Filling</font> <br>
  * [#elements/sec]</td>
  * <td align="center" width="1" height="150" rowspan="7" nowrap>&nbsp;</td>
- * <td align="center" height="50" colspan="2" bgcolor="#33CC66"><font
+ * <td align="center" height="50" columnspan="2" bgcolor="#33CC66"><font
  * size="5">Quantile computation</font><br>
  * [#quantiles/sec]</td>
  * </tr>
@@ -617,9 +617,9 @@ import cern.jet.stat.tdouble.quantile.DoubleQuantileFinderFactory;
  * N<sub>max</sub>=10<sup>7</sup></font></td>
  * </tr>
  * <tr valign="middle">
- * <td align="center" height="31" colspan="3" nowrap>&nbsp;</td>
- * <td align="center" height="31" colspan="2" nowrap>&nbsp;</td>
- * <td align="center" height="31" colspan="2" nowrap>&nbsp;</td>
+ * <td align="center" height="31" columnspan="3" nowrap>&nbsp;</td>
+ * <td align="center" height="31" columnspan="2" nowrap>&nbsp;</td>
+ * <td align="center" height="31" columnspan="2" nowrap>&nbsp;</td>
  * </tr>
  * <tr valign="middle">
  * <td align="center" width="56" rowspan="4" bgcolor="#FFCCCC" nowrap>
@@ -804,7 +804,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
-    @Override
+
     public synchronized void addAllOfFromTo(DoubleArrayList list, int from, int to) {
         super.addAllOfFromTo(list, from, to);
         if (this.finder != null)
@@ -815,7 +815,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns.
      */
-    @Override
+
     public synchronized void clear() {
         super.clear();
         if (this.finder != null)
@@ -827,7 +827,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public synchronized Object clone() {
         QuantileDoubleBin1D clone = (QuantileDoubleBin1D) super.clone();
         if (this.finder != null)
@@ -843,7 +843,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
      *            the other bin to compare with
      * @return a summary of the deviations.
      */
-    @Override
+
     public String compareWith(AbstractDoubleBin1D other) {
         StringBuffer buf = new StringBuffer(super.compareWith(other));
         if (other instanceof QuantileDoubleBin1D) {
@@ -1222,7 +1222,7 @@ public class QuantileDoubleBin1D extends MightyStaticDoubleBin1D {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
         buf.append("25%, 50%, 75% Quantiles: " + quantile(0.25) + ", " + quantile(0.5) + ", " + quantile(0.75));

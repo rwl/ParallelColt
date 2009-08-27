@@ -138,7 +138,7 @@ class KnownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected DoubleBuffer[] buffersToCollapse() {
         int minLevel = bufferSet._getMinLevelOfFullOrPartialBuffers();
         return bufferSet._getFullOrPartialBuffersWithLevel(minLevel);
@@ -148,7 +148,7 @@ class KnownDoubleQuantileEstimator extends DoubleQuantileEstimator {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns, and its memory requirements will be close to zero.
      */
-    @Override
+
     public void clear() {
         super.clear();
         this.beta = 1.0;
@@ -167,7 +167,7 @@ class KnownDoubleQuantileEstimator extends DoubleQuantileEstimator {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         KnownDoubleQuantileEstimator copy = (KnownDoubleQuantileEstimator) super.clone();
         if (this.samplingAssistant != null)
@@ -178,7 +178,7 @@ class KnownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected void newBuffer() {
         int numberOfEmptyBuffers = this.bufferSet._getNumberOfEmptyBuffers();
         // DoubleBuffer[] emptyBuffers = this.bufferSet._getEmptyBuffers();
@@ -203,14 +203,14 @@ class KnownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected void postCollapse(DoubleBuffer[] toCollapse) {
         this.weHadMoreThanOneEmptyBuffer = false;
     }
 
     /**
      */
-    @Override
+
     protected DoubleArrayList preProcessPhis(DoubleArrayList phis) {
         if (beta > 1.0) {
             phis = phis.copy();
@@ -231,7 +231,7 @@ class KnownDoubleQuantileEstimator extends DoubleQuantileEstimator {
      *            sorted ascending.
      * @return the approximate quantile elements.
      */
-    @Override
+
     public DoubleArrayList quantileElements(DoubleArrayList phis) {
         /*
          * The KNOWN quantile finder reads off quantiles from FULL buffers only.
@@ -312,7 +312,7 @@ class KnownDoubleQuantileEstimator extends DoubleQuantileEstimator {
     /**
      * Not yet commented.
      */
-    @Override
+
     protected boolean sampleNextElement() {
         if (samplingAssistant == null)
             return true;

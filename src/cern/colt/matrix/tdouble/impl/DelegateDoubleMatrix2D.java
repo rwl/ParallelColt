@@ -68,8 +68,7 @@ class DelegateDoubleMatrix2D extends DoubleMatrix2D {
         this.content = newContent;
     }
 
-    @Override
-    public double getQuick(int row, int column) {
+    public synchronized double getQuick(int row, int column) {
         switch (axis) {
         case 0:
             return content.getQuick(index, row, column);
@@ -82,13 +81,11 @@ class DelegateDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
-    @Override
-    public void setQuick(int row, int column, double value) {
+    public synchronized void setQuick(int row, int column, double value) {
         switch (axis) {
         case 0:
             content.setQuick(index, row, column, value);
@@ -104,33 +101,27 @@ class DelegateDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix1D viewColumn(int column) {
         checkColumn(column);
         return new WrapperDoubleMatrix2D(this).viewColumn(column);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     public DoubleMatrix1D like1D(int size) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected DoubleMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     public DoubleMatrix1D vectorize() {
         DoubleMatrix1D v = new DenseDoubleMatrix1D(rows * columns);
         int idx = 0;

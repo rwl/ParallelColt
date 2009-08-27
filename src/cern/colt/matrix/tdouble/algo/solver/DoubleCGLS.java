@@ -30,7 +30,6 @@ public class DoubleCGLS extends AbstractDoubleIterativeSolver {
         ((CGLSDoubleIterationMonitor) iter).setRelativeTolerance(-1);
     }
 
-    @Override
     public DoubleMatrix1D solve(DoubleMatrix2D A, DoubleMatrix1D b, DoubleMatrix1D x)
             throws IterativeSolverDoubleNotConvergedException {
         DoubleMatrix1D p, q, r, s;

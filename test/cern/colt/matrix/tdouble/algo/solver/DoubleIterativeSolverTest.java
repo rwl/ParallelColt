@@ -171,7 +171,6 @@ public abstract class DoubleIterativeSolverTest extends TestCase {
         super(arg0);
     }
 
-    @Override
     protected void setUp() throws Exception {
         createMatrix();
 
@@ -185,12 +184,12 @@ public abstract class DoubleIterativeSolverTest extends TestCase {
         DoubleIterationMonitor im = new DefaultDoubleIterationMonitor(1000000, rtol, 1e-50, 1e+5);
         //        im.setIterationReporter(new NoDoubleIterationReporter() {
         //
-        //            @Override
+        //            
         //            public void monitor(double r, DoubleMatrix1D x, int i) {
         //                System.out.println("Norm of residual = " + r);
         //            }
         //
-        //            @Override
+        //            
         //            public void monitor(double r, int i) {
         //                System.out.println("Residual = " + r);
         //            }
@@ -219,7 +218,6 @@ public abstract class DoubleIterativeSolverTest extends TestCase {
         A = Aco.getRowCompressed(true);
     }
 
-    @Override
     protected void tearDown() throws Exception {
         A = null;
         b = bt = x = null;

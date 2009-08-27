@@ -51,7 +51,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * Applies a function to each cell and aggregates the results. Returns a
      * value <tt>v</tt> such that <tt>v==a(size())</tt> where
      * <tt>a(i) == aggr( a(i-1), f(get(i)) )</tt> and terminators are
-     * <tt>a(1) == f(get(0)), a(0)==Integer.NaN</tt>.
+     * <tt>a(1) == f(get(0)), a(0)==Int.NaN</tt>.
      * <p>
      * <b>Example:</b>
      * 
@@ -95,7 +95,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                         for (int i = firstIdx + 1; i < lastIdx; i++) {
                             a = aggr.apply(a, f.apply(getQuick(i)));
                         }
-                        return Integer.valueOf(a);
+                        return a;
                     }
                 });
             }
@@ -109,11 +109,68 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
     }
 
     /**
+     * 
+     * Applies a function to all cells with a given indexes and aggregates the
+     * results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param indexList
+     *            indexes.
+     * 
+     * @return the aggregated measure.
+     * @see cern.jet.math.tint.IntFunctions
+     */
+    public int aggregate(final cern.colt.function.tint.IntIntFunction aggr,
+            final cern.colt.function.tint.IntFunction f, final IntArrayList indexList) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        final int size = indexList.size();
+        final int[] indexElements = indexList.elements();
+        int a = 0;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
+
+                    public Integer call() throws Exception {
+                        int a = f.apply(getQuick(indexElements[firstIdx]));
+                        int elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            elem = getQuick(indexElements[i]);
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            int elem;
+            a = f.apply(getQuick(indexElements[0]));
+            for (int i = 1; i < size; i++) {
+                elem = getQuick(indexElements[i]);
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
+
+    /**
      * Applies a function to each corresponding cell of two matrices and
      * aggregates the results. Returns a value <tt>v</tt> such that
      * <tt>v==a(size())</tt> where
      * <tt>a(i) == aggr( a(i-1), f(get(i),other.get(i)) )</tt> and terminators
-     * are <tt>a(1) == f(get(0),other.get(0)), a(0)==Integer.NaN</tt>.
+     * are <tt>a(1) == f(get(0),other.get(0)), a(0)==Int.NaN</tt>.
      * <p>
      * <b>Example:</b>
      * 
@@ -166,7 +223,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                         for (int i = firstIdx + 1; i < lastIdx; i++) {
                             a = aggr.apply(a, f.apply(getQuick(i), other.getQuick(i)));
                         }
-                        return Integer.valueOf(a);
+                        return a;
                     }
                 });
             }
@@ -708,7 +765,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1044,11 +1101,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                     results[j] = (int[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                location = results[0][1];
+                location = (int) results[0][1];
                 for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        location = results[j][1];
+                        location = (int) results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1108,11 +1165,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                     results[j] = (int[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                location = results[0][1];
+                location = (int) results[0][1];
                 for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        location = results[j][1];
+                        location = (int) results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1140,11 +1197,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * 
      * @param rows
      *            number of rows
-     * @param cols
+     * @param columns
      *            number of columns
      * @return new 2D matrix with columns being the elements of this matrix.
      */
-    public abstract IntMatrix2D reshape(int rows, int cols);
+    public abstract IntMatrix2D reshape(int rows, int columns);
 
     /**
      * Returns new IntMatrix3D of size slices x rows x columns, whose elements
@@ -1152,11 +1209,11 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * 
      * @param rows
      *            number of rows
-     * @param cols
+     * @param columns
      *            number of columns
      * @return new 2D matrix with columns being the elements of this matrix.
      */
-    public abstract IntMatrix3D reshape(int slices, int rows, int cols);
+    public abstract IntMatrix3D reshape(int slices, int rows, int columns);
 
     /**
      * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
@@ -1292,7 +1349,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
      * 
      * @see cern.colt.matrix.tint.algo.IntFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tint.algo.IntFormatter().toString(this);
     }
@@ -1542,7 +1599,7 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                             idx = k + from;
                             sum += getQuick(idx) * y.getQuick(idx);
                         }
-                        return Integer.valueOf(sum);
+                        return sum;
                     }
                 });
             }
@@ -1550,9 +1607,9 @@ public abstract class IntMatrix1D extends AbstractMatrix1D {
                 for (int j = 0; j < nthreads; j++) {
                     results[j] = (Integer) futures[j].get();
                 }
-                sum = results[0].intValue();
+                sum = results[0];
                 for (int j = 1; j < nthreads; j++) {
-                    sum += results[j].intValue();
+                    sum += results[j];
                 }
             } catch (ExecutionException ex) {
                 ex.printStackTrace();

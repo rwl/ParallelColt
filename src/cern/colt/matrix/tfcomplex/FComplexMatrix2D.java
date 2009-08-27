@@ -448,6 +448,62 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
     }
 
     /**
+     * Assigns the result of a function to all cells with a given indexes
+     * 
+     * @param y
+     *            the secondary matrix to operate on.
+     * @param function
+     *            a function object taking as first argument the current cell's
+     *            value of <tt>this</tt>, and as second argument the current
+     *            cell's value of <tt>y</tt>,
+     * @param rowList
+     *            row indexes.
+     * @param columnList
+     *            column indexes.
+     * 
+     * @return <tt>this</tt> (for convenience only).
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
+     * @see cern.jet.math.tdouble.DoubleFunctions
+     */
+    public FComplexMatrix2D assign(final FComplexMatrix2D y,
+            final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction function, IntArrayList rowList,
+            IntArrayList columnList) {
+        checkShape(y);
+        final int size = rowList.size();
+        final int[] rowElements = rowList.elements();
+        final int[] columnElements = columnList.elements();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, rows);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            setQuick(rowElements[i], columnElements[i], function.apply(getQuick(rowElements[i],
+                                    columnElements[i]), y.getQuick(rowElements[i], columnElements[i])));
+                        }
+                    }
+
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                setQuick(rowElements[i], columnElements[i], function.apply(getQuick(rowElements[i], columnElements[i]),
+                        y.getQuick(rowElements[i], columnElements[i])));
+            }
+        }
+        return this;
+    }
+
+    /**
      * Sets all cells to the state specified by <tt>re</tt> and <tt>im</tt>.
      * 
      * @param re
@@ -786,7 +842,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1173,7 +1229,7 @@ public abstract class FComplexMatrix2D extends AbstractMatrix2D {
      * 
      * @return a string representation of the matrix.
      */
-    @Override
+
     public String toString() {
         return toString("%.4f");
     }

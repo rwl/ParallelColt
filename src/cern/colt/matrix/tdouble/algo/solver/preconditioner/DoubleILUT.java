@@ -253,7 +253,6 @@ public class DoubleILUT implements DoublePreconditioner {
                 return -1;
         }
 
-        @Override
         public String toString() {
             return "(" + index + "=" + value + ")";
         }

@@ -10,6 +10,8 @@ package cern.colt.matrix.tdouble.impl;
 
 import java.util.concurrent.Future;
 
+import cern.colt.list.tdouble.DoubleArrayList;
+import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdcomplex.impl.DenseLargeDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
@@ -36,26 +38,109 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
 
     public WrapperDoubleMatrix2D(DoubleMatrix2D newContent) {
         if (newContent != null)
-        try {
-            setUp(newContent.rows(), newContent.columns());
-        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-            if (!"matrix too large".equals(exc.getMessage()))
-                throw exc;
-        }
+            try {
+                setUp(newContent.rows(), newContent.columns());
+            } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+                if (!"matrix too large".equals(exc.getMessage()))
+                    throw exc;
+            }
         this.content = newContent;
     }
 
-    @Override
+    public DoubleMatrix2D assign(final double[] values) {
+        if (content instanceof DiagonalDoubleMatrix2D) {
+            int dlength = ((DiagonalDoubleMatrix2D) content).dlength;
+            final double[] elems = ((DiagonalDoubleMatrix2D) content).elements;
+            if (values.length != dlength)
+                throw new IllegalArgumentException("Must have same length: length=" + values.length + " dlength="
+                        + dlength);
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = Math.min(nthreads, dlength);
+                Future<?>[] futures = new Future[nthreads];
+                int k = dlength / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == nthreads - 1) ? dlength : firstIdx + k;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                        public void run() {
+                            for (int i = firstIdx; i < lastIdx; i++) {
+                                elems[i] = values[i];
+                            }
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+            } else {
+                for (int i = 0; i < dlength; i++) {
+                    elems[i] = values[i];
+                }
+            }
+            return this;
+        } else {
+            return super.assign(values);
+        }
+    }
+
+    public DoubleMatrix2D assign(final float[] values) {
+        if (content instanceof DiagonalDoubleMatrix2D) {
+            int dlength = ((DiagonalDoubleMatrix2D) content).dlength;
+            final double[] elems = ((DiagonalDoubleMatrix2D) content).elements;
+            if (values.length != dlength)
+                throw new IllegalArgumentException("Must have same length: length=" + values.length + " dlength="
+                        + dlength);
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = Math.min(nthreads, dlength);
+                Future<?>[] futures = new Future[nthreads];
+                int k = dlength / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == nthreads - 1) ? dlength : firstIdx + k;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                        public void run() {
+                            for (int i = firstIdx; i < lastIdx; i++) {
+                                elems[i] = values[i];
+                            }
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+            } else {
+                for (int i = 0; i < dlength; i++) {
+                    elems[i] = values[i];
+                }
+            }
+            return this;
+        } else {
+            return super.assign(values);
+        }
+    }
+
+    public DoubleMatrix2D assign(final DoubleMatrix2D y, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
+        checkShape(y);
+        if (y instanceof WrapperDoubleMatrix2D) {
+            IntArrayList rowList = new IntArrayList();
+            IntArrayList columnList = new IntArrayList();
+            DoubleArrayList valueList = new DoubleArrayList();
+            y.getNonZeros(rowList, columnList, valueList);
+            assign(y, function, rowList, columnList);
+        } else {
+            super.assign(y, function);
+        }
+        return this;
+    }
+
     public Object elements() {
         return content.elements();
     }
 
-    @Override
-    public double getQuick(int row, int column) {
+    public synchronized double getQuick(int row, int column) {
         return content.getQuick(row, column);
     }
 
-    @Override
     public boolean equals(double value) {
         if (content instanceof DiagonalDoubleMatrix2D) {
             double epsilon = cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.tolerance();
@@ -75,7 +160,6 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public boolean equals(Object obj) {
         if (content instanceof DiagonalDoubleMatrix2D && obj instanceof DiagonalDoubleMatrix2D) {
             double epsilon = cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.tolerance();
@@ -106,12 +190,10 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return content.like(rows, columns);
     }
 
-    @Override
     public DoubleMatrix1D like1D(int size) {
         return content.like1D(size);
     }
@@ -688,12 +770,10 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
-    public void setQuick(int row, int column, double value) {
+    public synchronized void setQuick(int row, int column, double value) {
         content.setQuick(row, column, value);
     }
 
-    @Override
     public DoubleMatrix1D vectorize() {
         final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D((int) size());
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -728,12 +808,10 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return v;
     }
 
-    @Override
     public DoubleMatrix1D viewColumn(int column) {
         return viewDice().viewRow(column);
     }
 
-    @Override
     public DoubleMatrix2D viewColumnFlip() {
         if (columns == 0)
             return this;
@@ -743,23 +821,19 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double getQuick(int row, int column) {
+            public synchronized double getQuick(int row, int column) {
                 return content.getQuick(row, columns - 1 - column);
             }
 
-            @Override
-            public void setQuick(int row, int column, double value) {
+            public synchronized void setQuick(int row, int column, double value) {
                 content.setQuick(row, columns - 1 - column, value);
             }
 
-            @Override
-            public double get(int row, int column) {
+            public synchronized double get(int row, int column) {
                 return content.get(row, columns - 1 - column);
             }
 
-            @Override
-            public void set(int row, int column, double value) {
+            public synchronized void set(int row, int column, double value) {
                 content.set(row, columns - 1 - column, value);
             }
         };
@@ -768,7 +842,6 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return view;
     }
 
-    @Override
     public DoubleMatrix2D viewDice() {
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
             /**
@@ -776,23 +849,19 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double getQuick(int row, int column) {
+            public synchronized double getQuick(int row, int column) {
                 return content.getQuick(column, row);
             }
 
-            @Override
-            public void setQuick(int row, int column, double value) {
+            public synchronized void setQuick(int row, int column, double value) {
                 content.setQuick(column, row, value);
             }
 
-            @Override
-            public double get(int row, int column) {
+            public synchronized double get(int row, int column) {
                 return content.get(column, row);
             }
 
-            @Override
-            public void set(int row, int column, double value) {
+            public synchronized void set(int row, int column, double value) {
                 content.set(column, row, value);
             }
         };
@@ -803,7 +872,6 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return view;
     }
 
-    @Override
     public DoubleMatrix2D viewPart(final int row, final int column, int height, int width) {
         checkBox(row, column, height, width);
         WrapperDoubleMatrix2D view = new WrapperDoubleMatrix2D(this) {
@@ -812,23 +880,19 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double getQuick(int i, int j) {
+            public synchronized double getQuick(int i, int j) {
                 return content.getQuick(row + i, column + j);
             }
 
-            @Override
-            public void setQuick(int i, int j, double value) {
+            public synchronized void setQuick(int i, int j, double value) {
                 content.setQuick(row + i, column + j, value);
             }
 
-            @Override
-            public double get(int i, int j) {
+            public synchronized double get(int i, int j) {
                 return content.get(row + i, column + j);
             }
 
-            @Override
-            public void set(int i, int j, double value) {
+            public synchronized void set(int i, int j, double value) {
                 content.set(row + i, column + j, value);
             }
         };
@@ -839,13 +903,11 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return view;
     }
 
-    @Override
     public DoubleMatrix1D viewRow(int row) {
         checkRow(row);
         return new DelegateDoubleMatrix1D(this, row);
     }
 
-    @Override
     public DoubleMatrix2D viewRowFlip() {
         if (rows == 0)
             return this;
@@ -855,23 +917,19 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double getQuick(int row, int column) {
+            public synchronized double getQuick(int row, int column) {
                 return content.getQuick(rows - 1 - row, column);
             }
 
-            @Override
-            public void setQuick(int row, int column, double value) {
+            public synchronized void setQuick(int row, int column, double value) {
                 content.setQuick(rows - 1 - row, column, value);
             }
 
-            @Override
-            public double get(int row, int column) {
+            public synchronized double get(int row, int column) {
                 return content.get(rows - 1 - row, column);
             }
 
-            @Override
-            public void set(int row, int column, double value) {
+            public synchronized void set(int row, int column, double value) {
                 content.set(rows - 1 - row, column, value);
             }
         };
@@ -879,7 +937,6 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return view;
     }
 
-    @Override
     public DoubleMatrix2D viewSelection(int[] rowIndexes, int[] columnIndexes) {
         // check for "all"
         if (rowIndexes == null) {
@@ -904,23 +961,19 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double getQuick(int i, int j) {
+            public synchronized double getQuick(int i, int j) {
                 return content.getQuick(rix[i], cix[j]);
             }
 
-            @Override
-            public void setQuick(int i, int j, double value) {
+            public synchronized void setQuick(int i, int j, double value) {
                 content.setQuick(rix[i], cix[j], value);
             }
 
-            @Override
-            public double get(int i, int j) {
+            public synchronized double get(int i, int j) {
                 return content.get(rix[i], cix[j]);
             }
 
-            @Override
-            public void set(int i, int j, double value) {
+            public synchronized void set(int i, int j, double value) {
                 content.set(rix[i], cix[j], value);
             }
         };
@@ -931,7 +984,6 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return view;
     }
 
-    @Override
     public DoubleMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
         if (_rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
@@ -941,23 +993,19 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double getQuick(int row, int column) {
+            public synchronized double getQuick(int row, int column) {
                 return content.getQuick(_rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void setQuick(int row, int column, double value) {
+            public synchronized void setQuick(int row, int column, double value) {
                 content.setQuick(_rowStride * row, _columnStride * column, value);
             }
 
-            @Override
-            public double get(int row, int column) {
+            public synchronized double get(int row, int column) {
                 return content.get(_rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void set(int row, int column, double value) {
+            public synchronized void set(int row, int column, double value) {
                 content.set(_rowStride * row, _columnStride * column, value);
             }
         };
@@ -970,17 +1018,14 @@ public class WrapperDoubleMatrix2D extends DoubleMatrix2D {
         return view;
     }
 
-    @Override
     protected DoubleMatrix2D getContent() {
         return content;
     }
 
-    @Override
     protected DoubleMatrix1D like1D(int size, int offset, int stride) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never be called
     }

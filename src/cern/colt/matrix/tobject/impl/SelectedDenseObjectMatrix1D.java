@@ -10,6 +10,7 @@ package cern.colt.matrix.tobject.impl;
 
 import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
+import cern.colt.matrix.tobject.ObjectMatrix3D;
 
 /**
  * Selection view on dense 1-d matrices holding <tt>Object</tt> elements. First
@@ -115,12 +116,11 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
 
-    @Override
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -138,7 +138,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
+
     public Object getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements[index(index)];
@@ -149,7 +149,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(ObjectMatrix1D other) {
         if (other instanceof SelectedDenseObjectMatrix1D) {
             SelectedDenseObjectMatrix1D otherMatrix = (SelectedDenseObjectMatrix1D) other;
@@ -169,7 +169,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
@@ -189,7 +189,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public ObjectMatrix1D like(int size) {
         return new DenseObjectMatrix1D(size);
     }
@@ -208,7 +208,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public ObjectMatrix2D like2D(int rows, int columns) {
         return new DenseObjectMatrix2D(rows, columns);
     }
@@ -227,12 +227,20 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, Object value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // elements[index(index)] = value;
         // manually inlined:
         elements[offset + offsets[zero + index * stride]] = value;
+    }
+    
+    public ObjectMatrix2D reshape(int rows, int columns) {
+        throw new IllegalArgumentException("This method is not supported.");
+    }
+
+    public ObjectMatrix3D reshape(int slices, int rows, int columns) {
+        throw new IllegalArgumentException("This method is not supported.");
     }
 
     /**
@@ -241,7 +249,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
-    @Override
+
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -255,7 +263,7 @@ class SelectedDenseObjectMatrix1D extends ObjectMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected ObjectMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseObjectMatrix1D(this.elements, offsets);
     }

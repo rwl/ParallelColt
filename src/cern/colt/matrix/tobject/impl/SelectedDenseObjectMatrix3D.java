@@ -9,6 +9,7 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tobject.impl;
 
 import cern.colt.matrix.AbstractMatrix3D;
+import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 import cern.colt.matrix.tobject.ObjectMatrix3D;
 
@@ -115,7 +116,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -129,7 +130,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -143,12 +144,11 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _sliceOffset(int absRank) {
         return sliceOffsets[absRank];
     }
 
-    @Override
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -171,7 +171,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public Object getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -193,7 +193,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(ObjectMatrix3D other) {
         if (other instanceof SelectedDenseObjectMatrix3D) {
             SelectedDenseObjectMatrix3D otherMatrix = (SelectedDenseObjectMatrix3D) other;
@@ -216,7 +216,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    @Override
+
     public long index(int slice, int row, int column) {
         // return this.offset + super.index(slice,row,column);
         // manually inlined:
@@ -242,7 +242,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public ObjectMatrix3D like(int slices, int rows, int columns) {
         return new DenseObjectMatrix3D(slices, rows, columns);
     }
@@ -271,7 +271,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected ObjectMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -298,7 +298,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int slice, int row, int column, Object value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -308,6 +308,17 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
         // manually inlined:
         elements[offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
                 + columnOffsets[columnZero + column * columnStride]] = value;
+    }
+    
+    /**
+     * Returns a vector obtained by stacking the columns of each slice of the
+     * matrix on top of one another.
+     * 
+     * @return
+     */
+
+    public ObjectMatrix1D vectorize() {
+        throw new IllegalArgumentException("This method is not supported.");
     }
 
     /**
@@ -322,7 +333,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>(Object)rows*slices > Integer.MAX_VALUE</tt>.
      */
-    @Override
+
     protected void setUp(int slices, int rows, int columns) {
         super.setUp(slices, rows, columns);
         this.sliceStride = 1;
@@ -337,7 +348,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * @throws IllegalArgumentException
      *             if some of the parameters are equal or not in range 0..2.
      */
-    @Override
+
     protected AbstractMatrix3D vDice(int axis0, int axis1, int axis2) {
         super.vDice(axis0, axis1, axis2);
 
@@ -375,7 +386,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * @see #viewSlice(int)
      * @see #viewRow(int)
      */
-    @Override
+
     public ObjectMatrix2D viewColumn(int column) {
         checkColumn(column);
 
@@ -417,7 +428,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * @see #viewSlice(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public ObjectMatrix2D viewRow(int row) {
         checkRow(row);
 
@@ -449,7 +460,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected ObjectMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseObjectMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, this.offset);
     }
@@ -475,7 +486,7 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
      * @see #viewRow(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public ObjectMatrix2D viewSlice(int slice) {
         checkSlice(slice);
 
@@ -494,5 +505,10 @@ class SelectedDenseObjectMatrix3D extends ObjectMatrix3D {
 
         return new SelectedDenseObjectMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero,
                 viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
+    }
+
+    @Override
+    public ObjectMatrix2D like2D(int rows, int columns) {
+        throw new InternalError();
     }
 }

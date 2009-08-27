@@ -6,7 +6,6 @@ public class DenseColumnFloatMatrix2DViewTest extends DenseColumnFloatMatrix2DTe
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseColumnFloatMatrix2D(NCOLUMNS, NROWS).viewDice();
         B = new DenseColumnFloatMatrix2D(NCOLUMNS, NROWS).viewDice();

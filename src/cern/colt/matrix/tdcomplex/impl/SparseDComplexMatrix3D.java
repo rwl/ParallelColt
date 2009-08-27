@@ -32,7 +32,7 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, double[]> elements;
+    protected ConcurrentHashMap<Long, double[]> elements;
 
     /**
      * Constructs a matrix with a copy of the given values. <tt>values</tt> is
@@ -77,7 +77,7 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
      */
     public SparseDComplexMatrix3D(int slices, int rows, int columns) {
         setUp(slices, rows, columns);
-        this.elements = new ConcurrentHashMap<Integer, double[]>(slices * rows * (columns / 1000));
+        this.elements = new ConcurrentHashMap<Long, double[]>(slices * rows * (columns / 1000));
     }
 
     /**
@@ -111,14 +111,13 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected SparseDComplexMatrix3D(int slices, int rows, int columns, ConcurrentHashMap<Integer, double[]> elements,
+    protected SparseDComplexMatrix3D(int slices, int rows, int columns, ConcurrentHashMap<Long, double[]> elements,
             int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
         setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         this.elements = elements;
         this.isNoView = false;
     }
 
-    @Override
     public DComplexMatrix3D assign(double[] value) {
         // overriden for performance only
         if (this.isNoView && value[0] == 0 && value[1] == 0)
@@ -128,7 +127,6 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -136,10 +134,9 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
             return super.cardinality();
     }
 
-    @Override
-    public double[] getQuick(int slice, int row, int column) {
-        double[] elem = elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
-                * columnStride);
+    public synchronized double[] getQuick(int slice, int row, int column) {
+        double[] elem = elements.get((long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride);
         if (elem != null) {
             return new double[] { elem[0], elem[1] };
         } else {
@@ -147,15 +144,14 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
         }
     }
 
-    @Override
-    public ConcurrentHashMap<Integer, double[]> elements() {
+    public ConcurrentHashMap<Long, double[]> elements() {
         return elements;
     }
 
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DComplexMatrix3D other) {
         if (other instanceof SelectedSparseDComplexMatrix3D) {
             SelectedSparseDComplexMatrix3D otherMatrix = (SelectedSparseDComplexMatrix3D) other;
@@ -167,51 +163,46 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
         return false;
     }
 
-    @Override
     public long index(int slice, int row, int column) {
-        return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        return (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row * (long) rowStride
+                + (long) columnZero + (long) column * columnStride;
     }
 
-    @Override
     public DComplexMatrix3D like(int slices, int rows, int columns) {
         return new SparseDComplexMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public DComplexMatrix2D like2D(int rows, int columns) {
         return new SparseDComplexMatrix2D(rows, columns);
     }
 
-    @Override
     protected DComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
             int columnStride) {
         return new SparseDComplexMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
 
-    @Override
-    public void setQuick(int slice, int row, int column, double[] value) {
-        int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+    public synchronized void setQuick(int slice, int row, int column, double[] value) {
+        long index = (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(index);
         else
             this.elements.put(index, value);
     }
 
-    @Override
-    public void setQuick(int slice, int row, int column, double re, double im) {
-        int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+    public synchronized void setQuick(int slice, int row, int column, double re, double im) {
+        long index = (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
         if (re == 0 && im == 0)
             this.elements.remove(index);
         else
             this.elements.put(index, new double[] { re, im });
     }
 
-    @Override
     protected DComplexMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseDComplexMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }
 
-    @Override
     public DComplexMatrix1D vectorize() {
         DComplexMatrix1D v = new SparseDComplexMatrix1D((int) size());
         int length = rows * columns;
@@ -221,7 +212,6 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
         return v;
     }
 
-    @Override
     public DoubleMatrix3D getImaginaryPart() {
         final DoubleMatrix3D Im = new SparseDoubleMatrix3D(slices, rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -257,7 +247,6 @@ public class SparseDComplexMatrix3D extends DComplexMatrix3D {
         return Im;
     }
 
-    @Override
     public DoubleMatrix3D getRealPart() {
         final DoubleMatrix3D Re = new SparseDoubleMatrix3D(slices, rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

@@ -8,7 +8,6 @@ public class SparseFloatMatrix3DTest extends FloatMatrix3DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFloatMatrix3D(NSLICES, NROWS, NCOLUMNS);
         B = new SparseFloatMatrix3D(NSLICES, NROWS, NCOLUMNS);

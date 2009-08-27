@@ -116,7 +116,7 @@ public abstract class AbstractFloatBin1D extends AbstractFloatBin implements
      * of the same class or a subclass of this class and both have the same
      * size, minimum, maximum, sum and sumOfSquares.
      */
-    @Override
+
     public boolean equals(Object object) {
         if (!(object instanceof AbstractFloatBin1D))
             return false;
@@ -186,7 +186,7 @@ public abstract class AbstractFloatBin1D extends AbstractFloatBin implements
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(getClass().getName());
@@ -214,7 +214,7 @@ public abstract class AbstractFloatBin1D extends AbstractFloatBin implements
      * operation to minimize the storage of the receiver. This default
      * implementation does nothing.
      */
-    @Override
+
     public synchronized void trimToSize() {
     }
 

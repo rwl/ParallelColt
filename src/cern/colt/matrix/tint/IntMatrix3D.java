@@ -55,7 +55,7 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
      * Applies a function to each cell and aggregates the results. Returns a
      * value <tt>v</tt> such that <tt>v==a(size())</tt> where
      * <tt>a(i) == aggr( a(i-1), f(get(slice,row,column)) )</tt> and terminators
-     * are <tt>a(1) == f(get(0,0,0)), a(0)==Integer.NaN</tt>.
+     * are <tt>a(1) == f(get(0,0,0)), a(0)==Int.NaN</tt>.
      * <p>
      * <b>Example:</b>
      * 
@@ -276,7 +276,7 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
      * <tt>v==a(size())</tt> where
      * <tt>a(i) == aggr( a(i-1), f(get(slice,row,column),other.get(slice,row,column)) )</tt>
      * and terminators are
-     * <tt>a(1) == f(get(0,0,0),other.get(0,0,0)), a(0)==Integer.NaN</tt>.
+     * <tt>a(1) == f(get(0,0,0),other.get(0,0,0)), a(0)==Int.NaN</tt>.
      * <p>
      * <b>Example:</b>
      * 
@@ -1014,7 +1014,7 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1253,6 +1253,22 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
+     * instance of type <tt>DenseDoubleMatrix3D</tt> the new matrix must also be
+     * of type <tt>DenseDoubleMatrix2D</tt>, if the receiver is an instance of
+     * type <tt>SparseDoubleMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseDoubleMatrix2D</tt>, etc.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @return a new matrix of the corresponding dynamic type.
+     */
+    public abstract IntMatrix2D like2D(int rows, int columns);
+
+    /**
+     * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
+     * type</i>, sharing the same cells. For example, if the receiver is an
      * instance of type <tt>DenseIntMatrix3D</tt> the new matrix must also be of
      * type <tt>DenseIntMatrix2D</tt>, if the receiver is an instance of type
      * <tt>SparseIntMatrix3D</tt> the new matrix must also be of type
@@ -1328,15 +1344,15 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
                     results[j] = (int[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                sliceLocation = results[0][1];
-                rowLocation = results[0][2];
-                columnLocation = results[0][3];
+                sliceLocation = (int) results[0][1];
+                rowLocation = (int) results[0][2];
+                columnLocation = (int) results[0][3];
                 for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        sliceLocation = results[j][1];
-                        rowLocation = results[j][2];
-                        columnLocation = results[j][3];
+                        sliceLocation = (int) results[j][1];
+                        rowLocation = (int) results[j][2];
+                        columnLocation = (int) results[j][3];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1417,15 +1433,15 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
                     results[j] = (int[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                sliceLocation = results[0][1];
-                rowLocation = results[0][2];
-                columnLocation = results[0][3];
+                sliceLocation = (int) results[0][1];
+                rowLocation = (int) results[0][2];
+                columnLocation = (int) results[0][3];
                 for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        sliceLocation = results[j][1];
-                        rowLocation = results[j][2];
-                        columnLocation = results[j][3];
+                        sliceLocation = (int) results[j][1];
+                        rowLocation = (int) results[j][2];
+                        columnLocation = (int) results[j][3];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1556,7 +1572,7 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
      * 
      * @see cern.colt.matrix.tint.algo.IntFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tint.algo.IntFormatter().toString(this);
     }
@@ -1623,7 +1639,7 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the column axis. What
+     * Constructs and returns a new <i>flip view</i> aint the column axis. What
      * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
      * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
      * returned view is backed by this matrix, so changes in the returned view
@@ -1725,7 +1741,7 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the row axis. What
+     * Constructs and returns a new <i>flip view</i> aint the row axis. What
      * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
      * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
      * backed by this matrix, so changes in the returned view are reflected in
@@ -1904,7 +1920,7 @@ public abstract class IntMatrix3D extends AbstractMatrix3D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the slice axis. What
+     * Constructs and returns a new <i>flip view</i> aint the slice axis. What
      * used to be slice <tt>0</tt> is now slice <tt>slices()-1</tt>, ..., what
      * used to be slice <tt>slices()-1</tt> is now slice <tt>0</tt>. The
      * returned view is backed by this matrix, so changes in the returned view

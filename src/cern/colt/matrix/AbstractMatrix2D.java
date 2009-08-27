@@ -285,7 +285,7 @@ public abstract class AbstractMatrix2D extends AbstractMatrix {
     /**
      * Returns the number of cells which is <tt>rows()*columns()</tt>.
      */
-    @Override
+
     public long size() {
         return rows * columns;
     }

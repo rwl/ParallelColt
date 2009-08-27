@@ -86,7 +86,7 @@ public class QuickOpenIntIntHashMap extends OpenIntIntHashMap {
      *         <tt>false</tt> if the receiver did already contain such a key -
      *         the new value has now replaced the formerly associated value.
      */
-    @Override
+
     public boolean put(int key, int value) {
         /*
          * This is open addressing with double hashing, using "Brent's
@@ -213,7 +213,7 @@ public class QuickOpenIntIntHashMap extends OpenIntIntHashMap {
      * keys in the receiver exceeds the high water mark or falls below the low
      * water mark.
      */
-    @Override
+
     public void rehash(int newCapacity) {
         int oldCapacity = table.length;
         // if (oldCapacity == newCapacity) return;

@@ -114,8 +114,8 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *            The column offsets of the cells that shall be visible.
      * @param offset
      */
-    protected SelectedSparseLongMatrix2D(int rows, int columns, AbstractLongLongMap elements, int rowZero, int columnZero,
-            int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
+    protected SelectedSparseLongMatrix2D(int rows, int columns, AbstractLongLongMap elements, int rowZero,
+            int columnZero, int rowStride, int columnStride, int[] rowOffsets, int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -127,7 +127,6 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
         this.isNoView = false;
     }
 
-    @Override
     public AbstractLongLongMap elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -148,14 +147,14 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public long getQuick(int row, int column) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
         // return elements.get(index(row,column));
         // manually inlined:
-        return elements.get(offset + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride]);
+        return elements.get((long) offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride]);
     }
 
     /**
@@ -167,21 +166,23 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    @Override
+
     public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
-        return this.offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        return (long) this.offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
     }
 
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type <tt>DenseLongMatrix2D</tt>
-     * the new matrix must also be of type <tt>DenseLongMatrix2D</tt>, if the
-     * receiver is an instance of type <tt>SparseLongMatrix2D</tt> the new matrix
-     * must also be of type <tt>SparseLongMatrix2D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * example, if the receiver is an instance of type
+     * <tt>DenseLongMatrix2D</tt> the new matrix must also be of type
+     * <tt>DenseLongMatrix2D</tt>, if the receiver is an instance of type
+     * <tt>SparseLongMatrix2D</tt> the new matrix must also be of type
+     * <tt>SparseLongMatrix2D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -189,7 +190,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public LongMatrix2D like(int rows, int columns) {
         return new SparseLongMatrix2D(rows, columns);
     }
@@ -198,15 +199,15 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseLongMatrix2D</tt> the new matrix
-     * must be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an instance
-     * of type <tt>SparseLongMatrix2D</tt> the new matrix must be of type
-     * <tt>SparseLongMatrix1D</tt>, etc.
+     * must be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix2D</tt> the new matrix must be of
+     * type <tt>SparseLongMatrix1D</tt>, etc.
      * 
      * @param size
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public LongMatrix1D like1D(int size) {
         return new SparseLongMatrix1D(size);
     }
@@ -229,13 +230,14 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int row, int column, long value) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
         // int index = index(row,column);
         // manually inlined:
-        int index = offset + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
 
         if (value == 0)
             this.elements.removeKey(index);
@@ -249,7 +251,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      * 
      * @return
      */
-    @Override
+
     public LongMatrix1D vectorize() {
         SparseLongMatrix1D v = new SparseLongMatrix1D((int) size());
         int idx = 0;
@@ -287,7 +289,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *             if <tt>column < 0 || column >= columns()</tt>.
      * @see #viewRow(int)
      */
-    @Override
+
     public LongMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -324,7 +326,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *             if <tt>row < 0 || row >= rows()</tt>.
      * @see #viewColumn(int)
      */
-    @Override
+
     public LongMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -344,7 +346,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -358,7 +360,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -373,7 +375,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(LongMatrix2D other) {
         if (other instanceof SelectedSparseLongMatrix2D) {
             SelectedSparseLongMatrix2D otherMatrix = (SelectedSparseLongMatrix2D) other;
@@ -388,8 +390,8 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseLongMatrix2D</tt> the new matrix must be of type
-     * <tt>DenseLongMatrix1D</tt>, if the receiver is an instance of type
+     * instance of type <tt>DenseLongMatrix2D</tt> the new matrix must be of
+     * type <tt>DenseLongMatrix1D</tt>, if the receiver is an instance of type
      * <tt>SparseLongMatrix2D</tt> the new matrix must be of type
      * <tt>SparseLongMatrix1D</tt>, etc.
      * 
@@ -402,7 +404,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected LongMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -419,7 +421,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>(int)columns*rows > Long.MAX_VALUE</tt>.
      */
-    @Override
+
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -430,7 +432,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
     /**
      * Self modifying version of viewDice().
      */
-    @Override
+
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -453,7 +455,7 @@ class SelectedSparseLongMatrix2D extends LongMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected LongMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseLongMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }

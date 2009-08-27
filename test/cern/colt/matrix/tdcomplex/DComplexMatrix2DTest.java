@@ -42,7 +42,6 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         super(arg0);
     }
 
-    @Override
     protected void setUp() throws Exception {
         createMatrices();
         populateMatrices();
@@ -52,26 +51,25 @@ public abstract class DComplexMatrix2DTest extends TestCase {
 
     protected void populateMatrices() {
         ConcurrencyUtils.setThreadsBeginN_2D(1);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 A.setQuick(r, c, new double[] { Math.random(), Math.random() });
             }
         }
 
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < B.rows(); r++) {
+            for (int c = 0; c < B.columns(); c++) {
                 B.setQuick(r, c, new double[] { Math.random(), Math.random() });
             }
         }
 
-        for (int r = 0; r < NCOLUMNS; r++) {
-            for (int c = 0; c < NROWS; c++) {
+        for (int r = 0; r < Bt.rows(); r++) {
+            for (int c = 0; c < Bt.columns(); c++) {
                 Bt.setQuick(r, c, new double[] { Math.random(), Math.random() });
             }
         }
     }
 
-    @Override
     protected void tearDown() throws Exception {
         A = B = Bt = null;
     }
@@ -79,8 +77,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     public void testAggregateComplexComplexComplexFunctionComplexComplexFunction() {
         double[] actual = A.aggregate(DComplexFunctions.plus, DComplexFunctions.square);
         double[] expected = new double[2];
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 expected = DComplex.plus(expected, DComplex.square(A.getQuick(r, c)));
             }
         }
@@ -90,8 +88,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     public void testAggregateComplexMatrix2DComplexComplexComplexFunctionComplexComplexComplexFunction() {
         double[] actual = A.aggregate(B, DComplexFunctions.plus, DComplexFunctions.mult);
         double[] expected = new double[2];
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 expected = DComplex.plus(expected, DComplex.mult(A.getQuick(r, c), B.getQuick(r, c)));
             }
         }
@@ -102,8 +100,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         DComplexMatrix2D Acopy = A.copy();
         A.assign(DComplexFunctions.acos);
         double[] tmp;
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 tmp = DComplex.acos(Acopy.getQuick(r, c));
                 assertEquals(tmp, A.getQuick(r, c), TOL);
             }
@@ -112,8 +110,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
 
     public void testAssignComplexMatrix2D() {
         A.assign(B);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(B.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }
@@ -122,8 +120,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     public void testAssignComplexMatrix2DComplexComplexComplexFunction() {
         DComplexMatrix2D Acopy = A.copy();
         A.assign(B, DComplexFunctions.div);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(DComplex.div(Acopy.getQuick(r, c), B.getQuick(r, c)), A.getQuick(r, c), TOL);
             }
         }
@@ -140,8 +138,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
                 }
             }
         }, DComplexFunctions.tan);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 if (DComplex.abs(Acopy.getQuick(r, c)) > 3) {
                     assertEquals(DComplex.tan(Acopy.getQuick(r, c)), A.getQuick(r, c), TOL);
                 } else {
@@ -163,8 +161,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
                 }
             }
         }, value);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 if (DComplex.abs(A.getQuick(r, c)) > 3) {
                     assertEquals(value, A.getQuick(r, c), TOL);
                 } else {
@@ -178,8 +176,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         DComplexMatrix2D Acopy = A.copy();
         A.assign(DComplexFunctions.abs);
         double[] tmp;
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 tmp = A.getQuick(r, c);
                 assertEquals(DComplex.abs(Acopy.getQuick(r, c)), tmp[0], TOL);
                 assertEquals(0, tmp[1], TOL);
@@ -194,8 +192,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         }
         A.assign(expected);
         int idx = 0;
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 double[] elem = A.getQuick(r, c);
                 assertEquals(expected[idx], elem[0], TOL);
                 assertEquals(expected[idx + 1], elem[1], TOL);
@@ -205,15 +203,15 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     }
 
     public void testAssignDoubleArrayArray() {
-        double[][] expected = new double[NROWS][2 * NCOLUMNS];
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < 2 * NCOLUMNS; c++) {
+        double[][] expected = new double[A.rows()][2 * A.columns()];
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < 2 * A.columns(); c++) {
                 expected[r][c] = Math.random();
             }
         }
         A.assign(expected);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 double[] elem = A.getQuick(r, c);
                 assertEquals(expected[r][2 * c], elem[0], TOL);
                 assertEquals(expected[r][2 * c + 1], elem[1], TOL);
@@ -224,8 +222,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     public void testAssignDoubleDouble() {
         double[] value = new double[] { Math.random(), Math.random() };
         A.assign(value[0], value[1]);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 double[] elem = A.getQuick(r, c);
                 assertEquals(value, elem, TOL);
             }
@@ -233,14 +231,14 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     }
 
     public void testAssignFloatArray() {
-        float[] expected = new float[NROWS * 2 * NCOLUMNS];
+        float[] expected = new float[A.rows() * 2 * A.columns()];
         for (int i = 0; i < 2 * A.size(); i++) {
             expected[i] = (float) Math.random();
         }
         A.assign(expected);
         int idx = 0;
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 double[] elem = A.getQuick(r, c);
                 assertEquals(expected[idx], elem[0], TOL);
                 assertEquals(expected[idx + 1], elem[1], TOL);
@@ -250,11 +248,11 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     }
 
     public void testAssignImaginary() {
-        DoubleMatrix2D Im = DoubleFactory2D.dense.random(NROWS, NCOLUMNS);
+        DoubleMatrix2D Im = DoubleFactory2D.dense.random(A.rows(), A.columns());
         DComplexMatrix2D Acopy = A.copy();
         A.assignImaginary(Im);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(Acopy.getQuick(r, c)[0], A.getQuick(r, c)[0], TOL);
                 assertEquals(Im.getQuick(r, c), A.getQuick(r, c)[1], TOL);
             }
@@ -262,11 +260,11 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     }
 
     public void testAssignReal() {
-        DoubleMatrix2D Re = DoubleFactory2D.dense.random(NROWS, NCOLUMNS);
+        DoubleMatrix2D Re = DoubleFactory2D.dense.random(A.rows(), A.columns());
         DComplexMatrix2D Acopy = A.copy();
         A.assignReal(Re);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(Acopy.getQuick(r, c)[1], A.getQuick(r, c)[1], TOL);
                 assertEquals(Re.getQuick(r, c), A.getQuick(r, c)[0], TOL);
             }
@@ -302,8 +300,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
             }
         };
         A.forEachNonZero(function);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(DComplex.sqrt(Acopy.getQuick(r, c)), A.getQuick(r, c), TOL);
             }
         }
@@ -313,8 +311,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         DComplexMatrix2D Aconj = A.getConjugateTranspose();
         assertEquals(A.rows(), Aconj.columns());
         assertEquals(A.columns(), Aconj.rows());
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(r, c)[0], Aconj.getQuick(c, r)[0], TOL);
                 assertEquals(-A.getQuick(r, c)[1], Aconj.getQuick(c, r)[1], TOL);
             }
@@ -323,8 +321,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
 
     public void testGetImaginaryPart() {
         DoubleMatrix2D Im = A.getImaginaryPart();
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(r, c)[1], Im.getQuick(r, c), TOL);
             }
         }
@@ -339,8 +337,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         assertEquals(A.size(), colList.size());
         assertEquals(A.size(), valueList.size());
         int idx = 0;
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(rowList.get(idx), colList.get(idx)), valueList.get(idx), TOL);
                 idx++;
             }
@@ -349,8 +347,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
 
     public void testGetRealPart() {
         DoubleMatrix2D Re = A.getRealPart();
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(r, c)[0], Re.getQuick(r, c), TOL);
             }
         }
@@ -358,8 +356,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
 
     public void testToArray() {
         double[][] array = A.toArray();
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(r, c)[0], array[r][2 * c], TOL);
                 assertEquals(A.getQuick(r, c)[1], array[r][2 * c + 1], TOL);
             }
@@ -369,27 +367,27 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     public void testVectorize() {
         DComplexMatrix1D B = A.vectorize();
         int idx = 0;
-        for (int c = 0; c < NCOLUMNS; c++) {
-            for (int r = 0; r < NROWS; r++) {
+        for (int c = 0; c < A.columns(); c++) {
+            for (int r = 0; r < A.rows(); r++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(idx++), TOL);
             }
         }
     }
 
     public void testViewColumn() {
-        DComplexMatrix1D B = A.viewColumn(NCOLUMNS / 2);
-        assertEquals(NROWS, B.size());
-        for (int r = 0; r < NROWS; r++) {
-            assertEquals(A.getQuick(r, NCOLUMNS / 2), B.getQuick(r), TOL);
+        DComplexMatrix1D B = A.viewColumn(A.columns() / 2);
+        assertEquals(A.rows(), B.size());
+        for (int r = 0; r < A.rows(); r++) {
+            assertEquals(A.getQuick(r, A.columns() / 2), B.getQuick(r), TOL);
         }
     }
 
     public void testViewColumnFlip() {
         DComplexMatrix2D B = A.viewColumnFlip();
         assertEquals(A.size(), B.size());
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, NCOLUMNS - 1 - c), B.getQuick(r, c), TOL);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(A.getQuick(r, A.columns() - 1 - c), B.getQuick(r, c), TOL);
             }
         }
     }
@@ -398,44 +396,44 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         DComplexMatrix2D B = A.viewDice();
         assertEquals(A.rows(), B.columns());
         assertEquals(A.columns(), B.rows());
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(c, r), TOL);
             }
         }
     }
 
     public void testViewPart() {
-        DComplexMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
-        for (int r = 0; r < NROWS / 3; r++) {
-            for (int c = 0; c < NCOLUMNS / 3; c++) {
-                assertEquals(A.getQuick(NROWS / 2 + r, NCOLUMNS / 2 + c), B.getQuick(r, c), TOL);
+        DComplexMatrix2D B = A.viewPart(A.rows() / 2, A.columns() / 2, A.rows() / 3, A.columns() / 3);
+        for (int r = 0; r < A.rows() / 3; r++) {
+            for (int c = 0; c < A.columns() / 3; c++) {
+                assertEquals(A.getQuick(A.rows() / 2 + r, A.columns() / 2 + c), B.getQuick(r, c), TOL);
             }
         }
     }
 
     public void testViewRow() {
-        DComplexMatrix1D B = A.viewRow(NROWS / 2);
-        assertEquals(NCOLUMNS, B.size());
-        for (int c = 0; c < NCOLUMNS; c++) {
-            assertEquals(A.getQuick(NROWS / 2, c), B.getQuick(c), TOL);
+        DComplexMatrix1D B = A.viewRow(A.rows() / 2);
+        assertEquals(A.columns(), B.size());
+        for (int c = 0; c < A.columns(); c++) {
+            assertEquals(A.getQuick(A.rows() / 2, c), B.getQuick(c), TOL);
         }
     }
 
     public void testViewRowFlip() {
         DComplexMatrix2D B = A.viewRowFlip();
         assertEquals(A.size(), B.size());
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(NROWS - 1 - r, c), B.getQuick(r, c), TOL);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(A.getQuick(A.rows() - 1 - r, c), B.getQuick(r, c), TOL);
             }
         }
     }
 
     public void testViewSelectionComplexMatrix1DProcedure() {
         final double[] value = new double[] { Math.random(), Math.random() };
-        A.setQuick(NROWS / 3, 0, value);
-        A.setQuick(NROWS / 2, 0, value);
+        A.setQuick(A.rows() / 3, 0, value);
+        A.setQuick(A.rows() / 2, 0, value);
         DComplexMatrix2D B = A.viewSelection(new DComplexMatrix1DProcedure() {
             public boolean apply(DComplexMatrix1D element) {
                 return DComplex.isEqual(element.getQuick(0), value, TOL);
@@ -443,14 +441,14 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         });
         assertEquals(2, B.rows());
         assertEquals(A.columns(), B.columns());
-        assertEquals(A.getQuick(NROWS / 3, 0), B.getQuick(0, 0), TOL);
-        assertEquals(A.getQuick(NROWS / 2, 0), B.getQuick(1, 0), TOL);
+        assertEquals(A.getQuick(A.rows() / 3, 0), B.getQuick(0, 0), TOL);
+        assertEquals(A.getQuick(A.rows() / 2, 0), B.getQuick(1, 0), TOL);
     }
 
     public void testViewSelectionIntArrayIntArray() {
-        int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2,
-                NCOLUMNS - 1 };
+        int[] rowIndexes = new int[] { A.rows() / 6, A.rows() / 5, A.rows() / 4, A.rows() / 3, A.rows() / 2 };
+        int[] colIndexes = new int[] { A.columns() / 6, A.columns() / 5, A.columns() / 4, A.columns() / 3,
+                A.columns() / 2, A.columns() - 1 };
         DComplexMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
         assertEquals(rowIndexes.length, B.rows());
         assertEquals(colIndexes.length, B.columns());
@@ -473,7 +471,7 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     }
 
     public void testZMultDComplexMatrix1DDComplexMatrix1DDComplexDComplexBoolean() {
-        DComplexMatrix1D y = new DenseDComplexMatrix1D(NCOLUMNS);
+        DComplexMatrix1D y = new DenseDComplexMatrix1D(A.columns());
         for (int i = 0; i < y.size(); i++) {
             y.setQuick(i, new double[] { Math.random(), Math.random() });
         }
@@ -481,11 +479,11 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         double[] beta = new double[] { 5, 4 };
         DComplexMatrix1D z = null;
         z = A.zMult(y, z, alpha, beta, false);
-        double[] expected = new double[2 * NROWS];
+        double[] expected = new double[2 * A.rows()];
         double[] tmp = new double[2];
-        for (int r = 0; r < NROWS; r++) {
+        for (int r = 0; r < A.rows(); r++) {
             double[] s = new double[2];
-            for (int c = 0; c < NCOLUMNS; c++) {
+            for (int c = 0; c < A.columns(); c++) {
                 s = DComplex.plus(s, DComplex.mult(A.getQuick(r, c), y.getQuick(c)));
             }
             tmp[0] = expected[2 * r];
@@ -496,21 +494,21 @@ public abstract class DComplexMatrix2DTest extends TestCase {
             expected[2 * r + 1] = tmp[1];
         }
 
-        for (int r = 0; r < NROWS; r++) {
+        for (int r = 0; r < A.rows(); r++) {
             assertEquals(expected[2 * r], z.getQuick(r)[0], TOL);
             assertEquals(expected[2 * r + 1], z.getQuick(r)[1], TOL);
         }
         //transpose
-        y = new DenseDComplexMatrix1D(NROWS);
+        y = new DenseDComplexMatrix1D(A.rows());
         for (int i = 0; i < y.size(); i++) {
             y.setQuick(i, new double[] { Math.random(), Math.random() });
         }
         z = null;
         z = A.zMult(y, z, alpha, beta, true);
-        expected = new double[2 * NCOLUMNS];
-        for (int r = 0; r < NCOLUMNS; r++) {
+        expected = new double[2 * A.columns()];
+        for (int r = 0; r < A.columns(); r++) {
             double[] s = new double[2];
-            for (int c = 0; c < NROWS; c++) {
+            for (int c = 0; c < A.rows(); c++) {
                 s = DComplex.plus(s, DComplex.mult(DComplex.conj(A.getQuick(c, r)), y.getQuick(c)));
             }
             tmp[0] = expected[2 * r];
@@ -520,7 +518,7 @@ public abstract class DComplexMatrix2DTest extends TestCase {
             expected[2 * r] = tmp[0];
             expected[2 * r + 1] = tmp[1];
         }
-        for (int r = 0; r < NCOLUMNS; r++) {
+        for (int r = 0; r < A.columns(); r++) {
             assertEquals(expected[2 * r], z.getQuick(r)[0], TOL);
             assertEquals(expected[2 * r + 1], z.getQuick(r)[1], TOL);
         }
@@ -532,11 +530,11 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         double[] tmp = new double[2];
         DComplexMatrix2D C = null;
         C = A.zMult(Bt, C, alpha, beta, false, false);
-        double[][] expected = new double[NROWS][2 * NROWS];
-        for (int j = 0; j < NROWS; j++) {
-            for (int i = 0; i < NROWS; i++) {
+        double[][] expected = new double[A.rows()][2 * A.rows()];
+        for (int j = 0; j < A.rows(); j++) {
+            for (int i = 0; i < A.rows(); i++) {
                 double[] s = new double[2];
-                for (int k = 0; k < NCOLUMNS; k++) {
+                for (int k = 0; k < A.columns(); k++) {
                     s = DComplex.plus(s, DComplex.mult(A.getQuick(i, k), Bt.getQuick(k, j)));
                 }
                 tmp[0] = expected[i][2 * j];
@@ -547,8 +545,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
                 expected[i][2 * j + 1] = tmp[1];
             }
         }
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NROWS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.rows(); c++) {
                 assertEquals(expected[r][2 * c], C.getQuick(r, c)[0], TOL);
                 assertEquals(expected[r][2 * c + 1], C.getQuick(r, c)[1], TOL);
             }
@@ -557,11 +555,11 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         //transposeA
         C = null;
         C = A.zMult(B, C, alpha, beta, true, false);
-        expected = new double[NCOLUMNS][2 * NCOLUMNS];
-        for (int j = 0; j < NCOLUMNS; j++) {
-            for (int i = 0; i < NCOLUMNS; i++) {
+        expected = new double[A.columns()][2 * A.columns()];
+        for (int j = 0; j < A.columns(); j++) {
+            for (int i = 0; i < A.columns(); i++) {
                 double[] s = new double[2];
-                for (int k = 0; k < NROWS; k++) {
+                for (int k = 0; k < A.rows(); k++) {
                     s = DComplex.plus(s, DComplex.mult(DComplex.conj(A.getQuick(k, i)), B.getQuick(k, j)));
                 }
                 tmp[0] = expected[i][2 * j];
@@ -572,8 +570,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
                 expected[i][2 * j + 1] = tmp[1];
             }
         }
-        for (int r = 0; r < NCOLUMNS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.columns(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(expected[r][2 * c], C.getQuick(r, c)[0], TOL);
                 assertEquals(expected[r][2 * c + 1], C.getQuick(r, c)[1], TOL);
             }
@@ -581,11 +579,11 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         //transposeB
         C = null;
         C = A.zMult(B, C, alpha, beta, false, true);
-        expected = new double[NROWS][2 * NROWS];
-        for (int j = 0; j < NROWS; j++) {
-            for (int i = 0; i < NROWS; i++) {
+        expected = new double[A.rows()][2 * A.rows()];
+        for (int j = 0; j < A.rows(); j++) {
+            for (int i = 0; i < A.rows(); i++) {
                 double[] s = new double[2];
-                for (int k = 0; k < NCOLUMNS; k++) {
+                for (int k = 0; k < A.columns(); k++) {
                     s = DComplex.plus(s, DComplex.mult(A.getQuick(i, k), DComplex.conj(B.getQuick(j, k))));
                 }
                 tmp[0] = expected[i][2 * j];
@@ -596,8 +594,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
                 expected[i][2 * j + 1] = tmp[1];
             }
         }
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NROWS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.rows(); c++) {
                 assertEquals(expected[r][2 * c], C.getQuick(r, c)[0], TOL);
                 assertEquals(expected[r][2 * c + 1], C.getQuick(r, c)[1], TOL);
             }
@@ -605,11 +603,11 @@ public abstract class DComplexMatrix2DTest extends TestCase {
         //transposeA and transposeB
         C = null;
         C = A.zMult(Bt, C, alpha, beta, true, true);
-        expected = new double[NCOLUMNS][2 * NCOLUMNS];
-        for (int j = 0; j < NCOLUMNS; j++) {
-            for (int i = 0; i < NCOLUMNS; i++) {
+        expected = new double[A.columns()][2 * A.columns()];
+        for (int j = 0; j < A.columns(); j++) {
+            for (int i = 0; i < A.columns(); i++) {
                 double[] s = new double[2];
-                for (int k = 0; k < NROWS; k++) {
+                for (int k = 0; k < A.rows(); k++) {
                     s = DComplex.plus(s, DComplex.mult(DComplex.conj(A.getQuick(k, i)), DComplex
                             .conj(Bt.getQuick(j, k))));
                 }
@@ -621,8 +619,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
                 expected[i][2 * j + 1] = tmp[1];
             }
         }
-        for (int r = 0; r < NCOLUMNS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.columns(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(expected[r][2 * c], C.getQuick(r, c)[0], TOL);
                 assertEquals(expected[r][2 * c + 1], C.getQuick(r, c)[1], TOL);
             }
@@ -633,8 +631,8 @@ public abstract class DComplexMatrix2DTest extends TestCase {
     public void testZSum() {
         double[] actual = A.zSum();
         double[] expected = new double[2];
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 expected = DComplex.plus(expected, A.getQuick(r, c));
             }
         }

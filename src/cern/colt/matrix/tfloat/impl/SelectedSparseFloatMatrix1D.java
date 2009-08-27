@@ -109,7 +109,6 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
         this.isNoView = false;
     }
 
-    @Override
     public AbstractLongFloatMap elements() {
         return elements;
     }
@@ -127,12 +126,12 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
+
     public float getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements.get(index(index));
         // manually inlined:
-        return elements.get(offset + offsets[zero + index * stride]);
+        return elements.get((long) offset + (long) offsets[zero + index * stride]);
     }
 
     /**
@@ -143,11 +142,11 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
-        return offset + offsets[zero + rank * stride];
+        return (long) offset + (long) offsets[zero + rank * stride];
     }
 
     /**
@@ -163,7 +162,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public FloatMatrix1D like(int size) {
         return new SparseFloatMatrix1D(size);
     }
@@ -182,19 +181,18 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public FloatMatrix2D like2D(int rows, int columns) {
         return new SparseFloatMatrix2D(rows, columns);
     }
 
-    @Override
-    public FloatMatrix2D reshape(int rows, int cols) {
-        if (rows * cols != size) {
-            throw new IllegalArgumentException("rows*cols != size");
+    public FloatMatrix2D reshape(int rows, int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
         }
-        FloatMatrix2D M = new SparseFloatMatrix2D(rows, cols);
+        FloatMatrix2D M = new SparseFloatMatrix2D(rows, columns);
         int idx = 0;
-        for (int c = 0; c < cols; c++) {
+        for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
                 M.setQuick(r, c, getQuick(idx++));
             }
@@ -202,15 +200,14 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
         return M;
     }
 
-    @Override
-    public FloatMatrix3D reshape(int slices, int rows, int cols) {
-        if (slices * rows * cols != size) {
-            throw new IllegalArgumentException("slices*rows*cols != size");
+    public FloatMatrix3D reshape(int slices, int rows, int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
         }
-        FloatMatrix3D M = new SparseFloatMatrix3D(slices, rows, cols);
+        FloatMatrix3D M = new SparseFloatMatrix3D(slices, rows, columns);
         int idx = 0;
         for (int s = 0; s < slices; s++) {
-            for (int c = 0; c < cols; c++) {
+            for (int c = 0; c < columns; c++) {
                 for (int r = 0; r < rows; r++) {
                     M.setQuick(s, r, c, getQuick(idx++));
                 }
@@ -233,12 +230,12 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, float value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
         // manually inlined:
-        int i = offset + offsets[zero + index * stride];
+        long i = (long) offset + (long) offsets[zero + index * stride];
         if (value == 0)
             this.elements.removeKey(i);
         else
@@ -254,7 +251,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
@@ -262,7 +259,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
         if (other instanceof SelectedSparseFloatMatrix1D) {
             SelectedSparseFloatMatrix1D otherMatrix = (SelectedSparseFloatMatrix1D) other;
@@ -280,7 +277,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
-    @Override
+
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -294,7 +291,7 @@ class SelectedSparseFloatMatrix1D extends FloatMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected FloatMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseFloatMatrix1D(this.elements, offsets);
     }

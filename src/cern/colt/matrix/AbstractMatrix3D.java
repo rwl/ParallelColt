@@ -381,7 +381,7 @@ public abstract class AbstractMatrix3D extends AbstractMatrix {
     /**
      * Returns the number of cells which is <tt>slices()*rows()*columns()</tt>.
      */
-    @Override
+
     public long size() {
         return slices * rows * columns;
     }

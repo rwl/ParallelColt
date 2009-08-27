@@ -50,12 +50,15 @@ public class SparseFloatLUDecomposition {
      * @param order
      *            ordering option (0 to 3); 0: natural ordering, 1: amd(A+A'),
      *            2: amd(S'*S), 3: amd(A'*A)
+     * @param checkIfSingular
+     *            if true, then the singularity test (based on
+     *            Dulmage-Mendelsohn decomposition) is performed.
      * @throws IllegalArgumentException
      *             if <tt>A</tt> is not square or is not sparse.
      * @throws IllegalArgumentException
      *             if <tt>order</tt> is not in [0,3]
      */
-    public SparseFloatLUDecomposition(FloatMatrix2D A, int order) {
+    public SparseFloatLUDecomposition(FloatMatrix2D A, int order, boolean checkIfSingular) {
         FloatProperty.DEFAULT.checkSquare(A);
         FloatProperty.DEFAULT.checkSparse(A);
 
@@ -79,9 +82,11 @@ public class SparseFloatLUDecomposition {
         if (N == null) {
             throw new IllegalArgumentException("Exception occured in cs_lu()");
         }
-        Scsd D = Scs_dmperm.cs_dmperm(dcs, 1); /* check if matrix is singular */
-        if (D != null && D.rr[3] < n) {
-            isNonSingular = false;
+        if (checkIfSingular) {
+            Scsd D = Scs_dmperm.cs_dmperm(dcs, 1); /* check if matrix is singular */
+            if (D != null && D.rr[3] < n) {
+                isNonSingular = false;
+            }
         }
     }
 

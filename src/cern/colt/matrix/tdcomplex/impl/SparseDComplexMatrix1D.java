@@ -30,7 +30,7 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, double[]> elements;
+    protected ConcurrentHashMap<Long, double[]> elements;
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
@@ -55,7 +55,7 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
      */
     public SparseDComplexMatrix1D(int size) {
         setUp(size);
-        this.elements = new ConcurrentHashMap<Integer, double[]>(size / 1000);
+        this.elements = new ConcurrentHashMap<Long, double[]>(size / 1000);
     }
 
     /**
@@ -73,13 +73,12 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    protected SparseDComplexMatrix1D(int size, ConcurrentHashMap<Integer, double[]> elements, int offset, int stride) {
+    protected SparseDComplexMatrix1D(int size, ConcurrentHashMap<Long, double[]> elements, int offset, int stride) {
         setUp(size, offset, stride);
         this.elements = elements;
         this.isNoView = false;
     }
 
-    @Override
     public DComplexMatrix1D assign(double[] value) {
         // overriden for performance only
         if (this.isNoView && value[0] == 0 && value[1] == 0)
@@ -89,7 +88,6 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -97,9 +95,8 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
             return super.cardinality();
     }
 
-    @Override
-    public double[] getQuick(int index) {
-        double[] elem = elements.get(zero + index * stride);
+    public synchronized double[] getQuick(int index) {
+        double[] elem = elements.get((long) zero + (long) index * (long) stride);
         if (elem != null) {
             return new double[] { elem[0], elem[1] };
         } else {
@@ -107,15 +104,14 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
         }
     }
 
-    @Override
-    public ConcurrentHashMap<Integer, double[]> elements() {
+    public ConcurrentHashMap<Long, double[]> elements() {
         return elements;
     }
 
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DComplexMatrix1D other) {
         if (other instanceof SelectedSparseDComplexMatrix1D) {
             SelectedSparseDComplexMatrix1D otherMatrix = (SelectedSparseDComplexMatrix1D) other;
@@ -127,22 +123,18 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
-        return zero + rank * stride;
+        return (long) zero + (long) rank * (long) stride;
     }
 
-    @Override
     public DComplexMatrix1D like(int size) {
         return new SparseDComplexMatrix1D(size);
     }
 
-    @Override
     public DComplexMatrix2D like2D(int rows, int columns) {
         return new SparseDComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public DComplexMatrix2D reshape(final int rows, final int columns) {
         if (rows * columns != size) {
             throw new IllegalArgumentException("rows*columns != size");
@@ -186,7 +178,6 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
         return M;
     }
 
-    @Override
     public DComplexMatrix3D reshape(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != size) {
             throw new IllegalArgumentException("slices*rows*columns != size");
@@ -234,30 +225,26 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
         return M;
     }
 
-    @Override
-    public void setQuick(int index, double[] value) {
-        int i = zero + index * stride;
+    public synchronized void setQuick(int index, double[] value) {
+        long i = (long) zero + (long) index * (long) stride;
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(i);
         else
             this.elements.put(i, value);
     }
 
-    @Override
-    public void setQuick(int index, double re, double im) {
-        int i = zero + index * stride;
+    public synchronized void setQuick(int index, double re, double im) {
+        long i = (long) zero + (long) index * (long) stride;
         if (re == 0 && im == 0)
             this.elements.remove(i);
         else
             this.elements.put(i, new double[] { re, im });
     }
 
-    @Override
     protected DComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseDComplexMatrix1D(this.elements, offsets);
     }
 
-    @Override
     public DoubleMatrix1D getImaginaryPart() {
         final DoubleMatrix1D Im = new SparseDoubleMatrix1D(size);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -285,7 +272,6 @@ public class SparseDComplexMatrix1D extends DComplexMatrix1D {
         return Im;
     }
 
-    @Override
     public DoubleMatrix1D getRealPart() {
         final DoubleMatrix1D Re = new SparseDoubleMatrix1D(size);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

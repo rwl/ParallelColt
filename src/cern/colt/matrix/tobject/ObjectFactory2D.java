@@ -289,7 +289,7 @@ public class ObjectFactory2D extends cern.colt.PersistentObject {
      * 
      * </td>
      * <td><tt>IllegalArgumentException<br>
-     A[0,1].cols != A[2,1].cols<br>
+     A[0,1].columns != A[2,1].columns<br>
      (2 != 3)</tt></td>
      * </tr>
      * </table>

@@ -9,7 +9,6 @@ public class DenseFComplexMatrix1DTest extends FComplexMatrix1DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseFComplexMatrix1D(SIZE);
         B = new DenseFComplexMatrix1D(SIZE);
@@ -19,7 +18,7 @@ public class DenseFComplexMatrix1DTest extends FComplexMatrix1DTest {
         FComplexMatrix1D Acopy = A.copy();
         ((DenseFComplexMatrix1D) A).fft();
         ((DenseFComplexMatrix1D) A).ifft(true);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             assertEquals(Acopy.getQuick(i), A.getQuick(i), TOL);
         }
     }

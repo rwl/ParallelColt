@@ -8,7 +8,6 @@ public class SparseDoubleMatrix3DTest extends DoubleMatrix3DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseDoubleMatrix3D(NSLICES, NROWS, NCOLUMNS);
         B = new SparseDoubleMatrix3D(NSLICES, NROWS, NCOLUMNS);

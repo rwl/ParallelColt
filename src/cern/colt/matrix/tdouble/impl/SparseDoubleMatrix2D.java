@@ -313,7 +313,6 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         this.isNoView = false;
     }
 
-    @Override
     public DoubleMatrix2D assign(cern.colt.function.tdouble.DoubleFunction function) {
         if (this.isNoView && function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
             this.elements.assign(function);
@@ -323,7 +322,6 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(double value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -333,7 +331,6 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(DoubleMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof SparseDoubleMatrix2D)) {
@@ -351,7 +348,6 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return super.assign(source);
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D y, cern.colt.function.tdouble.DoubleDoubleFunction function) {
         if (!this.isNoView)
             return super.assign(y, function);
@@ -368,9 +364,7 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
                     return value;
                 }
             });
-        }
-
-        if (function == cern.jet.math.tdouble.DoubleFunctions.mult) { // x[i] = x[i] * y[i]
+        } else if (function == cern.jet.math.tdouble.DoubleFunctions.mult) { // x[i] = x[i] * y[i]
             this.elements.forEachPair(new cern.colt.function.tdouble.LongDoubleProcedure() {
                 public boolean apply(long key, double value) {
                     int i = (int) (key / columns);
@@ -381,10 +375,7 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
                     return true;
                 }
             });
-        }
-
-        if (function == cern.jet.math.tdouble.DoubleFunctions.div) { // x[i] = x[i] /
-            // y[i]
+        } else if (function == cern.jet.math.tdouble.DoubleFunctions.div) { // x[i] = x[i] /  y[i]
             this.elements.forEachPair(new cern.colt.function.tdouble.LongDoubleProcedure() {
                 public boolean apply(long key, double value) {
                     int i = (int) (key / columns);
@@ -395,6 +386,8 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
                     return true;
                 }
             });
+        } else {
+            super.assign(y, function);
         }
         return this;
 
@@ -514,7 +507,6 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -617,17 +609,14 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return A;
     }
 
-    @Override
     public AbstractLongDoubleMap elements() {
         return elements;
     }
 
-    @Override
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
 
-    @Override
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
         if (this.isNoView) {
             this.elements.forEachPair(new cern.colt.function.tdouble.LongDoubleProcedure() {
@@ -646,37 +635,32 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return this;
     }
 
-    @Override
-    public double getQuick(int row, int column) {
-        return this.elements.get(rowZero + (long) row * (long) rowStride + columnZero + (long) column
+    public synchronized double getQuick(int row, int column) {
+        return this.elements.get((long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column
                 * (long) columnStride);
     }
 
-    @Override
     public long index(int row, int column) {
-        return rowZero + (long) row * (long) rowStride + columnZero + (long) column * (long) columnStride;
+        return (long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new SparseDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public DoubleMatrix1D like1D(int size) {
         return new SparseDoubleMatrix1D(size);
     }
 
-    @Override
     public synchronized void setQuick(int row, int column, double value) {
-        long index = rowZero + (long) row * (long) rowStride + columnZero + (long) column * (long) columnStride;
+        long index = (long) rowZero + (long) row * (long) rowStride + (long) columnZero + (long) column
+                * (long) columnStride;
         if (value == 0)
             this.elements.removeKey(index);
         else
             this.elements.put(index, value);
     }
 
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
@@ -693,28 +677,24 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return builder.toString();
     }
 
-    @Override
     public void trimToSize() {
         this.elements.trimToSize();
     }
 
-    @Override
     public DoubleMatrix1D vectorize() {
         SparseDoubleMatrix1D v = new SparseDoubleMatrix1D((int) size());
         int idx = 0;
         for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
                 double elem = getQuick(r, c);
-                if (elem != 0) {
-                    v.setQuick(idx++, elem);
-                }
+                v.setQuick(idx++, elem);
             }
         }
         return v;
     }
 
-    @Override
-    public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, double alpha, double beta, final boolean transposeA) {
+    public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, double beta,
+            final boolean transposeA) {
         int rowsA = rows;
         int columnsA = columns;
         if (transposeA) {
@@ -736,7 +716,7 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
                     + z.toStringShort());
 
         if (!ignore)
-            z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(beta / alpha));
+            z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(beta));
 
         DenseDoubleMatrix1D zz = (DenseDoubleMatrix1D) z;
         final double[] elementsZ = zz.elements;
@@ -760,17 +740,14 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
                     i = j;
                     j = tmp;
                 }
-                elementsZ[zeroZ + strideZ * i] += value * elementsY[zeroY + strideY * j];
+                elementsZ[zeroZ + strideZ * i] += alpha * value * elementsY[zeroY + strideY * j];
                 return true;
             }
         });
 
-        if (alpha != 1)
-            z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(alpha));
         return z;
     }
 
-    @Override
     public DoubleMatrix2D zMult(DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, double beta,
             final boolean transposeA, boolean transposeB) {
         if (!(this.isNoView)) {
@@ -878,7 +855,6 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         }
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix2D other) {
         if (other instanceof SelectedSparseDoubleMatrix2D) {
             SelectedSparseDoubleMatrix2D otherMatrix = (SelectedSparseDoubleMatrix2D) other;
@@ -890,12 +866,10 @@ public class SparseDoubleMatrix2D extends DoubleMatrix2D {
         return false;
     }
 
-    @Override
     protected DoubleMatrix1D like1D(int size, int offset, int stride) {
         return new SparseDoubleMatrix1D(size, this.elements, offset, stride);
     }
 
-    @Override
     protected DoubleMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseDoubleMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }

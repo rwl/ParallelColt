@@ -171,7 +171,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         this.isNoView = !isView;
     }
 
-    @Override
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
             final cern.colt.function.tdouble.DoubleFunction f) {
         if (size() == 0)
@@ -220,7 +219,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return a;
     }
 
-    @Override
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
             final cern.colt.function.tdouble.DoubleFunction f, final cern.colt.function.tdouble.DoubleProcedure cond) {
         if (size() == 0)
@@ -281,7 +279,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return a;
     }
 
-    @Override
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
             final cern.colt.function.tdouble.DoubleFunction f, final IntArrayList sliceList,
             final IntArrayList rowList, final IntArrayList columnList) {
@@ -332,7 +329,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return a;
     }
 
-    @Override
     public double aggregate(final DoubleMatrix3D other, final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
             final cern.colt.function.tdouble.DoubleDoubleFunction f) {
         if (!(other instanceof DenseDoubleMatrix3D)) {
@@ -397,7 +393,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return a;
     }
 
-    @Override
     public DoubleMatrix3D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -440,7 +435,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D assign(final cern.colt.function.tdouble.DoubleProcedure cond,
             final cern.colt.function.tdouble.DoubleFunction f) {
         final int zero = (int) index(0, 0, 0);
@@ -492,7 +486,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final double value) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -543,7 +536,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D assign(final double value) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -585,7 +577,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D assign(final double[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length
@@ -644,7 +635,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D assign(final double[][][] values) {
         if (values.length != slices)
             throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
@@ -777,7 +767,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D assign(DoubleMatrix3D source) {
         // overriden for performance only
         if (!(source instanceof DenseDoubleMatrix3D)) {
@@ -863,7 +852,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         }
     }
 
-    @Override
     public DoubleMatrix3D assign(final DoubleMatrix3D y, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
         if (!(y instanceof DenseDoubleMatrix3D)) {
             super.assign(y, function);
@@ -922,7 +910,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D assign(final DoubleMatrix3D y,
             final cern.colt.function.tdouble.DoubleDoubleFunction function, final IntArrayList sliceList,
             final IntArrayList rowList, final IntArrayList columnList) {
@@ -975,7 +962,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         final int zero = (int) index(0, 0, 0);
@@ -1211,7 +1197,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public double[] elements() {
         return elements;
     }
@@ -1489,7 +1474,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return C;
     }
 
-    @Override
     public double[] getMaxLocation() {
         final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
@@ -1574,7 +1558,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return new double[] { maxValue, slice_loc, row_loc, col_loc };
     }
 
-    @Override
     public double[] getMinLocation() {
         final int zero = (int) index(0, 0, 0);
         int slice_loc = 0;
@@ -1659,7 +1642,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return new double[] { minValue, slice_loc, row_loc, col_loc };
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList, final DoubleArrayList valueList) {
         sliceList.clear();
@@ -1687,7 +1669,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
 
     }
 
-    @Override
     public void getNonZeros(final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList,
             final DoubleArrayList valueList) {
         sliceList.clear();
@@ -1715,7 +1696,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList sliceList, final IntArrayList rowList,
             final IntArrayList columnList, final DoubleArrayList valueList) {
         sliceList.clear();
@@ -1743,7 +1723,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
 
     }
 
-    @Override
     public double getQuick(int slice, int row, int column) {
         return elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
                 * columnStride];
@@ -2001,27 +1980,22 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public long index(int slice, int row, int column) {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     public DoubleMatrix3D like(int slices, int rows, int columns) {
         return new DenseDoubleMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public DoubleMatrix2D like2D(int rows, int columns) {
         return new DenseDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, double value) {
         elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride] = value;
     }
 
-    @Override
     public double[][][] toArray() {
         final double[][][] values = new double[slices][rows][columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -2068,7 +2042,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return values;
     }
 
-    @Override
     public DoubleMatrix1D vectorize() {
         DoubleMatrix1D v = new DenseDoubleMatrix1D((int) size());
         int length = rows * columns;
@@ -2078,7 +2051,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return v;
     }
 
-    @Override
     public void zAssign27Neighbors(DoubleMatrix3D B, cern.colt.function.tdouble.Double27Function function) {
         // overridden for performance only
         if (!(B instanceof DenseDoubleMatrix3D)) {
@@ -2216,7 +2188,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         }
     }
 
-    @Override
     public double zSum() {
         double sum = 0;
         final int zero = (int) index(0, 0, 0);
@@ -2270,7 +2241,6 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return sum;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix3D other) {
         if (other instanceof SelectedDenseDoubleMatrix3D) {
             SelectedDenseDoubleMatrix3D otherMatrix = (SelectedDenseDoubleMatrix3D) other;
@@ -2282,12 +2252,10 @@ public class DenseDoubleMatrix3D extends DoubleMatrix3D {
         return false;
     }
 
-    @Override
     protected DoubleMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         return new DenseDoubleMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride, true);
     }
 
-    @Override
     protected DoubleMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseDoubleMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

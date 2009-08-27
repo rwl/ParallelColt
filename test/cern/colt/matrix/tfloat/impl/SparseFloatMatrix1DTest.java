@@ -8,7 +8,6 @@ public class SparseFloatMatrix1DTest extends FloatMatrix1DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFloatMatrix1D(SIZE);
         B = new SparseFloatMatrix1D(SIZE);

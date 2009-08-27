@@ -38,7 +38,6 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         super(arg0);
     }
 
-    @Override
     protected void setUp() throws Exception {
         createMatrices();
         populateMatrices();
@@ -48,24 +47,23 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     protected void populateMatrices() {
         ConcurrencyUtils.setThreadsBeginN_3D(1);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     A.setQuick(s, r, c, new float[] { (float) Math.random(), (float) Math.random() });
                 }
             }
         }
 
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < B.slices(); s++) {
+            for (int r = 0; r < B.rows(); r++) {
+                for (int c = 0; c < B.columns(); c++) {
                     B.setQuick(s, r, c, new float[] { (float) Math.random(), (float) Math.random() });
                 }
             }
         }
     }
 
-    @Override
     protected void tearDown() throws Exception {
         A = B = null;
     }
@@ -79,9 +77,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testAggregateComplexComplexComplexFunctionComplexComplexFunction() {
         float[] actual = A.aggregate(FComplexFunctions.plus, FComplexFunctions.sqrt);
         float[] expected = new float[2];
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     expected = FComplex.plus(expected, FComplex.sqrt(A.getQuick(s, r, c)));
                 }
             }
@@ -92,9 +90,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testAggregateComplexMatrix3FComplexComplexComplexFunctionComplexComplexComplexFunction() {
         float[] actual = A.aggregate(B, FComplexFunctions.plus, FComplexFunctions.mult);
         float[] expected = new float[2];
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     expected = FComplex.plus(expected, FComplex.mult(A.getQuick(s, r, c), B.getQuick(s, r, c)));
                 }
             }
@@ -105,9 +103,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testAssignComplexComplexFunction() {
         FComplexMatrix3D Acopy = A.copy();
         A.assign(FComplexFunctions.acos);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(FComplex.acos(Acopy.getQuick(s, r, c)), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -116,9 +114,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testAssignComplexMatrix3D() {
         A.assign(B);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(B.getQuick(s, r, c), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -128,9 +126,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testAssignComplexMatrix3FComplexComplexComplexFunction() {
         FComplexMatrix3D Acopy = A.copy();
         A.assign(B, FComplexFunctions.div);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(FComplex.div(Acopy.getQuick(s, r, c), B.getQuick(s, r, c)), A.getQuick(s, r, c), TOL);
                 }
             }
@@ -148,9 +146,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
                 }
             }
         }, FComplexFunctions.tan);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     if (FComplex.abs(Acopy.getQuick(s, r, c)) > 3) {
                         assertEquals(FComplex.abs(Acopy.getQuick(s, r, c)), A.getQuick(s, r, c)[0], TOL);
                         assertEquals(0, A.getQuick(s, r, c)[1], TOL);
@@ -174,9 +172,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
                 }
             }
         }, value);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     if (FComplex.abs(Acopy.getQuick(s, r, c)) > 3) {
                         assertEquals(value, A.getQuick(s, r, c), TOL);
                     } else {
@@ -190,9 +188,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testAssignComplexRealFunction() {
         FComplexMatrix3D Acopy = A.copy();
         A.assign(FComplexFunctions.abs);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(FComplex.abs(A.getQuick(s, r, c)), A.getQuick(s, r, c)[0], TOL);
                     assertEquals(0, A.getQuick(s, r, c)[1], TOL);
                 }
@@ -207,9 +205,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         }
         A.assign(expected);
         int idx = 0;
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(expected[idx], A.getQuick(s, r, c)[0], TOL);
                     assertEquals(expected[idx + 1], A.getQuick(s, r, c)[1], TOL);
                     idx += 2;
@@ -219,20 +217,20 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     }
 
     public void testAssignFloatArrayArrayArray() {
-        float[][][] expected = new float[NSLICES][NROWS][2 * NCOLUMNS];
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < 2 * NCOLUMNS; c++) {
+        float[][][] expected = new float[A.slices()][A.rows()][2 * A.columns()];
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < 2 * A.columns(); c++) {
                     expected[s][r][c] = (float) Math.random();
                 }
             }
         }
         A.assign(expected);
-        for (int s = 0; s < NSLICES; s++) {
-            assertTrue(NROWS == expected[s].length);
-            for (int r = 0; r < NROWS; r++) {
-                assertTrue(2 * NCOLUMNS == expected[s][r].length);
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            assertTrue(A.rows() == expected[s].length);
+            for (int r = 0; r < A.rows(); r++) {
+                assertTrue(2 * A.columns() == expected[s][r].length);
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(expected[s][r][2 * c], A.getQuick(s, r, c)[0], TOL);
                     assertEquals(expected[s][r][2 * c + 1], A.getQuick(s, r, c)[1], TOL);
                 }
@@ -243,9 +241,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testAssignFloatFloat() {
         float[] value = new float[] { (float) Math.random(), (float) Math.random() };
         A.assign(value[0], value[1]);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(value, A.getQuick(s, r, c), TOL);
                 }
             }
@@ -254,11 +252,11 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testAssignImaginary() {
         FComplexMatrix3D Acopy = A.copy();
-        FloatMatrix3D Im = FloatFactory3D.dense.random(NSLICES, NROWS, NCOLUMNS);
+        FloatMatrix3D Im = FloatFactory3D.dense.random(A.slices(), A.rows(), A.columns());
         A.assignImaginary(Im);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Im.getQuick(s, r, c), A.getQuick(s, r, c)[1], TOL);
                     assertEquals(Acopy.getQuick(s, r, c)[0], A.getQuick(s, r, c)[0], TOL);
                 }
@@ -268,11 +266,11 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testAssignReal() {
         FComplexMatrix3D Acopy = A.copy();
-        FloatMatrix3D Re = FloatFactory3D.dense.random(NSLICES, NROWS, NCOLUMNS);
+        FloatMatrix3D Re = FloatFactory3D.dense.random(A.slices(), A.rows(), A.columns());
         A.assignReal(Re);
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(Re.getQuick(s, r, c), A.getQuick(s, r, c)[0], TOL);
                     assertEquals(Acopy.getQuick(s, r, c)[1], A.getQuick(s, r, c)[1], TOL);
                 }
@@ -303,9 +301,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testGetImaginaryPart() {
         FloatMatrix3D Im = A.getImaginaryPart();
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(A.getQuick(s, r, c)[1], Im.getQuick(s, r, c), TOL);
                 }
             }
@@ -314,9 +312,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testGetRealPart() {
         FloatMatrix3D Re = A.getRealPart();
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(A.getQuick(s, r, c)[0], Re.getQuick(s, r, c), TOL);
                 }
             }
@@ -334,9 +332,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         assertEquals(A.size(), colList.size());
         assertEquals(A.size(), valueList.size());
         int idx = 0;
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(A.getQuick(sliceList.get(idx), rowList.get(idx), colList.get(idx)),
                             valueList.get(idx), TOL);
                     idx++;
@@ -347,9 +345,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testToArray() {
         float[][][] array = A.toArray();
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(A.getQuick(s, r, c)[0], array[s][r][2 * c], TOL);
                     assertEquals(A.getQuick(s, r, c)[1], array[s][r][2 * c + 1], TOL);
                 }
@@ -360,9 +358,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testVectorize() {
         FComplexMatrix1D B = A.vectorize();
         int idx = 0;
-        for (int s = 0; s < NSLICES; s++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                for (int r = 0; r < NROWS; r++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int c = 0; c < A.columns(); c++) {
+                for (int r = 0; r < A.rows(); r++) {
                     assertEquals(A.getQuick(s, r, c), B.getQuick(idx++), TOL);
                 }
             }
@@ -370,12 +368,12 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     }
 
     public void testViewColumn() {
-        FComplexMatrix2D B = A.viewColumn(NCOLUMNS / 2);
-        assertEquals(NSLICES, B.rows());
-        assertEquals(NROWS, B.columns());
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                assertEquals(A.getQuick(s, r, NCOLUMNS / 2), B.getQuick(s, r), TOL);
+        FComplexMatrix2D B = A.viewColumn(A.columns() / 2);
+        assertEquals(A.slices(), B.rows());
+        assertEquals(A.rows(), B.columns());
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                assertEquals(A.getQuick(s, r, A.columns() / 2), B.getQuick(s, r), TOL);
             }
         }
     }
@@ -383,10 +381,10 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testViewColumnFlip() {
         FComplexMatrix3D B = A.viewColumnFlip();
         assertEquals(A.size(), B.size());
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
-                    assertEquals(A.getQuick(s, r, NCOLUMNS - 1 - c), B.getQuick(s, r, c), TOL);
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
+                    assertEquals(A.getQuick(s, r, A.columns() - 1 - c), B.getQuick(s, r, c), TOL);
                 }
             }
         }
@@ -397,9 +395,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
         assertEquals(A.slices(), B.columns());
         assertEquals(A.rows(), B.rows());
         assertEquals(A.columns(), B.slices());
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     assertEquals(A.getQuick(s, r, c), B.getQuick(c, r, s), TOL);
                 }
             }
@@ -407,23 +405,25 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     }
 
     public void testViewPart() {
-        FComplexMatrix3D B = A.viewPart(NSLICES / 2, NROWS / 2, NCOLUMNS / 2, NSLICES / 3, NROWS / 3, NCOLUMNS / 3);
-        for (int s = 0; s < NSLICES / 3; s++) {
-            for (int r = 0; r < NROWS / 3; r++) {
-                for (int c = 0; c < NCOLUMNS / 3; c++) {
-                    assertEquals(A.getQuick(NSLICES / 2 + s, NROWS / 2 + r, NCOLUMNS / 2 + c), B.getQuick(s, r, c), TOL);
+        FComplexMatrix3D B = A.viewPart(A.slices() / 2, A.rows() / 2, A.columns() / 2, A.slices() / 3, A.rows() / 3, A
+                .columns() / 3);
+        for (int s = 0; s < A.slices() / 3; s++) {
+            for (int r = 0; r < A.rows() / 3; r++) {
+                for (int c = 0; c < A.columns() / 3; c++) {
+                    assertEquals(A.getQuick(A.slices() / 2 + s, A.rows() / 2 + r, A.columns() / 2 + c), B.getQuick(s,
+                            r, c), TOL);
                 }
             }
         }
     }
 
     public void testViewRow() {
-        FComplexMatrix2D B = A.viewRow(NROWS / 2);
-        assertEquals(NSLICES, B.rows());
-        assertEquals(NCOLUMNS, B.columns());
-        for (int s = 0; s < NSLICES; s++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(s, NROWS / 2, c), B.getQuick(s, c), TOL);
+        FComplexMatrix2D B = A.viewRow(A.rows() / 2);
+        assertEquals(A.slices(), B.rows());
+        assertEquals(A.columns(), B.columns());
+        for (int s = 0; s < A.slices(); s++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(A.getQuick(s, A.rows() / 2, c), B.getQuick(s, c), TOL);
             }
         }
     }
@@ -431,10 +431,10 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testViewRowFlip() {
         FComplexMatrix3D B = A.viewRowFlip();
         assertEquals(A.size(), B.size());
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
-                    assertEquals(A.getQuick(s, NROWS - 1 - r, c), B.getQuick(s, r, c), TOL);
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
+                    assertEquals(A.getQuick(s, A.rows() - 1 - r, c), B.getQuick(s, r, c), TOL);
                 }
             }
         }
@@ -442,24 +442,24 @@ public abstract class FComplexMatrix3DTest extends TestCase {
 
     public void testViewSelectionComplexMatrix2DProcedure() {
         final float[] value = new float[] { 2, 3 };
-        A.setQuick(NSLICES / 2, NROWS / 2, 0, value);
+        A.setQuick(A.slices() / 2, A.rows() / 2, 0, value);
         FComplexMatrix3D B = A.viewSelection(new FComplexMatrix2DProcedure() {
             public boolean apply(FComplexMatrix2D element) {
-                return FComplex.isEqual(element.getQuick(NROWS / 2, 0), value, TOL);
+                return FComplex.isEqual(element.getQuick(A.rows() / 2, 0), value, TOL);
 
             }
         });
         assertEquals(1, B.slices());
         assertEquals(A.rows(), B.rows());
         assertEquals(A.columns(), B.columns());
-        assertEquals(A.getQuick(NSLICES / 2, NROWS / 2, 0), B.getQuick(0, NROWS / 2, 0), TOL);
+        assertEquals(A.getQuick(A.slices() / 2, A.rows() / 2, 0), B.getQuick(0, A.rows() / 2, 0), TOL);
     }
 
     public void testViewSelectionIntArrayIntArrayIntArray() {
-        int[] sliceIndexes = new int[] { NSLICES / 2, NSLICES / 3 };
-        int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
-        int[] colIndexes = new int[] { NCOLUMNS / 6, NCOLUMNS / 5, NCOLUMNS / 4, NCOLUMNS / 3, NCOLUMNS / 2,
-                NCOLUMNS - 1 };
+        int[] sliceIndexes = new int[] { A.slices() / 2, A.slices() / 3 };
+        int[] rowIndexes = new int[] { A.rows() / 6, A.rows() / 5, A.rows() / 4, A.rows() / 3, A.rows() / 2 };
+        int[] colIndexes = new int[] { A.columns() / 6, A.columns() / 5, A.columns() / 4, A.columns() / 3,
+                A.columns() / 2, A.columns() - 1 };
         FComplexMatrix3D B = A.viewSelection(sliceIndexes, rowIndexes, colIndexes);
         assertEquals(sliceIndexes.length, B.slices());
         assertEquals(rowIndexes.length, B.rows());
@@ -474,12 +474,12 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     }
 
     public void testViewSlice() {
-        FComplexMatrix2D B = A.viewSlice(NSLICES / 2);
-        assertEquals(NROWS, B.rows());
-        assertEquals(NCOLUMNS, B.columns());
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(NSLICES / 2, r, c), B.getQuick(r, c), TOL);
+        FComplexMatrix2D B = A.viewSlice(A.slices() / 2);
+        assertEquals(A.rows(), B.rows());
+        assertEquals(A.columns(), B.columns());
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(A.getQuick(A.slices() / 2, r, c), B.getQuick(r, c), TOL);
             }
         }
     }
@@ -487,10 +487,10 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testViewSliceFlip() {
         FComplexMatrix3D B = A.viewSliceFlip();
         assertEquals(A.size(), B.size());
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
-                    assertEquals(A.getQuick(NSLICES - 1 - s, r, c), B.getQuick(s, r, c), TOL);
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
+                    assertEquals(A.getQuick(A.slices() - 1 - s, r, c), B.getQuick(s, r, c), TOL);
                 }
             }
         }
@@ -513,9 +513,9 @@ public abstract class FComplexMatrix3DTest extends TestCase {
     public void testZSum() {
         float[] sum = A.zSum();
         float[] expected = new float[2];
-        for (int s = 0; s < NSLICES; s++) {
-            for (int r = 0; r < NROWS; r++) {
-                for (int c = 0; c < NCOLUMNS; c++) {
+        for (int s = 0; s < A.slices(); s++) {
+            for (int r = 0; r < A.rows(); r++) {
+                for (int c = 0; c < A.columns(); c++) {
                     expected = FComplex.plus(expected, A.getQuick(s, r, c));
                 }
             }

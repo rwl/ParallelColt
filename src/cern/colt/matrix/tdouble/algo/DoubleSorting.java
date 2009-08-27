@@ -69,12 +69,10 @@ public class DoubleSorting extends cern.colt.PersistentObject {
          */
         private static final long serialVersionUID = 1L;
 
-        @Override
         protected void runSort(int[] a, int fromIndex, int toIndex, IntComparator c) {
             cern.colt.Sorting.mergeSort(a, fromIndex, toIndex, c);
         }
 
-        @Override
         protected void runSort(int fromIndex, int toIndex, IntComparator c, cern.colt.Swapper swapper) {
             cern.colt.GenericSorting.mergeSort(fromIndex, toIndex, c, swapper);
         }
@@ -135,42 +133,8 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      *         matrix is left unaffected.</b>
      */
     public DoubleMatrix1D sort(final DoubleMatrix1D vector) {
-        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
-        // instead of matrix itself
-        for (int i = indexes.length; --i >= 0;)
-            indexes[i] = i;
+        return vector.viewSelection(sortIndex(vector));
 
-        if (vector instanceof DenseDoubleMatrix1D) {
-            final double[] velems = (double[]) vector.elements();
-            final int zero = (int) vector.index(0);
-            final int stride = vector.stride();
-            IntComparator comp = new IntComparator() {
-                public int compare(int a, int b) {
-                    int idxa = zero + a * stride;
-                    int idxb = zero + b * stride;
-                    double av = velems[idxa];
-                    double bv = velems[idxb];
-                    if (av != av || bv != bv)
-                        return compareNaN(av, bv); // swap NaNs to the end
-                    return av < bv ? -1 : (av == bv ? 0 : 1);
-                }
-            };
-            runSort(indexes, 0, indexes.length, comp);
-            return vector.viewSelection(indexes);
-        } else {
-            IntComparator comp = new IntComparator() {
-                public int compare(int a, int b) {
-                    double av = vector.getQuick(a);
-                    double bv = vector.getQuick(b);
-                    if (av != av || bv != bv)
-                        return compareNaN(av, bv); // swap NaNs to the end
-                    return av < bv ? -1 : (av == bv ? 0 : 1);
-                }
-            };
-            runSort(indexes, 0, indexes.length, comp);
-            return vector.viewSelection(indexes);
-
-        }
     }
 
     /**
@@ -184,21 +148,33 @@ public class DoubleSorting extends cern.colt.PersistentObject {
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
-
-        final double[] velems = (double[]) vector.elements();
-        final int zero = (int) vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                double av = velems[idxa];
-                double bv = velems[idxb];
-                if (av != av || bv != bv)
-                    return compareNaN(av, bv); // swap NaNs to the end
-                return av < bv ? -1 : (av == bv ? 0 : 1);
-            }
-        };
+        IntComparator comp = null;
+        if (vector instanceof DenseDoubleMatrix1D) {
+            final double[] velems = (double[]) vector.elements();
+            final int zero = (int) vector.index(0);
+            final int stride = vector.stride();
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    int idxa = zero + a * stride;
+                    int idxb = zero + b * stride;
+                    double av = velems[idxa];
+                    double bv = velems[idxb];
+                    if (av != av || bv != bv)
+                        return compareNaN(av, bv); // swap NaNs to the end
+                    return av < bv ? -1 : (av == bv ? 0 : 1);
+                }
+            };
+        } else {
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    double av = vector.getQuick(a);
+                    double bv = vector.getQuick(b);
+                    if (av != av || bv != bv)
+                        return compareNaN(av, bv); // swap NaNs to the end
+                    return av < bv ? -1 : (av == bv ? 0 : 1);
+                }
+            };
+        }
 
         runSort(indexes, 0, indexes.length, comp);
 
@@ -253,24 +229,7 @@ public class DoubleSorting extends cern.colt.PersistentObject {
      *         vector (matrix) is left unaffected.</b>
      */
     public DoubleMatrix1D sort(final DoubleMatrix1D vector, final cern.colt.function.tdouble.DoubleComparator c) {
-        int[] indexes = new int[(int) vector.size()]; // row indexes to reorder
-        // instead of matrix itself
-        for (int i = indexes.length; --i >= 0;)
-            indexes[i] = i;
-
-        final double[] velems = (double[]) vector.elements();
-        final int zero = (int) vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                return c.compare(velems[idxa], velems[idxb]);
-            }
-        };
-        runSort(indexes, 0, indexes.length, comp);
-
-        return vector.viewSelection(indexes);
+        return vector.viewSelection(sortIndex(vector, c));
     }
 
     /**
@@ -286,17 +245,25 @@ public class DoubleSorting extends cern.colt.PersistentObject {
         // instead of matrix itself
         for (int i = indexes.length; --i >= 0;)
             indexes[i] = i;
-
-        final double[] velems = (double[]) vector.elements();
-        final int zero = (int) vector.index(0);
-        final int stride = vector.stride();
-        IntComparator comp = new IntComparator() {
-            public int compare(int a, int b) {
-                int idxa = zero + a * stride;
-                int idxb = zero + b * stride;
-                return c.compare(velems[idxa], velems[idxb]);
-            }
-        };
+        IntComparator comp = null;
+        if (vector instanceof DenseDoubleMatrix1D) {
+            final double[] velems = (double[]) vector.elements();
+            final int zero = (int) vector.index(0);
+            final int stride = vector.stride();
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    int idxa = zero + a * stride;
+                    int idxb = zero + b * stride;
+                    return c.compare(velems[idxa], velems[idxb]);
+                }
+            };
+        } else {
+            comp = new IntComparator() {
+                public int compare(int a, int b) {
+                    return c.compare(vector.getQuick(a), vector.getQuick(b));
+                }
+            };
+        }
 
         runSort(indexes, 0, indexes.length, comp);
 

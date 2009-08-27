@@ -40,7 +40,7 @@ public interface Former {
      *                if bad argument
      */
     String form(float value);
-    
+
     /**
      * Formats an int into a string (like sprintf in C).
      * 
@@ -51,7 +51,7 @@ public interface Former {
      *                if bad argument
      */
     String form(int value);
-    
+
     /**
      * Formats an long into a string (like sprintf in C).
      * 
@@ -62,7 +62,7 @@ public interface Former {
      *                if bad argument
      */
     String form(long value);
-    
+
     /**
      * Formats a complex (double[]) into a string (like sprintf in C).
      * 
@@ -84,6 +84,5 @@ public interface Former {
      *                if bad argument
      */
     String form(float[] value);
-
 
 }

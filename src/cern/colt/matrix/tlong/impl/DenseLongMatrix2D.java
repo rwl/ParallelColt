@@ -67,7 +67,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * 
  */
 public class DenseLongMatrix2D extends LongMatrix2D {
-    static final long serialVersionUID = 1020177651L;
+    static final long serialVersionUID = 1L;
 
     /**
      * The elements of this matrix. elements are stored in row major, i.e.
@@ -148,7 +148,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         this.isNoView = !isView;
     }
 
-    @Override
     public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongFunction f) {
         if (size() == 0)
@@ -192,7 +191,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return a;
     }
 
-    @Override
     public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongFunction f, final cern.colt.function.tlong.LongProcedure cond) {
         if (size() == 0)
@@ -249,7 +247,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return a;
     }
 
-    @Override
     public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongFunction f, final IntArrayList rowList, final IntArrayList columnList) {
         if (size() == 0)
@@ -293,7 +290,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return a;
     }
 
-    @Override
     public long aggregate(final LongMatrix2D other, final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongLongFunction f) {
         if (!(other instanceof DenseLongMatrix2D)) {
@@ -348,7 +344,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return a;
     }
 
-    @Override
     public LongMatrix2D assign(final cern.colt.function.tlong.LongFunction function) {
         final long[] elems = this.elements;
         if (elems == null)
@@ -431,7 +426,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final cern.colt.function.tlong.LongProcedure cond,
             final cern.colt.function.tlong.LongFunction function) {
         final int zero = (int) index(0, 0);
@@ -479,8 +473,7 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
-    public LongMatrix2D assign(final cern.colt.function.tlong.LongProcedure cond, final int value) {
+    public LongMatrix2D assign(final cern.colt.function.tlong.LongProcedure cond, final long value) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -526,7 +519,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final long value) {
         final long[] elems = this.elements;
         final int zero = (int) index(0, 0);
@@ -565,7 +557,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final long[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " rows()*columns()="
@@ -615,7 +606,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final int[] values) {
         if (values.length != size())
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " rows()*columns()="
@@ -661,7 +651,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final long[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
@@ -752,7 +741,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final LongMatrix2D source) {
         // overriden for performance only
         if (!(source instanceof DenseLongMatrix2D)) {
@@ -826,7 +814,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final LongMatrix2D y, final cern.colt.function.tlong.LongLongFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseLongMatrix2D)) {
@@ -1040,7 +1027,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public LongMatrix2D assign(final LongMatrix2D y, final cern.colt.function.tlong.LongLongFunction function,
             IntArrayList rowList, IntArrayList columnList) {
         checkShape(y);
@@ -1088,7 +1074,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1145,12 +1130,10 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return cardinality;
     }
 
-    @Override
     public long[] elements() {
         return elements;
     }
 
-    @Override
     public LongMatrix2D forEachNonZero(final cern.colt.function.tlong.IntIntLongFunction function) {
         final int zero = (int) index(0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1195,7 +1178,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return this;
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList rowList, final IntArrayList columnList,
             final LongArrayList valueList) {
         rowList.clear();
@@ -1216,7 +1198,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         }
     }
 
-    @Override
     public void getNonZeros(final IntArrayList rowList, final IntArrayList columnList, final LongArrayList valueList) {
         rowList.clear();
         columnList.clear();
@@ -1236,7 +1217,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList rowList, final IntArrayList columnList,
             final LongArrayList valueList) {
         rowList.clear();
@@ -1257,27 +1237,22 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         }
     }
 
-    @Override
     public long getQuick(int row, int column) {
         return elements[rowZero + row * rowStride + columnZero + column * columnStride];
     }
 
-    @Override
     public long index(int row, int column) {
         return rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     public LongMatrix2D like(int rows, int columns) {
         return new DenseLongMatrix2D(rows, columns);
     }
 
-    @Override
     public LongMatrix1D like1D(int size) {
         return new DenseLongMatrix1D(size);
     }
 
-    @Override
     public long[] getMaxLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
@@ -1353,7 +1328,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return new long[] { maxValue, rowLocation, columnLocation };
     }
 
-    @Override
     public long[] getMinLocation() {
         int rowLocation = 0;
         int columnLocation = 0;
@@ -1429,12 +1403,10 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return new long[] { minValue, rowLocation, columnLocation };
     }
 
-    @Override
     public void setQuick(int row, int column, long value) {
         elements[rowZero + row * rowStride + columnZero + column * columnStride] = value;
     }
 
-    @Override
     public long[][] toArray() {
         final long[][] values = new long[rows][columns];
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1476,7 +1448,6 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return values;
     }
 
-    @Override
     public LongMatrix1D vectorize() {
         final DenseLongMatrix1D v = new DenseLongMatrix1D((int) size());
         final int zero = (int) index(0, 0);
@@ -1525,106 +1496,29 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return v;
     }
 
-    @Override
-    public LongMatrix1D zMult(LongMatrix1D y, LongMatrix1D z) {
-        final LongMatrix1D z_loc;
-        if (z == null) {
-            z_loc = new DenseLongMatrix1D(this.rows);
-        } else {
-            z_loc = z;
-        }
-        if (!(y instanceof DenseLongMatrix1D && z_loc instanceof DenseLongMatrix1D))
-            return super.zMult(y, z_loc);
-
-        if (columns != y.size() || rows > z_loc.size())
-            throw new IllegalArgumentException("Incompatible args: " + toStringShort() + ", " + y.toStringShort()
-                    + ", " + z_loc.toStringShort());
-
-        final long[] elemsY = (long[]) y.elements();
-        final long[] elemsZ = (long[]) z_loc.elements();
-        final int zero = (int) index(0, 0);
-        final int zeroY = (int) y.index(0);
-        final int zeroZ = (int) z_loc.index(0);
-        final int strideY = y.stride();
-        final int strideZ = z_loc.stride();
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-            nthreads = Math.min(nthreads, rows);
-            Future<?>[] futures = new Future[nthreads];
-            int k = rows / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstRow = j * k;
-                final int lastRow = (j == nthreads - 1) ? rows : firstRow + k;
-
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
-                        int idxZero = zero + firstRow * rowStride;
-                        int idxZeroZ = zeroZ + firstRow * strideZ;
-                        for (int r = firstRow; r < lastRow; r++) {
-                            int sum = 0;
-                            int idx = idxZero;
-                            int idxY = zeroY;
-                            for (int c = 0; c < columns; c++) {
-                                sum += elements[idx] * elemsY[idxY];
-                                idx += columnStride;
-                                idxY += strideY;
-                            }
-                            elemsZ[idxZeroZ] = sum;
-                            idxZero += rowStride;
-                            idxZeroZ += strideZ;
-                        }
-                    }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            int idxZero = zero;
-            int idxZ = zeroZ;
-            for (int r = 0; r < rows; r++) {
-                int sum = 0;
-                int idx = idxZero;
-                int idxY = zeroY;
-                for (int c = 0; c < columns; c++) {
-                    sum += elements[idx] * elemsY[idxY];
-                    idx += columnStride;
-                    idxY += strideY;
-                }
-                elemsZ[idxZ] = sum;
-                idxZero += rowStride;
-                idxZ += strideZ;
-            }
-        }
-        z = z_loc;
-        return z_loc;
-    }
-
-    @Override
-    public LongMatrix1D zMult(final LongMatrix1D y, LongMatrix1D z, final int alpha, final int beta,
+    public LongMatrix1D zMult(final LongMatrix1D y, LongMatrix1D z, final long alpha, final long beta,
             final boolean transposeA) {
-        final LongMatrix1D z_loc;
-        if (z == null) {
-            z_loc = new DenseLongMatrix1D(this.rows);
-        } else {
-            z_loc = z;
-        }
         if (transposeA)
-            return viewDice().zMult(y, z_loc, alpha, beta, false);
-        if (!(y instanceof DenseLongMatrix1D && z_loc instanceof DenseLongMatrix1D))
-            return super.zMult(y, z_loc, alpha, beta, transposeA);
+            return viewDice().zMult(y, z, alpha, beta, false);
+        if (z == null) {
+            z = new DenseLongMatrix1D(rows);
+        }
+        if (!(y instanceof DenseLongMatrix1D && z instanceof DenseLongMatrix1D))
+            return super.zMult(y, z, alpha, beta, transposeA);
 
-        if (columns != y.size() || rows > z_loc.size())
+        if (columns != y.size() || rows > z.size())
             throw new IllegalArgumentException("Incompatible args: " + toStringShort() + ", " + y.toStringShort()
-                    + ", " + z_loc.toStringShort());
+                    + ", " + z.toStringShort());
 
         final long[] elemsY = (long[]) y.elements();
-        final long[] elemsZ = (long[]) z_loc.elements();
+        final long[] elemsZ = (long[]) z.elements();
         if (elements == null || elemsY == null || elemsZ == null)
             throw new InternalError();
         final int strideY = y.stride();
-        final int strideZ = z_loc.stride();
+        final int strideZ = z.stride();
         final int zero = (int) index(0, 0);
         final int zeroY = (int) y.index(0);
-        final int zeroZ = (int) z_loc.index(0);
+        final int zeroZ = (int) z.index(0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, rows);
@@ -1638,7 +1532,7 @@ public class DenseLongMatrix2D extends LongMatrix2D {
                         int idxZero = zero + firstRow * rowStride;
                         int idxZeroZ = zeroZ + firstRow * strideZ;
                         for (int r = firstRow; r < lastRow; r++) {
-                            int sum = 0;
+                            long sum = 0;
                             int idx = idxZero;
                             int idxY = zeroY;
                             for (int c = 0; c < columns; c++) {
@@ -1658,7 +1552,7 @@ public class DenseLongMatrix2D extends LongMatrix2D {
             int idxZero = zero;
             int idxZeroZ = zeroZ;
             for (int r = 0; r < rows; r++) {
-                int sum = 0;
+                long sum = 0;
                 int idx = idxZero;
                 int idxY = zeroY;
                 for (int c = 0; c < columns; c++) {
@@ -1671,117 +1565,34 @@ public class DenseLongMatrix2D extends LongMatrix2D {
                 idxZeroZ += strideZ;
             }
         }
-        z = z_loc;
         return z;
     }
 
-    @Override
-    public LongMatrix2D zMult(final LongMatrix2D B, LongMatrix2D C) {
-        final int m = rows;
-        final int n = columns;
-        final int p = B.columns();
-        if (C == null)
-            C = new DenseLongMatrix2D(m, p);
-        /*
-         * determine how to split and parallelize best into blocks if more
-         * B.columns than tasks --> split B.columns, as follows:
-         * 
-         * xx|xx|xxx B xx|xx|xxx xx|xx|xxx A xxx xx|xx|xxx C xxx xx|xx|xxx xxx
-         * xx|xx|xxx xxx xx|xx|xxx xxx xx|xx|xxx
-         * 
-         * if less B.columns than tasks --> split A.rows, as follows:
-         * 
-         * xxxxxxx B xxxxxxx xxxxxxx A xxx xxxxxxx C xxx xxxxxxx --- ------- xxx
-         * xxxxxxx xxx xxxxxxx --- ------- xxx xxxxxxx
-         */
-        if (!(C instanceof DenseLongMatrix2D))
-            return super.zMult(B, C);
-
-        if (B.rows() != n)
-            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + this.toStringShort() + ", "
-                    + B.toStringShort());
-        if (C.rows() != m || C.columns() != p)
-            throw new IllegalArgumentException("Incompatibe result matrix: " + this.toStringShort() + ", "
-                    + B.toStringShort() + ", " + C.toStringShort());
-        if (this == C || B == C)
-            throw new IllegalArgumentException("Matrices must not be identical");
-
-        long flops = 2L * m * n * p;
-        int noOfTasks = (int) Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each thread should process at least 30000 flops
-
-        //        int nthreads = ConcurrencyUtils.getNumberOfProcessors();
-        //        int noOfTasks = 1;
-        //        if ((nthreads > 1) && (B.size() >= ConcurrencyUtils.getThreadsBeginN_2D())){
-        //            noOfTasks = nthreads;
-        //        }
-        boolean splitB = (p >= noOfTasks);
-        int width = splitB ? p : m;
-        noOfTasks = Math.min(width, noOfTasks);
-
-        if (noOfTasks < 2) { //parallelization doesn't pay off (too much start up overhead)
-            return this.zMultSeq(B, C);
-        }
-
-        // set up concurrent tasks
-        int span = width / noOfTasks;
-        final Future<?>[] subTasks = new Future[noOfTasks];
-        for (int i = 0; i < noOfTasks; i++) {
-            final int offset = i * span;
-            if (i == noOfTasks - 1)
-                span = width - span * i; // last span may be a bit larger
-
-            final LongMatrix2D AA, BB, CC;
-            if (splitB) {
-                // split B along columns into blocks
-                AA = this;
-                BB = B.viewPart(0, offset, n, span);
-                CC = C.viewPart(0, offset, m, span);
-            } else {
-                // split A along rows into blocks
-                AA = this.viewPart(offset, 0, span, n);
-                BB = B;
-                CC = C.viewPart(offset, 0, span, p);
-            }
-
-            subTasks[i] = ConcurrencyUtils.submit(new Runnable() {
-                public void run() {
-                    ((DenseLongMatrix2D) AA).zMultSeq(BB, CC);
-                }
-            });
-        }
-
-        try {
-            for (int j = 0; j < noOfTasks; j++) {
-                subTasks[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return C;
-    }
-
-    @Override
-    public LongMatrix2D zMult(final LongMatrix2D B, LongMatrix2D C, final int alpha, final int beta,
+    public LongMatrix2D zMult(final LongMatrix2D B, LongMatrix2D C, final long alpha, final long beta,
             final boolean transposeA, final boolean transposeB) {
-        final int m = rows;
-        final int n = columns;
-        final int p = B.columns();
-        if (C == null)
-            C = new DenseLongMatrix2D(m, p);
+        final int rowsA = rows;
+        final int columnsA = columns;
+        final int rowsB = B.rows();
+        final int columnsB = B.columns();
+        final int rowsC = transposeA ? columnsA : rowsA;
+        final int columnsC = transposeB ? rowsB : columnsB;
+
+        if (C == null) {
+            C = new DenseLongMatrix2D(rowsC, columnsC);
+        }
+
         /*
-         * determine how to split and parallelize best into blocks if more
-         * B.columns than tasks --> split B.columns, as follows:
-         * 
-         * xx|xx|xxx B xx|xx|xxx xx|xx|xxx A xxx xx|xx|xxx C xxx xx|xx|xxx xxx
-         * xx|xx|xxx xxx xx|xx|xxx xxx xx|xx|xxx
-         * 
-         * if less B.columns than tasks --> split A.rows, as follows:
-         * 
-         * xxxxxxx B xxxxxxx xxxxxxx A xxx xxxxxxx C xxx xxxxxxx --- ------- xxx
-         * xxxxxxx xxx xxxxxxx --- ------- xxx xxxxxxx
-         */
+        * determine how to split and parallelize best into blocks if more
+        * B.columns than tasks --> split B.columns, as follows:
+        * 
+        * xx|xx|xxx B xx|xx|xxx xx|xx|xxx A xxx xx|xx|xxx C xxx xx|xx|xxx xxx
+        * xx|xx|xxx xxx xx|xx|xxx xxx xx|xx|xxx
+        * 
+        * if less B.columns than tasks --> split A.rows, as follows:
+        * 
+        * xxxxxxx B xxxxxxx xxxxxxx A xxx xxxxxxx C xxx xxxxxxx --- ------- xxx
+        * xxxxxxx xxx xxxxxxx --- ------- xxx xxxxxxx
+        */
         if (transposeA)
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);
         if (B instanceof SparseLongMatrix2D || B instanceof SparseRCLongMatrix2D) {
@@ -1800,24 +1611,24 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         if (!(C instanceof DenseLongMatrix2D))
             return super.zMult(B, C, alpha, beta, transposeA, transposeB);
 
-        if (B.rows() != n)
+        if (B.rows() != columnsA)
             throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + this.toStringShort() + ", "
                     + B.toStringShort());
-        if (C.rows() != m || C.columns() != p)
+        if (C.rows() != rowsA || C.columns() != columnsB)
             throw new IllegalArgumentException("Incompatibe result matrix: " + this.toStringShort() + ", "
                     + B.toStringShort() + ", " + C.toStringShort());
         if (this == C || B == C)
             throw new IllegalArgumentException("Matrices must not be identical");
 
-        long flops = 2L * m * n * p;
+        long flops = 2L * rowsA * columnsA * columnsB;
         int noOfTasks = (int) Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each
         /* thread should process at least 30000 flops */
-        boolean splitB = (p >= noOfTasks);
-        int width = splitB ? p : m;
+        boolean splitB = (columnsB >= noOfTasks);
+        int width = splitB ? columnsB : rowsA;
         noOfTasks = Math.min(width, noOfTasks);
 
         if (noOfTasks < 2) { //parallelization doesn't pay off (too much start up overhead)
-            return this.zMultSeq(B, C, alpha, beta, transposeA, transposeB);
+            return this.zMultSequential(B, C, alpha, beta, transposeA, transposeB);
         }
 
         // set up concurrent tasks
@@ -1832,35 +1643,26 @@ public class DenseLongMatrix2D extends LongMatrix2D {
             if (splitB) {
                 // split B along columns into blocks
                 AA = this;
-                BB = B.viewPart(0, offset, n, span);
-                CC = C.viewPart(0, offset, m, span);
+                BB = B.viewPart(0, offset, columnsA, span);
+                CC = C.viewPart(0, offset, rowsA, span);
             } else {
                 // split A along rows into blocks
-                AA = this.viewPart(offset, 0, span, n);
+                AA = this.viewPart(offset, 0, span, columnsA);
                 BB = B;
-                CC = C.viewPart(offset, 0, span, p);
+                CC = C.viewPart(offset, 0, span, columnsB);
             }
 
             subTasks[i] = ConcurrencyUtils.submit(new Runnable() {
                 public void run() {
-                    ((DenseLongMatrix2D) AA).zMultSeq(BB, CC, alpha, beta, transposeA, transposeB);
+                    ((DenseLongMatrix2D) AA).zMultSequential(BB, CC, alpha, beta, transposeA, transposeB);
                 }
             });
         }
 
-        try {
-            for (int j = 0; j < noOfTasks; j++) {
-                subTasks[j].get();
-            }
-        } catch (ExecutionException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ConcurrencyUtils.waitForCompletion(subTasks);
         return C;
     }
 
-    @Override
     public long zSum() {
         long sum = 0;
         if (elements == null)
@@ -1912,116 +1714,11 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         return sum;
     }
 
-    @Override
-    protected boolean haveSharedCellsRaw(LongMatrix2D other) {
-        if (other instanceof SelectedDenseLongMatrix2D) {
-            SelectedDenseLongMatrix2D otherMatrix = (SelectedDenseLongMatrix2D) other;
-            return this.elements == otherMatrix.elements;
-        } else if (other instanceof DenseLongMatrix2D) {
-            DenseLongMatrix2D otherMatrix = (DenseLongMatrix2D) other;
-            return this.elements == otherMatrix.elements;
-        }
-        return false;
-    }
-
-    @Override
-    protected LongMatrix1D like1D(int size, int zero, int stride) {
-        return new DenseLongMatrix1D(size, this.elements, zero, stride, true);
-    }
-
-    @Override
-    protected LongMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
-        return new SelectedDenseLongMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
-    }
-
-    private LongMatrix2D zMultSeq(LongMatrix2D B, LongMatrix2D C) {
-        int m = rows;
-        int n = columns;
-        int p = B.columns();
-        if (C == null)
-            C = new DenseLongMatrix2D(m, p);
-        if (!(C instanceof DenseLongMatrix2D))
-            return super.zMult(B, C);
-        if (B.rows() != n)
-            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
-                    + B.toStringShort());
-        if (C.rows() != m || C.columns() != p)
-            throw new IllegalArgumentException("Incompatibel result matrix: " + toStringShort() + ", "
-                    + B.toStringShort() + ", " + C.toStringShort());
-        if (this == C || B == C)
-            throw new IllegalArgumentException("Matrices must not be identical");
-
-        DenseLongMatrix2D BB = (DenseLongMatrix2D) B;
-        DenseLongMatrix2D CC = (DenseLongMatrix2D) C;
-        final long[] AElems = this.elements;
-        final long[] BElems = BB.elements;
-        final long[] CElems = CC.elements;
-
-        int cA = this.columnStride;
-        int cB = BB.columnStride;
-        int cC = CC.columnStride;
-
-        int rA = this.rowStride;
-        int rB = BB.rowStride;
-        int rC = CC.rowStride;
-
-        /*
-         * A is blocked to hide memory latency xxxxxxx B xxxxxxx xxxxxxx A xxx
-         * xxxxxxx C xxx xxxxxxx --- ------- xxx xxxxxxx xxx xxxxxxx --- -------
-         * xxx xxxxxxx
-         */
-        final int BLOCK_SIZE = 30000; // * 8 == Level 2 cache in bytes
-        int m_optimal = (BLOCK_SIZE - n) / (n + 1);
-        if (m_optimal <= 0)
-            m_optimal = 1;
-        int blocks = m / m_optimal;
-        int rr = 0;
-        if (m % m_optimal != 0)
-            blocks++;
-        for (; --blocks >= 0;) {
-            int jB = (int) BB.index(0, 0);
-            int indexA = (int) index(rr, 0);
-            int jC = (int) CC.index(rr, 0);
-            rr += m_optimal;
-            if (blocks == 0)
-                m_optimal += m - rr;
-
-            for (int j = p; --j >= 0;) {
-                int iA = indexA;
-                int iC = jC;
-                for (int i = m_optimal; --i >= 0;) {
-                    int kA = iA;
-                    int kB = jB;
-                    int s = 0;
-
-                    // loop unrolled
-                    kA -= cA;
-                    kB -= rB;
-
-                    for (int k = n % 4; --k >= 0;) {
-                        s += AElems[kA += cA] * BElems[kB += rB];
-                    }
-                    for (int k = n / 4; --k >= 0;) {
-                        s += AElems[kA += cA] * BElems[kB += rB] + AElems[kA += cA] * BElems[kB += rB]
-                                + AElems[kA += cA] * BElems[kB += rB] + AElems[kA += cA] * BElems[kB += rB];
-                    }
-
-                    CElems[iC] = s;
-                    iA += rA;
-                    iC += rC;
-                }
-                jB += cB;
-                jC += cC;
-            }
-        }
-        return C;
-    }
-
-    private LongMatrix2D zMultSeq(LongMatrix2D B, LongMatrix2D C, int alpha, int beta, boolean transposeA,
+    private LongMatrix2D zMultSequential(LongMatrix2D B, LongMatrix2D C, long alpha, long beta, boolean transposeA,
             boolean transposeB) {
         if (transposeA)
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);
-        if (B instanceof SparseLongMatrix2D || B instanceof SparseRCLongMatrix2D) {
+        if (B instanceof SparseLongMatrix2D || B instanceof SparseRCLongMatrix2D || B instanceof SparseCCLongMatrix2D) {
             // exploit quick sparse mult
             // A*B = (B' * A')'
             if (C == null) {
@@ -2034,17 +1731,18 @@ public class DenseLongMatrix2D extends LongMatrix2D {
         if (transposeB)
             return this.zMult(B.viewDice(), C, alpha, beta, transposeA, false);
 
-        int m = rows;
-        int n = columns;
+        int rowsA = rows;
+        int columnsA = columns;
         int p = B.columns();
-        if (C == null)
-            C = new DenseLongMatrix2D(m, p);
-        if (!(C instanceof DenseLongMatrix2D))
+        if (C == null) {
+            C = new DenseLongMatrix2D(rowsA, p);
+        }
+        if (!(B instanceof DenseLongMatrix2D) || !(C instanceof DenseLongMatrix2D))
             return super.zMult(B, C, alpha, beta, transposeA, transposeB);
-        if (B.rows() != n)
+        if (B.rows() != columnsA)
             throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
                     + B.toStringShort());
-        if (C.rows() != m || C.columns() != p)
+        if (C.rows() != rowsA || C.columns() != p)
             throw new IllegalArgumentException("Incompatibel result matrix: " + toStringShort() + ", "
                     + B.toStringShort() + ", " + C.toStringShort());
         if (this == C || B == C)
@@ -2072,12 +1770,12 @@ public class DenseLongMatrix2D extends LongMatrix2D {
          * xxx xxxxxxx
          */
         final int BLOCK_SIZE = 30000; // * 8 == Level 2 cache in bytes
-        int m_optimal = (BLOCK_SIZE - n) / (n + 1);
+        int m_optimal = (BLOCK_SIZE - columnsA) / (columnsA + 1);
         if (m_optimal <= 0)
             m_optimal = 1;
-        int blocks = m / m_optimal;
+        int blocks = rowsA / m_optimal;
         int rr = 0;
-        if (m % m_optimal != 0)
+        if (rowsA % m_optimal != 0)
             blocks++;
         for (; --blocks >= 0;) {
             int jB = (int) BB.index(0, 0);
@@ -2085,7 +1783,7 @@ public class DenseLongMatrix2D extends LongMatrix2D {
             int jC = (int) CC.index(rr, 0);
             rr += m_optimal;
             if (blocks == 0)
-                m_optimal += m - rr;
+                m_optimal += rowsA - rr;
 
             for (int j = p; --j >= 0;) {
                 int iA = indexA;
@@ -2093,16 +1791,16 @@ public class DenseLongMatrix2D extends LongMatrix2D {
                 for (int i = m_optimal; --i >= 0;) {
                     int kA = iA;
                     int kB = jB;
-                    int s = 0;
+                    long s = 0;
 
                     // loop unrolled
                     kA -= cA;
                     kB -= rB;
 
-                    for (int k = n % 4; --k >= 0;) {
+                    for (int k = columnsA % 4; --k >= 0;) {
                         s += AElems[kA += cA] * BElems[kB += rB];
                     }
-                    for (int k = n / 4; --k >= 0;) {
+                    for (int k = columnsA / 4; --k >= 0;) {
                         s += AElems[kA += cA] * BElems[kB += rB] + AElems[kA += cA] * BElems[kB += rB]
                                 + AElems[kA += cA] * BElems[kB += rB] + AElems[kA += cA] * BElems[kB += rB];
                     }
@@ -2116,5 +1814,24 @@ public class DenseLongMatrix2D extends LongMatrix2D {
             }
         }
         return C;
+    }
+
+    protected boolean haveSharedCellsRaw(LongMatrix2D other) {
+        if (other instanceof SelectedDenseLongMatrix2D) {
+            SelectedDenseLongMatrix2D otherMatrix = (SelectedDenseLongMatrix2D) other;
+            return this.elements == otherMatrix.elements;
+        } else if (other instanceof DenseLongMatrix2D) {
+            DenseLongMatrix2D otherMatrix = (DenseLongMatrix2D) other;
+            return this.elements == otherMatrix.elements;
+        }
+        return false;
+    }
+
+    protected LongMatrix1D like1D(int size, int zero, int stride) {
+        return new DenseLongMatrix1D(size, this.elements, zero, stride, true);
+    }
+
+    protected LongMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
+        return new SelectedDenseLongMatrix2D(this.elements, rowOffsets, columnOffsets, 0);
     }
 }

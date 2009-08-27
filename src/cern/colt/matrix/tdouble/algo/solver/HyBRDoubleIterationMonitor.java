@@ -38,7 +38,6 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         this.stoppingCondition = HyBRStoppingCondition.PERFORMED_MAX_NUMBER_OF_ITERATIONS;
     }
 
-    @Override
     public boolean converged(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, x, iter);
@@ -47,7 +46,6 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         return convergedI(r, x);
     }
 
-    @Override
     public boolean converged(double r) throws IterativeSolverDoubleNotConvergedException {
         if (!isFirst()) {
             reporter.monitor(r, iter);
@@ -56,7 +54,6 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         return convergedI(r);
     }
 
-    @Override
     protected boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException {
         // Store initial residual
         if (isFirst())
@@ -77,17 +74,14 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
         return false;
     }
 
-    @Override
     protected boolean convergedI(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
         return convergedI(r);
     }
 
-    @Override
     public int getMaxIterations() {
         return maxIter;
     }
 
-    @Override
     public void setMaxIterations(int maxIter) {
         this.maxIter = maxIter;
     }
@@ -123,7 +117,8 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
     /**
      * Sets the regularization parameter
      * 
-     * @param regularizationParameter regularization parameter
+     * @param regularizationParameter
+     *            regularization parameter
      */
     public void setRegularizationParameter(double regularizationParameter) {
         this.regularizationParameter = regularizationParameter;
@@ -132,7 +127,8 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
     /**
      * Sets the stopping condition
      * 
-     * @param stoppingCondition stopping condition
+     * @param stoppingCondition
+     *            stopping condition
      */
     public void setStoppingCondition(HyBRStoppingCondition stoppingCondition) {
         this.stoppingCondition = stoppingCondition;
@@ -146,8 +142,7 @@ public class HyBRDoubleIterationMonitor extends AbstractDoubleIterationMonitor {
     public HyBRStoppingCondition getStoppingCondition() {
         return stoppingCondition;
     }
-    
-    @Override
+
     public int iterations() {
         return Math.min(iter, maxIter);
     }

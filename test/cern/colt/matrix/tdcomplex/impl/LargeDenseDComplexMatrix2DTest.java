@@ -8,7 +8,6 @@ public class LargeDenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseLargeDComplexMatrix2D(NROWS, NCOLUMNS);
         B = new DenseLargeDComplexMatrix2D(NROWS, NCOLUMNS);
@@ -19,8 +18,8 @@ public class LargeDenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
         DComplexMatrix2D Acopy = A.copy();
         ((WrapperDComplexMatrix2D) A).fft2();
         ((WrapperDComplexMatrix2D) A).ifft2(true);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(Acopy.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }
@@ -30,8 +29,8 @@ public class LargeDenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
         DComplexMatrix2D Acopy = A.copy();
         ((WrapperDComplexMatrix2D) A).fftColumns();
         ((WrapperDComplexMatrix2D) A).ifftColumns(true);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(Acopy.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }
@@ -41,8 +40,8 @@ public class LargeDenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
         DComplexMatrix2D Acopy = A.copy();
         ((WrapperDComplexMatrix2D) A).fftRows();
         ((WrapperDComplexMatrix2D) A).ifftRows(true);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(Acopy.getQuick(r, c), A.getQuick(r, c), TOL);
             }
         }

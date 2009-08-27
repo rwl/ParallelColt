@@ -15,14 +15,14 @@ import cern.colt.matrix.tlong.LongMatrix2D;
 import cern.colt.matrix.tlong.LongMatrix3D;
 
 /**
- * Sparse hashed 1-d matrix (aka <i>vector</i>) holding <tt>int</tt> elements.
+ * Sparse hashed 1-d matrix (aka <i>vector</i>) holding <tt>long</tt> elements.
  * First see the <a href="package-summary.html">package summary</a> and javadoc
  * <a href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
  * <b>Implementation:</b>
  * <p>
  * Note that this implementation is not synchronized. Uses a
- * {@link cern.colt.map.tlong.OpenLongLongHashMap}, which is a compact and
+ * {@link cern.colt.map.tlong.OpenIntLongHashMap}, which is a compact and
  * performant hashing technique.
  * <p>
  * <b>Memory requirements:</b>
@@ -99,7 +99,7 @@ public class SparseLongMatrix1D extends LongMatrix1D {
     /**
      * Constructs a matrix with a given number of parameters. All entries are
      * initially <tt>0</tt>. For details related to memory usage see
-     * {@link cern.colt.map.tlong.OpenLongLongHashMap}.
+     * {@link cern.colt.map.tlong.OpenIntLongHashMap}.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -151,7 +151,7 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      *            the value to be filled into the cells.
      * @return <tt>this</tt> (for convenience only).
      */
-    @Override
+
     public LongMatrix1D assign(long value) {
         // overriden for performance only
         if (this.isNoView && value == 0)
@@ -164,7 +164,7 @@ public class SparseLongMatrix1D extends LongMatrix1D {
     /**
      * Returns the number of cells having non-zero values.
      */
-    @Override
+
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -172,24 +172,12 @@ public class SparseLongMatrix1D extends LongMatrix1D {
             return super.cardinality();
     }
 
-    public void dct(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dht() {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
-    public void dst(boolean scale) {
-        throw new IllegalArgumentException("This method is not supported.");
-    }
-
     /**
      * Returns the elements of this matrix.
      * 
      * @return the elements
      */
-    @Override
+
     public AbstractLongLongMap elements() {
         return elements;
     }
@@ -208,7 +196,7 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      * @param minCapacity
      *            the desired minimum number of non-zero cells.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
@@ -226,12 +214,12 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
-    public long getQuick(int index) {
+
+    public synchronized long getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return this.elements.get(index(index));
         // manually inlined:
-        return elements.get(zero + index * stride);
+        return elements.get((long) zero + (long) index * (long) stride);
     }
 
     /**
@@ -242,27 +230,27 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // overriden for manual inlining only
         // return _offset(_rank(rank));
-        return zero + rank * stride;
+        return (long) zero + (long) rank * (long) stride;
     }
 
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix must also
-     * be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseLongMatrix1D</tt> the new matrix must also be of type
-     * <tt>SparseLongMatrix1D</tt>, etc. In general, the new matrix should have
-     * internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix must
+     * also be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix1D</tt> the new matrix must also be
+     * of type <tt>SparseLongMatrix1D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public LongMatrix1D like(int size) {
         return new SparseLongMatrix1D(size);
     }
@@ -271,9 +259,9 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix
-     * must be of type <tt>DenseLongMatrix2D</tt>, if the receiver is an instance
-     * of type <tt>SparseLongMatrix1D</tt> the new matrix must be of type
-     * <tt>SparseLongMatrix2D</tt>, etc.
+     * must be of type <tt>DenseLongMatrix2D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix1D</tt> the new matrix must be of
+     * type <tt>SparseLongMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -281,19 +269,45 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public LongMatrix2D like2D(int rows, int columns) {
         return new SparseLongMatrix2D(rows, columns);
     }
 
-    @Override
-    public LongMatrix2D reshape(int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+    public LongMatrix2D reshape(int rows, int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
+        }
+        LongMatrix2D M = new SparseLongMatrix2D(rows, columns);
+        int idx = 0;
+        for (int c = 0; c < columns; c++) {
+            for (int r = 0; r < rows; r++) {
+                long elem = getQuick(idx++);
+                if (elem != 0) {
+                    M.setQuick(r, c, elem);
+                }
+            }
+        }
+        return M;
     }
 
-    @Override
-    public LongMatrix3D reshape(int slices, int rows, int cols) {
-        throw new IllegalArgumentException("This method is not supported.");
+    public LongMatrix3D reshape(int slices, int rows, int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
+        }
+        LongMatrix3D M = new SparseLongMatrix3D(slices, rows, columns);
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < columns; c++) {
+                for (int r = 0; r < rows; r++) {
+                    long elem = getQuick(idx++);
+                    if (elem != 0) {
+                        M.setQuick(s, r, c, elem);
+                    }
+                }
+            }
+        }
+        return M;
     }
 
     /**
@@ -310,40 +324,30 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public synchronized void setQuick(int index, long value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
         // manually inlined:
-        int i = zero + index * stride;
+        long i = (long) zero + (long) index * (long) stride;
         if (value == 0)
             this.elements.removeKey(i);
         else
             this.elements.put(i, value);
     }
 
-    /**
-     * Releases any superfluous memory created by explicitly putting zero values
-     * into cells formerly having non-zero values; An application can use this
-     * operation to minimize the storage of the receiver.
-     * <p>
-     * <b>Background:</b>
-     * <p>
-     * Cells that
-     * <ul>
-     * <li>are never set to non-zero values do not use any memory.
-     * <li>switch from zero to non-zero state do use memory.
-     * <li>switch back from non-zero to zero state also do use memory. However,
-     * their memory can be reclaimed by calling <tt>trimToSize()</tt>.
-     * </ul>
-     * A sequence like <tt>set(i,5); set(i,0);</tt> sets a cell to non-zero
-     * state and later back to zero state. Such as sequence generates obsolete
-     * memory that is automatically reclaimed from time to time or can manually
-     * be reclaimed by calling <tt>trimToSize()</tt>. Putting zeros into cells
-     * already containing zeros does not generate obsolete memory since no
-     * memory was allocated to them in the first place.
-     */
-    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("1 x ").append(size).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        for (int i = 0; i < size; i++) {
+            long elem = getQuick(i);
+            if (elem != 0) {
+                builder.append('(').append(i).append(')').append('\t').append(elem).append('\n');
+            }
+        }
+        return builder.toString();
+    }
+
     public void trimToSize() {
         this.elements.trimToSize();
     }
@@ -351,7 +355,7 @@ public class SparseLongMatrix1D extends LongMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(LongMatrix1D other) {
         if (other instanceof SelectedSparseLongMatrix1D) {
             SelectedSparseLongMatrix1D otherMatrix = (SelectedSparseLongMatrix1D) other;
@@ -370,7 +374,7 @@ public class SparseLongMatrix1D extends LongMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected LongMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseLongMatrix1D(this.elements, offsets);
     }

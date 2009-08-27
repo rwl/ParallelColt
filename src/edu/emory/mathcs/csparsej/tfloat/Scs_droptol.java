@@ -35,7 +35,7 @@ import edu.emory.mathcs.csparsej.tfloat.Scs_common.Scs;
 public class Scs_droptol {
 
     private static class Cs_tol implements Scs_ifkeep {
-        @Override
+
         public boolean fkeep(int i, int j, float aij, Object other) {
             return (Math.abs(aij) > (Float) other);
         }

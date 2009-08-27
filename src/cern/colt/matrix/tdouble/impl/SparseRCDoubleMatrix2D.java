@@ -367,7 +367,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         this.values = values;
     }
 
-    @Override
     public DoubleMatrix2D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
             final double alpha = ((cern.jet.math.tdouble.DoubleMult) function).multiplicator;
@@ -392,7 +391,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(double value) {
         if (value == 0) {
             Arrays.fill(rowPointers, 0);
@@ -407,7 +405,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(DoubleMatrix2D source) {
         if (source == this)
             return this; // nothing to do
@@ -442,7 +439,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D y, cern.colt.function.tdouble.DoubleDoubleFunction function) {
         checkShape(y);
         if ((y instanceof SparseRCDoubleMatrix2D) && (function == cern.jet.math.tdouble.DoubleFunctions.plus)) { // x[i] = x[i] + y[i] 
@@ -566,12 +562,10 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
     }
 
-    @Override
     public int cardinality() {
         return rowPointers[rows];
     }
 
-    @Override
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
 
         for (int i = rows; --i >= 0;) {
@@ -632,7 +626,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return dense;
     }
 
-    @Override
     public synchronized double getQuick(int row, int column) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
         int k = searchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
@@ -703,12 +696,10 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return columnIndexesSorted;
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new SparseRCDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public DoubleMatrix1D like1D(int size) {
         return new SparseDoubleMatrix1D(size);
     }
@@ -758,7 +749,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         rowPointers[rows] = nz; /* finalize A */
     }
 
-    @Override
     public synchronized void setQuick(int row, int column, double value) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
         int k = searchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
@@ -802,7 +792,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         //        System.arraycopy(T.values, 0, this.values, 0, T.values.length);
     }
 
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
@@ -817,12 +806,10 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return builder.toString();
     }
 
-    @Override
     public void trimToSize() {
         realloc(0);
     }
 
-    @Override
     public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta,
             final boolean transposeA) {
         final int rowsA = transposeA ? columns : rows;
@@ -1036,7 +1023,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return z;
     }
 
-    @Override
     public DoubleMatrix2D zMult(DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, double beta,
             final boolean transposeA, boolean transposeB) {
         int rowsA = rows;
@@ -1231,7 +1217,6 @@ public class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         values = valuesNew;
     }
 
-    @Override
     protected DoubleMatrix2D getContent() {
         return this;
     }

@@ -16,8 +16,8 @@ import cern.jet.math.tdouble.DoubleArithmetic;
 import cern.jet.math.tdouble.DoubleFunctions;
 
 /**
- * Integer Function objects to be passed to generic methods. Same as
- * {@link DoubleFunctions} except operating on integers.
+ * Int Function objects to be passed to generic methods. Same as
+ * {@link DoubleFunctions} except operating on longs.
  * <p>
  * For aliasing see {@link #intFunctions}.
  * 
@@ -34,7 +34,7 @@ public class IntFunctions extends Object {
      * is a bit awkward, to say the least. Using the aliasing you can instead
      * write
      * <p>
-     * <tt>IntFunctions F = IntFunctions.intFunctions; <br>
+     * <tt>IntFunctions F = IntFunctions.longFunctions; <br>
     F.chain(F.plus,F.mult(3),F.chain(F.square,F.div(2)));</tt>
      * <p>
      */
@@ -156,6 +156,15 @@ public class IntFunctions extends Object {
     };
 
     /**
+     * Function that returns <tt>-(a / b)</tt>.
+     */
+    public static final IntIntFunction divNeg = new IntIntFunction() {
+        public final int apply(int a, int b) {
+            return -(a / b);
+        }
+    };
+
+    /**
      * Function that returns <tt>a == b ? 1 : 0</tt>.
      */
     public static final IntIntFunction equals = new IntIntFunction() {
@@ -237,6 +246,24 @@ public class IntFunctions extends Object {
     };
 
     /**
+     * Function that returns <tt>-(a * b)</tt>.
+     */
+    public static final IntIntFunction multNeg = new IntIntFunction() {
+        public final int apply(int a, int b) {
+            return -(a * b);
+        }
+    };
+
+    /**
+     * Function that returns <tt>a * b^2</tt>.
+     */
+    public static final IntIntFunction multSquare = new IntIntFunction() {
+        public final int apply(int a, int b) {
+            return a * b * b;
+        }
+    };
+
+    /**
      * Function that returns <tt>a | b</tt>.
      */
     public static final IntIntFunction or = new IntIntFunction() {
@@ -251,6 +278,15 @@ public class IntFunctions extends Object {
     public static final IntIntFunction plus = new IntIntFunction() {
         public final int apply(int a, int b) {
             return a + b;
+        }
+    };
+
+    /**
+     * Function that returns <tt>Math.abs(a) + Math.abs(b)</tt>.
+     */
+    public static final IntIntFunction plusAbs = new IntIntFunction() {
+        public final int apply(int a, int b) {
+            return Math.abs(a) + Math.abs(b);
         }
     };
 
@@ -551,6 +587,14 @@ public class IntFunctions extends Object {
     }
 
     /**
+     * Constructs a function that returns <tt>a - b*constant</tt>. <tt>a</tt>
+     * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
+     */
+    public static IntIntFunction minusMult(final int constant) {
+        return plusMultSecond(-constant);
+    }
+
+    /**
      * Constructs a function that returns <tt>a % b</tt>. <tt>a</tt> is a
      * variable, <tt>b</tt> is fixed.
      */
@@ -599,6 +643,19 @@ public class IntFunctions extends Object {
     }
 
     /**
+     * Constructs a function that returns <tt>b*constant</tt>.
+     */
+    public static IntIntFunction multSecond(final int constant) {
+
+        return new IntIntFunction() {
+            public final int apply(int a, int b) {
+                return b * constant;
+            }
+        };
+
+    }
+
+    /**
      * Constructs a function that returns <tt>(int) Math.pow(a,b)</tt>.
      * <tt>a</tt> is a variable, <tt>b</tt> is fixed.
      */
@@ -628,17 +685,17 @@ public class IntFunctions extends Object {
 
     /**
      * Constructs a function that returns a 32 bit uniformly distributed random
-     * number in the closed interval
-     * <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> (including
-     * <tt>Integer.MIN_VALUE</tt> and <tt>Integer.MAX_VALUE</tt>). Currently the
-     * engine is {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister}
-     * and is seeded with the current time.
+     * number in the closed longerval <tt>[Int.MIN_VALUE,Int.MAX_VALUE]</tt>
+     * (including <tt>Int.MIN_VALUE</tt> and <tt>Int.MAX_VALUE</tt>). Currently
+     * the engine is
+     * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} and is
+     * seeded with the current time.
      * <p>
      * Note that any random engine derived from
      * {@link cern.jet.random.tdouble.engine.DoubleRandomEngine} and any random
      * distribution derived from
      * {@link cern.jet.random.tdouble.AbstractDoubleDistribution} are function
-     * objects, because they implement the proper interfaces. Thus, if you are
+     * objects, because they implement the proper longerfaces. Thus, if you are
      * not happy with the default, just pass your favourite random generator to
      * function evaluating methods.
      */

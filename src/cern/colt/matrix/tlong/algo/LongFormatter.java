@@ -270,8 +270,8 @@ import cern.colt.matrix.tlong.LongMatrix3D;
  * <p>
  * Analyzes the entire matrix before producing output. Each cell is converted to
  * a String as indicated by the given C-like format string. If <tt>null</tt> is
- * passed as format string, {@link java.lang.Long#toString(long)} is used instead,
- * yielding full precision.
+ * passed as format string, {@link java.lang.Long#toString(long)} is used
+ * instead, yielding full precision.
  * </p>
  * <p>
  * Next, leading and trailing whitespaces are removed. For each column the
@@ -318,7 +318,7 @@ public class LongFormatter extends AbstractFormatter {
     /**
      * Converts a given cell to a String; no alignment considered.
      */
-    @Override
+
     protected String form(AbstractMatrix1D matrix, int index, Former formatter) {
         return this.form((LongMatrix1D) matrix, index, formatter);
     }
@@ -336,7 +336,7 @@ public class LongFormatter extends AbstractFormatter {
     /**
      * Returns a string representations of all cells; no alignment considered.
      */
-    @Override
+
     protected String[][] format(AbstractMatrix2D matrix) {
         return this.format((LongMatrix2D) matrix);
     }
@@ -358,7 +358,7 @@ public class LongFormatter extends AbstractFormatter {
     /**
      * Returns the number of characters before the decimal point.
      */
-    @Override
+
     protected int lead(String s) {
         if (alignment.equals(DECIMAL))
             return indexOfDecimalPoint(s);
@@ -468,7 +468,7 @@ public class LongFormatter extends AbstractFormatter {
      * @param matrix
      *            the matrix to convert.
      */
-    @Override
+
     protected String toString(AbstractMatrix2D matrix) {
         return this.toString((LongMatrix2D) matrix);
     }

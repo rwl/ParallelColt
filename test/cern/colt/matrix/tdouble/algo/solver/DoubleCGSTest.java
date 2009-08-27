@@ -9,7 +9,6 @@ public class DoubleCGSTest extends DoubleIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new DoubleCGS(x);
         M = solver.getPreconditioner(); //identity preconditioner

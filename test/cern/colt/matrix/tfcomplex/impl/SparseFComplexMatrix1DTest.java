@@ -8,7 +8,6 @@ public class SparseFComplexMatrix1DTest extends FComplexMatrix1DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFComplexMatrix1D(SIZE);
         B = new SparseFComplexMatrix1D(SIZE);

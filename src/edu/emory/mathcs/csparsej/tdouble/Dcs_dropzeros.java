@@ -35,7 +35,7 @@ import edu.emory.mathcs.csparsej.tdouble.Dcs_common.Dcs;
 public class Dcs_dropzeros {
 
     private static class Cs_nonzero implements Dcs_ifkeep {
-        @Override
+
         public boolean fkeep(int i, int j, double aij, Object other) {
             double eps = Math.pow(2, -52);
             return (Math.abs(aij) > eps);

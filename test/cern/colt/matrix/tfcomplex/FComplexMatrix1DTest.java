@@ -35,7 +35,6 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         super(arg0);
     }
 
-    @Override
     protected void setUp() throws Exception {
         createMatrices();
         populateMatrices();
@@ -46,23 +45,22 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     protected void populateMatrices() {
         ConcurrencyUtils.setThreadsBeginN_1D(1);
 
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             A.setQuick(i, new float[] { (float) Math.random(), (float) Math.random() });
         }
 
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) B.size(); i++) {
             B.setQuick(i, new float[] { (float) Math.random(), (float) Math.random() });
         }
     }
 
-    @Override
     protected void tearDown() throws Exception {
         A = B = null;
     }
 
     public void testAggregateFloatFloatFunctionFloatFunction() {
         float[] expected = new float[2];
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             expected = FComplex.plus(expected, FComplex.square(A.getQuick(i)));
         }
         float[] result = A.aggregate(FComplexFunctions.plus, FComplexFunctions.square);
@@ -72,7 +70,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testAggregateComplexMatrix1FComplexComplexFunctionComplexComplexFunction() {
         float[] actual = A.aggregate(B, FComplexFunctions.plus, FComplexFunctions.mult);
         float[] expected = new float[2];
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             expected = FComplex.plus(expected, FComplex.mult(A.getQuick(i), B.getQuick(i)));
         }
         assertEquals(expected, actual, TOL);
@@ -81,7 +79,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testAssignComplexComplexFunction() {
         FComplexMatrix1D Acopy = A.copy();
         A.assign(FComplexFunctions.acos);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] expected = FComplex.acos(Acopy.getQuick(i));
             assertEquals(expected, A.getQuick(i), TOL);
         }
@@ -90,7 +88,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testAssignComplexMatrix1D() {
         A.assign(B);
         assertTrue(A.size() == B.size());
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             assertEquals(B.getQuick(i), A.getQuick(i), TOL);
         }
     }
@@ -98,7 +96,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testAssignComplexMatrix1FComplexComplexFunction() {
         FComplexMatrix1D Acopy = A.copy();
         A.assign(B, FComplexFunctions.div);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             assertEquals(FComplex.div(Acopy.getQuick(i), B.getQuick(i)), A.getQuick(i), TOL);
         }
     }
@@ -115,7 +113,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         };
         FComplexMatrix1D Acopy = A.copy();
         A.assign(procedure, FComplexFunctions.tan);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             if (FComplex.abs(Acopy.getQuick(i)) > 0.1) {
                 assertEquals(FComplex.tan(Acopy.getQuick(i)), A.getQuick(i), TOL);
             } else {
@@ -137,7 +135,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         FComplexMatrix1D Acopy = A.copy();
         float[] value = new float[] { -1, -1 };
         A.assign(procedure, value);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             if (FComplex.abs(Acopy.getQuick(i)) > 0.1) {
                 assertEquals(value, A.getQuick(i), TOL);
             } else {
@@ -149,7 +147,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testAssignComplexRealFunction() {
         FComplexMatrix1D Acopy = A.copy();
         A.assign(FComplexFunctions.abs);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] elem = A.getQuick(i);
             assertEquals(FComplex.abs(Acopy.getQuick(i)), elem[0], TOL);
             assertEquals(0, elem[1], TOL);
@@ -157,12 +155,12 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     }
 
     public void testAssignFloatArray() {
-        float[] expected = new float[2 * SIZE];
-        for (int i = 0; i < 2 * SIZE; i++) {
+        float[] expected = new float[2 * (int) A.size()];
+        for (int i = 0; i < 2 * (int) A.size(); i++) {
             expected[i] = (float) Math.random();
         }
         A.assign(expected);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] elem = A.getQuick(i);
             assertEquals(expected[2 * i], elem[0], TOL);
             assertEquals(expected[2 * i + 1], elem[1], TOL);
@@ -174,7 +172,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         float re = (float) Math.random();
         float im = (float) Math.random();
         A.assign(re, im);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] elem = A.getQuick(i);
             assertEquals(re, elem[0], TOL);
             assertEquals(im, elem[1], TOL);
@@ -183,9 +181,9 @@ public abstract class FComplexMatrix1DTest extends TestCase {
 
     public void testAssignImaginary() {
         FComplexMatrix1D Acopy = A.copy();
-        FloatMatrix1D Im = FloatFactory1D.dense.random(SIZE);
+        FloatMatrix1D Im = FloatFactory1D.dense.random((int) A.size());
         A.assignImaginary(Im);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] elem = A.getQuick(i);
             assertEquals(Acopy.getQuick(i)[0], elem[0], TOL);
             assertEquals(Im.getQuick(i), elem[1], TOL);
@@ -194,9 +192,9 @@ public abstract class FComplexMatrix1DTest extends TestCase {
 
     public void testAssignReal() {
         FComplexMatrix1D Acopy = A.copy();
-        FloatMatrix1D Re = FloatFactory1D.dense.random(SIZE);
+        FloatMatrix1D Re = FloatFactory1D.dense.random((int) A.size());
         A.assignReal(Re);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] elem = A.getQuick(i);
             assertEquals(Acopy.getQuick(i)[1], elem[1], TOL);
             assertEquals(Re.getQuick(i), elem[0], TOL);
@@ -205,7 +203,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
 
     public void testCardinality() {
         int card = A.cardinality();
-        assertEquals(SIZE, card);
+        assertEquals((int) A.size(), card);
     }
 
     public void testEqualsFloat() {
@@ -226,14 +224,14 @@ public abstract class FComplexMatrix1DTest extends TestCase {
 
     public void testGetImaginaryPart() {
         FloatMatrix1D Im = A.getImaginaryPart();
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             assertEquals(A.getQuick(i)[1], Im.getQuick(i), TOL);
         }
     }
 
     public void testGetRealPart() {
         FloatMatrix1D Re = A.getRealPart();
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             assertEquals(A.getQuick(i)[0], Re.getQuick(i), TOL);
         }
     }
@@ -242,9 +240,9 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         IntArrayList indexList = new IntArrayList();
         ArrayList<float[]> valueList = new ArrayList<float[]>();
         A.getNonZeros(indexList, valueList);
-        assertEquals(SIZE, indexList.size());
-        assertEquals(SIZE, valueList.size());
-        for (int i = 0; i < SIZE; i++) {
+        assertEquals((int) A.size(), indexList.size());
+        assertEquals((int) A.size(), valueList.size());
+        for (int i = 0; i < (int) A.size(); i++) {
             assertEquals(A.getQuick(indexList.get(i)), valueList.get(i), TOL);
             assertTrue(valueList.get(i)[0] != 0 || valueList.get(i)[1] != 0);
         }
@@ -252,10 +250,10 @@ public abstract class FComplexMatrix1DTest extends TestCase {
 
     public void testReshapeIntInt() {
         int rows = 10;
-        int cols = 17;
-        FComplexMatrix2D B = A.reshape(rows, cols);
+        int columns = 17;
+        FComplexMatrix2D B = A.reshape(rows, columns);
         int idx = 0;
-        for (int c = 0; c < cols; c++) {
+        for (int c = 0; c < columns; c++) {
             for (int r = 0; r < rows; r++) {
                 assertEquals(A.getQuick(idx++), B.getQuick(r, c), TOL);
             }
@@ -265,11 +263,11 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testReshapeIntIntInt() {
         int slices = 2;
         int rows = 5;
-        int cols = 17;
-        FComplexMatrix3D B = A.reshape(slices, rows, cols);
+        int columns = 17;
+        FComplexMatrix3D B = A.reshape(slices, rows, columns);
         int idx = 0;
         for (int s = 0; s < slices; s++) {
-            for (int c = 0; c < cols; c++) {
+            for (int c = 0; c < columns; c++) {
                 for (int r = 0; r < rows; r++) {
                     assertEquals(A.getQuick(idx++), B.getQuick(s, r, c), TOL);
                 }
@@ -281,7 +279,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         FComplexMatrix1D Acopy = A.copy();
         FComplexMatrix1D Bcopy = B.copy();
         A.swap(B);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             assertEquals(Bcopy.getQuick(i), A.getQuick(i), TOL);
             assertEquals(Acopy.getQuick(i), B.getQuick(i), TOL);
         }
@@ -289,7 +287,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
 
     public void testToArray() {
         float[] array = A.toArray();
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] elem = A.getQuick(i);
             assertEquals(elem[0], array[2 * i], TOL);
             assertEquals(elem[1], array[2 * i + 1], TOL);
@@ -297,9 +295,9 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     }
 
     public void testToArrayFloatArray() {
-        float[] array = new float[2 * SIZE];
+        float[] array = new float[2 * (int) A.size()];
         A.toArray(array);
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             float[] elem = A.getQuick(i);
             assertEquals(elem[0], array[2 * i], TOL);
             assertEquals(elem[1], array[2 * i + 1], TOL);
@@ -308,15 +306,15 @@ public abstract class FComplexMatrix1DTest extends TestCase {
 
     public void testViewFlip() {
         FComplexMatrix1D B = A.viewFlip();
-        for (int i = 0; i < SIZE; i++) {
-            assertEquals(A.getQuick(SIZE - 1 - i), B.getQuick(i), TOL);
+        for (int i = 0; i < (int) A.size(); i++) {
+            assertEquals(A.getQuick((int) A.size() - 1 - i), B.getQuick(i), TOL);
         }
     }
 
     public void testViewPart() {
-        FComplexMatrix1D B = A.viewPart(SIZE / 2, SIZE / 3);
-        for (int i = 0; i < SIZE / 3; i++) {
-            assertEquals(A.getQuick(SIZE / 2 + i), B.getQuick(i), TOL);
+        FComplexMatrix1D B = A.viewPart((int) A.size() / 2, (int) A.size() / 3);
+        for (int i = 0; i < (int) A.size() / 3; i++) {
+            assertEquals(A.getQuick((int) A.size() / 2 + i), B.getQuick(i), TOL);
         }
     }
 
@@ -339,7 +337,8 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     }
 
     public void testViewSelectionIntArray() {
-        int[] indexes = new int[] { SIZE / 6, SIZE / 5, SIZE / 4, SIZE / 3, SIZE / 2 };
+        int[] indexes = new int[] { (int) A.size() / 6, (int) A.size() / 5, (int) A.size() / 4, (int) A.size() / 3,
+                (int) A.size() / 2 };
         FComplexMatrix1D B = A.viewSelection(indexes);
         for (int i = 0; i < indexes.length; i++) {
             assertEquals(A.getQuick(indexes[i]), B.getQuick(i), TOL);
@@ -357,7 +356,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testZDotProductComplexMatrix1D() {
         float[] actual = A.zDotProduct(B);
         float[] expected = new float[2];
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             expected = FComplex.plus(expected, FComplex.mult(A.getQuick(i), FComplex.conj(B.getQuick(i))));
         }
         assertEquals(expected, actual, TOL);
@@ -366,7 +365,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testZDotProductComplexMatrix1DIntInt() {
         float[] actual = A.zDotProduct(B, 5, (int) B.size() - 10);
         float[] expected = new float[2];
-        for (int i = 5; i < SIZE - 5; i++) {
+        for (int i = 5; i < (int) A.size() - 5; i++) {
             expected = FComplex.plus(expected, FComplex.mult(A.getQuick(i), FComplex.conj(B.getQuick(i))));
         }
         assertEquals(expected, actual, TOL);
@@ -378,7 +377,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
         B.getNonZeros(indexList, valueList);
         float[] actual = A.zDotProduct(B, 5, (int) B.size() - 10, indexList);
         float[] expected = new float[2];
-        for (int i = 5; i < SIZE - 5; i++) {
+        for (int i = 5; i < (int) A.size() - 5; i++) {
             expected = FComplex.plus(expected, FComplex.mult(A.getQuick(i), FComplex.conj(B.getQuick(i))));
         }
         assertEquals(expected, actual, TOL);
@@ -387,7 +386,7 @@ public abstract class FComplexMatrix1DTest extends TestCase {
     public void testZSum() {
         float[] actual = A.zSum();
         float[] expected = new float[2];
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 0; i < (int) A.size(); i++) {
             expected = FComplex.plus(expected, A.getQuick(i));
         }
         assertEquals(expected, actual, TOL);

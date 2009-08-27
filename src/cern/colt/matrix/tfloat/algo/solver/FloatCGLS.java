@@ -30,7 +30,6 @@ public class FloatCGLS extends AbstractFloatIterativeSolver {
         ((CGLSFloatIterationMonitor) iter).setRelativeTolerance(-1);
     }
 
-    @Override
     public FloatMatrix1D solve(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x)
             throws IterativeSolverFloatNotConvergedException {
         FloatMatrix1D p, q, r, s;

@@ -117,7 +117,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         return new DenseDoubleAlgebra(property.tolerance());
     }
@@ -319,15 +319,14 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
                 jk.viewRow(i).assign(ja).assign(IntFunctions.plus(jb.getQuick(i)));
             }
             DoubleMatrix2D sk = multOuter(sa, sb, null);
-            if(X instanceof SparseCCDoubleMatrix2D || Y instanceof SparseCCDoubleMatrix2D) {
-            return new SparseCCDoubleMatrix2D(rows_x * rows_y, columns_x * columns_y,
-                    (int[]) ik.vectorize().elements(), (int[]) jk.vectorize().elements(), (double[]) sk.viewDice()
-                            .vectorize().elements(), false, false, false);
-            }
-            else {
-                return new SparseRCDoubleMatrix2D(rows_x * rows_y, columns_x * columns_y,
-                        (int[]) ik.vectorize().elements(), (int[]) jk.vectorize().elements(), (double[]) sk.viewDice()
-                                .vectorize().elements(), false, false, false);                
+            if (X instanceof SparseCCDoubleMatrix2D || Y instanceof SparseCCDoubleMatrix2D) {
+                return new SparseCCDoubleMatrix2D(rows_x * rows_y, columns_x * columns_y, (int[]) ik.vectorize()
+                        .elements(), (int[]) jk.vectorize().elements(),
+                        (double[]) sk.viewDice().vectorize().elements(), false, false, false);
+            } else {
+                return new SparseRCDoubleMatrix2D(rows_x * rows_y, columns_x * columns_y, (int[]) ik.vectorize()
+                        .elements(), (int[]) jk.vectorize().elements(),
+                        (double[]) sk.viewDice().vectorize().elements(), false, false, false);
             }
 
         }
@@ -504,10 +503,10 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
     public double vectorNorm2(final DoubleMatrix2D X) {
         if (X.isView() == true || !(X instanceof DenseDoubleMatrix2D)) {
             final int rows = X.rows();
-            final int cols = X.columns();
+            final int columns = X.columns();
             double sum = 0;
             int nthreads = ConcurrencyUtils.getNumberOfThreads();
-            if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 nthreads = Math.min(nthreads, rows);
                 Future<?>[] futures = new Future[nthreads];
                 Double result;
@@ -520,7 +519,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
                             double sum = 0;
                             double elem;
                             for (int r = firstRow; r < lastRow; r++) {
-                                for (int c = 0; c < cols; c++) {
+                                for (int c = 0; c < columns; c++) {
                                     elem = X.getQuick(r, c);
                                     sum += (elem * elem);
                                 }
@@ -542,7 +541,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
             } else {
                 double elem;
                 for (int r = 0; r < rows; r++) {
-                    for (int c = 0; c < cols; c++) {
+                    for (int c = 0; c < columns; c++) {
                         elem = X.getQuick(r, c);
                         sum += (elem * elem);
                     }
@@ -599,10 +598,10 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
         if (X.isView() == true || !(X instanceof DenseDoubleMatrix3D)) {
             final int slices = X.slices();
             final int rows = X.rows();
-            final int cols = X.columns();
+            final int columns = X.columns();
             double sum = 0;
             int nthreads = ConcurrencyUtils.getNumberOfThreads();
-            if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 nthreads = Math.min(nthreads, slices);
                 Future<?>[] futures = new Future[nthreads];
                 Double result;
@@ -616,7 +615,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
                             double elem;
                             for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
-                                    for (int c = 0; c < cols; c++) {
+                                    for (int c = 0; c < columns; c++) {
                                         elem = X.getQuick(s, r, c);
                                         sum += (elem * elem);
                                     }
@@ -640,7 +639,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
                 double elem;
                 for (int s = 0; s < slices; s++) {
                     for (int r = 0; r < rows; r++) {
-                        for (int c = 0; c < cols; c++) {
+                        for (int c = 0; c < columns; c++) {
                             elem = X.getQuick(s, r, c);
                             sum += (elem * elem);
                         }

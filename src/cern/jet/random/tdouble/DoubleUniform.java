@@ -87,7 +87,7 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
      * Returns a uniformly distributed random number in the open interval
      * <tt>(min,max)</tt> (excluding <tt>min</tt> and <tt>max</tt>).
      */
-    @Override
+
     public double nextDouble() {
         return min + (max - min) * randomGenerator.raw();
     }
@@ -114,7 +114,7 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
      * Returns a uniformly distributed random number in the closed interval
      * <tt>[min,max]</tt> (including <tt>min</tt> and <tt>max</tt>).
      */
-    @Override
+
     public int nextInt() {
         return nextIntFromTo((int) Math.round(min), (int) Math.round(max));
     }
@@ -279,7 +279,7 @@ public class DoubleUniform extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + min + "," + max + ")";
     }

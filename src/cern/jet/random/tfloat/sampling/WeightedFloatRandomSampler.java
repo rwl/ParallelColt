@@ -79,7 +79,7 @@ public class WeightedFloatRandomSampler extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         WeightedFloatRandomSampler copy = (WeightedFloatRandomSampler) super.clone();
         copy.generator = (FloatUniform) this.generator.clone();

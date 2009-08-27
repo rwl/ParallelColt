@@ -11,7 +11,6 @@ public class DoubleChebyshevICCTest extends DoubleChebyshevTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new DoubleICC(A.rows());

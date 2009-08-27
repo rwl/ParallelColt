@@ -180,7 +180,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         this.isNoView = isNoView;
     }
 
-    @Override
     public float[] aggregate(final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
             final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
         float[] b = new float[2];
@@ -236,7 +235,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return a;
     }
 
-    @Override
     public float[] aggregate(final FComplexMatrix3D other,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction aggr,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction f) {
@@ -309,7 +307,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return a;
     }
 
-    @Override
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexFComplexFunction function) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -397,7 +394,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond,
             final cern.colt.function.tfcomplex.FComplexFComplexFunction f) {
         final int zero = (int) index(0, 0, 0);
@@ -455,7 +451,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexProcedure cond, final float[] value) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -511,7 +506,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(final cern.colt.function.tfcomplex.FComplexRealFunction function) {
         final int zero = (int) index(0, 0, 0);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -590,7 +584,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(FComplexMatrix3D source) {
         // overriden for performance only
         if (!(source instanceof DenseFComplexMatrix3D)) {
@@ -666,7 +659,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(final FComplexMatrix3D y,
             final cern.colt.function.tfcomplex.FComplexFComplexFComplexFunction function) {
         checkShape(y);
@@ -845,7 +837,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(final float re, final float im) {
         if (this.isNoView == false) {
             return super.assign(re, im);
@@ -893,7 +884,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(final float[] values) {
         if (values.length != slices * rows * 2 * columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length
@@ -947,7 +937,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assign(final float[][][] values) {
         if (values.length != slices)
             throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
@@ -1067,7 +1056,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assignImaginary(final FloatMatrix3D other) {
         checkShape(other);
         final int zero = (int) index(0, 0, 0);
@@ -1121,7 +1109,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix3D assignReal(final FloatMatrix3D other) {
         checkShape(other);
         final int zero = (int) index(0, 0, 0);
@@ -1175,7 +1162,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         final int zero = (int) index(0, 0, 0);
@@ -1290,12 +1276,10 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
 
-    @Override
     public FloatMatrix3D getImaginaryPart() {
         final DenseFloatMatrix3D Im = new DenseFloatMatrix3D(slices, rows, columns);
         final float[] elemsOther = Im.elements();
@@ -1349,7 +1333,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return Im;
     }
 
-    @Override
     public void getNonZeros(final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList,
             final ArrayList<float[]> valueList) {
         sliceList.clear();
@@ -1379,13 +1362,11 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         }
     }
 
-    @Override
     public float[] getQuick(int slice, int row, int column) {
         int idx = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         return new float[] { elements[idx], elements[idx + 1] };
     }
 
-    @Override
     public FloatMatrix3D getRealPart() {
         final DenseFloatMatrix3D R = new DenseFloatMatrix3D(slices, rows, columns);
         final float[] elemsOther = R.elements();
@@ -1499,31 +1480,26 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public FComplexMatrix3D like(int slices, int rows, int columns) {
         return new DenseFComplexMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new DenseFComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float re, float im) {
         int idx = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = re;
         elements[idx + 1] = im;
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float[] value) {
         int idx = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
         elements[idx] = value[0];
         elements[idx + 1] = value[1];
     }
 
-    @Override
     public float[][][] toArray() {
         final int zero = (int) index(0, 0, 0);
         final float[][][] values = new float[slices][rows][2 * columns];
@@ -1572,7 +1548,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return values;
     }
 
-    @Override
     public FComplexMatrix1D vectorize() {
         FComplexMatrix1D v = new DenseFComplexMatrix1D((int) size());
         int length = rows * columns;
@@ -1583,7 +1558,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return v;
     }
 
-    @Override
     public float[] zSum() {
         float[] sum = new float[2];
         final int zero = (int) index(0, 0, 0);
@@ -1642,7 +1616,6 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return sum;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(FComplexMatrix3D other) {
         if (other instanceof SelectedDenseFComplexMatrix3D) {
             SelectedDenseFComplexMatrix3D otherMatrix = (SelectedDenseFComplexMatrix3D) other;
@@ -1654,19 +1627,16 @@ public class DenseFComplexMatrix3D extends FComplexMatrix3D {
         return false;
     }
 
-    @Override
     public long index(int slice, int row, int column) {
         return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
     }
 
-    @Override
     protected FComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
             int columnStride) {
         return new DenseFComplexMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride,
                 false);
     }
 
-    @Override
     protected FComplexMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseFComplexMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }

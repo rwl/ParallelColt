@@ -25,7 +25,6 @@ import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecompositionQui
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.TridiagonalDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.WrapperDoubleMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 
@@ -1172,17 +1171,6 @@ class TestMatrix2D {
 
         System.out.println("done");
 
-    }
-
-    /**
-     */
-    public static void doubleTest32() {
-        double[][] data = { { 1, 4, 0 }, { 6, 2, 5 }, { 0, 7, 3 }, { 0, 0, 8 }, { 0, 0, 0 }, { 0, 0, 0 } };
-
-        DoubleMatrix2D x = new TridiagonalDoubleMatrix2D(data);
-
-        System.out.println("\n\n\n" + x);
-        System.out.println("\n" + new DenseDoubleMatrix2D(data));
     }
 
     /**

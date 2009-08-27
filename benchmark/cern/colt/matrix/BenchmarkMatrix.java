@@ -798,13 +798,10 @@ public class BenchmarkMatrix {
      * Not yet documented.
      */
     protected static DoubleFactory2D getFactory(String type) {
-        DoubleFactory2D factory;
         if (type.equals("dense"))
             return DoubleFactory2D.dense;
         if (type.equals("sparse"))
             return DoubleFactory2D.sparse;
-        if (type.equals("rowCompressed"))
-            return DoubleFactory2D.rowCompressed;
         String s = "type=" + type + " is unknown. Use one of {dense,sparse,rowCompressed}";
         throw new IllegalArgumentException(s);
     }

@@ -88,7 +88,7 @@ public class Normal extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public double nextDouble() {
         return nextDouble(this.mean, this.standardDeviation);
     }
@@ -129,7 +129,7 @@ public class Normal extends AbstractContinousDoubleDistribution {
     /**
      * Sets the uniform random generator internally used.
      */
-    @Override
+
     protected void setRandomGenerator(DoubleRandomEngine randomGenerator) {
         super.setRandomGenerator(randomGenerator);
         this.cacheFilled = false;
@@ -162,7 +162,7 @@ public class Normal extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + mean + "," + standardDeviation + ")";
     }

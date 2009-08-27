@@ -88,7 +88,7 @@ public class FRand extends FloatRandomEngine {
      * interval <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> (including
      * <tt>Integer.MIN_VALUE</tt> and <tt>Integer.MAX_VALUE</tt>).
      */
-    @Override
+
     public int nextInt() {
         current *= 0x278DDE6D; /* z(i+1)=a*z(i) (mod 2**32) */
         // a == 0x278DDE6D == 663608941

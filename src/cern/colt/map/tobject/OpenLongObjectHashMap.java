@@ -113,7 +113,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * Removes all (key,value) associations from the receiver. Implicitly calls
      * <tt>trimToSize()</tt>.
      */
-    @Override
+
     public void clear() {
         new ByteArrayList(this.state).fillFromToWith(0, this.state.length - 1, FREE);
         new ObjectArrayList(values).fillFromToWith(0, state.length - 1, null); // delta
@@ -128,7 +128,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         OpenLongObjectHashMap copy = (OpenLongObjectHashMap) super.clone();
         copy.table = copy.table.clone();
@@ -142,7 +142,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified key.
      */
-    @Override
+
     public boolean containsKey(long key) {
         return indexOfKey(key) >= 0;
     }
@@ -152,7 +152,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified value.
      */
-    @Override
+
     public boolean containsValue(Object value) {
         return indexOfValue(value) >= 0;
     }
@@ -171,7 +171,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @param minCapacity
      *            the desired minimum capacity.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         if (table.length < minCapacity) {
             int newCapacity = nextPrime(minCapacity);
@@ -195,7 +195,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEachKey(LongProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -216,7 +216,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEachPair(final LongObjectProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -237,7 +237,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @return the value associated with the specified key; <tt>null</tt> if no
      *         such key is present.
      */
-    @Override
+
     public Object get(long key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -365,7 +365,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
      *         <tt>Long.MIN_VALUE</tt> if no such key exists.
      */
-    @Override
+
     public long keyOf(Object value) {
         // returns the first key found; there may be more matching keys,
         // however.
@@ -387,7 +387,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @param list
      *            the list to be filled, can have any size.
      */
-    @Override
+
     public void keys(LongArrayList list) {
         list.setSize(distinct);
         long[] elements = list.elements();
@@ -427,7 +427,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    @Override
+
     public void pairsMatching(final LongObjectProcedure condition, final LongArrayList keyList,
             final ObjectArrayList valueList) {
         keyList.clear();
@@ -453,7 +453,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      *         <tt>false</tt> if the receiver did already contain such a key -
      *         the new value has now replaced the formerly associated value.
      */
-    @Override
+
     public boolean put(long key, Object value) {
         int i = indexOfInsertion(key);
         if (i < 0) { // already contained
@@ -529,7 +529,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @return <tt>true</tt> if the receiver contained the specified key,
      *         <tt>false</tt> otherwise.
      */
-    @Override
+
     public boolean removeKey(long key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -562,7 +562,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      */
-    @Override
+
     protected void setUp(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         int capacity = initialCapacity;
         super.setUp(capacity, minLoadFactor, maxLoadFactor);
@@ -601,7 +601,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * Releases any superfluous internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
-    @Override
+
     public void trimToSize() {
         // * 1.2 because open addressing's performance exponentially degrades
         // beyond that point
@@ -624,7 +624,7 @@ public class OpenLongObjectHashMap extends AbstractLongObjectMap {
      * @param list
      *            the list to be filled, can have any size.
      */
-    @Override
+
     public void values(ObjectArrayList list) {
         list.setSize(distinct);
         Object[] elements = list.elements();

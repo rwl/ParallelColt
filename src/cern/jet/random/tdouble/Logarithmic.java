@@ -57,7 +57,7 @@ public class Logarithmic extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public double nextDouble() {
         return nextDouble(this.my_p);
     }
@@ -148,7 +148,7 @@ public class Logarithmic extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + my_p + ")";
     }

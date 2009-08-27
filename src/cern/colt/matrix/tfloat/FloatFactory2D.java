@@ -9,9 +9,7 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tfloat;
 
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.SparseCCFloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix2D;
-import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;
 
 /**
@@ -102,16 +100,6 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * A factory producing sparse hash matrices.
      */
     public static final FloatFactory2D sparse = new FloatFactory2D();
-
-    /**
-     * A factory producing sparse row compressed matrices.
-     */
-    public static final FloatFactory2D rowCompressed = new FloatFactory2D();
-
-    /**
-     * A factory producing sparse row compressed matrices.
-     */
-    public static final FloatFactory2D columnCompressed = new FloatFactory2D();
 
     /**
      * Checks whether the given array is rectangular, that is, whether all rows
@@ -397,7 +385,7 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
      * 
      * </td>
      * <td><tt>IllegalArgumentException<br>
-     A[0,1].cols != A[2,1].cols<br>
+     A[0,1].columns != A[2,1].columns<br>
      (2 != 3)</tt></td>
      * </tr>
      * </table>
@@ -945,10 +933,6 @@ public class FloatFactory2D extends cern.colt.PersistentObject {
     public FloatMatrix2D make(int rows, int columns) {
         if (this == sparse) {
             return new SparseFloatMatrix2D(rows, columns);
-        } else if (this == rowCompressed) {
-            return new SparseRCFloatMatrix2D(rows, columns);
-        } else if (this == columnCompressed) {
-            return new SparseCCFloatMatrix2D(rows, columns);
         } else {
             return new DenseFloatMatrix2D(rows, columns);
         }

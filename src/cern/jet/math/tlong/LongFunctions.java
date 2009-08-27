@@ -156,6 +156,15 @@ public class LongFunctions extends Object {
     };
 
     /**
+     * Function that returns <tt>-(a / b)</tt>.
+     */
+    public static final LongLongFunction divNeg = new LongLongFunction() {
+        public final long apply(long a, long b) {
+            return -(a / b);
+        }
+    };
+
+    /**
      * Function that returns <tt>a == b ? 1 : 0</tt>.
      */
     public static final LongLongFunction equals = new LongLongFunction() {
@@ -237,6 +246,24 @@ public class LongFunctions extends Object {
     };
 
     /**
+     * Function that returns <tt>-(a * b)</tt>.
+     */
+    public static final LongLongFunction multNeg = new LongLongFunction() {
+        public final long apply(long a, long b) {
+            return -(a * b);
+        }
+    };
+
+    /**
+     * Function that returns <tt>a * b^2</tt>.
+     */
+    public static final LongLongFunction multSquare = new LongLongFunction() {
+        public final long apply(long a, long b) {
+            return a * b * b;
+        }
+    };
+
+    /**
      * Function that returns <tt>a | b</tt>.
      */
     public static final LongLongFunction or = new LongLongFunction() {
@@ -251,6 +278,15 @@ public class LongFunctions extends Object {
     public static final LongLongFunction plus = new LongLongFunction() {
         public final long apply(long a, long b) {
             return a + b;
+        }
+    };
+
+    /**
+     * Function that returns <tt>Math.abs(a) + Math.abs(b)</tt>.
+     */
+    public static final LongLongFunction plusAbs = new LongLongFunction() {
+        public final long apply(long a, long b) {
+            return Math.abs(a) + Math.abs(b);
         }
     };
 
@@ -551,6 +587,14 @@ public class LongFunctions extends Object {
     }
 
     /**
+     * Constructs a function that returns <tt>a - b*constant</tt>. <tt>a</tt>
+     * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
+     */
+    public static LongLongFunction minusMult(final long constant) {
+        return plusMultSecond(-constant);
+    }
+
+    /**
      * Constructs a function that returns <tt>a % b</tt>. <tt>a</tt> is a
      * variable, <tt>b</tt> is fixed.
      */
@@ -599,6 +643,19 @@ public class LongFunctions extends Object {
     }
 
     /**
+     * Constructs a function that returns <tt>b*constant</tt>.
+     */
+    public static LongLongFunction multSecond(final long constant) {
+
+        return new LongLongFunction() {
+            public final long apply(long a, long b) {
+                return b * constant;
+            }
+        };
+
+    }
+
+    /**
      * Constructs a function that returns <tt>(long) Math.pow(a,b)</tt>.
      * <tt>a</tt> is a variable, <tt>b</tt> is fixed.
      */
@@ -628,11 +685,11 @@ public class LongFunctions extends Object {
 
     /**
      * Constructs a function that returns a 32 bit uniformly distributed random
-     * number in the closed longerval
-     * <tt>[Long.MIN_VALUE,Long.MAX_VALUE]</tt> (including
-     * <tt>Long.MIN_VALUE</tt> and <tt>Long.MAX_VALUE</tt>). Currently the
-     * engine is {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister}
-     * and is seeded with the current time.
+     * number in the closed longerval <tt>[Long.MIN_VALUE,Long.MAX_VALUE]</tt>
+     * (including <tt>Long.MIN_VALUE</tt> and <tt>Long.MAX_VALUE</tt>).
+     * Currently the engine is
+     * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} and is
+     * seeded with the current time.
      * <p>
      * Note that any random engine derived from
      * {@link cern.jet.random.tdouble.engine.DoubleRandomEngine} and any random

@@ -802,7 +802,7 @@ public class DComplexFunctions {
         double[] negconstant = new double[2];
         negconstant[0] = -constant[0];
         negconstant[1] = -constant[1];
-        return plusMult(negconstant);
+        return plusMultSecond(negconstant);
     }
 
     public static DComplexDComplexFunction mult(final double[] x) {
@@ -831,8 +831,12 @@ public class DComplexFunctions {
         };
     }
 
-    public static DComplexDComplexDComplexFunction plusMult(double[] constant) {
-        return new DComplexPlusMult(constant);
+    public static DComplexDComplexDComplexFunction plusMultSecond(double[] constant) {
+        return new DComplexPlusMultSecond(constant);
+    }
+
+    public static DComplexDComplexDComplexFunction plusMultFirst(double[] constant) {
+        return new DComplexPlusMultFirst(constant);
     }
 
     public static DComplexDComplexFunction pow1(final double y) {

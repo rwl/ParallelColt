@@ -108,7 +108,6 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
         this.isNoView = false;
     }
 
-    @Override
     public AbstractLongDoubleMap elements() {
         return elements;
     }
@@ -131,7 +130,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public double getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -139,8 +138,9 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
         // column:"+column);
         // return elements.get(index(slice,row,column));
         // manually inlined:
-        return elements.get(offset + sliceOffsets[sliceZero + slice * sliceStride]
-                + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
+        return elements.get((long) offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride]);
     }
 
     /**
@@ -154,7 +154,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    @Override
+
     public long index(int slice, int row, int column) {
         // return this.offset + super.index(slice,row,column);
         // manually inlined:
@@ -180,12 +180,11 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public DoubleMatrix3D like(int slices, int rows, int columns) {
         return new SparseDoubleMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public DoubleMatrix2D like2D(int rows, int columns) {
         return new SparseDoubleMatrix2D(rows, columns);
     }
@@ -210,7 +209,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int slice, int row, int column, double value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -218,8 +217,9 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
         // column:"+column);
         // int index = index(slice,row,column);
         // manually inlined:
-        int index = offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
         if (value == 0)
             this.elements.removeKey(index);
         else
@@ -232,7 +232,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * 
      * @return
      */
-    @Override
+
     public DoubleMatrix1D vectorize() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -258,7 +258,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * @see #viewSlice(int)
      * @see #viewRow(int)
      */
-    @Override
+
     public DoubleMatrix2D viewColumn(int column) {
         checkColumn(column);
 
@@ -300,7 +300,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * @see #viewSlice(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public DoubleMatrix2D viewRow(int row) {
         checkRow(row);
 
@@ -342,7 +342,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * @see #viewRow(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public DoubleMatrix2D viewSlice(int slice) {
         checkSlice(slice);
 
@@ -372,7 +372,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -386,7 +386,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -400,7 +400,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _sliceOffset(int absRank) {
         return sliceOffsets[absRank];
     }
@@ -415,7 +415,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(DoubleMatrix3D other) {
         if (other instanceof SelectedSparseDoubleMatrix3D) {
             SelectedSparseDoubleMatrix3D otherMatrix = (SelectedSparseDoubleMatrix3D) other;
@@ -451,7 +451,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected DoubleMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -470,7 +470,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>(double)rows*slices > Integer.MAX_VALUE</tt>.
      */
-    @Override
+
     protected void setUp(int slices, int rows, int columns) {
         super.setUp(slices, rows, columns);
         this.sliceStride = 1;
@@ -485,7 +485,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      * @throws IllegalArgumentException
      *             if some of the parameters are equal or not in range 0..2.
      */
-    @Override
+
     protected AbstractMatrix3D vDice(int axis0, int axis1, int axis2) {
         super.vDice(axis0, axis1, axis2);
 
@@ -513,7 +513,7 @@ class SelectedSparseDoubleMatrix3D extends DoubleMatrix3D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected DoubleMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseDoubleMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, this.offset);
     }

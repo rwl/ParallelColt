@@ -150,8 +150,7 @@ public class LongProperty extends cern.colt.PersistentObject {
      */
     public void checkRectangular(LongMatrix2D A) {
         if (A.rows() < A.columns()) {
-            throw new IllegalArgumentException("Matrix must be rectangular: "
-                    + AbstractFormatter.shape(A));
+            throw new IllegalArgumentException("Matrix must be rectangular: " + AbstractFormatter.shape(A));
         }
     }
 
@@ -163,8 +162,7 @@ public class LongProperty extends cern.colt.PersistentObject {
      */
     public void checkSquare(LongMatrix2D A) {
         if (A.rows() != A.columns())
-            throw new IllegalArgumentException("Matrix must be square: "
-                    + AbstractFormatter.shape(A));
+            throw new IllegalArgumentException("Matrix must be square: " + AbstractFormatter.shape(A));
     }
 
     /**
@@ -188,7 +186,7 @@ public class LongProperty extends cern.colt.PersistentObject {
      * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
      *         otherwise.
      */
-    public boolean equals(final LongMatrix1D A, final int value) {
+    public boolean equals(final LongMatrix1D A, final long value) {
         if (A == null)
             return false;
         int size = (int) A.size();
@@ -200,16 +198,11 @@ public class LongProperty extends cern.colt.PersistentObject {
             Boolean[] results = new Boolean[nthreads];
             int k = size / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == nthreads - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (!(A.getQuick(i) == value))
                                 return false;
                         }
@@ -271,16 +264,11 @@ public class LongProperty extends cern.colt.PersistentObject {
             Boolean[] results = new Boolean[nthreads];
             int k = size / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startsize = j * k;
-                final int stopsize;
-                if (j == nthreads - 1) {
-                    stopsize = size;
-                } else {
-                    stopsize = startsize + k;
-                }
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int i = startsize; i < stopsize; i++) {
+                        for (int i = firstIdx; i < lastIdx; i++) {
                             if (!(A.getQuick(i) == B.getQuick(i)))
                                 return false;
                         }
@@ -325,7 +313,7 @@ public class LongProperty extends cern.colt.PersistentObject {
      * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
      *         otherwise.
      */
-    public boolean equals(final LongMatrix2D A, final int value) {
+    public boolean equals(final LongMatrix2D A, final long value) {
         if (A == null)
             return false;
         final int rows = A.rows();
@@ -338,16 +326,11 @@ public class LongProperty extends cern.colt.PersistentObject {
             Boolean[] results = new Boolean[nthreads];
             int k = A.rows() / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startrows = j * k;
-                final int stoprows;
-                if (j == nthreads - 1) {
-                    stoprows = A.rows();
-                } else {
-                    stoprows = startrows + k;
-                }
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? A.rows() : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int r = startrows; r < stoprows; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 if (!(A.getQuick(r, c) == value))
                                     return false;
@@ -414,16 +397,11 @@ public class LongProperty extends cern.colt.PersistentObject {
             Boolean[] results = new Boolean[nthreads];
             int k = A.rows() / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startrows = j * k;
-                final int stoprows;
-                if (j == nthreads - 1) {
-                    stoprows = A.rows();
-                } else {
-                    stoprows = startrows + k;
-                }
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? A.rows() : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
-                        for (int r = startrows; r < stoprows; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             for (int c = 0; c < columns; c++) {
                                 if (!(A.getQuick(r, c) == B.getQuick(r, c)))
                                     return false;
@@ -472,7 +450,7 @@ public class LongProperty extends cern.colt.PersistentObject {
      * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
      *         otherwise.
      */
-    public boolean equals(final LongMatrix3D A, final int value) {
+    public boolean equals(final LongMatrix3D A, final long value) {
         if (A == null)
             return false;
         final int slices = A.slices();
@@ -785,7 +763,8 @@ public class LongProperty extends cern.colt.PersistentObject {
      */
     public boolean isOrthogonal(LongMatrix2D A) {
         checkSquare(A);
-        return equals(A.zMult(A, null, 1, 0, false, true), cern.colt.matrix.tlong.LongFactory2D.dense.identity(A.rows()));
+        return equals(A.zMult(A, null, 1, 0, false, true), cern.colt.matrix.tlong.LongFactory2D.dense
+                .identity(A.rows()));
     }
 
     /**

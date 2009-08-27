@@ -45,7 +45,6 @@ class DcoreControl implements Runnable {
         this.my_core_id = core_id;
     }
 
-    @Override
     public void run() {
 
         int action = 0;

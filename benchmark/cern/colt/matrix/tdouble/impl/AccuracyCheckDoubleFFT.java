@@ -1,4 +1,3 @@
-
 package cern.colt.matrix.tdouble.impl;
 
 import java.util.Random;
@@ -14,14 +13,13 @@ import edu.emory.mathcs.utils.IOUtils;
  */
 public class AccuracyCheckDoubleFFT {
 
-    private static int[] sizesPrimes = {997, 4999, 9973, 49999, 99991, 249989 };
+    private static int[] sizesPrimes = { 997, 4999, 9973, 49999, 99991, 249989 };
 
-    private static int[] sizesPower2 = { 8192, 16384, 32768, 65536, 131072, 262144};
+    private static int[] sizesPower2 = { 8192, 16384, 32768, 65536, 131072, 262144 };
 
     private static final int niters = 10;
-    
-    private static Random r;
 
+    private static Random r;
 
     private AccuracyCheckDoubleFFT() {
 
@@ -37,11 +35,11 @@ public class AccuracyCheckDoubleFFT {
                 fillMatrix_1D(sizesPrimes[i], (double[]) M.elements());
                 DenseDComplexMatrix1D Mc = M.getFft();
                 Mc.ifft(true);
-                DenseDoubleMatrix1D Mr = (DenseDoubleMatrix1D)Mc.getRealPart();
+                DenseDoubleMatrix1D Mr = (DenseDoubleMatrix1D) Mc.getRealPart();
                 errors[j][i] = computeRMSE(M.elements(), Mr.elements());
             }
         }
-        IOUtils.writeToFileReal_2D("%g", errors, "pc_rmse_primes_double.txt");        
+        IOUtils.writeToFileReal_2D("%g", errors, "pc_rmse_primes_double.txt");
 
         System.out.println("Checking accuracy of 1D real forward full FFT (power2 sizes)...");
         errors = new double[niters][sizesPower2.length];
@@ -52,15 +50,14 @@ public class AccuracyCheckDoubleFFT {
                 fillMatrix_1D(sizesPower2[i], (double[]) M.elements());
                 DenseDComplexMatrix1D Mc = M.getFft();
                 Mc.ifft(true);
-                DenseDoubleMatrix1D Mr = (DenseDoubleMatrix1D)Mc.getRealPart();
+                DenseDoubleMatrix1D Mr = (DenseDoubleMatrix1D) Mc.getRealPart();
                 errors[j][i] = computeRMSE(M.elements(), Mr.elements());
             }
         }
-        IOUtils.writeToFileReal_2D("%g", errors, "pc_rmse_power2_double.txt");        
+        IOUtils.writeToFileReal_2D("%g", errors, "pc_rmse_power2_double.txt");
 
-        
     }
-    
+
     private static double computeRMSE(double[] a, double[] b) {
         if (a.length != b.length) {
             throw new IllegalArgumentException("Arrays are not the same size.");
@@ -78,7 +75,7 @@ public class AccuracyCheckDoubleFFT {
         checkAccuracyRealFFT_1D();
         System.exit(0);
     }
-    
+
     private static void fillMatrix_1D(int N, double[] m) {
         for (int i = 0; i < N; i++) {
             m[i] = r.nextDouble();

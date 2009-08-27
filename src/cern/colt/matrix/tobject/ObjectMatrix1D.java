@@ -48,22 +48,7 @@ public abstract class ObjectMatrix1D extends AbstractMatrix1D {
      * Applies a function to each cell and aggregates the results. Returns a
      * value <tt>v</tt> such that <tt>v==a(size())</tt> where
      * <tt>a(i) == aggr( a(i-1), f(get(i)) )</tt> and terminators are
-     * <tt>a(1) == f(get(0)), a(0)==null</tt>.
-     * <p>
-     * <b>Example:</b>
-     * 
-     * <pre>
-     * 	 cern.jet.math.Functions F = cern.jet.math.Functions.functions;
-     * 	 matrix = 0 1 2 3 
-     * 
-     * 	 // Sum( x[i]*x[i] ) 
-     * 	 matrix.aggregate(F.plus,F.square);
-     * 	 --&gt; 14
-     * 
-     * </pre>
-     * 
-     * For further examples, see the <a
-     * href="package-summary.html#FunctionObjects">package doc</a>.
+     * <tt>a(1) == f(get(0)), a(0)==null</tt>. 
      * 
      * @param aggr
      *            an aggregation function taking as first argument the current
@@ -105,6 +90,62 @@ public abstract class ObjectMatrix1D extends AbstractMatrix1D {
         } else {
             for (int i = 1; i < size; i++) {
                 a = aggr.apply(a, f.apply(getQuick(i)));
+            }
+        }
+        return a;
+    }
+    
+    /**
+     * 
+     * Applies a function to all cells with a given indexes and aggregates the
+     * results.
+     * 
+     * @param aggr
+     *            an aggregation function taking as first argument the current
+     *            aggregation and as second argument the transformed current
+     *            cell value.
+     * @param f
+     *            a function transforming the current cell value.
+     * @param indexList
+     *            indexes.
+     * 
+     * @return the aggregated measure.
+     */
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f, final IntArrayList indexList) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        final int size = indexList.size();
+        final int[] indexElements = indexList.elements();
+        Object a = null;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object a = f.apply(getQuick(indexElements[firstIdx]));
+                        Object elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            elem = getQuick(indexElements[i]);
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            Object elem;
+            a = f.apply(getQuick(indexElements[0]));
+            for (int i = 1; i < size; i++) {
+                elem = getQuick(indexElements[i]);
+                a = aggr.apply(a, f.apply(elem));
             }
         }
         return a;
@@ -463,7 +504,7 @@ public abstract class ObjectMatrix1D extends AbstractMatrix1D {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
-    @Override
+
     public boolean equals(Object otherObj) { // delta
         return equals(otherObj, true);
     }
@@ -664,6 +705,31 @@ public abstract class ObjectMatrix1D extends AbstractMatrix1D {
      */
     public abstract ObjectMatrix2D like2D(int rows, int columns);
 
+    
+    /**
+     * Returns new ObjectMatrix2D of size rows x columns whose elements are taken
+     * column-wise from this matrix.
+     * 
+     * @param rows
+     *            number of rows
+     * @param columns
+     *            number of columns
+     * @return new 2D matrix with columns being the elements of this matrix.
+     */
+    public abstract ObjectMatrix2D reshape(int rows, int columns);
+
+    /**
+     * Returns new ObjectMatrix3D of size slices x rows x columns, whose elements
+     * are taken column-wise from this matrix.
+     * 
+     * @param rows
+     *            number of rows
+     * @param columns
+     *            number of columns
+     * @return new 2D matrix with columns being the elements of this matrix.
+     */
+    public abstract ObjectMatrix3D reshape(int slices, int rows, int columns);
+    
     /**
      * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
@@ -678,6 +744,15 @@ public abstract class ObjectMatrix1D extends AbstractMatrix1D {
         if (index < 0 || index >= size)
             checkIndex(index);
         setQuick(index, value);
+    }
+    
+    /**
+     * Sets the size of this matrix.
+     * 
+     * @param size
+     */
+    public void setSize(int size) {
+        this.size = size;
     }
 
     /**
@@ -792,7 +867,7 @@ public abstract class ObjectMatrix1D extends AbstractMatrix1D {
      * 
      * @see cern.colt.matrix.tobject.algo.ObjectFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tobject.algo.ObjectFormatter().toString(this);
     }

@@ -92,18 +92,15 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         this.isNoView = false;
     }
 
-    @Override
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
 
-    @Override
     public float[] getQuick(int index) {
         int idx = zero + index * stride;
         return new float[] { elements[offset + offsets[idx]], elements[offset + offsets[idx] + 1] };
     }
 
-    @Override
     public FloatMatrix1D getRealPart() {
         final DenseFloatMatrix1D R = new DenseFloatMatrix1D(size);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -136,7 +133,6 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         return R;
     }
 
-    @Override
     public FloatMatrix1D getImaginaryPart() {
         final DenseFloatMatrix1D Im = new DenseFloatMatrix1D(size);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -170,7 +166,6 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         return Im;
     }
 
-    @Override
     public float[] elements() {
         throw new IllegalAccessError("This method is not supported.");
     }
@@ -182,7 +177,7 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
      *            matrix
      * @return <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedDenseFComplexMatrix1D) {
             SelectedDenseFComplexMatrix1D otherMatrix = (SelectedDenseFComplexMatrix1D) other;
@@ -194,52 +189,43 @@ class SelectedDenseFComplexMatrix1D extends FComplexMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         return offset + offsets[zero + rank * stride];
     }
 
-    @Override
     public FComplexMatrix1D like(int size) {
         return new DenseFComplexMatrix1D(size);
     }
 
-    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new DenseFComplexMatrix2D(rows, columns);
     }
 
-    @Override
-    public FComplexMatrix2D reshape(int rows, int cols) {
+    public FComplexMatrix2D reshape(int rows, int columns) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
-    public FComplexMatrix3D reshape(int slices, int rows, int cols) {
+    public FComplexMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
     public void setQuick(int index, float[] value) {
         int idx = zero + index * stride;
         elements[offset + offsets[idx]] = value[0];
         elements[offset + offsets[idx] + 1] = value[1];
     }
 
-    @Override
     public void setQuick(int index, float re, float im) {
         int idx = zero + index * stride;
         elements[offset + offsets[idx]] = re;
         elements[offset + offsets[idx] + 1] = im;
     }
 
-    @Override
     protected void setUp(int size) {
         super.setUp(size, 0, 1);
         this.offset = 0;
     }
 
-    @Override
     protected FComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseFComplexMatrix1D(this.elements, offsets);
     }

@@ -9,7 +9,6 @@ public class DoubleIRTest extends DoubleIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new DoubleIR(x);
         M = solver.getPreconditioner(); //identity preconditioner

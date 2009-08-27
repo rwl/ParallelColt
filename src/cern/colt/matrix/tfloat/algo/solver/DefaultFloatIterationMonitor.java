@@ -161,7 +161,6 @@ public class DefaultFloatIterationMonitor extends AbstractFloatIterationMonitor 
         return dtol;
     }
 
-    @Override
     protected boolean convergedI(float r) throws IterativeSolverFloatNotConvergedException {
         // Store initial residual
         if (isFirst())
@@ -183,7 +182,6 @@ public class DefaultFloatIterationMonitor extends AbstractFloatIterationMonitor 
         return false;
     }
 
-    @Override
     protected boolean convergedI(float r, FloatMatrix1D x) throws IterativeSolverFloatNotConvergedException {
         return convergedI(r);
     }

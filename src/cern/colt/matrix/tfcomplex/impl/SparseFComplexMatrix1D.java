@@ -30,7 +30,7 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, float[]> elements;
+    protected ConcurrentHashMap<Long, float[]> elements;
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
@@ -55,7 +55,7 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
      */
     public SparseFComplexMatrix1D(int size) {
         setUp(size);
-        this.elements = new ConcurrentHashMap<Integer, float[]>(size / 1000);
+        this.elements = new ConcurrentHashMap<Long, float[]>(size / 1000);
     }
 
     /**
@@ -73,13 +73,12 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    protected SparseFComplexMatrix1D(int size, ConcurrentHashMap<Integer, float[]> elements, int offset, int stride) {
+    protected SparseFComplexMatrix1D(int size, ConcurrentHashMap<Long, float[]> elements, int offset, int stride) {
         setUp(size, offset, stride);
         this.elements = elements;
         this.isNoView = false;
     }
 
-    @Override
     public FComplexMatrix1D assign(float[] value) {
         // overriden for performance only
         if (this.isNoView && value[0] == 0 && value[1] == 0)
@@ -89,7 +88,6 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -97,9 +95,8 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
             return super.cardinality();
     }
 
-    @Override
-    public float[] getQuick(int index) {
-        float[] elem = elements.get(zero + index * stride);
+    public synchronized float[] getQuick(int index) {
+        float[] elem = elements.get((long) zero + (long) index * (long) stride);
         if (elem != null) {
             return new float[] { elem[0], elem[1] };
         } else {
@@ -107,15 +104,14 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
         }
     }
 
-    @Override
-    public ConcurrentHashMap<Integer, float[]> elements() {
+    public ConcurrentHashMap<Long, float[]> elements() {
         return elements;
     }
 
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FComplexMatrix1D other) {
         if (other instanceof SelectedSparseFComplexMatrix1D) {
             SelectedSparseFComplexMatrix1D otherMatrix = (SelectedSparseFComplexMatrix1D) other;
@@ -127,22 +123,18 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
-        return zero + rank * stride;
+        return (long) zero + (long) rank * (long) stride;
     }
 
-    @Override
     public FComplexMatrix1D like(int size) {
         return new SparseFComplexMatrix1D(size);
     }
 
-    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new SparseFComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public FComplexMatrix2D reshape(final int rows, final int columns) {
         if (rows * columns != size) {
             throw new IllegalArgumentException("rows*columns != size");
@@ -186,7 +178,6 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
         return M;
     }
 
-    @Override
     public FComplexMatrix3D reshape(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != size) {
             throw new IllegalArgumentException("slices*rows*columns != size");
@@ -234,30 +225,26 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
         return M;
     }
 
-    @Override
-    public void setQuick(int index, float[] value) {
-        int i = zero + index * stride;
+    public synchronized void setQuick(int index, float[] value) {
+        long i = (long) zero + (long) index * (long) stride;
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(i);
         else
             this.elements.put(i, value);
     }
 
-    @Override
-    public void setQuick(int index, float re, float im) {
-        int i = zero + index * stride;
+    public synchronized void setQuick(int index, float re, float im) {
+        long i = (long) zero + (long) index * (long) stride;
         if (re == 0 && im == 0)
             this.elements.remove(i);
         else
             this.elements.put(i, new float[] { re, im });
     }
 
-    @Override
     protected FComplexMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseFComplexMatrix1D(this.elements, offsets);
     }
 
-    @Override
     public FloatMatrix1D getImaginaryPart() {
         final FloatMatrix1D Im = new SparseFloatMatrix1D(size);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -285,7 +272,6 @@ public class SparseFComplexMatrix1D extends FComplexMatrix1D {
         return Im;
     }
 
-    @Override
     public FloatMatrix1D getRealPart() {
         final FloatMatrix1D Re = new SparseFloatMatrix1D(size);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

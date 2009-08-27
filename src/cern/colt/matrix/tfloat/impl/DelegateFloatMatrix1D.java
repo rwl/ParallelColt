@@ -49,42 +49,34 @@ class DelegateFloatMatrix1D extends FloatMatrix1D {
         this.content = newContent;
     }
 
-    @Override
-    public float getQuick(int index) {
+    public synchronized float getQuick(int index) {
         return content.getQuick(row, index);
     }
 
-    @Override
     public FloatMatrix1D like(int size) {
         return content.like1D(size);
     }
 
-    @Override
     public FloatMatrix2D like2D(int rows, int columns) {
         return content.like(rows, columns);
     }
 
-    @Override
-    public void setQuick(int index, float value) {
+    public synchronized void setQuick(int index, float value) {
         content.setQuick(row, index, value);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
-    public FloatMatrix2D reshape(int rows, int cols) {
+    public FloatMatrix2D reshape(int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public FloatMatrix3D reshape(int slices, int rows, int cols) {
+    public FloatMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     protected FloatMatrix1D viewSelectionLike(int[] offsets) {
         throw new InternalError(); // should never get called
     }

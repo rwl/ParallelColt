@@ -69,7 +69,7 @@ public class ShortArrayList extends AbstractShortList {
      * @param element
      *            element to be appended to this list.
      */
-    @Override
+
     public void add(short element) {
         // overridden for performance only.
         if (size == elements.length) {
@@ -92,7 +92,7 @@ public class ShortArrayList extends AbstractShortList {
      *                index is out of range (
      *                <tt>index &lt; 0 || index &gt; size()</tt>).
      */
-    @Override
+
     public void beforeInsert(int index, short element) {
         // overridden for performance only.
         if (index > size || index < 0)
@@ -128,7 +128,7 @@ public class ShortArrayList extends AbstractShortList {
      * @see cern.colt.Sorting
      * @see java.util.Arrays
      */
-    @Override
+
     public int binarySearchFromTo(short key, int from, int to) {
         return cern.colt.Sorting.binarySearchFromTo(this.elements, key, from, to);
     }
@@ -138,7 +138,7 @@ public class ShortArrayList extends AbstractShortList {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         // overridden for performance only.
         ShortArrayList clone = new ShortArrayList(elements.clone());
@@ -214,7 +214,7 @@ public class ShortArrayList extends AbstractShortList {
      * 
      * @return the elements currently stored.
      */
-    @Override
+
     public short[] elements() {
         return elements;
     }
@@ -233,7 +233,7 @@ public class ShortArrayList extends AbstractShortList {
      *            the new elements to be stored.
      * @return the receiver itself.
      */
-    @Override
+
     public AbstractShortList elements(short[] elements) {
         this.elements = elements;
         this.size = elements.length;
@@ -248,7 +248,7 @@ public class ShortArrayList extends AbstractShortList {
      * @param minCapacity
      *            the desired minimum capacity.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         elements = cern.colt.Arrays.ensureCapacity(elements, minCapacity);
     }
@@ -264,7 +264,7 @@ public class ShortArrayList extends AbstractShortList {
      *            the Object to be compared for equality with the receiver.
      * @return true if the specified Object is equal to the receiver.
      */
-    @Override
+
     public boolean equals(Object otherObj) { // delta
         // overridden for performance only.
         if (!(otherObj instanceof ShortArrayList))
@@ -296,7 +296,7 @@ public class ShortArrayList extends AbstractShortList {
      * @return <tt>false</tt> if the procedure stopped before all elements where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEach(ShortProcedure procedure) {
         // overridden for performance only.
         short[] theElements = elements;
@@ -317,7 +317,7 @@ public class ShortArrayList extends AbstractShortList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
-    @Override
+
     public short get(int index) {
         // overridden for performance only.
         if (index >= size || index < 0)
@@ -336,7 +336,7 @@ public class ShortArrayList extends AbstractShortList {
      * @param index
      *            index of element to return.
      */
-    @Override
+
     public short getQuick(int index) {
         return elements[index];
     }
@@ -360,7 +360,7 @@ public class ShortArrayList extends AbstractShortList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public int indexOfFromTo(short element, int from, int to) {
         // overridden for performance only.
         if (size == 0)
@@ -395,7 +395,7 @@ public class ShortArrayList extends AbstractShortList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public int lastIndexOfFromTo(short element, int from, int to) {
         // overridden for performance only.
         if (size == 0)
@@ -425,7 +425,7 @@ public class ShortArrayList extends AbstractShortList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public AbstractShortList partFromTo(int from, int to) {
         if (size == 0)
             return new ShortArrayList(0);
@@ -446,7 +446,7 @@ public class ShortArrayList extends AbstractShortList {
      * @return <code>true</code> if the receiver changed as a result of the
      *         call.
      */
-    @Override
+
     public boolean removeAll(AbstractShortList other) {
         // overridden for performance only.
         if (!(other instanceof ShortArrayList))
@@ -512,7 +512,7 @@ public class ShortArrayList extends AbstractShortList {
      * @param otherFrom
      *            position of first element within other list to be copied.
      */
-    @Override
+
     public void replaceFromToWithFrom(int from, int to, AbstractShortList other, int otherFrom) {
         // overridden for performance only.
         if (!(other instanceof ShortArrayList)) {
@@ -538,7 +538,7 @@ public class ShortArrayList extends AbstractShortList {
      * @return <code>true</code> if the receiver changed as a result of the
      *         call.
      */
-    @Override
+
     public boolean retainAll(AbstractShortList other) {
         // overridden for performance only.
         if (!(other instanceof ShortArrayList))
@@ -587,7 +587,7 @@ public class ShortArrayList extends AbstractShortList {
      * Reverses the elements of the receiver. Last becomes first, second last
      * becomes second first, and so on.
      */
-    @Override
+
     public void reverse() {
         // overridden for performance only.
         short tmp;
@@ -614,7 +614,7 @@ public class ShortArrayList extends AbstractShortList {
      *                index is out of range (index &lt; 0 || index &gt;=
      *                size()).
      */
-    @Override
+
     public void set(int index, short element) {
         // overridden for performance only.
         if (index >= size || index < 0)
@@ -635,7 +635,7 @@ public class ShortArrayList extends AbstractShortList {
      * @param element
      *            element to be stored at the specified position.
      */
-    @Override
+
     public void setQuick(int index, short element) {
         elements[index] = element;
     }
@@ -653,7 +653,7 @@ public class ShortArrayList extends AbstractShortList {
      *                <tt>size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=size())</tt>
      *                ).
      */
-    @Override
+
     public void shuffleFromTo(int from, int to) {
         // overridden for performance only.
         if (size == 0) {
@@ -698,7 +698,7 @@ public class ShortArrayList extends AbstractShortList {
      *                index is out of range (<tt>size()&gt;0 && (from&lt;0 ||
      *                from&gt;to || to&gt;=size())</tt>).
      */
-    @Override
+
     public void sortFromTo(int from, int to) {
         /*
          * Computes min and max and decides on this basis. In practice the
@@ -745,7 +745,7 @@ public class ShortArrayList extends AbstractShortList {
      * Releases any superfluos internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
-    @Override
+
     public void trimToSize() {
         elements = cern.colt.Arrays.trimToCapacity(elements, size());
     }

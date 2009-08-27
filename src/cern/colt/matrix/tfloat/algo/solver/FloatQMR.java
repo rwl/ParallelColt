@@ -215,7 +215,6 @@ public class FloatQMR extends AbstractFloatIterativeSolver {
         return x;
     }
 
-    @Override
     public void setPreconditioner(FloatPreconditioner M) {
         super.setPreconditioner(M);
         M1 = M;

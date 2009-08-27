@@ -11,7 +11,6 @@ public class FloatBiCGSSORTest extends FloatBiCGTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         float omega = (float) Math.random() + 1;

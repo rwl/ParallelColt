@@ -68,8 +68,7 @@ class DelegateFloatMatrix2D extends FloatMatrix2D {
         this.content = newContent;
     }
 
-    @Override
-    public float getQuick(int row, int column) {
+    public synchronized float getQuick(int row, int column) {
         switch (axis) {
         case 0:
             return content.getQuick(index, row, column);
@@ -82,13 +81,11 @@ class DelegateFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
-    @Override
-    public void setQuick(int row, int column, float value) {
+    public synchronized void setQuick(int row, int column, float value) {
         switch (axis) {
         case 0:
             content.setQuick(index, row, column, value);
@@ -104,33 +101,27 @@ class DelegateFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix1D viewColumn(int column) {
         checkColumn(column);
         return new WrapperFloatMatrix2D(this).viewColumn(column);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
     protected FloatMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected FloatMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     public FloatMatrix1D vectorize() {
         FloatMatrix1D v = new DenseFloatMatrix1D(rows * columns);
         int idx = 0;

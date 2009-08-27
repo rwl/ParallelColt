@@ -9,9 +9,9 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.map;
 
 import cern.colt.Timer;
-import cern.colt.map.tint.AbstractIntIntMap;
-import cern.colt.map.tint.OpenIntIntHashMap;
 import cern.colt.map.tint.QuickOpenIntIntHashMap;
+import cern.colt.map.tlong.AbstractLongIntMap;
+import cern.colt.map.tlong.OpenLongIntHashMap;
 
 /**
  * Benchmarks the classes of this package.
@@ -118,7 +118,7 @@ public class BenchmarkMap extends Object {
 
         int size = keys.length;
         // AbstractIntIntMap map = new OpenIntIntHashMap(size*2, 0.2, 0.5);
-        AbstractIntIntMap map = new OpenIntIntHashMap();
+        AbstractLongIntMap map = new OpenLongIntHashMap();
 
         for (int i = 0; i < keys.length; i++) {
             map.put(keys[i], values[i]);

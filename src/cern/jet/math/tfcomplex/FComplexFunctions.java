@@ -802,7 +802,7 @@ public class FComplexFunctions {
         float[] negconstant = new float[2];
         negconstant[0] = -constant[0];
         negconstant[1] = -constant[1];
-        return plusMult(negconstant);
+        return plusMultSecond(negconstant);
     }
 
     public static FComplexFComplexFunction mult(final float[] x) {
@@ -831,8 +831,12 @@ public class FComplexFunctions {
         };
     }
 
-    public static FComplexFComplexFComplexFunction plusMult(float[] constant) {
-        return new FComplexPlusMult(constant);
+    public static FComplexFComplexFComplexFunction plusMultSecond(float[] constant) {
+        return new FComplexPlusMultSecond(constant);
+    }
+
+    public static FComplexFComplexFComplexFunction plusMultFirst(float[] constant) {
+        return new FComplexPlusMultFirst(constant);
     }
 
     public static FComplexFComplexFunction pow1(final float y) {

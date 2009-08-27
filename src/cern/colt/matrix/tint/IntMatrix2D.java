@@ -58,7 +58,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
      * Applies a function to each cell and aggregates the results. Returns a
      * value <tt>v</tt> such that <tt>v==a(size())</tt> where
      * <tt>a(i) == aggr( a(i-1), f(get(row,column)) )</tt> and terminators are
-     * <tt>a(1) == f(get(0,0)), a(0)==Integer.NaN</tt>.
+     * <tt>a(1) == f(get(0,0)), a(0)==Int.NaN</tt>.
      * <p>
      * <b>Example:</b>
      * 
@@ -109,7 +109,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
                             }
                             d = 0;
                         }
-                        return Integer.valueOf(a);
+                        return a;
                     }
                 });
             }
@@ -173,7 +173,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
                             }
                             d = 0;
                         }
-                        return Integer.valueOf(a);
+                        return a;
                     }
                 });
             }
@@ -263,7 +263,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
      * <tt>v==a(size())</tt> where
      * <tt>a(i) == aggr( a(i-1), f(get(row,column),other.get(row,column)) )</tt>
      * and terminators are
-     * <tt>a(1) == f(get(0,0),other.get(0,0)), a(0)==Integer.NaN</tt>.
+     * <tt>a(1) == f(get(0,0),other.get(0,0)), a(0)==Int.NaN</tt>.
      * <p>
      * <b>Example:</b>
      * 
@@ -327,7 +327,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
                             }
                             d = 0;
                         }
-                        return Integer.valueOf(a);
+                        return a;
                     }
                 });
             }
@@ -871,7 +871,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
                                     cardinality++;
                             }
                         }
-                        return Integer.valueOf(cardinality);
+                        return cardinality;
                     }
                 });
             }
@@ -943,7 +943,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1295,13 +1295,13 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
                     results[j] = (int[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                rowLocation = results[0][1];
-                columnLocation = results[0][2];
+                rowLocation = (int) results[0][1];
+                columnLocation = (int) results[0][2];
                 for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        rowLocation = results[j][1];
-                        columnLocation = results[j][2];
+                        rowLocation = (int) results[j][1];
+                        columnLocation = (int) results[j][2];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1374,13 +1374,13 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
                     results[j] = (int[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                rowLocation = results[0][1];
-                columnLocation = results[0][2];
+                rowLocation = (int) results[0][1];
+                columnLocation = (int) results[0][2];
                 for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        rowLocation = results[j][1];
-                        columnLocation = results[j][2];
+                        rowLocation = (int) results[j][1];
+                        columnLocation = (int) results[j][2];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1497,7 +1497,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
      * 
      * @see cern.colt.matrix.tint.algo.IntFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tint.algo.IntFormatter().toString(this);
     }
@@ -1562,7 +1562,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the column axis. What
+     * Constructs and returns a new <i>flip view</i> aint the column axis. What
      * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
      * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
      * returned view is backed by this matrix, so changes in the returned view
@@ -1703,7 +1703,7 @@ public abstract class IntMatrix2D extends AbstractMatrix2D {
     }
 
     /**
-     * Constructs and returns a new <i>flip view</i> along the row axis. What
+     * Constructs and returns a new <i>flip view</i> aint the row axis. What
      * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
      * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
      * backed by this matrix, so changes in the returned view are reflected in

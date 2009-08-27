@@ -6,7 +6,6 @@ public class SparseFloatMatrix3DViewTest extends SparseFloatMatrix3DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFloatMatrix3D(NCOLUMNS, NROWS, NSLICES).viewDice(2, 1, 0);
         B = new SparseFloatMatrix3D(NCOLUMNS, NROWS, NSLICES).viewDice(2, 1, 0);

@@ -10,6 +10,8 @@ package cern.colt.matrix.tfloat.impl;
 
 import java.util.concurrent.Future;
 
+import cern.colt.list.tfloat.FloatArrayList;
+import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tfcomplex.impl.DenseLargeFComplexMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
@@ -34,6 +36,56 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
      */
     protected FloatMatrix2D content;
 
+    public FloatMatrix2D assign(final float[] values) {
+        if (content instanceof DiagonalFloatMatrix2D) {
+            int dlength = ((DiagonalFloatMatrix2D) content).dlength;
+            final float[] elems = ((DiagonalFloatMatrix2D) content).elements;
+            if (values.length != dlength)
+                throw new IllegalArgumentException("Must have same length: length=" + values.length + " dlength="
+                        + dlength);
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = Math.min(nthreads, dlength);
+                Future<?>[] futures = new Future[nthreads];
+                int k = dlength / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == nthreads - 1) ? dlength : firstIdx + k;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                        public void run() {
+                            for (int i = firstIdx; i < lastIdx; i++) {
+                                elems[i] = values[i];
+                            }
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+            } else {
+                for (int i = 0; i < dlength; i++) {
+                    elems[i] = values[i];
+                }
+            }
+            return this;
+        } else {
+            return super.assign(values);
+        }
+    }
+
+    public FloatMatrix2D assign(final FloatMatrix2D y, final cern.colt.function.tfloat.FloatFloatFunction function) {
+        checkShape(y);
+        if (y instanceof WrapperFloatMatrix2D) {
+            IntArrayList rowList = new IntArrayList();
+            IntArrayList columnList = new IntArrayList();
+            FloatArrayList valueList = new FloatArrayList();
+            y.getNonZeros(rowList, columnList, valueList);
+            assign(y, function, rowList, columnList);
+        } else {
+            super.assign(y, function);
+        }
+        return this;
+    }
+
     public WrapperFloatMatrix2D(FloatMatrix2D newContent) {
         if (newContent != null)
             try {
@@ -45,17 +97,14 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         this.content = newContent;
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
 
-    @Override
-    public float getQuick(int row, int column) {
+    public synchronized float getQuick(int row, int column) {
         return content.getQuick(row, column);
     }
 
-    @Override
     public boolean equals(float value) {
         if (content instanceof DiagonalFloatMatrix2D) {
             float epsilon = cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.tolerance();
@@ -75,7 +124,6 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public boolean equals(Object obj) {
         if (content instanceof DiagonalFloatMatrix2D && obj instanceof DiagonalFloatMatrix2D) {
             float epsilon = cern.colt.matrix.tfloat.algo.FloatProperty.DEFAULT.tolerance();
@@ -106,12 +154,10 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return content.like(rows, columns);
     }
 
-    @Override
     public FloatMatrix1D like1D(int size) {
         return content.like1D(size);
     }
@@ -688,12 +734,10 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         }
     }
 
-    @Override
-    public void setQuick(int row, int column, float value) {
+    public synchronized void setQuick(int row, int column, float value) {
         content.setQuick(row, column, value);
     }
 
-    @Override
     public FloatMatrix1D vectorize() {
         final DenseFloatMatrix1D v = new DenseFloatMatrix1D((int) size());
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -728,12 +772,10 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return v;
     }
 
-    @Override
     public FloatMatrix1D viewColumn(int column) {
         return viewDice().viewRow(column);
     }
 
-    @Override
     public FloatMatrix2D viewColumnFlip() {
         if (columns == 0)
             return this;
@@ -743,23 +785,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int row, int column) {
+            public synchronized float getQuick(int row, int column) {
                 return content.getQuick(row, columns - 1 - column);
             }
 
-            @Override
-            public void setQuick(int row, int column, float value) {
+            public synchronized void setQuick(int row, int column, float value) {
                 content.setQuick(row, columns - 1 - column, value);
             }
 
-            @Override
-            public float get(int row, int column) {
+            public synchronized float get(int row, int column) {
                 return content.get(row, columns - 1 - column);
             }
 
-            @Override
-            public void set(int row, int column, float value) {
+            public synchronized void set(int row, int column, float value) {
                 content.set(row, columns - 1 - column, value);
             }
         };
@@ -768,7 +806,6 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return view;
     }
 
-    @Override
     public FloatMatrix2D viewDice() {
         WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
             /**
@@ -776,23 +813,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int row, int column) {
+            public synchronized float getQuick(int row, int column) {
                 return content.getQuick(column, row);
             }
 
-            @Override
-            public void setQuick(int row, int column, float value) {
+            public synchronized void setQuick(int row, int column, float value) {
                 content.setQuick(column, row, value);
             }
 
-            @Override
-            public float get(int row, int column) {
+            public synchronized float get(int row, int column) {
                 return content.get(column, row);
             }
 
-            @Override
-            public void set(int row, int column, float value) {
+            public synchronized void set(int row, int column, float value) {
                 content.set(column, row, value);
             }
         };
@@ -803,7 +836,6 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return view;
     }
 
-    @Override
     public FloatMatrix2D viewPart(final int row, final int column, int height, int width) {
         checkBox(row, column, height, width);
         WrapperFloatMatrix2D view = new WrapperFloatMatrix2D(this) {
@@ -812,23 +844,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int i, int j) {
+            public synchronized float getQuick(int i, int j) {
                 return content.getQuick(row + i, column + j);
             }
 
-            @Override
-            public void setQuick(int i, int j, float value) {
+            public synchronized void setQuick(int i, int j, float value) {
                 content.setQuick(row + i, column + j, value);
             }
 
-            @Override
-            public float get(int i, int j) {
+            public synchronized float get(int i, int j) {
                 return content.get(row + i, column + j);
             }
 
-            @Override
-            public void set(int i, int j, float value) {
+            public synchronized void set(int i, int j, float value) {
                 content.set(row + i, column + j, value);
             }
         };
@@ -839,13 +867,11 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return view;
     }
 
-    @Override
     public FloatMatrix1D viewRow(int row) {
         checkRow(row);
         return new DelegateFloatMatrix1D(this, row);
     }
 
-    @Override
     public FloatMatrix2D viewRowFlip() {
         if (rows == 0)
             return this;
@@ -855,23 +881,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int row, int column) {
+            public synchronized float getQuick(int row, int column) {
                 return content.getQuick(rows - 1 - row, column);
             }
 
-            @Override
-            public void setQuick(int row, int column, float value) {
+            public synchronized void setQuick(int row, int column, float value) {
                 content.setQuick(rows - 1 - row, column, value);
             }
 
-            @Override
-            public float get(int row, int column) {
+            public synchronized float get(int row, int column) {
                 return content.get(rows - 1 - row, column);
             }
 
-            @Override
-            public void set(int row, int column, float value) {
+            public synchronized void set(int row, int column, float value) {
                 content.set(rows - 1 - row, column, value);
             }
         };
@@ -879,7 +901,6 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return view;
     }
 
-    @Override
     public FloatMatrix2D viewSelection(int[] rowIndexes, int[] columnIndexes) {
         // check for "all"
         if (rowIndexes == null) {
@@ -904,23 +925,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int i, int j) {
+            public synchronized float getQuick(int i, int j) {
                 return content.getQuick(rix[i], cix[j]);
             }
 
-            @Override
-            public void setQuick(int i, int j, float value) {
+            public synchronized void setQuick(int i, int j, float value) {
                 content.setQuick(rix[i], cix[j], value);
             }
 
-            @Override
-            public float get(int i, int j) {
+            public synchronized float get(int i, int j) {
                 return content.get(rix[i], cix[j]);
             }
 
-            @Override
-            public void set(int i, int j, float value) {
+            public synchronized void set(int i, int j, float value) {
                 content.set(rix[i], cix[j], value);
             }
         };
@@ -931,7 +948,6 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return view;
     }
 
-    @Override
     public FloatMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
         if (_rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
@@ -941,23 +957,19 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int row, int column) {
+            public synchronized float getQuick(int row, int column) {
                 return content.getQuick(_rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void setQuick(int row, int column, float value) {
+            public synchronized void setQuick(int row, int column, float value) {
                 content.setQuick(_rowStride * row, _columnStride * column, value);
             }
 
-            @Override
-            public float get(int row, int column) {
+            public synchronized float get(int row, int column) {
                 return content.get(_rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void set(int row, int column, float value) {
+            public synchronized void set(int row, int column, float value) {
                 content.set(_rowStride * row, _columnStride * column, value);
             }
         };
@@ -970,17 +982,14 @@ public class WrapperFloatMatrix2D extends FloatMatrix2D {
         return view;
     }
 
-    @Override
     protected FloatMatrix2D getContent() {
         return content;
     }
 
-    @Override
     protected FloatMatrix1D like1D(int size, int offset, int stride) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected FloatMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never be called
     }

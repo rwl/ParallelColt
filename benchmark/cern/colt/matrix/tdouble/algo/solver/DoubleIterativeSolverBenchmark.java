@@ -61,7 +61,6 @@ public abstract class DoubleIterativeSolverBenchmark extends TestCase {
         super(arg0);
     }
 
-    @Override
     protected void setUp() throws Exception {
         readIterativeSolverBenchmarkSettings();
 
@@ -79,7 +78,6 @@ public abstract class DoubleIterativeSolverBenchmark extends TestCase {
         x = new DenseDoubleMatrix1D(n);
     }
 
-    @Override
     protected void tearDown() throws Exception {
         b = x = null;
         solver = null;

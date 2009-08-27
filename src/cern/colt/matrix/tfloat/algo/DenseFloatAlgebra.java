@@ -117,7 +117,7 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         return new DenseFloatAlgebra(property.tolerance());
     }
@@ -319,16 +319,15 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
                 jk.viewRow(i).assign(ja).assign(IntFunctions.plus(jb.getQuick(i)));
             }
             FloatMatrix2D sk = multOuter(sa, sb, null);
-            if(X instanceof SparseCCFloatMatrix2D || Y instanceof SparseCCFloatMatrix2D) {
-                return new SparseCCFloatMatrix2D(rows_x * rows_y, columns_x * columns_y,
-                        (int[]) ik.vectorize().elements(), (int[]) jk.vectorize().elements(), (float[]) sk.viewDice()
-                                .vectorize().elements(), false, false, false);
-                }
-                else {
-            return new SparseRCFloatMatrix2D(rows_x * rows_y, columns_x * columns_y, (int[]) ik.vectorize().elements(),
-                    (int[]) jk.vectorize().elements(), (float[]) sk.viewDice().vectorize().elements(), false, false,
-                    false);
-                }
+            if (X instanceof SparseCCFloatMatrix2D || Y instanceof SparseCCFloatMatrix2D) {
+                return new SparseCCFloatMatrix2D(rows_x * rows_y, columns_x * columns_y, (int[]) ik.vectorize()
+                        .elements(), (int[]) jk.vectorize().elements(), (float[]) sk.viewDice().vectorize().elements(),
+                        false, false, false);
+            } else {
+                return new SparseRCFloatMatrix2D(rows_x * rows_y, columns_x * columns_y, (int[]) ik.vectorize()
+                        .elements(), (int[]) jk.vectorize().elements(), (float[]) sk.viewDice().vectorize().elements(),
+                        false, false, false);
+            }
 
         }
     }
@@ -504,10 +503,10 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
     public float vectorNorm2(final FloatMatrix2D X) {
         if (X.isView() == true || !(X instanceof DenseFloatMatrix2D)) {
             final int rows = X.rows();
-            final int cols = X.columns();
+            final int columns = X.columns();
             float sum = 0;
             int nthreads = ConcurrencyUtils.getNumberOfThreads();
-            if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 nthreads = Math.min(nthreads, rows);
                 Future<?>[] futures = new Future[nthreads];
                 Float result;
@@ -520,7 +519,7 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
                             float sum = 0;
                             float elem;
                             for (int r = firstRow; r < lastRow; r++) {
-                                for (int c = 0; c < cols; c++) {
+                                for (int c = 0; c < columns; c++) {
                                     elem = X.getQuick(r, c);
                                     sum += (elem * elem);
                                 }
@@ -542,7 +541,7 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
             } else {
                 float elem;
                 for (int r = 0; r < rows; r++) {
-                    for (int c = 0; c < cols; c++) {
+                    for (int c = 0; c < columns; c++) {
                         elem = X.getQuick(r, c);
                         sum += (elem * elem);
                     }
@@ -599,10 +598,10 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
         if (X.isView() == true || !(X instanceof DenseFloatMatrix3D)) {
             final int slices = X.slices();
             final int rows = X.rows();
-            final int cols = X.columns();
+            final int columns = X.columns();
             float sum = 0;
             int nthreads = ConcurrencyUtils.getNumberOfThreads();
-            if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
                 nthreads = Math.min(nthreads, slices);
                 Future<?>[] futures = new Future[nthreads];
                 Float result;
@@ -616,7 +615,7 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
                             float elem;
                             for (int s = firstSlice; s < lastSlice; s++) {
                                 for (int r = 0; r < rows; r++) {
-                                    for (int c = 0; c < cols; c++) {
+                                    for (int c = 0; c < columns; c++) {
                                         elem = X.getQuick(s, r, c);
                                         sum += (elem * elem);
                                     }
@@ -640,7 +639,7 @@ public class DenseFloatAlgebra extends cern.colt.PersistentObject {
                 float elem;
                 for (int s = 0; s < slices; s++) {
                     for (int r = 0; r < rows; r++) {
-                        for (int c = 0; c < cols; c++) {
+                        for (int c = 0; c < columns; c++) {
                             elem = X.getQuick(s, r, c);
                             sum += (elem * elem);
                         }

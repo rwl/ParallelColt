@@ -42,7 +42,7 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
      * otherwise. Override this method in wrappers.
      */
-    @Override
+
     protected LongMatrix1D getContent() {
         return this.content;
     }
@@ -60,12 +60,11 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
-    public long getQuick(int index) {
+
+    public synchronized long getQuick(int index) {
         return content.getQuick(index);
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
@@ -73,17 +72,17 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix must also
-     * be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseLongMatrix1D</tt> the new matrix must also be of type
-     * <tt>SparseLongMatrix1D</tt>, etc. In general, the new matrix should have
-     * internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix must
+     * also be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix1D</tt> the new matrix must also be
+     * of type <tt>SparseLongMatrix1D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public LongMatrix1D like(int size) {
         return content.like(size);
     }
@@ -92,9 +91,9 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix
-     * must be of type <tt>DenseLongMatrix2D</tt>, if the receiver is an instance
-     * of type <tt>SparseLongMatrix1D</tt> the new matrix must be of type
-     * <tt>SparseLongMatrix2D</tt>, etc.
+     * must be of type <tt>DenseLongMatrix2D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix1D</tt> the new matrix must be of
+     * type <tt>SparseLongMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -102,18 +101,16 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public LongMatrix2D like2D(int rows, int columns) {
         return content.like2D(rows, columns);
     }
 
-    @Override
-    public LongMatrix2D reshape(int rows, int cols) {
+    public LongMatrix2D reshape(int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
-    public LongMatrix3D reshape(int slices, int rows, int cols) {
+    public LongMatrix3D reshape(int slices, int rows, int columns) {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
@@ -131,8 +128,8 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
-    public void setQuick(int index, long value) {
+
+    public synchronized void setQuick(int index, long value) {
         content.setQuick(index, value);
     }
 
@@ -145,7 +142,7 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      * 
      * @return a new flip view.
      */
-    @Override
+
     public LongMatrix1D viewFlip() {
         LongMatrix1D view = new WrapperLongMatrix1D(this) {
             /**
@@ -153,13 +150,19 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public long getQuick(int index) {
+            public synchronized long getQuick(int index) {
+                return content.getQuick(size - 1 - index);
+            }
+
+            public synchronized void setQuick(int index, long value) {
+                content.setQuick(size - 1 - index, value);
+            }
+
+            public synchronized long get(int index) {
                 return content.get(size - 1 - index);
             }
 
-            @Override
-            public void setQuick(int index, long value) {
+            public synchronized void set(int index, long value) {
                 content.set(size - 1 - index, value);
             }
         };
@@ -194,7 +197,7 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      * @return the new view.
      * 
      */
-    @Override
+
     public LongMatrix1D viewPart(final int index, int width) {
         checkRange(index, width);
         LongMatrix1D view = new WrapperLongMatrix1D(this) {
@@ -203,13 +206,19 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public long getQuick(int i) {
+            public synchronized long getQuick(int i) {
+                return content.getQuick(index + i);
+            }
+
+            public synchronized void setQuick(int i, long value) {
+                content.setQuick(index + i, value);
+            }
+
+            public synchronized long get(int i) {
                 return content.get(index + i);
             }
 
-            @Override
-            public void setQuick(int i, long value) {
+            public synchronized void set(int i, long value) {
                 content.set(index + i, value);
             }
         };
@@ -248,7 +257,7 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      *             if <tt>!(0 <= indexes[i] < size())</tt> for any
      *             <tt>i=0..indexes.length()-1</tt>.
      */
-    @Override
+
     public LongMatrix1D viewSelection(int[] indexes) {
         // check for "all"
         if (indexes == null) {
@@ -266,13 +275,19 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public long getQuick(int i) {
+            public synchronized long getQuick(int i) {
+                return content.getQuick(idx[i]);
+            }
+
+            public synchronized void setQuick(int i, long value) {
+                content.setQuick(idx[i], value);
+            }
+
+            public synchronized long get(int i) {
                 return content.get(idx[i]);
             }
 
-            @Override
-            public void setQuick(int i, long value) {
+            public synchronized void set(int i, long value) {
                 content.set(idx[i], value);
             }
         };
@@ -287,7 +302,7 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected LongMatrix1D viewSelectionLike(int[] offsets) {
         throw new InternalError(); // should never get called
     }
@@ -305,7 +320,7 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
      * @return the new view.
      * 
      */
-    @Override
+
     public LongMatrix1D viewStrides(final int _stride) {
         if (stride <= 0)
             throw new IndexOutOfBoundsException("illegal stride: " + stride);
@@ -315,13 +330,19 @@ public class WrapperLongMatrix1D extends LongMatrix1D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public long getQuick(int index) {
+            public synchronized long getQuick(int index) {
+                return content.getQuick(index * _stride);
+            }
+
+            public synchronized void setQuick(int index, long value) {
+                content.setQuick(index * _stride, value);
+            }
+
+            public synchronized long get(int index) {
                 return content.get(index * _stride);
             }
 
-            @Override
-            public void setQuick(int index, long value) {
+            public synchronized void set(int index, long value) {
                 content.set(index * _stride, value);
             }
         };

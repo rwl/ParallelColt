@@ -24,7 +24,7 @@ public class SparseRCMFloatMatrix2D extends WrapperFloatMatrix2D {
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
      *             if
-     *             <tt>rows<0 || columns<0 || (float)columns*rows > Integer.MAX_VALUE</tt>
+     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
      *             .
      */
     public SparseRCMFloatMatrix2D(int rows, int columns) {
@@ -40,39 +40,32 @@ public class SparseRCMFloatMatrix2D extends WrapperFloatMatrix2D {
             elements[i] = new SparseFloatMatrix1D(columns);
     }
 
-    @Override
     public SparseFloatMatrix1D[] elements() {
         return elements;
     }
 
-    @Override
-    public synchronized float getQuick(int row, int column) {
+    public float getQuick(int row, int column) {
         return elements[row].getQuick(column);
     }
 
-    @Override
-    public synchronized void setQuick(int row, int column, float value) {
+    public void setQuick(int row, int column, float value) {
         elements[row].setQuick(column, value);
     }
 
-    @Override
     public void trimToSize() {
         for (int r = 0; r < rows; r++) {
             elements[r].trimToSize();
         }
     }
 
-    @Override
     public SparseFloatMatrix1D viewRow(int row) {
         return elements[row];
     }
 
-    @Override
     protected FloatMatrix2D getContent() {
         return this;
     }
 
-    @Override
     public FloatMatrix2D like(int rows, int columns) {
         return new SparseRCMFloatMatrix2D(rows, columns);
     }

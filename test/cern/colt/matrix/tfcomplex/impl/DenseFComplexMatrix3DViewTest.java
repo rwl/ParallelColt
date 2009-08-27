@@ -5,7 +5,6 @@ public class DenseFComplexMatrix3DViewTest extends DenseFComplexMatrix3DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseFComplexMatrix3D(NCOLUMNS, NROWS, NSLICES).viewDice(2, 1, 0);
         B = new DenseFComplexMatrix3D(NCOLUMNS, NROWS, NSLICES).viewDice(2, 1, 0);

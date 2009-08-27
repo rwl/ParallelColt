@@ -9,7 +9,6 @@ public class DoubleHyBRBenchmark extends DoubleIterativeSolverBenchmark {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new DoubleHyBR();
         M = solver.getPreconditioner();

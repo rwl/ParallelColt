@@ -44,7 +44,7 @@ public class TestSparseDoubleLUDecomposition {
         int N = A1.columns();
         double eps = 1e-10;
 
-        SparseDoubleLUDecomposition lu = new SparseDoubleLUDecomposition(A2, 0);
+        SparseDoubleLUDecomposition lu = new SparseDoubleLUDecomposition(A2, 0, true);
         //        DoubleMatrix2D L = lu.getL();
         //        DoubleMatrix2D U = lu.getU();
         DoubleMatrix1D X = B2.copy();

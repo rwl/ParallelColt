@@ -109,7 +109,6 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
         this.isNoView = false;
     }
 
-    @Override
     public int[] elements() {
         throw new IllegalAccessError("getElements() is not supported for SelectedDenseIntMatrix3D.");
     }
@@ -132,7 +131,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public int getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -155,7 +154,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    @Override
+
     public long index(int slice, int row, int column) {
         // return this.offset + super.index(slice,row,column);
         // manually inlined:
@@ -181,9 +180,13 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public IntMatrix3D like(int slices, int rows, int columns) {
         return new DenseIntMatrix3D(slices, rows, columns);
+    }
+
+    public IntMatrix2D like2D(int rows, int columns) {
+        return new DenseIntMatrix2D(rows, columns);
     }
 
     /**
@@ -206,7 +209,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int slice, int row, int column, int value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -224,7 +227,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * 
      * @return
      */
-    @Override
+
     public IntMatrix1D vectorize() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -250,7 +253,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * @see #viewSlice(int)
      * @see #viewRow(int)
      */
-    @Override
+
     public IntMatrix2D viewColumn(int column) {
         checkColumn(column);
 
@@ -292,7 +295,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * @see #viewSlice(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public IntMatrix2D viewRow(int row) {
         checkRow(row);
 
@@ -334,7 +337,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * @see #viewRow(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public IntMatrix2D viewSlice(int slice) {
         checkSlice(slice);
 
@@ -364,7 +367,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -378,7 +381,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -392,7 +395,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _sliceOffset(int absRank) {
         return sliceOffsets[absRank];
     }
@@ -407,7 +410,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(IntMatrix3D other) {
         if (other instanceof SelectedDenseIntMatrix3D) {
             SelectedDenseIntMatrix3D otherMatrix = (SelectedDenseIntMatrix3D) other;
@@ -443,7 +446,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected IntMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -462,7 +465,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>(int)rows*slices > Integer.MAX_VALUE</tt>.
      */
-    @Override
+
     protected void setUp(int slices, int rows, int columns) {
         super.setUp(slices, rows, columns);
         this.sliceStride = 1;
@@ -477,7 +480,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      * @throws IllegalArgumentException
      *             if some of the parameters are equal or not in range 0..2.
      */
-    @Override
+
     protected AbstractMatrix3D vDice(int axis0, int axis1, int axis2) {
         super.vDice(axis0, axis1, axis2);
 
@@ -505,7 +508,7 @@ class SelectedDenseIntMatrix3D extends IntMatrix3D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected IntMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseIntMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, this.offset);
     }

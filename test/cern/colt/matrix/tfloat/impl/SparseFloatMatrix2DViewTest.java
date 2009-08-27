@@ -6,7 +6,6 @@ public class SparseFloatMatrix2DViewTest extends SparseFloatMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFloatMatrix2D(NCOLUMNS, NROWS).viewDice();
         B = new SparseFloatMatrix2D(NCOLUMNS, NROWS).viewDice();

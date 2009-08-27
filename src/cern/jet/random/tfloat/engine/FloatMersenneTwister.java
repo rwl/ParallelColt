@@ -215,7 +215,7 @@ public class FloatMersenneTwister extends FloatRandomEngine {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         FloatMersenneTwister clone = (FloatMersenneTwister) super.clone();
         clone.mt = this.mt.clone();
@@ -268,7 +268,7 @@ public class FloatMersenneTwister extends FloatRandomEngine {
      * interval <tt>[Integer.MIN_VALUE,Integer.MAX_VALUE]</tt> (including
      * <tt>Integer.MIN_VALUE</tt> and <tt>Integer.MAX_VALUE</tt>).
      */
-    @Override
+
     public int nextInt() {
         /* Each single bit including the sign bit will be random */
         if (mti == N)

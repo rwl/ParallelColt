@@ -8,7 +8,6 @@ public class SparseCCMDoubleMatrix2DTest extends DoubleMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseCCMDoubleMatrix2D(NROWS, NCOLUMNS);
         B = new SparseCCMDoubleMatrix2D(NROWS, NCOLUMNS);

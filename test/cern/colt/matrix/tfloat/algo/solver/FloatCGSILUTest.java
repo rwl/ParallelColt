@@ -11,7 +11,6 @@ public class FloatCGSILUTest extends FloatCGSTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new FloatILU(A.rows());

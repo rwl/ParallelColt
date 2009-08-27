@@ -8,10 +8,11 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tobject.impl;
 
-import cern.colt.map.tobject.AbstractIntObjectMap;
-import cern.colt.map.tobject.OpenIntObjectHashMap;
+import cern.colt.map.tobject.AbstractLongObjectMap;
+import cern.colt.map.tobject.OpenLongObjectHashMap;
 import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
+import cern.colt.matrix.tobject.ObjectMatrix3D;
 
 /**
  * Sparse hashed 1-d matrix (aka <i>vector</i>) holding <tt>Object</tt>
@@ -22,7 +23,7 @@ import cern.colt.matrix.tobject.ObjectMatrix2D;
  * <b>Implementation:</b>
  * <p>
  * Note that this implementation is not synchronized. Uses a
- * {@link cern.colt.map.tobject.OpenIntObjectHashMap}, which is a compact and
+ * {@link cern.colt.map.tobject.OpenLongObjectHashMap}, which is a compact and
  * performant hashing technique.
  * <p>
  * <b>Memory requirements:</b>
@@ -66,7 +67,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
     /*
      * The elements of the matrix.
      */
-    protected AbstractIntObjectMap elements;
+    protected AbstractLongObjectMap elements;
 
     /**
      * Constructs a matrix with a copy of the given values. The values are
@@ -97,7 +98,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
     /**
      * Constructs a matrix with a given number of parameters. All entries are
      * initially <tt>null</tt>. For details related to memory usage see
-     * {@link cern.colt.map.tobject.OpenIntObjectHashMap}.
+     * {@link cern.colt.map.tobject.OpenLongObjectHashMap}.
      * 
      * @param size
      *            the number of cells the matrix shall have.
@@ -118,7 +119,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      */
     public SparseObjectMatrix1D(int size, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         setUp(size);
-        this.elements = new OpenIntObjectHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
+        this.elements = new OpenLongObjectHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
     }
 
     /**
@@ -136,7 +137,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    protected SparseObjectMatrix1D(int size, AbstractIntObjectMap elements, int offset, int stride) {
+    protected SparseObjectMatrix1D(int size, AbstractLongObjectMap elements, int offset, int stride) {
         setUp(size, offset, stride);
         this.elements = elements;
         this.isNoView = false;
@@ -145,7 +146,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
     /**
      * Returns the number of cells having non-zero values.
      */
-    @Override
+
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -158,8 +159,8 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      * 
      * @return the elements
      */
-    @Override
-    public AbstractIntObjectMap elements() {
+
+    public AbstractLongObjectMap elements() {
         return elements;
     }
 
@@ -177,7 +178,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      * @param minCapacity
      *            the desired minimum number of non-zero cells.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         this.elements.ensureCapacity(minCapacity);
     }
@@ -195,18 +196,18 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
-    public Object getQuick(int index) {
+
+    public synchronized Object getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return this.elements.get(index(index));
         // manually inlined:
-        return elements.get(zero + index * stride);
+        return elements.get((long) zero + (long) index * (long) stride);
     }
 
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(ObjectMatrix1D other) {
         if (other instanceof SelectedSparseObjectMatrix1D) {
             SelectedSparseObjectMatrix1D otherMatrix = (SelectedSparseObjectMatrix1D) other;
@@ -226,11 +227,11 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // overriden for manual inlining only
         // return _offset(_rank(rank));
-        return zero + rank * stride;
+        return (long) zero + (long) rank * (long) stride;
     }
 
     /**
@@ -246,7 +247,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public ObjectMatrix1D like(int size) {
         return new SparseObjectMatrix1D(size);
     }
@@ -265,11 +266,47 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public ObjectMatrix2D like2D(int rows, int columns) {
         return new SparseObjectMatrix2D(rows, columns);
     }
 
+    public ObjectMatrix2D reshape(int rows, int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
+        }
+        ObjectMatrix2D M = new SparseObjectMatrix2D(rows, columns);
+        int idx = 0;
+        for (int c = 0; c < columns; c++) {
+            for (int r = 0; r < rows; r++) {
+                Object elem = getQuick(idx++);
+                if (elem != null) {
+                    M.setQuick(r, c, elem);
+                }
+            }
+        }
+        return M;
+    }
+
+    public ObjectMatrix3D reshape(int slices, int rows, int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
+        }
+        ObjectMatrix3D M = new SparseObjectMatrix3D(slices, rows, columns);
+        int idx = 0;
+        for (int s = 0; s < slices; s++) {
+            for (int c = 0; c < columns; c++) {
+                for (int r = 0; r < rows; r++) {
+                    Object elem = getQuick(idx++);
+                    if (elem != null) {
+                        M.setQuick(s, r, c, elem);
+                    }
+                }
+            }
+        }
+        return M;
+    }
+    
     /**
      * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
      * 
@@ -284,12 +321,12 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
-    public void setQuick(int index, Object value) {
+
+    public synchronized void setQuick(int index, Object value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // int i = index(index);
         // manually inlined:
-        int i = zero + index * stride;
+        long i = (long) zero + (long) index * (long) stride;
         if (value == null)
             this.elements.removeKey(i);
         else
@@ -317,7 +354,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      * already containing zeros does not generate obsolete memory since no
      * memory was allocated to them in the first place.
      */
-    @Override
+
     public void trimToSize() {
         this.elements.trimToSize();
     }
@@ -329,7 +366,7 @@ public class SparseObjectMatrix1D extends ObjectMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected ObjectMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedSparseObjectMatrix1D(this.elements, offsets);
     }

@@ -11,7 +11,6 @@ public class DoubleCGILUTTest extends DoubleCGTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new DoubleILUT(A.rows());

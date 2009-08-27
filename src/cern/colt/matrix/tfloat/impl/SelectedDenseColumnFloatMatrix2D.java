@@ -129,7 +129,6 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
         this.isNoView = false;
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
@@ -150,7 +149,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public float getQuick(int row, int column) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
@@ -169,7 +168,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      * @param column
      *            the index of the column-coordinate.
      */
-    @Override
+
     public long index(int row, int column) {
         // return this.offset + super.index(row,column);
         // manually inlined:
@@ -192,7 +191,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public FloatMatrix2D like(int rows, int columns) {
         return new DenseColumnFloatMatrix2D(rows, columns);
     }
@@ -209,7 +208,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *            the number of cells the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public FloatMatrix1D like1D(int size) {
         return new DenseFloatMatrix1D(size);
     }
@@ -232,7 +231,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int row, int column, float value) {
         // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
         // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
@@ -247,7 +246,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      * 
      * @return
      */
-    @Override
+
     public FloatMatrix1D vectorize() {
         DenseFloatMatrix1D v = new DenseFloatMatrix1D((int) size());
         int idx = 0;
@@ -285,7 +284,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *             if <tt>column < 0 || column >= columns()</tt>.
      * @see #viewRow(int)
      */
-    @Override
+
     public FloatMatrix1D viewColumn(int column) {
         checkColumn(column);
         int viewSize = this.rows;
@@ -322,7 +321,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *             if <tt>row < 0 || row >= rows()</tt>.
      * @see #viewColumn(int)
      */
-    @Override
+
     public FloatMatrix1D viewRow(int row) {
         checkRow(row);
         int viewSize = this.columns;
@@ -342,7 +341,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -356,7 +355,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -371,7 +370,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FloatMatrix2D other) {
         if (other instanceof SelectedDenseColumnFloatMatrix2D) {
             SelectedDenseColumnFloatMatrix2D otherMatrix = (SelectedDenseColumnFloatMatrix2D) other;
@@ -400,7 +399,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *            <tt>index(i+1)-index(i)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected FloatMatrix1D like1D(int size, int zero, int stride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -415,9 +414,9 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      * @param columns
      *            the number of columns the matrix shall have.
      * @throws IllegalArgumentException
-     *             if <tt>(float)columns*rows > Integer.MAX_VALUE</tt>.
+     *             if <tt>(double)columns*rows > Integer.MAX_VALUE</tt>.
      */
-    @Override
+
     protected void setUp(int rows, int columns) {
         super.setUp(rows, columns);
         this.rowStride = 1;
@@ -428,7 +427,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
     /**
      * Self modifying version of viewDice().
      */
-    @Override
+
     protected AbstractMatrix2D vDice() {
         super.vDice();
         // swap
@@ -451,7 +450,7 @@ class SelectedDenseColumnFloatMatrix2D extends FloatMatrix2D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected FloatMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseColumnFloatMatrix2D(this.elements, rowOffsets, columnOffsets, this.offset);
     }

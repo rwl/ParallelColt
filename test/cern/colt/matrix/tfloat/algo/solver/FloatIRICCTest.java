@@ -11,7 +11,6 @@ public class FloatIRICCTest extends FloatIRTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new FloatICC(A.rows());

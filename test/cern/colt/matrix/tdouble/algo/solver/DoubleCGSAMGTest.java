@@ -11,7 +11,6 @@ public class DoubleCGSAMGTest extends DoubleCGSTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new DoubleAMG();

@@ -10,7 +10,6 @@ public class SparseFloatMatrix2DTest extends FloatMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFloatMatrix2D(NROWS, NCOLUMNS);
         B = new SparseFloatMatrix2D(NROWS, NCOLUMNS);
@@ -18,111 +17,111 @@ public class SparseFloatMatrix2DTest extends FloatMatrix2DTest {
     }
 
     public void testGetRowCompressed() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = (float) Math.random();
         }
-        SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        SparseRCFloatMatrix2D B = A.getRowCompressed(false);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        SparseFloatMatrix2D S = new SparseFloatMatrix2D(A.rows(), A.columns(), rowindexes, columnindexes, values);
+        SparseRCFloatMatrix2D B = S.getRowCompressed(false);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
-        B = A.getRowCompressed(true);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        B = S.getRowCompressed(true);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
     }
 
     public void testGetRowCompressedModified() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = (float) Math.random();
         }
-        SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        SparseRCMFloatMatrix2D B = A.getRowCompressedModified();
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        SparseFloatMatrix2D S = new SparseFloatMatrix2D(A.rows(), A.columns(), rowindexes, columnindexes, values);
+        SparseRCMFloatMatrix2D B = S.getRowCompressedModified();
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
     }
 
     public void testGetColumnCompressed() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = (float) Math.random();
         }
-        SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        SparseCCFloatMatrix2D B = A.getColumnCompressed(false);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        SparseFloatMatrix2D S = new SparseFloatMatrix2D(A.rows(), A.columns(), rowindexes, columnindexes, values);
+        SparseCCFloatMatrix2D B = S.getColumnCompressed(false);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
-        B = A.getColumnCompressed(true);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        B = S.getColumnCompressed(true);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
 
     }
 
     public void testGetColumnCompressedModified() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = (float) Math.random();
         }
-        SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        SparseCCMFloatMatrix2D B = A.getColumnCompressedModified();
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        SparseFloatMatrix2D S = new SparseFloatMatrix2D(A.rows(), A.columns(), rowindexes, columnindexes, values);
+        SparseCCMFloatMatrix2D B = S.getColumnCompressedModified();
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
     }
 
     public void testAssignIntArrayIntArrayFloatArrayFloatFloatFunction() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         float[] values = new float[SIZE];
-        FloatMatrix2D Adense = new DenseFloatMatrix2D(NROWS, NCOLUMNS);
+        FloatMatrix2D Adense = new DenseFloatMatrix2D(A.rows(), A.columns());
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = i % NROWS;
-            columnindexes[i] = i % NCOLUMNS;
+            rowindexes[i] = i % A.rows();
+            columnindexes[i] = i % A.columns();
             values[i] = (float) Math.random();
             Adense.setQuick(rowindexes[i], columnindexes[i], values[i]);
         }
-        SparseFloatMatrix2D A = new SparseFloatMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        A.assign(rowindexes, columnindexes, values, FloatFunctions.plus);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(2 * Adense.getQuick(r, c), A.getQuick(r, c));
+        SparseFloatMatrix2D S = new SparseFloatMatrix2D(A.rows(), A.columns());
+        S.assign(rowindexes, columnindexes, values, FloatFunctions.plusMultSecond(2));
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(2 * Adense.getQuick(r, c), S.getQuick(r, c));
             }
         }
     }

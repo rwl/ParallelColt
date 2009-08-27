@@ -48,7 +48,7 @@ public class Scs_amd {
 
     /* keep off-diagonal entries; drop diagonal entries */
     private static class Cs_diag implements Scs_ifkeep {
-        @Override
+
         public boolean fkeep(int i, int j, float aij, Object other) {
             return (i != j);
         }

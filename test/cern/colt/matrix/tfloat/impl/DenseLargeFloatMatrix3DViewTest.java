@@ -6,7 +6,6 @@ public class DenseLargeFloatMatrix3DViewTest extends DenseLargeFloatMatrix3DTest
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new DenseLargeFloatMatrix3D(NCOLUMNS, NROWS, NSLICES).viewDice(2, 1, 0);
         B = new DenseLargeFloatMatrix3D(NCOLUMNS, NROWS, NSLICES).viewDice(2, 1, 0);

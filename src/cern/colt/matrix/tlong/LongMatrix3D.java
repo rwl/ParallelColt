@@ -87,7 +87,8 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
      * @return the aggregated measure.
      * @see cern.jet.math.tlong.LongFunctions
      */
-    public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr, final cern.colt.function.tlong.LongFunction f) {
+    public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
+            final cern.colt.function.tlong.LongFunction f) {
         if (size() == 0)
             throw new IllegalArgumentException("size == 0");
         long a = 0;
@@ -526,7 +527,7 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
         }
         return this;
     }
-    
+
     /**
      * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
      * is required to have the form <tt>values[slice*row*column]</tt>.
@@ -579,7 +580,6 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
         }
         return this;
     }
-
 
     /**
      * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
@@ -726,7 +726,7 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
      * @return <tt>this</tt> (for convenience only).
      * 
      */
-    public LongMatrix3D assign(final cern.colt.function.tlong.LongProcedure cond, final int value) {
+    public LongMatrix3D assign(final cern.colt.function.tlong.LongProcedure cond, final long value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
             nthreads = Math.min(nthreads, slices);
@@ -1053,7 +1053,7 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
      * @return <tt>true</tt> if all cells are equal to the given value,
      *         <tt>false</tt> otherwise.
      */
-    public boolean equals(int value) {
+    public boolean equals(long value) {
         return cern.colt.matrix.tlong.algo.LongProperty.DEFAULT.equals(this, value);
     }
 
@@ -1069,7 +1069,7 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1273,11 +1273,12 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the same number of slices, rows and columns. For
-     * example, if the receiver is an instance of type <tt>DenseLongMatrix3D</tt>
-     * the new matrix must also be of type <tt>DenseLongMatrix3D</tt>, if the
-     * receiver is an instance of type <tt>SparseLongMatrix3D</tt> the new matrix
-     * must also be of type <tt>SparseLongMatrix3D</tt>, etc. In general, the new
-     * matrix should have internal parametrization as similar as possible.
+     * example, if the receiver is an instance of type
+     * <tt>DenseLongMatrix3D</tt> the new matrix must also be of type
+     * <tt>DenseLongMatrix3D</tt>, if the receiver is an instance of type
+     * <tt>SparseLongMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseLongMatrix3D</tt>, etc. In general, the new matrix should have
+     * internal parametrization as similar as possible.
      * 
      * @return a new empty matrix of the same dynamic type.
      */
@@ -1308,9 +1309,25 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
     /**
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, sharing the same cells. For example, if the receiver is an
-     * instance of type <tt>DenseLongMatrix3D</tt> the new matrix must also be of
-     * type <tt>DenseLongMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseLongMatrix3D</tt> the new matrix must also be of type
+     * instance of type <tt>DenseDoubleMatrix3D</tt> the new matrix must also be
+     * of type <tt>DenseDoubleMatrix2D</tt>, if the receiver is an instance of
+     * type <tt>SparseDoubleMatrix3D</tt> the new matrix must also be of type
+     * <tt>SparseDoubleMatrix2D</tt>, etc.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @return a new matrix of the corresponding dynamic type.
+     */
+    public abstract LongMatrix2D like2D(int rows, int columns);
+
+    /**
+     * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
+     * type</i>, sharing the same cells. For example, if the receiver is an
+     * instance of type <tt>DenseLongMatrix3D</tt> the new matrix must also be
+     * of type <tt>DenseLongMatrix2D</tt>, if the receiver is an instance of
+     * type <tt>SparseLongMatrix3D</tt> the new matrix must also be of type
      * <tt>SparseLongMatrix2D</tt>, etc.
      * 
      * @param rows
@@ -1383,15 +1400,15 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
                     results[j] = (long[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                sliceLocation = (int)results[0][1];
-                rowLocation = (int)results[0][2];
-                columnLocation = (int)results[0][3];
+                sliceLocation = (int) results[0][1];
+                rowLocation = (int) results[0][2];
+                columnLocation = (int) results[0][3];
                 for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        sliceLocation = (int)results[j][1];
-                        rowLocation = (int)results[j][2];
-                        columnLocation = (int)results[j][3];
+                        sliceLocation = (int) results[j][1];
+                        rowLocation = (int) results[j][2];
+                        columnLocation = (int) results[j][3];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1472,15 +1489,15 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
                     results[j] = (long[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                sliceLocation = (int)results[0][1];
-                rowLocation = (int)results[0][2];
-                columnLocation = (int)results[0][3];
+                sliceLocation = (int) results[0][1];
+                rowLocation = (int) results[0][2];
+                columnLocation = (int) results[0][3];
                 for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        sliceLocation = (int)results[j][1];
-                        rowLocation = (int)results[j][2];
-                        columnLocation = (int)results[j][3];
+                        sliceLocation = (int) results[j][1];
+                        rowLocation = (int) results[j][2];
+                        columnLocation = (int) results[j][3];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -1611,7 +1628,7 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
      * 
      * @see cern.colt.matrix.tlong.algo.LongFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tlong.algo.LongFormatter().toString(this);
     }
@@ -1978,8 +1995,8 @@ public abstract class LongMatrix3D extends AbstractMatrix3D {
      * ordering</i> of the matrix values in the given <tt>[row,column]</tt>
      * position. This sort is guaranteed to be <i>stable</i>. For further
      * information, see
-     * {@link cern.colt.matrix.tlong.algo.LongSorting#sort(LongMatrix3D,int,int)}.
-     * For more advanced sorting functionality, see
+     * {@link cern.colt.matrix.tlong.algo.LongSorting#sort(LongMatrix3D,int,int)}
+     * . For more advanced sorting functionality, see
      * {@link cern.colt.matrix.tlong.algo.LongSorting}.
      * 
      * @return a new sorted vector (matrix) view.

@@ -37,7 +37,6 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         this.content = newContent;
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
@@ -119,27 +118,22 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         }
     }
 
-    @Override
-    public double[] getQuick(int slice, int row, int column) {
+    public synchronized double[] getQuick(int slice, int row, int column) {
         return content.getQuick(slice, row, column);
     }
 
-    @Override
     public DComplexMatrix3D like(int slices, int rows, int columns) {
         return content.like(slices, rows, columns);
     }
 
-    @Override
-    public void setQuick(int slice, int row, int column, double[] value) {
+    public synchronized void setQuick(int slice, int row, int column, double[] value) {
         content.setQuick(slice, row, column, value);
     }
 
-    @Override
-    public void setQuick(int slice, int row, int column, double re, double im) {
+    public synchronized void setQuick(int slice, int row, int column, double re, double im) {
         content.setQuick(slice, row, column, re, im);
     }
 
-    @Override
     public DComplexMatrix1D vectorize() {
         DComplexMatrix1D v = new DenseDComplexMatrix1D((int) size());
         int length = rows * columns;
@@ -149,46 +143,38 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return v;
     }
 
-    @Override
     public DComplexMatrix2D viewColumn(int column) {
         checkColumn(column);
         return new DelegateDComplexMatrix2D(this, 2, column);
     }
 
-    @Override
     public DComplexMatrix3D viewColumnFlip() {
         if (columns == 0)
             return this;
         WrapperDComplexMatrix3D view = new WrapperDComplexMatrix3D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int slice, int row, int column) {
+            public synchronized double[] getQuick(int slice, int row, int column) {
                 return content.getQuick(slice, row, columns - 1 - column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double[] value) {
+            public synchronized void setQuick(int slice, int row, int column, double[] value) {
                 content.setQuick(slice, row, columns - 1 - column, value);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double re, double im) {
+            public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                 content.setQuick(slice, row, columns - 1 - column, re, im);
             }
 
-            @Override
-            public double[] get(int slice, int row, int column) {
+            public synchronized double[] get(int slice, int row, int column) {
                 return content.get(slice, row, columns - 1 - column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double[] value) {
+            public synchronized void set(int slice, int row, int column, double[] value) {
                 content.set(slice, row, columns - 1 - column, value);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double re, double im) {
+            public synchronized void set(int slice, int row, int column, double re, double im) {
                 content.set(slice, row, columns - 1 - column, re, im);
             }
         };
@@ -196,46 +182,38 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return view;
     }
 
-    @Override
     public DComplexMatrix2D viewSlice(int slice) {
         checkSlice(slice);
         return new DelegateDComplexMatrix2D(this, 0, slice);
     }
 
-    @Override
     public DComplexMatrix3D viewSliceFlip() {
         if (slices == 0)
             return this;
         WrapperDComplexMatrix3D view = new WrapperDComplexMatrix3D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int slice, int row, int column) {
+            public synchronized double[] getQuick(int slice, int row, int column) {
                 return content.getQuick(slices - 1 - slice, row, column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double[] value) {
+            public synchronized void setQuick(int slice, int row, int column, double[] value) {
                 content.setQuick(slices - 1 - slice, row, column, value);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double re, double im) {
+            public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                 content.setQuick(slices - 1 - slice, row, column, re, im);
             }
 
-            @Override
-            public double[] get(int slice, int row, int column) {
+            public synchronized double[] get(int slice, int row, int column) {
                 return content.get(slices - 1 - slice, row, column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double[] value) {
+            public synchronized void set(int slice, int row, int column, double[] value) {
                 content.set(slices - 1 - slice, row, column, value);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double re, double im) {
+            public synchronized void set(int slice, int row, int column, double re, double im) {
                 content.set(slices - 1 - slice, row, column, re, im);
             }
         };
@@ -243,7 +221,6 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return view;
     }
 
-    @Override
     public DComplexMatrix3D viewDice(int axis0, int axis1, int axis2) {
         int d = 3;
         if (axis0 < 0 || axis0 >= d || axis1 < 0 || axis1 >= d || axis2 < 0 || axis2 >= d || axis0 == axis1
@@ -257,33 +234,27 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
             view = new WrapperDComplexMatrix3D(this) {
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public double[] getQuick(int slice, int row, int column) {
+                public synchronized double[] getQuick(int slice, int row, int column) {
                     return content.getQuick(row, slice, column);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double[] value) {
+                public synchronized void setQuick(int slice, int row, int column, double[] value) {
                     content.setQuick(row, slice, column, value);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double re, double im) {
+                public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                     content.setQuick(row, slice, column, re, im);
                 }
 
-                @Override
-                public double[] get(int slice, int row, int column) {
+                public synchronized double[] get(int slice, int row, int column) {
                     return content.get(row, slice, column);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double[] value) {
+                public synchronized void set(int slice, int row, int column, double[] value) {
                     content.set(row, slice, column, value);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double re, double im) {
+                public synchronized void set(int slice, int row, int column, double re, double im) {
                     content.set(row, slice, column, re, im);
                 }
 
@@ -292,33 +263,27 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
             view = new WrapperDComplexMatrix3D(this) {
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public double[] getQuick(int slice, int row, int column) {
+                public synchronized double[] getQuick(int slice, int row, int column) {
                     return content.getQuick(row, column, slice);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double[] value) {
+                public synchronized void setQuick(int slice, int row, int column, double[] value) {
                     content.setQuick(row, column, slice, value);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double re, double im) {
+                public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                     content.setQuick(row, column, slice, re, im);
                 }
 
-                @Override
-                public double[] get(int slice, int row, int column) {
+                public synchronized double[] get(int slice, int row, int column) {
                     return content.get(row, column, slice);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double[] value) {
+                public synchronized void set(int slice, int row, int column, double[] value) {
                     content.set(row, column, slice, value);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double re, double im) {
+                public synchronized void set(int slice, int row, int column, double re, double im) {
                     content.set(row, column, slice, re, im);
                 }
 
@@ -327,33 +292,27 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
             view = new WrapperDComplexMatrix3D(this) {
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public double[] getQuick(int slice, int row, int column) {
+                public synchronized double[] getQuick(int slice, int row, int column) {
                     return content.getQuick(column, row, slice);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double[] value) {
+                public synchronized void setQuick(int slice, int row, int column, double[] value) {
                     content.setQuick(column, row, slice, value);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double re, double im) {
+                public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                     content.setQuick(column, row, slice, re, im);
                 }
 
-                @Override
-                public double[] get(int slice, int row, int column) {
+                public synchronized double[] get(int slice, int row, int column) {
                     return content.get(column, row, slice);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double[] value) {
+                public synchronized void set(int slice, int row, int column, double[] value) {
                     content.set(column, row, slice, value);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double re, double im) {
+                public synchronized void set(int slice, int row, int column, double re, double im) {
                     content.set(column, row, slice, re, im);
                 }
             };
@@ -361,33 +320,27 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
             view = new WrapperDComplexMatrix3D(this) {
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public double[] getQuick(int slice, int row, int column) {
+                public synchronized double[] getQuick(int slice, int row, int column) {
                     return content.getQuick(column, slice, row);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double[] value) {
+                public synchronized void setQuick(int slice, int row, int column, double[] value) {
                     content.setQuick(column, slice, row, value);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, double re, double im) {
+                public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                     content.setQuick(column, slice, row, re, im);
                 }
 
-                @Override
-                public double[] get(int slice, int row, int column) {
+                public synchronized double[] get(int slice, int row, int column) {
                     return content.get(column, slice, row);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double[] value) {
+                public synchronized void set(int slice, int row, int column, double[] value) {
                     content.set(column, slice, row, value);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, double re, double im) {
+                public synchronized void set(int slice, int row, int column, double re, double im) {
                     content.set(column, slice, row, re, im);
                 }
 
@@ -401,39 +354,32 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return view;
     }
 
-    @Override
     public DComplexMatrix3D viewPart(final int slice, final int row, final int column, int depth, int height, int width) {
         checkBox(slice, row, column, depth, height, width);
         WrapperDComplexMatrix3D view = new WrapperDComplexMatrix3D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int i, int j, int k) {
+            public synchronized double[] getQuick(int i, int j, int k) {
                 return content.getQuick(slice + i, row + j, column + k);
             }
 
-            @Override
-            public void setQuick(int i, int j, int k, double[] value) {
+            public synchronized void setQuick(int i, int j, int k, double[] value) {
                 content.setQuick(slice + i, row + j, column + k, value);
             }
 
-            @Override
-            public void setQuick(int i, int j, int k, double re, double im) {
+            public synchronized void setQuick(int i, int j, int k, double re, double im) {
                 content.setQuick(slice + i, row + j, column + k, re, im);
             }
 
-            @Override
-            public double[] get(int i, int j, int k) {
+            public synchronized double[] get(int i, int j, int k) {
                 return content.get(slice + i, row + j, column + k);
             }
 
-            @Override
-            public void set(int i, int j, int k, double[] value) {
+            public synchronized void set(int i, int j, int k, double[] value) {
                 content.set(slice + i, row + j, column + k, value);
             }
 
-            @Override
-            public void set(int i, int j, int k, double re, double im) {
+            public synchronized void set(int i, int j, int k, double re, double im) {
                 content.set(slice + i, row + j, column + k, re, im);
             }
 
@@ -445,46 +391,38 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return view;
     }
 
-    @Override
     public DComplexMatrix2D viewRow(int row) {
         checkRow(row);
         return new DelegateDComplexMatrix2D(this, 1, row);
     }
 
-    @Override
     public DComplexMatrix3D viewRowFlip() {
         if (rows == 0)
             return this;
         WrapperDComplexMatrix3D view = new WrapperDComplexMatrix3D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int slice, int row, int column) {
+            public synchronized double[] getQuick(int slice, int row, int column) {
                 return content.getQuick(slice, rows - 1 - row, column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double[] value) {
+            public synchronized void setQuick(int slice, int row, int column, double[] value) {
                 content.setQuick(slice, rows - 1 - row, column, value);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double re, double im) {
+            public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                 content.setQuick(slice, rows - 1 - row, column, re, im);
             }
 
-            @Override
-            public double[] get(int slice, int row, int column) {
+            public synchronized double[] get(int slice, int row, int column) {
                 return content.get(slice, rows - 1 - row, column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double[] value) {
+            public synchronized void set(int slice, int row, int column, double[] value) {
                 content.set(slice, rows - 1 - row, column, value);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double re, double im) {
+            public synchronized void set(int slice, int row, int column, double re, double im) {
                 content.set(slice, rows - 1 - row, column, re, im);
             }
         };
@@ -492,7 +430,6 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return view;
     }
 
-    @Override
     public DComplexMatrix3D viewSelection(int[] sliceIndexes, int[] rowIndexes, int[] columnIndexes) {
         // check for "all"
         if (sliceIndexes == null) {
@@ -521,33 +458,27 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         WrapperDComplexMatrix3D view = new WrapperDComplexMatrix3D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int i, int j, int k) {
+            public synchronized double[] getQuick(int i, int j, int k) {
                 return content.getQuick(six[i], rix[j], cix[k]);
             }
 
-            @Override
-            public void setQuick(int i, int j, int k, double[] value) {
+            public synchronized void setQuick(int i, int j, int k, double[] value) {
                 content.setQuick(six[i], rix[j], cix[k], value);
             }
 
-            @Override
-            public void setQuick(int i, int j, int k, double re, double im) {
+            public synchronized void setQuick(int i, int j, int k, double re, double im) {
                 content.setQuick(six[i], rix[j], cix[k], re, im);
             }
 
-            @Override
-            public double[] get(int i, int j, int k) {
+            public synchronized double[] get(int i, int j, int k) {
                 return content.get(six[i], rix[j], cix[k]);
             }
 
-            @Override
-            public void set(int i, int j, int k, double[] value) {
+            public synchronized void set(int i, int j, int k, double[] value) {
                 content.set(six[i], rix[j], cix[k], value);
             }
 
-            @Override
-            public void set(int i, int j, int k, double re, double im) {
+            public synchronized void set(int i, int j, int k, double re, double im) {
                 content.set(six[i], rix[j], cix[k], re, im);
             }
 
@@ -559,40 +490,33 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return view;
     }
 
-    @Override
     public DComplexMatrix3D viewStrides(final int _sliceStride, final int _rowStride, final int _columnStride) {
         if (_sliceStride <= 0 || _rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
         WrapperDComplexMatrix3D view = new WrapperDComplexMatrix3D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public double[] getQuick(int slice, int row, int column) {
+            public synchronized double[] getQuick(int slice, int row, int column) {
                 return content.getQuick(_sliceStride * slice, _rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double value[]) {
+            public synchronized void setQuick(int slice, int row, int column, double value[]) {
                 content.setQuick(_sliceStride * slice, _rowStride * row, _columnStride * column, value);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, double re, double im) {
+            public synchronized void setQuick(int slice, int row, int column, double re, double im) {
                 content.setQuick(_sliceStride * slice, _rowStride * row, _columnStride * column, re, im);
             }
 
-            @Override
-            public double[] get(int slice, int row, int column) {
+            public synchronized double[] get(int slice, int row, int column) {
                 return content.get(_sliceStride * slice, _rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double[] value) {
+            public synchronized void set(int slice, int row, int column, double[] value) {
                 content.set(_sliceStride * slice, _rowStride * row, _columnStride * column, value);
             }
 
-            @Override
-            public void set(int slice, int row, int column, double re, double im) {
+            public synchronized void set(int slice, int row, int column, double re, double im) {
                 content.set(_sliceStride * slice, _rowStride * row, _columnStride * column, re, im);
             }
 
@@ -607,28 +531,23 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return view;
     }
 
-    @Override
     protected DComplexMatrix3D getContent() {
         return content;
     }
 
-    @Override
     public DComplexMatrix2D like2D(int rows, int columns) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected DComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
             int columnStride) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected DComplexMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     public DoubleMatrix3D getImaginaryPart() {
         final DenseLargeDoubleMatrix3D Im = new DenseLargeDoubleMatrix3D(slices, rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -664,7 +583,6 @@ public class WrapperDComplexMatrix3D extends DComplexMatrix3D {
         return Im;
     }
 
-    @Override
     public DoubleMatrix3D getRealPart() {
         final DenseLargeDoubleMatrix3D Re = new DenseLargeDoubleMatrix3D(slices, rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

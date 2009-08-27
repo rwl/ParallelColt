@@ -10,7 +10,6 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS);
         B = new SparseDoubleMatrix2D(NROWS, NCOLUMNS);
@@ -23,106 +22,106 @@ public class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
         int[] columnindexes = new int[SIZE];
         double[] values = new double[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = Math.random();
         }
         SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
         SparseRCDoubleMatrix2D B = A.getRowCompressed(false);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
             }
         }
         B = A.getRowCompressed(true);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
                 assertEquals(A.getQuick(r, c), B.getQuick(r, c));
             }
         }
     }
 
     public void testGetRowCompressedModified() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         double[] values = new double[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = Math.random();
         }
-        SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        SparseRCMDoubleMatrix2D B = A.getRowCompressedModified();
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        SparseDoubleMatrix2D S = new SparseDoubleMatrix2D(A.rows(), A.columns(), rowindexes, columnindexes, values);
+        SparseRCMDoubleMatrix2D B = S.getRowCompressedModified();
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
     }
 
     public void testGetColumnCompressed() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         double[] values = new double[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = Math.random();
         }
-        SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        SparseCCDoubleMatrix2D B = A.getColumnCompressed(false);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        SparseDoubleMatrix2D S = new SparseDoubleMatrix2D(A.rows(), A.columns(), rowindexes, columnindexes, values);
+        SparseCCDoubleMatrix2D B = S.getColumnCompressed(false);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
-        B = A.getColumnCompressed(true);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        B = S.getColumnCompressed(true);
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
 
     }
 
     public void testGetColumnCompressedModified() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         double[] values = new double[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = (int) (Math.random() * NROWS);
-            columnindexes[i] = (int) (Math.random() * NCOLUMNS);
+            rowindexes[i] = (int) Math.abs(random.nextInt() % NROWS);
+            columnindexes[i] = (int) Math.abs(random.nextInt() % NCOLUMNS);
             values[i] = Math.random();
         }
-        SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        SparseCCMDoubleMatrix2D B = A.getColumnCompressedModified();
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(A.getQuick(r, c), B.getQuick(r, c));
+        SparseDoubleMatrix2D S = new SparseDoubleMatrix2D(A.rows(), A.columns(), rowindexes, columnindexes, values);
+        SparseCCMDoubleMatrix2D B = S.getColumnCompressedModified();
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(S.getQuick(r, c), B.getQuick(r, c));
             }
         }
     }
 
     public void testAssignIntArrayIntArrayDoubleArrayDoubleDoubleFunction() {
-        int SIZE = NROWS * NCOLUMNS;
+        int SIZE = A.rows() * A.columns();
         int[] rowindexes = new int[SIZE];
         int[] columnindexes = new int[SIZE];
         double[] values = new double[SIZE];
-        DoubleMatrix2D Adense = new DenseDoubleMatrix2D(NROWS, NCOLUMNS);
+        DoubleMatrix2D Adense = new DenseDoubleMatrix2D(A.rows(), A.columns());
         for (int i = 0; i < SIZE; i++) {
-            rowindexes[i] = i % NROWS;
-            columnindexes[i] = i % NCOLUMNS;
+            rowindexes[i] = i % A.rows();
+            columnindexes[i] = i % A.columns();
             values[i] = Math.random();
             Adense.setQuick(rowindexes[i], columnindexes[i], values[i]);
         }
-        SparseDoubleMatrix2D A = new SparseDoubleMatrix2D(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-        A.assign(rowindexes, columnindexes, values, DoubleFunctions.plus);
-        for (int r = 0; r < NROWS; r++) {
-            for (int c = 0; c < NCOLUMNS; c++) {
-                assertEquals(2 * Adense.getQuick(r, c), A.getQuick(r, c));
+        SparseDoubleMatrix2D S = new SparseDoubleMatrix2D(A.rows(), A.columns());
+        S.assign(rowindexes, columnindexes, values, DoubleFunctions.multSecond(2));
+        for (int r = 0; r < A.rows(); r++) {
+            for (int c = 0; c < A.columns(); c++) {
+                assertEquals(2 * Adense.getQuick(r, c), S.getQuick(r, c));
             }
         }
     }

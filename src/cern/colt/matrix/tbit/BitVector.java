@@ -251,7 +251,7 @@ public class BitVector extends cern.colt.PersistentObject {
      * 
      * @return a deep copy of this bit vector.
      */
-    @Override
+
     public Object clone() {
         BitVector clone = (BitVector) super.clone();
         if (this.bits != null)
@@ -333,7 +333,7 @@ public class BitVector extends cern.colt.PersistentObject {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof BitVector))
             return false;
@@ -604,7 +604,7 @@ public class BitVector extends cern.colt.PersistentObject {
      * 
      * @return a hash code value for the receiver.
      */
-    @Override
+
     public int hashCode() {
         long h = 1234;
         for (int i = bits.length; --i >= 0;)
@@ -976,7 +976,7 @@ public class BitVector extends cern.colt.PersistentObject {
      * 
      * @return a string representation of this bit vector.
      */
-    @Override
+
     public String toString() {
         StringBuffer buffer = new StringBuffer(nbits);
         String separator = "";

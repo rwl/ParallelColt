@@ -100,7 +100,6 @@ public class Dcs_dmperm {
     /* return 1 if row i is in R2 */
     private static class Cs_rprune implements Dcs_ifkeep {
 
-        @Override
         public boolean fkeep(int i, int j, double aij, Object other) {
             int[] rr = (int[]) other;
             return (i >= rr[1] && i < rr[2]);
@@ -109,13 +108,13 @@ public class Dcs_dmperm {
     }
 
     /**
-     * Compute coarse and then fine Dulmage-Mendelsohn decompositionm. seed
+     * Compute coarse and then fine Dulmage-Mendelsohn decomposition. seed
      * optionally selects a randomized algorithm.
      * 
      * @param A
      *            column-compressed matrix
      * @param seed
-     *            0: natural, -1: reverse, random order oterwise
+     *            0: natural, -1: reverse, random order otherwise
      * @return Dulmage-Mendelsohn analysis, null on error
      */
     public static Dcsd cs_dmperm(Dcs A, int seed) {
@@ -146,7 +145,7 @@ public class Dcs_dmperm {
         wi = r;
         wj = s; /* use r and s as workspace */
         for (j = 0; j < n; j++)
-            wj[j] = -1; /* unmark all cols for bfs */
+            wj[j] = -1; /* unmark all columns for bfs */
         for (i = 0; i < m; i++)
             wi[i] = -1; /* unmark all rows for bfs */
         cs_bfs(A, n, wi, wj, q, imatch, imatch_offset, jmatch, 0, 1); /* find C1, R1 from C0*/
@@ -168,7 +167,7 @@ public class Dcs_dmperm {
         if (C == null)
             return (null);
         Cp = C.p;
-        nc = cc[3] - cc[2]; /* delete cols C0, C1, and C3 from C */
+        nc = cc[3] - cc[2]; /* delete columns C0, C1, and C3 from C */
         if (cc[2] > 0)
             for (j = cc[2]; j <= cc[3]; j++)
                 Cp[j - cc[2]] = Cp[j];

@@ -6,7 +6,6 @@ public class SparseCCMFloatMatrix2DViewTest extends SparseCCMFloatMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseCCMFloatMatrix2D(NCOLUMNS, NROWS).viewDice();
         B = new SparseCCMFloatMatrix2D(NCOLUMNS, NROWS).viewDice();

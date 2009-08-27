@@ -14,6 +14,7 @@ import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.DenseLargeFloatMatrix2D;
+import cern.jet.math.tfcomplex.FComplex;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -35,22 +36,126 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         this.content = newContent;
     }
 
-    @Override
+    public FComplexMatrix2D assign(final float[] values) {
+        if (content instanceof DiagonalFComplexMatrix2D) {
+            int dlength = ((DiagonalFComplexMatrix2D) content).dlength;
+            final float[] elems = ((DiagonalFComplexMatrix2D) content).elements;
+            if (values.length != 2 * dlength)
+                throw new IllegalArgumentException("Must have same length: length=" + values.length + " 2 * dlength="
+                        + 2 * dlength);
+            int nthreads = ConcurrencyUtils.getNumberOfThreads();
+            if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+                nthreads = Math.min(nthreads, dlength);
+                Future<?>[] futures = new Future[nthreads];
+                int k = dlength / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstIdx = j * k;
+                    final int lastIdx = (j == nthreads - 1) ? dlength : firstIdx + k;
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                        public void run() {
+                            for (int i = firstIdx; i < lastIdx; i++) {
+                                elems[2 * i] = values[2 * i];
+                                elems[2 * i + 1] = values[2 * i + 1];
+                            }
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+            } else {
+                for (int i = 0; i < dlength; i++) {
+                    elems[2 * i] = values[2 * i];
+                    elems[2 * i + 1] = values[2 * i + 1];
+                }
+            }
+            return this;
+        } else {
+            return super.assign(values);
+        }
+    }
+
+    public boolean equals(float[] value) {
+        if (content instanceof DiagonalFComplexMatrix2D) {
+            float epsilon = cern.colt.matrix.tfcomplex.algo.FComplexProperty.DEFAULT.tolerance();
+            float[] elements = (float[]) content.elements();
+            int dlength = ((DiagonalFComplexMatrix2D) content).dlength;
+            float[] x = new float[2];
+            float[] diff = new float[2];
+            for (int i = 0; i < dlength; i++) {
+                x[0] = elements[2 * i];
+                x[1] = elements[2 * i + 1];
+                diff[0] = Math.abs(value[0] - x[0]);
+                diff[1] = Math.abs(value[1] - x[1]);
+                if (((diff[0] != diff[0]) || (diff[1] != diff[1]))
+                        && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1]))))
+                        || (FComplex.isEqual(value, x, epsilon))) {
+                    diff[0] = 0;
+                    diff[1] = 0;
+                }
+                if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return super.equals(value);
+        }
+    }
+
+    public boolean equals(Object obj) {
+        if (content instanceof DiagonalFComplexMatrix2D && obj instanceof DiagonalFComplexMatrix2D) {
+            DiagonalFComplexMatrix2D other = (DiagonalFComplexMatrix2D) obj;
+            int dlength = ((DiagonalFComplexMatrix2D) content).dlength;
+            float epsilon = cern.colt.matrix.tfcomplex.algo.FComplexProperty.DEFAULT.tolerance();
+            if (this == obj)
+                return true;
+            if (!(this != null && obj != null))
+                return false;
+            DiagonalFComplexMatrix2D A = (DiagonalFComplexMatrix2D) content;
+            DiagonalFComplexMatrix2D B = (DiagonalFComplexMatrix2D) obj;
+            if (A.columns() != B.columns() || A.rows() != B.rows() || A.diagonalIndex() != B.diagonalIndex()
+                    || A.diagonalLength() != B.diagonalLength())
+                return false;
+            float[] otherElements = other.elements;
+            float[] elements = ((DiagonalFComplexMatrix2D) content).elements;
+            float[] x = new float[2];
+            float[] value = new float[2];
+            float[] diff = new float[2];
+            for (int i = 0; i < dlength; i++) {
+                x[0] = elements[2 * i];
+                x[1] = elements[2 * i + 1];
+                value[0] = otherElements[2 * i];
+                value[1] = otherElements[2 * i + 1];
+                diff[0] = Math.abs(value[0] - x[0]);
+                diff[1] = Math.abs(value[1] - x[1]);
+                if (((diff[0] != diff[0]) || (diff[1] != diff[1]))
+                        && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1]))))
+                        || (FComplex.isEqual(value, x, epsilon))) {
+                    diff[0] = 0;
+                    diff[1] = 0;
+                }
+                if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return super.equals(obj);
+        }
+    }
+
     public Object elements() {
         return content.elements();
     }
 
-    @Override
-    public float[] getQuick(int row, int column) {
+    public synchronized float[] getQuick(int row, int column) {
         return content.getQuick(row, column);
     }
 
-    @Override
     public FComplexMatrix2D like(int rows, int columns) {
         return content.like(rows, columns);
     }
 
-    @Override
     public FComplexMatrix1D like1D(int size) {
         return content.like1D(size);
     }
@@ -170,17 +275,14 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         }
     }
 
-    @Override
-    public void setQuick(int row, int column, float[] value) {
+    public synchronized void setQuick(int row, int column, float[] value) {
         content.setQuick(row, column, value);
     }
 
-    @Override
-    public void setQuick(int row, int column, float re, float im) {
+    public synchronized void setQuick(int row, int column, float re, float im) {
         content.setQuick(row, column, re, im);
     }
 
-    @Override
     public FComplexMatrix1D vectorize() {
         final DenseFComplexMatrix1D v = new DenseFComplexMatrix1D((int) size());
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -215,45 +317,37 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return v;
     }
 
-    @Override
     public FComplexMatrix1D viewColumn(int column) {
         return viewDice().viewRow(column);
     }
 
-    @Override
     public FComplexMatrix2D viewColumnFlip() {
         if (columns == 0)
             return this;
         WrapperFComplexMatrix2D view = new WrapperFComplexMatrix2D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float[] getQuick(int row, int column) {
+            public synchronized float[] getQuick(int row, int column) {
                 return content.getQuick(row, columns - 1 - column);
             }
 
-            @Override
-            public void setQuick(int row, int column, float[] value) {
+            public synchronized void setQuick(int row, int column, float[] value) {
                 content.setQuick(row, columns - 1 - column, value);
             }
 
-            @Override
-            public void setQuick(int row, int column, float re, float im) {
+            public synchronized void setQuick(int row, int column, float re, float im) {
                 content.setQuick(row, columns - 1 - column, re, im);
             }
 
-            @Override
-            public float[] get(int row, int column) {
+            public synchronized float[] get(int row, int column) {
                 return content.get(row, columns - 1 - column);
             }
 
-            @Override
-            public void set(int row, int column, float[] value) {
+            public synchronized void set(int row, int column, float[] value) {
                 content.set(row, columns - 1 - column, value);
             }
 
-            @Override
-            public void set(int row, int column, float re, float im) {
+            public synchronized void set(int row, int column, float re, float im) {
                 content.set(row, columns - 1 - column, re, im);
             }
 
@@ -262,38 +356,31 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return view;
     }
 
-    @Override
     public FComplexMatrix2D viewDice() {
         WrapperFComplexMatrix2D view = new WrapperFComplexMatrix2D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float[] getQuick(int row, int column) {
+            public synchronized float[] getQuick(int row, int column) {
                 return content.getQuick(column, row);
             }
 
-            @Override
-            public void setQuick(int row, int column, float[] value) {
+            public synchronized void setQuick(int row, int column, float[] value) {
                 content.setQuick(column, row, value);
             }
 
-            @Override
-            public void setQuick(int row, int column, float re, float im) {
+            public synchronized void setQuick(int row, int column, float re, float im) {
                 content.setQuick(column, row, re, im);
             }
 
-            @Override
-            public float[] get(int row, int column) {
+            public synchronized float[] get(int row, int column) {
                 return content.get(column, row);
             }
 
-            @Override
-            public void set(int row, int column, float[] value) {
+            public synchronized void set(int row, int column, float[] value) {
                 content.set(column, row, value);
             }
 
-            @Override
-            public void set(int row, int column, float re, float im) {
+            public synchronized void set(int row, int column, float re, float im) {
                 content.set(column, row, re, im);
             }
 
@@ -305,39 +392,32 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return view;
     }
 
-    @Override
     public FComplexMatrix2D viewPart(final int row, final int column, int height, int width) {
         checkBox(row, column, height, width);
         WrapperFComplexMatrix2D view = new WrapperFComplexMatrix2D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float[] getQuick(int i, int j) {
+            public synchronized float[] getQuick(int i, int j) {
                 return content.getQuick(row + i, column + j);
             }
 
-            @Override
-            public void setQuick(int i, int j, float[] value) {
+            public synchronized void setQuick(int i, int j, float[] value) {
                 content.setQuick(row + i, column + j, value);
             }
 
-            @Override
-            public void setQuick(int i, int j, float re, float im) {
+            public synchronized void setQuick(int i, int j, float re, float im) {
                 content.setQuick(row + i, column + j, re, im);
             }
 
-            @Override
-            public float[] get(int i, int j) {
+            public synchronized float[] get(int i, int j) {
                 return content.get(row + i, column + j);
             }
 
-            @Override
-            public void set(int i, int j, float[] value) {
+            public synchronized void set(int i, int j, float[] value) {
                 content.set(row + i, column + j, value);
             }
 
-            @Override
-            public void set(int i, int j, float re, float im) {
+            public synchronized void set(int i, int j, float re, float im) {
                 content.set(row + i, column + j, re, im);
             }
 
@@ -349,46 +429,38 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return view;
     }
 
-    @Override
     public FComplexMatrix1D viewRow(int row) {
         checkRow(row);
         return new DelegateFComplexMatrix1D(this, row);
     }
 
-    @Override
     public FComplexMatrix2D viewRowFlip() {
         if (rows == 0)
             return this;
         WrapperFComplexMatrix2D view = new WrapperFComplexMatrix2D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float[] getQuick(int row, int column) {
+            public synchronized float[] getQuick(int row, int column) {
                 return content.getQuick(rows - 1 - row, column);
             }
 
-            @Override
-            public void setQuick(int row, int column, float[] value) {
+            public synchronized void setQuick(int row, int column, float[] value) {
                 content.setQuick(rows - 1 - row, column, value);
             }
 
-            @Override
-            public void setQuick(int row, int column, float re, float im) {
+            public synchronized void setQuick(int row, int column, float re, float im) {
                 content.setQuick(rows - 1 - row, column, re, im);
             }
 
-            @Override
-            public float[] get(int row, int column) {
+            public synchronized float[] get(int row, int column) {
                 return content.get(rows - 1 - row, column);
             }
 
-            @Override
-            public void set(int row, int column, float[] value) {
+            public synchronized void set(int row, int column, float[] value) {
                 content.set(rows - 1 - row, column, value);
             }
 
-            @Override
-            public void set(int row, int column, float re, float im) {
+            public synchronized void set(int row, int column, float re, float im) {
                 content.set(rows - 1 - row, column, re, im);
             }
         };
@@ -397,7 +469,6 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return view;
     }
 
-    @Override
     public FComplexMatrix2D viewSelection(int[] rowIndexes, int[] columnIndexes) {
         // check for "all"
         if (rowIndexes == null) {
@@ -419,33 +490,27 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         WrapperFComplexMatrix2D view = new WrapperFComplexMatrix2D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float[] getQuick(int i, int j) {
+            public synchronized float[] getQuick(int i, int j) {
                 return content.getQuick(rix[i], cix[j]);
             }
 
-            @Override
-            public void setQuick(int i, int j, float[] value) {
+            public synchronized void setQuick(int i, int j, float[] value) {
                 content.setQuick(rix[i], cix[j], value);
             }
 
-            @Override
-            public void setQuick(int i, int j, float re, float im) {
+            public synchronized void setQuick(int i, int j, float re, float im) {
                 content.setQuick(rix[i], cix[j], re, im);
             }
 
-            @Override
-            public float[] get(int i, int j) {
+            public synchronized float[] get(int i, int j) {
                 return content.get(rix[i], cix[j]);
             }
 
-            @Override
-            public void set(int i, int j, float[] value) {
+            public synchronized void set(int i, int j, float[] value) {
                 content.set(rix[i], cix[j], value);
             }
 
-            @Override
-            public void set(int i, int j, float re, float im) {
+            public synchronized void set(int i, int j, float re, float im) {
                 content.set(rix[i], cix[j], re, im);
             }
 
@@ -457,40 +522,33 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return view;
     }
 
-    @Override
     public FComplexMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
         if (_rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
         WrapperFComplexMatrix2D view = new WrapperFComplexMatrix2D(this) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float[] getQuick(int row, int column) {
+            public synchronized float[] getQuick(int row, int column) {
                 return content.getQuick(_rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void setQuick(int row, int column, float[] value) {
+            public synchronized void setQuick(int row, int column, float[] value) {
                 content.setQuick(_rowStride * row, _columnStride * column, value);
             }
 
-            @Override
-            public void setQuick(int row, int column, float re, float im) {
+            public synchronized void setQuick(int row, int column, float re, float im) {
                 content.setQuick(_rowStride * row, _columnStride * column, re, im);
             }
 
-            @Override
-            public float[] get(int row, int column) {
+            public synchronized float[] get(int row, int column) {
                 return content.get(_rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void set(int row, int column, float[] value) {
+            public synchronized void set(int row, int column, float[] value) {
                 content.set(_rowStride * row, _columnStride * column, value);
             }
 
-            @Override
-            public void set(int row, int column, float re, float im) {
+            public synchronized void set(int row, int column, float re, float im) {
                 content.set(_rowStride * row, _columnStride * column, re, im);
             }
         };
@@ -503,22 +561,18 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return view;
     }
 
-    @Override
     protected FComplexMatrix2D getContent() {
         return content;
     }
 
-    @Override
     protected FComplexMatrix1D like1D(int size, int offset, int stride) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected FComplexMatrix2D viewSelectionLike(int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never be called
     }
 
-    @Override
     public FloatMatrix2D getImaginaryPart() {
         final DenseLargeFloatMatrix2D Im = new DenseLargeFloatMatrix2D(rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -550,7 +604,6 @@ public class WrapperFComplexMatrix2D extends FComplexMatrix2D {
         return Im;
     }
 
-    @Override
     public FloatMatrix2D getRealPart() {
         final DenseLargeFloatMatrix2D Re = new DenseLargeFloatMatrix2D(rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

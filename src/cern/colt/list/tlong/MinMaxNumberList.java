@@ -119,7 +119,7 @@ public class MinMaxNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param element
      *            element to be appended to this list.
      */
-    @Override
+
     public void add(long element) {
         // overridden for performance only.
         if (size == capacity) {
@@ -194,7 +194,7 @@ public class MinMaxNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param minCapacity
      *            the desired minimum capacity.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         int oldCapacity = capacity;
         if (minCapacity > oldCapacity) {
@@ -219,7 +219,7 @@ public class MinMaxNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param index
      *            index of element to return.
      */
-    @Override
+
     public long getQuick(int index) {
         int i = index * this.bitsPerElement;
         return this.minValue + QuickBitVector.getLongFromTo(this.bits, i, i + this.bitsPerElement - 1);
@@ -282,7 +282,7 @@ public class MinMaxNumberList extends cern.colt.list.tlong.AbstractLongList {
      * @param element
      *            element to be stored at the specified position.
      */
-    @Override
+
     public void setQuick(int index, long element) {
         int i = index * this.bitsPerElement;
         QuickBitVector.putLongFromTo(this.bits, element - this.minValue, i, i + this.bitsPerElement - 1);
@@ -293,8 +293,8 @@ public class MinMaxNumberList extends cern.colt.list.tlong.AbstractLongList {
      * should not release or allocate new memory but simply set some instance
      * variable like <tt>size</tt>.
      */
-    @Override
-    protected void setSizeRaw(int newSize) {
+
+    public void setSizeRaw(int newSize) {
         super.setSizeRaw(newSize);
     }
 
@@ -360,7 +360,7 @@ public class MinMaxNumberList extends cern.colt.list.tlong.AbstractLongList {
      * application can use this operation to minimize the storage of the
      * receiver.
      */
-    @Override
+
     public void trimToSize() {
         int oldCapacity = capacity;
         if (size < oldCapacity) {

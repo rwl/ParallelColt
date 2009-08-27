@@ -56,8 +56,8 @@ class DelegateIntMatrix1D extends WrapperIntMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
-    public int getQuick(int index) {
+
+    public synchronized int getQuick(int index) {
         return content.getQuick(row, index);
     }
 
@@ -74,7 +74,7 @@ class DelegateIntMatrix1D extends WrapperIntMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public IntMatrix1D like(int size) {
         return content.like1D(size);
     }
@@ -93,7 +93,7 @@ class DelegateIntMatrix1D extends WrapperIntMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public IntMatrix2D like2D(int rows, int columns) {
         return content.like(rows, columns);
     }
@@ -112,8 +112,8 @@ class DelegateIntMatrix1D extends WrapperIntMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
-    public void setQuick(int index, int value) {
+
+    public synchronized void setQuick(int index, int value) {
         content.setQuick(row, index, value);
     }
 }

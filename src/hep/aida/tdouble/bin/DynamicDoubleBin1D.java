@@ -101,7 +101,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * @param element
      *            element to be appended.
      */
-    @Override
+
     public synchronized void add(double element) {
         elements.add(element);
         invalidateAll();
@@ -122,7 +122,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      *             <tt>list.size()&gt;0 && (from&lt;0 || from&gt;to || to&gt;=list.size())</tt>
      *             .
      */
-    @Override
+
     public synchronized void addAllOfFromTo(DoubleArrayList list, int from, int to) {
         this.elements.addAllOfFromTo(list, from, to);
         this.invalidateAll();
@@ -174,7 +174,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * Removes all elements from the receiver. The receiver will be empty after
      * this call returns.
      */
-    @Override
+
     public synchronized void clear() {
         super.clear();
 
@@ -189,7 +189,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Resets the values of all measures.
      */
-    @Override
+
     protected void clearAllMeasures() {
         super.clearAllMeasures();
 
@@ -202,7 +202,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public synchronized Object clone() {
         DynamicDoubleBin1D clone = (DynamicDoubleBin1D) super.clone();
         if (this.elements != null)
@@ -315,7 +315,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * superset of B and B is a superset of A. (Elements must occur the same
      * number of times, order is irrelevant.)
      */
-    @Override
+
     public synchronized boolean equals(Object object) {
         if (!(object instanceof DynamicDoubleBin1D))
             return false;
@@ -411,7 +411,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * @see #hasSumOfPowers(int)
      * @see #sumOfPowers(int)
      */
-    @Override
+
     public int getMaxOrderForSumOfPowers() {
         return Integer.MAX_VALUE;
     }
@@ -423,7 +423,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * @see #hasSumOfPowers(int)
      * @see #sumOfPowers(int)
      */
-    @Override
+
     public int getMinOrderForSumOfPowers() {
         return Integer.MIN_VALUE;
     }
@@ -452,7 +452,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * the elements can be obtained via <tt>elements()</tt> methods.
      * 
      */
-    @Override
+
     public synchronized boolean isRebinnable() {
         return true;
     }
@@ -460,7 +460,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Returns the maximum.
      */
-    @Override
+
     public synchronized double max() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -470,7 +470,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Returns the minimum.
      */
-    @Override
+
     public synchronized double min() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -487,7 +487,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * @param c
      *            any number.
      */
-    @Override
+
     public synchronized double moment(int k, double c) {
         // currently no caching for this parameter
         return DoubleDescriptive.moment(this.elements, k, c);
@@ -501,7 +501,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * @param phi
      *            must satisfy <tt>0 &lt; phi &lt; 1</tt>.
      */
-    @Override
+
     public synchronized double quantile(double phi) {
         return DoubleDescriptive.quantile(sortedElements_unsafe(), phi);
     }
@@ -516,7 +516,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * @return the exact percentage <tt>phi</tt> of elements
      *         <tt>&lt;= element</tt> (<tt>0.0 &lt;= phi &lt;= 1.0)</tt>.
      */
-    @Override
+
     public synchronized double quantileInverse(double element) {
         return DoubleDescriptive.quantileInverse(sortedElements_unsafe(), element);
     }
@@ -530,7 +530,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      *            <tt>percentages</tt> must be sorted ascending.
      * @return the exact quantiles.
      */
-    @Override
+
     public DoubleArrayList quantiles(DoubleArrayList percentages) {
         return DoubleDescriptive.quantiles(sortedElements_unsafe(), percentages);
     }
@@ -826,7 +826,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * 
      * @return the number of elements contained in the receiver.
      */
-    @Override
+
     public synchronized int size() {
         return elements.size();
         // Never ever use "this.size" as it would be intuitive!
@@ -922,7 +922,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Returns the sum of all elements, which is <tt>Sum( x[i] )</tt>.
      */
-    @Override
+
     public synchronized double sum() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -932,7 +932,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Returns the sum of inversions, which is <tt>Sum( 1 / x[i] )</tt>.
      */
-    @Override
+
     public synchronized double sumOfInversions() {
         if (!isSumOfInversionsValid)
             updateSumOfInversions();
@@ -942,7 +942,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Returns the sum of logarithms, which is <tt>Sum( Log(x[i]) )</tt>.
      */
-    @Override
+
     public synchronized double sumOfLogarithms() {
         if (!isSumOfLogarithmsValid)
             updateSumOfLogarithms();
@@ -957,7 +957,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      *            the order of the powers.
      * @return the sum of powers.
      */
-    @Override
+
     public synchronized double sumOfPowers(int k) {
         // no chaching for this measure
         if (k >= -1 && k <= 2)
@@ -969,7 +969,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Returns the sum of squares, which is <tt>Sum( x[i] * x[i] )</tt>.
      */
-    @Override
+
     public synchronized double sumOfSquares() {
         if (!isIncrementalStatValid)
             updateIncrementalStats();
@@ -979,7 +979,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public synchronized String toString() {
         StringBuffer buf = new StringBuffer(super.toString());
         DoubleArrayList distinctElements = new DoubleArrayList();
@@ -1036,7 +1036,7 @@ public class DynamicDoubleBin1D extends QuantileDoubleBin1D {
      * operation to minimize the storage of the receiver. Does not affect
      * functionality.
      */
-    @Override
+
     public synchronized void trimToSize() {
         this.elements.trimToSize();
 

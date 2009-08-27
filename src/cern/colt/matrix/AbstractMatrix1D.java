@@ -164,7 +164,7 @@ public abstract class AbstractMatrix1D extends AbstractMatrix {
     /**
      * Returns the number of cells.
      */
-    @Override
+
     public long size() {
         return size;
     }

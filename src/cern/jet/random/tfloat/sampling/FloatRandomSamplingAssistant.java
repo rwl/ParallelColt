@@ -71,7 +71,7 @@ public class FloatRandomSamplingAssistant extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         FloatRandomSamplingAssistant copy = (FloatRandomSamplingAssistant) super.clone();
         copy.sampler = (FloatRandomSampler) this.sampler.clone();

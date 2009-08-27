@@ -174,7 +174,7 @@ class FloatBufferSet extends BufferSet {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         FloatBufferSet copy = (FloatBufferSet) super.clone();
 
@@ -441,7 +441,7 @@ class FloatBufferSet extends BufferSet {
     /**
      * @return a String representation of the receiver
      */
-    @Override
+
     public String toString() {
         StringBuffer buf = new StringBuffer();
         for (int b = 0; b < this.b(); b++) {

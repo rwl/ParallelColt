@@ -81,7 +81,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dct3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -100,7 +100,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void dct2Slices(final boolean scale) {
         if (dct2Slices == null) {
             dct2Slices = new DoubleDCT_2D(rows, columns);
@@ -139,7 +139,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
     /**
      * Computes the 3D discrete Hartley transform (DHT) of this matrix.
      */
-    @Override
+
     public void dht3() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -155,7 +155,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      * matrix.
      * 
      */
-    @Override
+
     public void dht2Slices() {
         if (dht2Slices == null) {
             dht2Slices = new DoubleDHT_2D(rows, columns);
@@ -197,7 +197,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      * @param scale
      *            if true then scaling is performed
      */
-    @Override
+
     public void dst3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -215,7 +215,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      * @param scale
      *            if true then scaling is performed
      */
-    @Override
+
     public void dst2Slices(final boolean scale) {
         if (dst2Slices == null) {
             dst2Slices = new DoubleDST_2D(rows, columns);
@@ -307,7 +307,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *             if the slice size or the row size or the column size of this
      *             matrix is not a power of 2 number.
      */
-    @Override
+
     public void fft3() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -326,7 +326,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *         matrix.
      * 
      */
-    @Override
+
     public DenseLargeDComplexMatrix3D getFft2Slices() {
         if (fft2Slices == null) {
             fft2Slices = new DoubleFFT_2D(rows, columns);
@@ -376,7 +376,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      * 
      * @return the 3D discrete Fourier transform (DFT) of this matrix.
      */
-    @Override
+
     public DenseLargeDComplexMatrix3D getFft3() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -433,7 +433,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *         slice of this matrix.
      * 
      */
-    @Override
+
     public DenseLargeDComplexMatrix3D getIfft2Slices(final boolean scale) {
         if (fft2Slices == null) {
             fft2Slices = new DoubleFFT_2D(rows, columns);
@@ -488,7 +488,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *         matrix.
      * 
      */
-    @Override
+
     public DenseLargeDComplexMatrix3D getIfft3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -534,7 +534,6 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
         return C;
     }
 
-    @Override
     public double getQuick(int slice, int row, int column) {
         return elements[slice][row][column];
     }
@@ -547,7 +546,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idct2Slices(final boolean scale) {
         if (dct2Slices == null) {
             dct2Slices = new DoubleDCT_2D(rows, columns);
@@ -595,7 +594,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *             matrix is not a power of 2 number.
      * 
      */
-    @Override
+
     public void idht3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -618,7 +617,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *             matrix is not a power of 2 number.
      * 
      */
-    @Override
+
     public void idht2Slices(final boolean scale) {
         if (dht2Slices == null) {
             dht2Slices = new DoubleDHT_2D(rows, columns);
@@ -662,7 +661,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idct3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -681,7 +680,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idst2Slices(final boolean scale) {
         if (dst2Slices == null) {
             dst2Slices = new DoubleDST_2D(rows, columns);
@@ -725,7 +724,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void idst3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -793,7 +792,7 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
      *             if the slice size or the row size or the column size of this
      *             matrix is not a power of 2 number.
      */
-    @Override
+
     public void ifft3(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -804,22 +803,18 @@ public class DenseLargeDoubleMatrix3D extends WrapperDoubleMatrix3D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, double value) {
         elements[slice][row][column] = value;
     }
 
-    @Override
     public double[][][] elements() {
         return elements;
     }
 
-    @Override
     protected DoubleMatrix3D getContent() {
         return this;
     }
 
-    @Override
     public DoubleMatrix3D like(int slices, int rows, int columns) {
         return new DenseLargeDoubleMatrix3D(slices, rows, columns);
     }

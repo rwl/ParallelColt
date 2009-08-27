@@ -87,7 +87,7 @@ public class FloatUniform extends AbstractContinousFloatDistribution {
      * Returns a uniformly distributed random number in the open interval
      * <tt>(min,max)</tt> (excluding <tt>min</tt> and <tt>max</tt>).
      */
-    @Override
+
     public float nextFloat() {
         return min + (max - min) * randomGenerator.raw();
     }
@@ -105,7 +105,7 @@ public class FloatUniform extends AbstractContinousFloatDistribution {
      * Returns a uniformly distributed random number in the closed interval
      * <tt>[min,max]</tt> (including <tt>min</tt> and <tt>max</tt>).
      */
-    @Override
+
     public int nextInt() {
         return nextIntFromTo(Math.round(min), Math.round(max));
     }
@@ -259,7 +259,7 @@ public class FloatUniform extends AbstractContinousFloatDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + min + "," + max + ")";
     }

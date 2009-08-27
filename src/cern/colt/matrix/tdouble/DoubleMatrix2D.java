@@ -982,7 +982,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1508,7 +1508,7 @@ public abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * 
      * @see cern.colt.matrix.tdouble.algo.DoubleFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tdouble.algo.DoubleFormatter().toString(this);
     }

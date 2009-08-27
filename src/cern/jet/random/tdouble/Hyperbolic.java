@@ -63,7 +63,7 @@ public class Hyperbolic extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public double nextDouble() {
         return nextDouble(alpha, beta);
     }
@@ -168,7 +168,7 @@ public class Hyperbolic extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return this.getClass().getName() + "(" + alpha + "," + beta + ")";
     }

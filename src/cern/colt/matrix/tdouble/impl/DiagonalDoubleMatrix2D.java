@@ -121,7 +121,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         elements = new double[dlength];
     }
 
-    @Override
     public DoubleMatrix2D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
             final double alpha = ((cern.jet.math.tdouble.DoubleMult) function).multiplicator;
@@ -142,14 +141,12 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(double value) {
         for (int i = dlength; --i >= 0;)
             elements[i] = value;
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final double[] values) {
         if (values.length != dlength)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + " dlength=" + dlength);
@@ -159,17 +156,12 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
             Future<?>[] futures = new Future[nthreads];
             int k = dlength / nthreads;
             for (int j = 0; j < nthreads; j++) {
-                final int startrow = j * k;
-                final int stoprow;
-                if (j == nthreads - 1) {
-                    stoprow = dlength;
-                } else {
-                    stoprow = startrow + k;
-                }
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? dlength : firstRow + k;
                 futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                     public void run() {
-                        for (int r = startrow; r < stoprow; r++) {
+                        for (int r = firstRow; r < lastRow; r++) {
                             elements[r] = values[r];
                         }
                     }
@@ -184,7 +176,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final double[][] values) {
         if (values.length != rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
@@ -207,7 +198,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(DoubleMatrix2D source) {
         // overriden for performance only
         if (source == this)
@@ -227,7 +217,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D y, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
         checkShape(y);
         if (y instanceof DiagonalDoubleMatrix2D) {
@@ -248,37 +237,32 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
                 Future<?>[] futures = new Future[nthreads];
                 int k = dlength / nthreads;
                 for (int j = 0; j < nthreads; j++) {
-                    final int startrow = j * k;
-                    final int stoprow;
-                    if (j == nthreads - 1) {
-                        stoprow = dlength;
-                    } else {
-                        stoprow = startrow + k;
-                    }
+                    final int firstRow = j * k;
+                    final int lastRow = (j == nthreads - 1) ? dlength : firstRow + k;
                     futures[j] = ConcurrencyUtils.submit(new Runnable() {
 
                         public void run() {
                             if (function instanceof cern.jet.math.tdouble.DoublePlusMultSecond) { // x[i] = x[i] + alpha*y[i]
                                 final double alpha = ((cern.jet.math.tdouble.DoublePlusMultSecond) function).multiplicator;
                                 if (alpha == 1) {
-                                    for (int j = startrow; j < stoprow; j++) {
+                                    for (int j = firstRow; j < lastRow; j++) {
                                         elements[j] += otherElements[j];
                                     }
                                 } else {
-                                    for (int j = startrow; j < stoprow; j++) {
+                                    for (int j = firstRow; j < lastRow; j++) {
                                         elements[j] = elements[j] + alpha * otherElements[j];
                                     }
                                 }
                             } else if (function == cern.jet.math.tdouble.DoubleFunctions.mult) { // x[i] = x[i] * y[i]
-                                for (int j = startrow; j < stoprow; j++) {
+                                for (int j = firstRow; j < lastRow; j++) {
                                     elements[j] = elements[j] * otherElements[j];
                                 }
                             } else if (function == cern.jet.math.tdouble.DoubleFunctions.div) { // x[i] = x[i] /  y[i]
-                                for (int j = startrow; j < stoprow; j++) {
+                                for (int j = firstRow; j < lastRow; j++) {
                                     elements[j] = elements[j] / otherElements[j];
                                 }
                             } else {
-                                for (int j = startrow; j < stoprow; j++) {
+                                for (int j = firstRow; j < lastRow; j++) {
                                     elements[j] = function.apply(elements[j], otherElements[j]);
                                 }
                             }
@@ -318,7 +302,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -363,12 +346,10 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return cardinality;
     }
 
-    @Override
     public double[] elements() {
         return elements;
     }
 
-    @Override
     public boolean equals(double value) {
         double epsilon = cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.tolerance();
         for (int r = 0; r < dlength; r++) {
@@ -383,7 +364,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return true;
     }
 
-    @Override
     public boolean equals(Object obj) {
         if (obj instanceof DiagonalDoubleMatrix2D) {
             DiagonalDoubleMatrix2D other = (DiagonalDoubleMatrix2D) obj;
@@ -416,7 +396,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
         for (int j = dlength; --j >= 0;) {
             double value = elements[j];
@@ -445,7 +424,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return dindex;
     }
 
-    @Override
     public double[] getMaxLocation() {
         int location = 0;
         double maxValue = 0;
@@ -517,7 +495,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return new double[] { maxValue, rowLocation, columnLocation };
     }
 
-    @Override
     public double[] getMinLocation() {
         int location = 0;
         double minValue = 0;
@@ -589,7 +566,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return new double[] { minValue, rowLocation, columnLocation };
     }
 
-    @Override
     public double getQuick(int row, int column) {
         if (dindex >= 0) {
             if (column < dindex) {
@@ -614,17 +590,14 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new SparseDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public DoubleMatrix1D like1D(int size) {
         return new SparseDoubleMatrix1D(size);
     }
 
-    @Override
     public void setQuick(int row, int column, double value) {
         if (dindex >= 0) {
             if (column < dindex) {
@@ -649,7 +622,6 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, double alpha, double beta, final boolean transposeA) {
         int rowsA = rows;
         int columnsA = columns;
@@ -671,8 +643,8 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
                     + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", "
                     + z.toStringShort());
 
-        if ((!ignore) && ((beta / alpha) != 1))
-            z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(beta / alpha));
+        if ((!ignore) && ((beta) != 1))
+            z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(beta));
 
         DenseDoubleMatrix1D zz = (DenseDoubleMatrix1D) z;
         final double[] elementsZ = zz.elements;
@@ -689,31 +661,28 @@ public class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         if (!transposeA) {
             if (dindex >= 0) {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[zeroZ + strideZ * i] += elements[i] * elementsY[dindex + zeroY + strideY * i];
+                    elementsZ[zeroZ + strideZ * i] += alpha * elements[i] * elementsY[dindex + zeroY + strideY * i];
                 }
             } else {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[-dindex + zeroZ + strideZ * i] += elements[i] * elementsY[zeroY + strideY * i];
+                    elementsZ[-dindex + zeroZ + strideZ * i] += alpha * elements[i] * elementsY[zeroY + strideY * i];
                 }
             }
         } else {
             if (dindex >= 0) {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[dindex + zeroZ + strideZ * i] += elements[i] * elementsY[zeroY + strideY * i];
+                    elementsZ[dindex + zeroZ + strideZ * i] += alpha * elements[i] * elementsY[zeroY + strideY * i];
                 }
             } else {
                 for (int i = dlength; --i >= 0;) {
-                    elementsZ[zeroZ + strideZ * i] += elements[i] * elementsY[-dindex + zeroY + strideY * i];
+                    elementsZ[zeroZ + strideZ * i] += alpha * elements[i] * elementsY[-dindex + zeroY + strideY * i];
                 }
             }
 
         }
-        if (alpha != 1)
-            z.assign(cern.jet.math.tdouble.DoubleFunctions.mult(alpha));
         return z;
     }
 
-    @Override
     protected DoubleMatrix2D getContent() {
         return this;
     }

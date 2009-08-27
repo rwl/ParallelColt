@@ -99,7 +99,7 @@ public class Empirical extends AbstractContinousDoubleDistribution {
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         Empirical copy = (Empirical) super.clone();
         if (this.cdf != null)
@@ -110,7 +110,7 @@ public class Empirical extends AbstractContinousDoubleDistribution {
     /**
      * Returns a random number from the distribution.
      */
-    @Override
+
     public double nextDouble() {
         double rand = randomGenerator.raw();
         if (this.cdf == null)
@@ -223,7 +223,7 @@ public class Empirical extends AbstractContinousDoubleDistribution {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         String interpolation = null;
         if (interpolationType == NO_INTERPOLATION)

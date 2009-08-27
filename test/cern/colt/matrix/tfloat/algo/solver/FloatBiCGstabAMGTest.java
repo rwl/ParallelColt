@@ -11,7 +11,6 @@ public class FloatBiCGstabAMGTest extends FloatBiCGstabTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new FloatAMG();

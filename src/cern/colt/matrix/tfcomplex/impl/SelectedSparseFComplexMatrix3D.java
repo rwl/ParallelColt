@@ -28,7 +28,7 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
     /**
      * The elements of this matrix.
      */
-    protected ConcurrentHashMap<Integer, float[]> elements;
+    protected ConcurrentHashMap<Long, float[]> elements;
 
     /**
      * The offsets of the visible cells of this matrix.
@@ -56,7 +56,7 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
      * @param columnOffsets
      *            The column offsets of the cells that shall be visible.
      */
-    protected SelectedSparseFComplexMatrix3D(ConcurrentHashMap<Integer, float[]> elements, int[] sliceOffsets,
+    protected SelectedSparseFComplexMatrix3D(ConcurrentHashMap<Long, float[]> elements, int[] sliceOffsets,
             int[] rowOffsets, int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         int slices = sliceOffsets.length;
@@ -75,28 +75,24 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
         this.isNoView = false;
     }
 
-    @Override
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
 
-    @Override
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
 
-    @Override
     protected int _sliceOffset(int absRank) {
         return sliceOffsets[absRank];
     }
 
-    @Override
     public float[] getQuick(int slice, int row, int column) {
-        return elements.get(offset + sliceOffsets[sliceZero + slice * sliceStride]
-                + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
+        return elements.get((long) offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride]);
     }
 
-    @Override
     public ConcurrentHashMap<Integer, float[]> elements() {
         throw new IllegalAccessError("This method is not supported.");
     }
@@ -111,7 +107,7 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FComplexMatrix3D other) {
         if (other instanceof SelectedSparseFComplexMatrix3D) {
             SelectedSparseFComplexMatrix3D otherMatrix = (SelectedSparseFComplexMatrix3D) other;
@@ -123,23 +119,20 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
         return false;
     }
 
-    @Override
     public long index(int slice, int row, int column) {
-        return this.offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride];
+        return (long) this.offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
     }
 
-    @Override
     public FComplexMatrix3D like(int slices, int rows, int columns) {
         return new SparseFComplexMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public FComplexMatrix1D vectorize() {
         throw new IllegalArgumentException("This method is not supported.");
     }
 
-    @Override
     protected FComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
             int columnStride) {
         throw new InternalError(); // this method is never called since
@@ -147,25 +140,24 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
         // properly.
     }
 
-    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         throw new InternalError(); // this method is never called
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float[] value) {
-        int index = offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(index);
         else
             this.elements.put(index, value);
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float re, float im) {
-        int index = offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
         if (re == 0 && im == 0)
             this.elements.remove(index);
         else
@@ -173,7 +165,6 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
 
     }
 
-    @Override
     protected void setUp(int slices, int rows, int columns) {
         super.setUp(slices, rows, columns);
         this.sliceStride = 1;
@@ -182,7 +173,6 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
         this.offset = 0;
     }
 
-    @Override
     protected AbstractMatrix3D vDice(int axis0, int axis1, int axis2) {
         super.vDice(axis0, axis1, axis2);
 
@@ -199,7 +189,6 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D viewColumn(int column) {
         checkColumn(column);
 
@@ -220,7 +209,6 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
                 viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
     }
 
-    @Override
     public FComplexMatrix2D viewRow(int row) {
         checkRow(row);
 
@@ -241,12 +229,10 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
                 viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
     }
 
-    @Override
     protected FComplexMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFComplexMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, this.offset);
     }
 
-    @Override
     public FComplexMatrix2D viewSlice(int slice) {
         checkSlice(slice);
 
@@ -267,12 +253,10 @@ class SelectedSparseFComplexMatrix3D extends FComplexMatrix3D {
                 viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
     }
 
-    @Override
     public FloatMatrix3D getImaginaryPart() {
         throw new IllegalAccessError("This method is not supported.");
     }
 
-    @Override
     public FloatMatrix3D getRealPart() {
         throw new IllegalAccessError("This method is not supported.");
     }

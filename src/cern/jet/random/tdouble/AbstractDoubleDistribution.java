@@ -107,7 +107,7 @@ public abstract class AbstractDoubleDistribution extends cern.colt.PersistentObj
      * 
      * @return a copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         AbstractDoubleDistribution copy = (AbstractDoubleDistribution) super.clone();
         if (this.randomGenerator != null)

@@ -68,7 +68,7 @@ class FloatBuffer extends Buffer {
     /**
      * Clears the receiver.
      */
-    @Override
+
     public void clear() {
         values.clear();
     }
@@ -78,7 +78,7 @@ class FloatBuffer extends Buffer {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         FloatBuffer copy = (FloatBuffer) super.clone();
         if (this.values != null)
@@ -97,7 +97,7 @@ class FloatBuffer extends Buffer {
     /**
      * Returns whether the receiver is empty.
      */
-    @Override
+
     public boolean isEmpty() {
         return values.size() == 0;
     }
@@ -105,7 +105,7 @@ class FloatBuffer extends Buffer {
     /**
      * Returns whether the receiver is empty.
      */
-    @Override
+
     public boolean isFull() {
         return values.size() == k;
     }
@@ -140,7 +140,7 @@ class FloatBuffer extends Buffer {
     /**
      * Returns the number of elements contained in the receiver.
      */
-    @Override
+
     public int size() {
         return values.size();
     }
@@ -148,7 +148,7 @@ class FloatBuffer extends Buffer {
     /**
      * Sorts the receiver.
      */
-    @Override
+
     public void sort() {
         if (!this.isSorted) {
             // IMPORTANT: TO DO : replace mergeSort with quickSort!
@@ -163,7 +163,7 @@ class FloatBuffer extends Buffer {
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         return "k=" + this.k + ", w=" + Long.toString(weight()) + ", l=" + Integer.toString(level()) + ", size="
                 + values.size();

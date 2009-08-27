@@ -72,7 +72,8 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction EUCLID = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return Math.sqrt(a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.square, DoubleFunctions.minus)));
+            return Math.sqrt(a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.square,
+                    DoubleFunctions.minus)));
         }
     };
 
@@ -82,7 +83,9 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction BRAY_CURTIS = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.abs, DoubleFunctions.minus)) / a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.plus);
+            return a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.abs,
+                    DoubleFunctions.minus))
+                    / a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.plus);
         }
     };
 
@@ -107,7 +110,8 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction MAXIMUM = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return a.aggregate(b, DoubleFunctions.max, DoubleFunctions.chain(DoubleFunctions.abs, DoubleFunctions.minus));
+            return a.aggregate(b, DoubleFunctions.max, DoubleFunctions
+                    .chain(DoubleFunctions.abs, DoubleFunctions.minus));
         }
     };
 
@@ -116,7 +120,8 @@ public class DoubleStatistic extends Object {
      */
     public static final VectorVectorFunction MANHATTAN = new VectorVectorFunction() {
         public final double apply(DoubleMatrix1D a, DoubleMatrix1D b) {
-            return a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.abs, DoubleFunctions.minus));
+            return a.aggregate(b, DoubleFunctions.plus, DoubleFunctions.chain(DoubleFunctions.abs,
+                    DoubleFunctions.minus));
         }
     };
 
@@ -596,15 +601,15 @@ public class DoubleStatistic extends Object {
     public static hep.aida.tdouble.DoubleIHistogram1D[][] histogram(
             final hep.aida.tdouble.DoubleIHistogram1D[][] histo, final DoubleMatrix2D matrix, final int m, final int n) {
         int rows = matrix.rows();
-        int cols = matrix.columns();
+        int columns = matrix.columns();
         if (m >= rows) {
             throw new IllegalArgumentException("Parameter m must be smaller than the number of rows in the matrix");
         }
-        if (n >= cols) {
+        if (n >= columns) {
             throw new IllegalArgumentException("Parameter n must be smaller than the number of columns in the matrix");
         }
         final int row_size = rows / m;
-        final int col_size = cols / n;
+        final int col_size = columns / n;
         final int[] height = new int[m];
         final int[] width = new int[n];
         for (int r = 0; r < m - 1; r++) {
@@ -614,10 +619,10 @@ public class DoubleStatistic extends Object {
         for (int c = 0; c < n - 1; c++) {
             width[c] = col_size;
         }
-        width[n - 1] = cols - (n - 1) * col_size;
+        width[n - 1] = columns - (n - 1) * col_size;
 
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (rows * cols >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        if ((nthreads > 1) && (rows * columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, m);
             Future<?>[] futures = new Future[nthreads];
             int k = m / nthreads;
@@ -750,13 +755,13 @@ public class DoubleStatistic extends Object {
         if (randomGenerator == null)
             randomGenerator = new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) System.currentTimeMillis());
 
-        int ncols = (int) Math.round(matrix.size() * fraction);
-        int max = ncols;
+        int ncolumns = (int) Math.round(matrix.size() * fraction);
+        int max = ncolumns;
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
 
         // sample
-        int n = ncols;
+        int n = ncolumns;
         int N = (int) matrix.size();
         cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
@@ -856,8 +861,8 @@ public class DoubleStatistic extends Object {
             randomGenerator = new cern.jet.random.tdouble.engine.DoubleMersenneTwister((int) System.currentTimeMillis());
 
         int nrows = (int) Math.round(matrix.rows() * rowFraction);
-        int ncols = (int) Math.round(matrix.columns() * columnFraction);
-        int max = Math.max(nrows, ncols);
+        int ncolumns = (int) Math.round(matrix.columns() * columnFraction);
+        int max = Math.max(nrows, ncolumns);
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
 
@@ -870,7 +875,7 @@ public class DoubleStatistic extends Object {
             selectedRows[i] = (int) selected[i];
 
         // sample columns
-        n = ncols;
+        n = ncolumns;
         N = matrix.columns();
         cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];
@@ -938,8 +943,8 @@ public class DoubleStatistic extends Object {
 
         int nslices = (int) Math.round(matrix.slices() * sliceFraction);
         int nrows = (int) Math.round(matrix.rows() * rowFraction);
-        int ncols = (int) Math.round(matrix.columns() * columnFraction);
-        int max = Math.max(nslices, Math.max(nrows, ncols));
+        int ncolumns = (int) Math.round(matrix.columns() * columnFraction);
+        int max = Math.max(nslices, Math.max(nrows, ncolumns));
         long[] selected = new long[max]; // sampler works on long's, not
         // int's
 
@@ -960,7 +965,7 @@ public class DoubleStatistic extends Object {
             selectedRows[i] = (int) selected[i];
 
         // sample columns
-        n = ncols;
+        n = ncolumns;
         N = matrix.columns();
         cern.jet.random.tdouble.sampling.DoubleRandomSampler.sample(n, N, n, 0, selected, 0, randomGenerator);
         int[] selectedCols = new int[n];

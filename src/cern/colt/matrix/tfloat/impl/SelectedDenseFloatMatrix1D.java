@@ -110,7 +110,6 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
         this.isNoView = false;
     }
 
-    @Override
     public float[] elements() {
         return elements;
     }
@@ -128,7 +127,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
+
     public float getQuick(int index) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // return elements[index(index)];
@@ -144,7 +143,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * @param rank
      *            the rank of the element.
      */
-    @Override
+
     public long index(int rank) {
         // return this.offset + super.index(rank);
         // manually inlined:
@@ -164,7 +163,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public FloatMatrix1D like(int size) {
         return new DenseFloatMatrix1D(size);
     }
@@ -183,24 +182,23 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public FloatMatrix2D like2D(int rows, int columns) {
         return new DenseFloatMatrix2D(rows, columns);
     }
 
-    @Override
-    public FloatMatrix2D reshape(int rows, int cols) {
-        if (rows * cols != size) {
-            throw new IllegalArgumentException("rows*cols != size");
+    public FloatMatrix2D reshape(int rows, int columns) {
+        if (rows * columns != size) {
+            throw new IllegalArgumentException("rows*columns != size");
         }
-        FloatMatrix2D M = new DenseFloatMatrix2D(rows, cols);
+        FloatMatrix2D M = new DenseFloatMatrix2D(rows, columns);
         final float[] elementsOther = (float[]) M.elements();
         final int zeroOther = (int) M.index(0, 0);
         final int rowStrideOther = M.rowStride();
         final int colStrideOther = M.columnStride();
         int idxOther;
         int idx = 0;
-        for (int c = 0; c < cols; c++) {
+        for (int c = 0; c < columns; c++) {
             idxOther = zeroOther + c * colStrideOther;
             for (int r = 0; r < rows; r++) {
                 elementsOther[idxOther] = getQuick(idx++);
@@ -210,12 +208,11 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
         return M;
     }
 
-    @Override
-    public FloatMatrix3D reshape(int slices, int rows, int cols) {
-        if (slices * rows * cols != size) {
-            throw new IllegalArgumentException("slices*rows*cols != size");
+    public FloatMatrix3D reshape(int slices, int rows, int columns) {
+        if (slices * rows * columns != size) {
+            throw new IllegalArgumentException("slices*rows*columns != size");
         }
-        FloatMatrix3D M = new DenseFloatMatrix3D(slices, rows, cols);
+        FloatMatrix3D M = new DenseFloatMatrix3D(slices, rows, columns);
         final float[] elementsOther = (float[]) M.elements();
         final int zeroOther = (int) M.index(0, 0, 0);
         final int sliceStrideOther = M.sliceStride();
@@ -224,7 +221,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
         int idxOther;
         int idx = 0;
         for (int s = 0; s < slices; s++) {
-            for (int c = 0; c < cols; c++) {
+            for (int c = 0; c < columns; c++) {
                 idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
                 for (int r = 0; r < rows; r++) {
                     elementsOther[idxOther] = getQuick(idx++);
@@ -249,7 +246,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int index, float value) {
         // if (debug) if (index<0 || index>=size) checkIndex(index);
         // elements[index(index)] = value;
@@ -266,7 +263,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _offset(int absRank) {
         return offsets[absRank];
     }
@@ -274,7 +271,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FloatMatrix1D other) {
         if (other instanceof SelectedDenseFloatMatrix1D) {
             SelectedDenseFloatMatrix1D otherMatrix = (SelectedDenseFloatMatrix1D) other;
@@ -292,7 +289,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      * @param size
      *            the number of cells the matrix shall have.
      */
-    @Override
+
     protected void setUp(int size) {
         super.setUp(size);
         this.stride = 1;
@@ -306,7 +303,7 @@ class SelectedDenseFloatMatrix1D extends FloatMatrix1D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected FloatMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseFloatMatrix1D(this.elements, offsets);
     }

@@ -76,15 +76,15 @@ public class FormerFactory {
             public String form(float value) {
                 return String.format(format, value);
             }
-            
+
             public String form(int value) {
                 return String.format(format, value);
             }
-            
+
             public String form(long value) {
                 return String.format(format, value);
             }
-            
+
             public String form(double[] value) {
                 if (value[0] == 0 && value[1] == 0) {
                     return "0";
@@ -110,7 +110,7 @@ public class FormerFactory {
                 }
                 return String.format(format, value[0]) + " + " + String.format(format, value[1]);
             }
-            
+
         };
     }
 }

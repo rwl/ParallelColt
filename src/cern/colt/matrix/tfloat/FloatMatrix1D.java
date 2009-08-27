@@ -740,7 +740,7 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1213,11 +1213,11 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * 
      * @param rows
      *            number of rows
-     * @param cols
+     * @param columns
      *            number of columns
      * @return new 2D matrix with columns being the elements of this matrix.
      */
-    public abstract FloatMatrix2D reshape(int rows, int cols);
+    public abstract FloatMatrix2D reshape(int rows, int columns);
 
     /**
      * Returns new FloatMatrix3D of size slices x rows x columns, whose elements
@@ -1225,11 +1225,11 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * 
      * @param rows
      *            number of rows
-     * @param cols
+     * @param columns
      *            number of columns
      * @return new 2D matrix with columns being the elements of this matrix.
      */
-    public abstract FloatMatrix3D reshape(int slices, int rows, int cols);
+    public abstract FloatMatrix3D reshape(int slices, int rows, int columns);
 
     /**
      * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
@@ -1356,7 +1356,7 @@ public abstract class FloatMatrix1D extends AbstractMatrix1D {
      * 
      * @see cern.colt.matrix.tfloat.algo.FloatFormatter
      */
-    @Override
+
     public String toString() {
         return new cern.colt.matrix.tfloat.algo.FloatFormatter().toString(this);
     }

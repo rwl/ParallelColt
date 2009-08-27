@@ -287,7 +287,6 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
 
     }
 
-    @Override
     protected void checkSizes(FloatMatrix2D A, FloatMatrix1D b, FloatMatrix1D x) {
         if (b.size() != A.rows())
             throw new IllegalArgumentException("b.size() != A.rows()");

@@ -8,8 +8,9 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tobject.impl;
 
-import cern.colt.map.tobject.AbstractIntObjectMap;
+import cern.colt.map.tobject.AbstractLongObjectMap;
 import cern.colt.matrix.AbstractMatrix3D;
+import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 import cern.colt.matrix.tobject.ObjectMatrix3D;
 
@@ -60,7 +61,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
     /**
      * The elements of this matrix.
      */
-    protected AbstractIntObjectMap elements;
+    protected AbstractLongObjectMap elements;
 
     /**
      * The offsets of the visible cells of this matrix.
@@ -88,7 +89,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @param columnOffsets
      *            The column offsets of the cells that shall be visible.
      */
-    protected SelectedSparseObjectMatrix3D(AbstractIntObjectMap elements, int[] sliceOffsets, int[] rowOffsets,
+    protected SelectedSparseObjectMatrix3D(AbstractLongObjectMap elements, int[] sliceOffsets, int[] rowOffsets,
             int[] columnOffsets, int offset) {
         // be sure parameters are valid, we do not check...
         int slices = sliceOffsets.length;
@@ -116,7 +117,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _columnOffset(int absRank) {
         return columnOffsets[absRank];
     }
@@ -130,7 +131,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _rowOffset(int absRank) {
         return rowOffsets[absRank];
     }
@@ -144,12 +145,11 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      *            the absolute rank of the element.
      * @return the position.
      */
-    @Override
+
     protected int _sliceOffset(int absRank) {
         return sliceOffsets[absRank];
     }
 
-    @Override
     public Object elements() {
         throw new IllegalArgumentException("This method is not supported.");
     }
@@ -172,7 +172,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public Object getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -180,8 +180,9 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
         // column:"+column);
         // return elements.get(index(slice,row,column));
         // manually inlined:
-        return elements.get(offset + sliceOffsets[sliceZero + slice * sliceStride]
-                + rowOffsets[rowZero + row * rowStride] + columnOffsets[columnZero + column * columnStride]);
+        return elements.get((long) offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride]);
     }
 
     /**
@@ -194,7 +195,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(ObjectMatrix3D other) {
         if (other instanceof SelectedSparseObjectMatrix3D) {
             SelectedSparseObjectMatrix3D otherMatrix = (SelectedSparseObjectMatrix3D) other;
@@ -217,12 +218,13 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    @Override
+
     public long index(int slice, int row, int column) {
         // return this.offset + super.index(slice,row,column);
         // manually inlined:
-        return this.offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride];
+        return (long) this.offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
     }
 
     /**
@@ -243,7 +245,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public ObjectMatrix3D like(int slices, int rows, int columns) {
         return new SparseObjectMatrix3D(slices, rows, columns);
     }
@@ -272,7 +274,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected ObjectMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         throw new InternalError(); // this method is never called since
         // viewRow() and viewColumn are overridden
@@ -299,7 +301,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int slice, int row, int column, Object value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -307,13 +309,26 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
         // column:"+column);
         // int index = index(slice,row,column);
         // manually inlined:
-        int index = offset + sliceOffsets[sliceZero + slice * sliceStride] + rowOffsets[rowZero + row * rowStride]
-                + columnOffsets[columnZero + column * columnStride];
+        long index = (long) offset + (long) sliceOffsets[sliceZero + slice * sliceStride]
+                + (long) rowOffsets[rowZero + row * rowStride]
+                + (long) columnOffsets[columnZero + column * columnStride];
         if (value == null)
             this.elements.removeKey(index);
         else
             this.elements.put(index, value);
     }
+    
+    /**
+     * Returns a vector obtained by stacking the columns of each slice of the
+     * matrix on top of one another.
+     * 
+     * @return
+     */
+
+    public ObjectMatrix1D vectorize() {
+        throw new IllegalArgumentException("This method is not supported.");
+    }
+
 
     /**
      * Sets up a matrix with a given number of slices and rows.
@@ -327,7 +342,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>(Object)rows*slices > Integer.MAX_VALUE</tt>.
      */
-    @Override
+
     protected void setUp(int slices, int rows, int columns) {
         super.setUp(slices, rows, columns);
         this.sliceStride = 1;
@@ -342,7 +357,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @throws IllegalArgumentException
      *             if some of the parameters are equal or not in range 0..2.
      */
-    @Override
+
     protected AbstractMatrix3D vDice(int axis0, int axis1, int axis2) {
         super.vDice(axis0, axis1, axis2);
 
@@ -380,7 +395,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @see #viewSlice(int)
      * @see #viewRow(int)
      */
-    @Override
+
     public ObjectMatrix2D viewColumn(int column) {
         checkColumn(column);
 
@@ -422,7 +437,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @see #viewSlice(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public ObjectMatrix2D viewRow(int row) {
         checkRow(row);
 
@@ -454,7 +469,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected ObjectMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseObjectMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, this.offset);
     }
@@ -480,7 +495,7 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
      * @see #viewRow(int)
      * @see #viewColumn(int)
      */
-    @Override
+
     public ObjectMatrix2D viewSlice(int slice) {
         checkSlice(slice);
 
@@ -499,5 +514,10 @@ class SelectedSparseObjectMatrix3D extends ObjectMatrix3D {
 
         return new SelectedSparseObjectMatrix2D(viewRows, viewColumns, this.elements, viewRowZero, viewColumnZero,
                 viewRowStride, viewColumnStride, viewRowOffsets, viewColumnOffsets, viewOffset);
+    }
+
+    @Override
+    public ObjectMatrix2D like2D(int rows, int columns) {
+        throw new InternalError();
     }
 }

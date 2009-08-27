@@ -19,7 +19,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         DINDEX = 3;
         A = new DiagonalFloatMatrix2D(NROWS, NCOLUMNS, DINDEX);
@@ -29,7 +28,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
 
     }
 
-    @Override
     protected void populateMatrices() {
         ConcurrencyUtils.setThreadsBeginN_2D(1);
         if (DINDEX >= 0) {
@@ -60,7 +58,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignFloat() {
         float value = (float) Math.random();
         A.assign(value);
@@ -75,7 +72,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignFloatArrayArray() {
         float[][] expected = new float[NROWS][NCOLUMNS];
         for (int r = 0; r < NROWS; r++) {
@@ -95,7 +91,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignFloatFunction() {
         FloatMatrix2D Acopy = A.copy();
         A.assign(FloatFunctions.acos);
@@ -112,7 +107,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignFloatMatrix2DFloatFloatFunction() {
         FloatMatrix2D Acopy = A.copy();
         A.assign(B, FloatFunctions.div);
@@ -127,7 +121,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignFloatMatrix2DFloatFloatFunctionIntArrayListIntArrayList() {
         IntArrayList rowList = new IntArrayList();
         IntArrayList columnList = new IntArrayList();
@@ -154,13 +147,11 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testCardinality() {
         int card = A.cardinality();
         assertEquals(DLENGTH, card);
     }
 
-    @Override
     public void testMaxLocation() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -180,7 +171,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testMinLocation() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -200,7 +190,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testGetNegativeValues() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -238,7 +227,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testGetNonZeros() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -276,7 +264,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testGetPositiveValues() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -314,7 +301,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testToArray() {
         float[][] array = A.toArray();
         assertTrue(NROWS == array.length);
@@ -326,7 +312,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testVectorize() {
         FloatMatrix1D Avec = A.vectorize();
         int idx = 0;
@@ -337,7 +322,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewColumn() {
         FloatMatrix1D col = A.viewColumn(NCOLUMNS / 2);
         assertEquals(NROWS, col.size());
@@ -346,7 +330,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewColumnFlip() {
         FloatMatrix2D B = A.viewColumnFlip();
         assertEquals(A.size(), B.size());
@@ -357,7 +340,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewDice() {
         FloatMatrix2D B = A.viewDice();
         assertEquals(NROWS, B.columns());
@@ -369,7 +351,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewPart() {
         FloatMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
         assertEquals(NROWS / 3, B.rows());
@@ -381,7 +362,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewRow() {
         FloatMatrix1D B = A.viewRow(NROWS / 2);
         assertEquals(NCOLUMNS, B.size());
@@ -390,7 +370,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewRowFlip() {
         FloatMatrix2D B = A.viewRowFlip();
         assertEquals(A.size(), B.size());
@@ -401,7 +380,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewSelectionFloatMatrix1DProcedure() {
         final float value = 2;
         A.assign(0);
@@ -438,7 +416,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewSelectionIntArrayIntArray() {
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
         int[] colIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2, NROWS - 1 };
@@ -452,7 +429,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewSorted() {
         FloatMatrix2D B = A.viewSorted(1);
         for (int r = 0; r < NROWS - 1; r++) {
@@ -460,7 +436,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewStrides() {
         int rowStride = 3;
         int colStride = 5;
@@ -472,7 +447,6 @@ public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
         }
     }
 
-    @Override
     public void testZMultFloatMatrix2DFloatMatrix2DFloatFloatBooleanBoolean() {
         float alpha = 3;
         float beta = 5;

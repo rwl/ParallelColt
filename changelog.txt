@@ -1,5 +1,18 @@
 Parallel Colt changelog
 
+0.9:	August 27, 2009 
+	- Added new types of objects to cern.colt.buffer.
+	- Added OpenDoubleLongHashMap and OpenFloatLongHashMap.
+	- Added OpenLongIntHashMap and OpenIntLongHashMap.
+	- Added new types of matrices holding complex elements.
+	- Added new types of matrices holding int elements.
+	- Added new types of matrices holding long elements.
+	- Added new types of matrices holding Object elements.
+	- Removed tridiagonal matrices.	
+	- Removed "@override" to allow compilation with Java 5.
+	- Some improvements in ConcurrencyUtils.
+	- Some refactoring and cosmetic changes. 
+		
 0.8.2: July 29, 2009
 	- Fixed bug in solve() methods in linear algebra causing to return incorrect results for rectangular matrices.
 	- Fixed bug in HyBR causing incorrect results when a preconditioner was used.

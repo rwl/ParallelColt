@@ -112,7 +112,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         this.isNoView = !isView;
     }
 
-    @Override
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
             final cern.colt.function.tdouble.DoubleFunction f) {
         if (size == 0)
@@ -148,7 +147,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return a;
     }
 
-    @Override
     public double aggregate(final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
             final cern.colt.function.tdouble.DoubleFunction f, final IntArrayList indexList) {
         if (size() == 0)
@@ -193,7 +191,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return a;
     }
 
-    @Override
     public double aggregate(final DoubleMatrix1D other, final cern.colt.function.tdouble.DoubleDoubleFunction aggr,
             final cern.colt.function.tdouble.DoubleDoubleFunction f) {
         if (!(other instanceof DenseDoubleMatrix1D)) {
@@ -242,7 +239,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return a;
     }
 
-    @Override
     public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         final double multiplicator;
         if (function instanceof cern.jet.math.tdouble.DoubleMult) {
@@ -302,7 +298,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    @Override
     public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleProcedure cond,
             final cern.colt.function.tdouble.DoubleFunction function) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -339,7 +334,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    @Override
     public DoubleMatrix1D assign(final cern.colt.function.tdouble.DoubleProcedure cond, final double value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -375,7 +369,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    @Override
     public DoubleMatrix1D assign(final double value) {
         final double[] elems = this.elements;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -407,7 +400,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    @Override
     public DoubleMatrix1D assign(final double[] values) {
         if (values.length != size)
             throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
@@ -446,7 +438,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    @Override
     public DoubleMatrix1D assign(DoubleMatrix1D source) {
         // overriden for performance only
         if (!(source instanceof DenseDoubleMatrix1D)) {
@@ -510,7 +501,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    @Override
     public DoubleMatrix1D assign(final DoubleMatrix1D y, final cern.colt.function.tdouble.DoubleDoubleFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseDoubleMatrix1D)) {
@@ -677,7 +667,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -790,7 +779,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public double[] elements() {
         return elements;
     }
@@ -880,7 +868,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return c;
     }
 
-    @Override
     public void getNonZeros(final IntArrayList indexList, final DoubleArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -927,7 +914,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList indexList, final DoubleArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -974,7 +960,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList indexList, final DoubleArrayList valueList) {
         boolean fillIndexList = indexList != null;
         boolean fillValueList = valueList != null;
@@ -1021,7 +1006,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
     }
 
-    @Override
     public double[] getMaxLocation() {
         int location = 0;
         double maxValue = 0;
@@ -1082,7 +1066,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return new double[] { maxValue, location };
     }
 
-    @Override
     public double[] getMinLocation() {
         int location = 0;
         double minValue = 0;
@@ -1143,7 +1126,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return new double[] { minValue, location };
     }
 
-    @Override
     public double getQuick(int index) {
         return elements[zero + index * stride];
     }
@@ -1247,17 +1229,14 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         ConcurrencyUtils.setNumberOfThreads(oldNthreads);
     }
 
-    @Override
     public DoubleMatrix1D like(int size) {
         return new DenseDoubleMatrix1D(size);
     }
 
-    @Override
     public DoubleMatrix2D like2D(int rows, int columns) {
         return new DenseDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public DoubleMatrix2D reshape(final int rows, final int columns) {
         if (rows * columns != size) {
             throw new IllegalArgumentException("rows*columns != size");
@@ -1307,7 +1286,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return M;
     }
 
-    @Override
     public DoubleMatrix3D reshape(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != size) {
             throw new IllegalArgumentException("slices*rows*columns != size");
@@ -1362,12 +1340,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return M;
     }
 
-    @Override
     public void setQuick(int index, double value) {
         elements[zero + index * stride] = value;
     }
 
-    @Override
     public void swap(final DoubleMatrix1D other) {
         // overriden for performance only
         if (!(other instanceof DenseDoubleMatrix1D)) {
@@ -1418,7 +1394,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
     }
 
-    @Override
     public void toArray(double[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
@@ -1428,7 +1403,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
             super.toArray(values);
     }
 
-    @Override
     public double zDotProduct(DoubleMatrix1D y, int from, int length) {
         if (!(y instanceof DenseDoubleMatrix1D)) {
             return super.zDotProduct(y, from, length);
@@ -1512,7 +1486,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return sum;
     }
 
-    @Override
     public double zSum() {
         double sum = 0;
         final double[] elems = this.elements;
@@ -1562,7 +1535,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return sum;
     }
 
-    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int index = zero;
@@ -1576,7 +1548,6 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return cardinality;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(DoubleMatrix1D other) {
         if (other instanceof SelectedDenseDoubleMatrix1D) {
             SelectedDenseDoubleMatrix1D otherMatrix = (SelectedDenseDoubleMatrix1D) other;
@@ -1588,12 +1559,10 @@ public class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
-    @Override
     protected DoubleMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseDoubleMatrix1D(this.elements, offsets);
     }

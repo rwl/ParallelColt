@@ -32,7 +32,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
     /*
      * The elements of the matrix.
      */
-    protected ConcurrentHashMap<Integer, float[]> elements;
+    protected ConcurrentHashMap<Long, float[]> elements;
 
     /**
      * Constructs a matrix with a copy of the given values. <tt>values</tt> is
@@ -77,7 +77,7 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      */
     public SparseFComplexMatrix3D(int slices, int rows, int columns) {
         setUp(slices, rows, columns);
-        this.elements = new ConcurrentHashMap<Integer, float[]>(slices * rows * (columns / 1000));
+        this.elements = new ConcurrentHashMap<Long, float[]>(slices * rows * (columns / 1000));
     }
 
     /**
@@ -111,14 +111,13 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
-    protected SparseFComplexMatrix3D(int slices, int rows, int columns, ConcurrentHashMap<Integer, float[]> elements,
+    protected SparseFComplexMatrix3D(int slices, int rows, int columns, ConcurrentHashMap<Long, float[]> elements,
             int sliceZero, int rowZero, int columnZero, int sliceStride, int rowStride, int columnStride) {
         setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         this.elements = elements;
         this.isNoView = false;
     }
 
-    @Override
     public FComplexMatrix3D assign(float[] value) {
         // overriden for performance only
         if (this.isNoView && value[0] == 0 && value[1] == 0)
@@ -128,7 +127,6 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         if (this.isNoView)
             return this.elements.size();
@@ -136,10 +134,9 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
             return super.cardinality();
     }
 
-    @Override
     public float[] getQuick(int slice, int row, int column) {
-        float[] elem = elements.get(sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column
-                * columnStride);
+        float[] elem = elements.get((long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride);
         if (elem != null) {
             return new float[] { elem[0], elem[1] };
         } else {
@@ -147,15 +144,14 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         }
     }
 
-    @Override
-    public ConcurrentHashMap<Integer, float[]> elements() {
+    public ConcurrentHashMap<Long, float[]> elements() {
         return elements;
     }
 
     /**
      * Returns <tt>true</tt> if both matrices share at least one identical cell.
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(FComplexMatrix3D other) {
         if (other instanceof SelectedSparseFComplexMatrix3D) {
             SelectedSparseFComplexMatrix3D otherMatrix = (SelectedSparseFComplexMatrix3D) other;
@@ -167,51 +163,46 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         return false;
     }
 
-    @Override
     public long index(int slice, int row, int column) {
-        return sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        return (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row * (long) rowStride
+                + (long) columnZero + (long) column * (long) columnStride;
     }
 
-    @Override
     public FComplexMatrix3D like(int slices, int rows, int columns) {
         return new SparseFComplexMatrix3D(slices, rows, columns);
     }
 
-    @Override
     public FComplexMatrix2D like2D(int rows, int columns) {
         return new SparseFComplexMatrix2D(rows, columns);
     }
 
-    @Override
     protected FComplexMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride,
             int columnStride) {
         return new SparseFComplexMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float[] value) {
-        int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        long index = (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
         if (value[0] == 0 && value[1] == 0)
             this.elements.remove(index);
         else
             this.elements.put(index, value);
     }
 
-    @Override
     public void setQuick(int slice, int row, int column, float re, float im) {
-        int index = sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride;
+        long index = (long) sliceZero + (long) slice * (long) sliceStride + (long) rowZero + (long) row
+                * (long) rowStride + (long) columnZero + (long) column * (long) columnStride;
         if (re == 0 && im == 0)
             this.elements.remove(index);
         else
             this.elements.put(index, new float[] { re, im });
     }
 
-    @Override
     protected FComplexMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedSparseFComplexMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
     }
 
-    @Override
     public FComplexMatrix1D vectorize() {
         FComplexMatrix1D v = new SparseFComplexMatrix1D((int) size());
         int length = rows * columns;
@@ -221,7 +212,6 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         return v;
     }
 
-    @Override
     public FloatMatrix3D getImaginaryPart() {
         final FloatMatrix3D Im = new SparseFloatMatrix3D(slices, rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -257,7 +247,6 @@ public class SparseFComplexMatrix3D extends FComplexMatrix3D {
         return Im;
     }
 
-    @Override
     public FloatMatrix3D getRealPart() {
         final FloatMatrix3D Re = new SparseFloatMatrix3D(slices, rows, columns);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();

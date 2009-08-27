@@ -8,9 +8,12 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tobject.impl;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import cern.colt.list.tint.IntArrayList;
+import cern.colt.matrix.tobject.ObjectMatrix1D;
 import cern.colt.matrix.tobject.ObjectMatrix2D;
 import cern.colt.matrix.tobject.ObjectMatrix3D;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -152,16 +155,240 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @param columnnStride
      *            the number of elements between two columns, i.e.
      *            <tt>index(k,i,j+1)-index(k,i,j)</tt>.
+     * @param isView
+     *            if true then a matrix view is constructed.
      * @throws IllegalArgumentException
      *             if <tt>(Object)slices*columns*rows > Integer.MAX_VALUE</tt>.
      * @throws IllegalArgumentException
      *             if <tt>slices<0 || rows<0 || columns<0</tt>.
      */
     protected DenseObjectMatrix3D(int slices, int rows, int columns, Object[] elements, int sliceZero, int rowZero,
-            int columnZero, int sliceStride, int rowStride, int columnStride) {
+            int columnZero, int sliceStride, int rowStride, int columnStride, boolean isView) {
         setUp(slices, rows, columns, sliceZero, rowZero, columnZero, sliceStride, rowStride, columnStride);
         this.elements = elements;
-        this.isNoView = false;
+        this.isNoView = !isView;
+    }
+
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        Object a = null;
+        final int zero = (int) index(0, 0, 0);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object a = f.apply(elements[zero + firstSlice * sliceStride]);
+                        int d = 1;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = d; c < columns; c++) {
+                                    a = aggr.apply(a, f.apply(elements[zero + s * sliceStride + r * rowStride + c
+                                            * columnStride]));
+                                }
+                                d = 0;
+                            }
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            a = f.apply(elements[zero]);
+            int d = 1; // first cell already done
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = d; c < columns; c++) {
+                        a = aggr.apply(a, f.apply(elements[zero + s * sliceStride + r * rowStride + c * columnStride]));
+                    }
+                    d = 0;
+                }
+            }
+        }
+        return a;
+    }
+
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f, final cern.colt.function.tobject.ObjectProcedure cond) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        Object a = null;
+        final int zero = (int) index(0, 0, 0);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object elem = elements[zero + firstSlice * sliceStride];
+                        Object a = 0;
+                        if (cond.apply(elem) == true) {
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        int d = 1;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = d; c < columns; c++) {
+                                    elem = elements[zero + s * sliceStride + r * rowStride + c * columnStride];
+                                    if (cond.apply(elem) == true) {
+                                        a = aggr.apply(a, f.apply(elem));
+                                    }
+                                    d = 0;
+                                }
+                            }
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            Object elem = elements[zero];
+            if (cond.apply(elem) == true) {
+                a = aggr.apply(a, f.apply(elem));
+            }
+            int d = 1;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = d; c < columns; c++) {
+                        elem = elements[zero + s * sliceStride + r * rowStride + c * columnStride];
+                        if (cond.apply(elem) == true) {
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        d = 0;
+                    }
+                }
+            }
+        }
+        return a;
+    }
+
+    public Object aggregate(final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectFunction f, final IntArrayList sliceList,
+            final IntArrayList rowList, final IntArrayList columnList) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        if (sliceList.size() == 0 || rowList.size() == 0 || columnList.size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        final int size = sliceList.size();
+        final int[] sliceElements = sliceList.elements();
+        final int[] rowElements = rowList.elements();
+        final int[] columnElements = columnList.elements();
+        final int zero = (int) index(0, 0, 0);
+        Object a = null;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+
+                    public Object call() throws Exception {
+                        Object a = f.apply(elements[zero + sliceElements[firstIdx] * sliceStride
+                                + rowElements[firstIdx] * rowStride + columnElements[firstIdx] * columnStride]);
+                        Object elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            elem = elements[zero + sliceElements[i] * sliceStride + rowElements[i] * rowStride
+                                    + columnElements[i] * columnStride];
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            a = f.apply(elements[zero + sliceElements[0] * sliceStride + rowElements[0] * rowStride + columnElements[0]
+                    * columnStride]);
+            Object elem;
+            for (int i = 1; i < size; i++) {
+                elem = elements[zero + sliceElements[i] * sliceStride + rowElements[i] * rowStride + columnElements[i]
+                        * columnStride];
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
+
+    public Object aggregate(final ObjectMatrix3D other, final cern.colt.function.tobject.ObjectObjectFunction aggr,
+            final cern.colt.function.tobject.ObjectObjectFunction f) {
+        if (!(other instanceof DenseObjectMatrix3D)) {
+            return super.aggregate(other, aggr, f);
+        }
+        checkShape(other);
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        Object a = null;
+        final int zero = (int) index(0, 0, 0);
+        final int zeroOther = (int) other.index(0, 0, 0);
+        final int sliceStrideOther = other.sliceStride();
+        final int rowStrideOther = other.rowStride();
+        final int colStrideOther = other.columnStride();
+        final Object[] elemsOther = (Object[]) other.elements();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Object>() {
+                    public Object call() throws Exception {
+                        int idx = zero + firstSlice * sliceStride;
+                        int idxOther = zeroOther + firstSlice * sliceStrideOther;
+                        Object a = f.apply(elements[idx], elemsOther[idxOther]);
+                        int d = 1;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                for (int c = d; c < columns; c++) {
+                                    idx = zero + s * sliceStride + r * rowStride + c * columnStride;
+                                    idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther + c
+                                            * colStrideOther;
+                                    a = aggr.apply(a, f.apply(elements[idx], elemsOther[idxOther]));
+                                }
+                                d = 0;
+                            }
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            a = f.apply(getQuick(0, 0, 0), other.getQuick(0, 0, 0));
+            int d = 1; // first cell already done
+            int idx;
+            int idxOther;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    for (int c = d; c < columns; c++) {
+                        idx = zero + s * sliceStride + r * rowStride + c * columnStride;
+                        idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther + c * colStrideOther;
+                        a = aggr.apply(a, f.apply(elements[idx], elemsOther[idxOther]));
+                    }
+                    d = 0;
+                }
+            }
+        }
+        return a;
     }
 
     /**
@@ -184,7 +411,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *             <tt>for any 0 &lt;= column &lt; columns(): values[slice][row].length != columns()</tt>
      *             .
      */
-    @Override
+
     public ObjectMatrix3D assign(final Object[][][] values) {
         if (values.length != slices)
             throw new IllegalArgumentException("Must have same number of slices: slices=" + values.length + "slices()="
@@ -317,6 +544,202 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
         }
         return this;
     }
+    
+    public ObjectMatrix3D assign(final Object[] values) {
+        if (values.length != size())
+            throw new IllegalArgumentException("Must have same length: length=" + values.length
+                    + "slices()*rows()*columns()=" + slices() * rows() * columns());
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if (this.isNoView) {
+            System.arraycopy(values, 0, this.elements, 0, values.length);
+        } else {
+            final int zero = (int) index(0, 0, 0);
+            if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+                nthreads = Math.min(nthreads, slices);
+                Future<?>[] futures = new Future[nthreads];
+                int k = slices / nthreads;
+                for (int j = 0; j < nthreads; j++) {
+                    final int firstSlice = j * k;
+                    final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                    futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                        public void run() {
+                            int idxOther = firstSlice * rows * columns;
+                            int idx;
+                            for (int s = firstSlice; s < lastSlice; s++) {
+                                for (int r = 0; r < rows; r++) {
+                                    idx = zero + s * sliceStride + r * rowStride;
+                                    for (int c = 0; c < columns; c++) {
+                                        elements[idx] = values[idxOther++];
+                                        idx += columnStride;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                ConcurrencyUtils.waitForCompletion(futures);
+            } else {
+                int idxOther = 0;
+                int idx;
+                for (int s = 0; s < slices; s++) {
+                    for (int r = 0; r < rows; r++) {
+                        idx = zero + s * sliceStride + r * rowStride;
+                        for (int c = 0; c < columns; c++) {
+                            elements[idx] = values[idxOther++];
+                            idx += columnStride;
+                        }
+                    }
+                }
+            }
+        }
+        return this;
+    }
+    
+    public ObjectMatrix3D assign(final Object value) {
+        final int zero = (int) index(0, 0, 0);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        int idx;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                idx = zero + s * sliceStride + r * rowStride;
+                                for (int c = 0; c < columns; c++) {
+                                    elements[idx] = value;
+                                    idx += columnStride;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            int idx;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    idx = zero + s * sliceStride + r * rowStride;
+                    for (int c = 0; c < columns; c++) {
+                        elements[idx] = value;
+                        idx += columnStride;
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    public ObjectMatrix3D assign(final cern.colt.function.tobject.ObjectProcedure cond,
+            final cern.colt.function.tobject.ObjectFunction f) {
+        final int zero = (int) index(0, 0, 0);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        Object elem;
+                        int idx;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                idx = zero + s * sliceStride + r * rowStride;
+                                for (int c = 0; c < columns; c++) {
+                                    elem = elements[idx];
+                                    if (cond.apply(elem) == true) {
+                                        elements[idx] = f.apply(elem);
+                                    }
+                                    idx += columnStride;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Object elem;
+            int idx;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    idx = zero + s * sliceStride + r * rowStride;
+                    for (int c = 0; c < columns; c++) {
+                        elem = elements[idx];
+                        if (cond.apply(elem) == true) {
+                            elements[idx] = f.apply(elem);
+                        }
+                        idx += columnStride;
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    public ObjectMatrix3D assign(final cern.colt.function.tobject.ObjectProcedure cond, final Object value) {
+        final int zero = (int) index(0, 0, 0);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (slices * rows * columns >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        Object elem;
+                        int idx;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                idx = zero + s * sliceStride + r * rowStride;
+                                for (int c = 0; c < columns; c++) {
+                                    elem = elements[idx];
+                                    if (cond.apply(elem) == true) {
+                                        elements[idx] = value;
+                                    }
+                                    idx += columnStride;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Object elem;
+            int idx;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    idx = zero + s * sliceStride + r * rowStride;
+                    for (int c = 0; c < columns; c++) {
+                        elem = elements[idx];
+                        if (cond.apply(elem) == true) {
+                            elements[idx] = value;
+                        }
+                        idx += columnStride;
+                    }
+                }
+            }
+        }
+        return this;
+    }
 
     /**
      * Replaces all cell values of the receiver with the values of another
@@ -334,7 +757,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *             if
      *             <tt>slices() != source.slices() || rows() != source.rows() || columns() != source.columns()</tt>
      */
-    @Override
+
     public ObjectMatrix3D assign(ObjectMatrix3D source) {
         // overriden for performance only
         if (!(source instanceof DenseObjectMatrix3D)) {
@@ -423,8 +846,161 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
             return this;
         }
     }
+    
+    public ObjectMatrix3D assign(final cern.colt.function.tobject.ObjectFunction function) {
+        final int zero = (int) index(0, 0, 0);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
 
-    @Override
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        int idx;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                idx = zero + s * sliceStride + r * rowStride;
+                                for (int c = 0; c < columns; c++) {
+                                    elements[idx] = function.apply(elements[idx]);
+                                    idx += columnStride;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+
+        } else {
+            int idx;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    idx = zero + s * sliceStride + r * rowStride;
+                    for (int c = 0; c < columns; c++) {
+                        elements[idx] = function.apply(elements[idx]);
+                        idx += columnStride;
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    
+    public ObjectMatrix3D assign(final ObjectMatrix3D y, final cern.colt.function.tobject.ObjectObjectFunction function) {
+        if (!(y instanceof DenseObjectMatrix3D)) {
+            super.assign(y, function);
+            return this;
+        }
+        checkShape(y);
+        final int zero = (int) index(0, 0, 0);
+        final int zeroOther = (int) y.index(0, 0, 0);
+        final int sliceStrideOther = y.sliceStride();
+        final int rowStrideOther = y.rowStride();
+        final int columnStrideOther = y.columnStride();
+        final Object[] elemsOther = (Object[]) y.elements();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, slices);
+            Future<?>[] futures = new Future[nthreads];
+            int k = slices / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstSlice = j * k;
+                final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        int idx;
+                        int idxOther;
+                        for (int s = firstSlice; s < lastSlice; s++) {
+                            for (int r = 0; r < rows; r++) {
+                                idx = zero + s * sliceStride + r * rowStride;
+                                idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
+                                for (int c = 0; c < columns; c++) {
+                                    elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
+                                    idx += columnStride;
+                                    idxOther += columnStrideOther;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            int idx;
+            int idxOther;
+            for (int s = 0; s < slices; s++) {
+                for (int r = 0; r < rows; r++) {
+                    idx = zero + s * sliceStride + r * rowStride;
+                    idxOther = zeroOther + s * sliceStrideOther + r * rowStrideOther;
+                    for (int c = 0; c < columns; c++) {
+                        elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
+                        idx += columnStride;
+                        idxOther += columnStrideOther;
+                    }
+                }
+            }
+        }
+
+        return this;
+    }
+
+    public ObjectMatrix3D assign(final ObjectMatrix3D y, final cern.colt.function.tobject.ObjectObjectFunction function,
+            final IntArrayList sliceList, final IntArrayList rowList, final IntArrayList columnList) {
+        if (!(y instanceof DenseObjectMatrix3D)) {
+            super.assign(y, function);
+            return this;
+        }
+        checkShape(y);
+        final int zero = (int) index(0, 0, 0);
+        final int zeroOther = (int) y.index(0, 0, 0);
+        final int sliceStrideOther = y.sliceStride();
+        final int rowStrideOther = y.rowStride();
+        final int columnStrideOther = y.columnStride();
+        final Object[] elemsOther = (Object[]) y.elements();
+        int size = sliceList.size();
+        final int[] sliceElements = sliceList.elements();
+        final int[] rowElements = rowList.elements();
+        final int[] columnElements = columnList.elements();
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_3D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            int idx = zero + sliceElements[i] * sliceStride + rowElements[i] * rowStride
+                                    + columnElements[i] * columnStride;
+                            int idxOther = zeroOther + sliceElements[i] * sliceStrideOther + rowElements[i]
+                                    * rowStrideOther + columnElements[i] * columnStrideOther;
+                            elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                int idx = zero + sliceElements[i] * sliceStride + rowElements[i] * rowStride + columnElements[i]
+                        * columnStride;
+                int idxOther = zeroOther + sliceElements[i] * sliceStrideOther + rowElements[i] * rowStrideOther
+                        + columnElements[i] * columnStrideOther;
+                elements[idx] = function.apply(elements[idx], elemsOther[idxOther]);
+            }
+        }
+        return this;
+    }
+
     public Object[] elements() {
         return elements;
     }
@@ -447,7 +1023,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            the index of the column-coordinate.
      * @return the value at the specified coordinate.
      */
-    @Override
+
     public Object getQuick(int slice, int row, int column) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -469,7 +1045,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * <li><tt>this == other</tt>
      * </ul>
      */
-    @Override
+
     protected boolean haveSharedCellsRaw(ObjectMatrix3D other) {
         if (other instanceof SelectedDenseObjectMatrix3D) {
             SelectedDenseObjectMatrix3D otherMatrix = (SelectedDenseObjectMatrix3D) other;
@@ -492,7 +1068,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @param column
      *            the index of the third-coordinate.
      */
-    @Override
+
     public long index(int slice, int row, int column) {
         // return _sliceOffset(_sliceRank(slice)) + _rowOffset(_rowRank(row)) +
         // _columnOffset(_columnRank(column));
@@ -518,7 +1094,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public ObjectMatrix3D like(int slices, int rows, int columns) {
         return new DenseObjectMatrix3D(slices, rows, columns);
     }
@@ -547,9 +1123,9 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            <tt>index(i,j+1)-index(i,j)</tt>.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     protected ObjectMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
-        return new DenseObjectMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride);
+        return new DenseObjectMatrix2D(rows, columns, this.elements, rowZero, columnZero, rowStride, columnStride, true);
     }
 
     /**
@@ -572,7 +1148,7 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
+
     public void setQuick(int slice, int row, int column, Object value) {
         // if (debug) if (slice<0 || slice>=slices || row<0 || row>=rows ||
         // column<0 || column>=columns) throw new
@@ -581,6 +1157,15 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
         // elements[index(slice,row,column)] = value;
         // manually inlined:
         elements[sliceZero + slice * sliceStride + rowZero + row * rowStride + columnZero + column * columnStride] = value;
+    }
+    
+    public ObjectMatrix1D vectorize() {
+        ObjectMatrix1D v = new DenseObjectMatrix1D((int) size());
+        int length = rows * columns;
+        for (int s = 0; s < slices; s++) {
+            v.viewPart(s * length, length).assign(viewSlice(s).vectorize());
+        }
+        return v;
     }
 
     /**
@@ -594,8 +1179,13 @@ public class DenseObjectMatrix3D extends ObjectMatrix3D {
      *            the offsets of the visible elements.
      * @return a new view.
      */
-    @Override
+
     protected ObjectMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         return new SelectedDenseObjectMatrix3D(this.elements, sliceOffsets, rowOffsets, columnOffsets, 0);
+    }
+
+    @Override
+    public ObjectMatrix2D like2D(int rows, int columns) {
+        return new DenseObjectMatrix2D(rows, columns);
     }
 }

@@ -66,7 +66,8 @@ public class LongFactory3D extends cern.colt.PersistentObject {
      */
     public LongMatrix3D ascending(int slices, int rows, int columns) {
         cern.jet.math.tlong.LongFunctions F = cern.jet.math.tlong.LongFunctions.longFunctions;
-        return descending(slices, rows, columns).assign(LongFunctions.chain(LongFunctions.neg, LongFunctions.minus(slices * rows * columns)));
+        return descending(slices, rows, columns).assign(
+                LongFunctions.chain(LongFunctions.neg, LongFunctions.minus(slices * rows * columns)));
     }
 
     /**

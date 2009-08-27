@@ -7,7 +7,6 @@ public class SparseFComplexMatrix3DTest extends FComplexMatrix3DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFComplexMatrix3D(NSLICES, NROWS, NCOLUMNS);
         B = new SparseFComplexMatrix3D(NSLICES, NROWS, NCOLUMNS);

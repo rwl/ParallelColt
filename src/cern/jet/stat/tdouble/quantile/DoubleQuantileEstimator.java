@@ -148,7 +148,7 @@ abstract class DoubleQuantileEstimator extends cern.colt.PersistentObject implem
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         DoubleQuantileEstimator copy = (DoubleQuantileEstimator) super.clone();
         if (this.bufferSet != null) {
@@ -301,7 +301,7 @@ abstract class DoubleQuantileEstimator extends cern.colt.PersistentObject implem
     /**
      * Returns a String representation of the receiver.
      */
-    @Override
+
     public String toString() {
         String s = this.getClass().getName();
         s = s.substring(s.lastIndexOf('.') + 1);

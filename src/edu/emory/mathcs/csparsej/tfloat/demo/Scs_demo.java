@@ -105,7 +105,6 @@ public class Scs_demo {
     /* true for off-diagonal entries */
     private static class Dropdiag implements Scs_ifkeep {
 
-        @Override
         public boolean fkeep(int i, int j, float aij, Object other) {
             return (i != j);
         }

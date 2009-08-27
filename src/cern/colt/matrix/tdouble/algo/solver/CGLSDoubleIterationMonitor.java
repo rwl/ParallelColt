@@ -4,7 +4,6 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
 public class CGLSDoubleIterationMonitor extends DefaultDoubleIterationMonitor {
 
-    @Override
     protected boolean convergedI(double r) throws IterativeSolverDoubleNotConvergedException {
         // Store initial residual
         if (isFirst())
@@ -25,7 +24,6 @@ public class CGLSDoubleIterationMonitor extends DefaultDoubleIterationMonitor {
         return false;
     }
 
-    @Override
     protected boolean convergedI(double r, DoubleMatrix1D x) throws IterativeSolverDoubleNotConvergedException {
         return convergedI(r);
     }

@@ -56,7 +56,7 @@ public class DenseLargeFComplexMatrix2D extends WrapperFComplexMatrix2D {
     /**
      * Computes the 2D discrete Fourier transform (DFT) of this matrix.
      */
-    @Override
+
     public void fft2() {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -71,7 +71,7 @@ public class DenseLargeFComplexMatrix2D extends WrapperFComplexMatrix2D {
      * Computes the discrete Fourier transform (DFT) of each column of this
      * matrix.
      */
-    @Override
+
     public void fftColumns() {
         if (fftColumns == null) {
             fftColumns = new FloatFFT_1D(rows);
@@ -112,7 +112,7 @@ public class DenseLargeFComplexMatrix2D extends WrapperFComplexMatrix2D {
     /**
      * Computes the discrete Fourier transform (DFT) of each row of this matrix.
      */
-    @Override
+
     public void fftRows() {
         if (fftRows == null) {
             fftRows = new FloatFFT_1D(columns);
@@ -153,7 +153,7 @@ public class DenseLargeFComplexMatrix2D extends WrapperFComplexMatrix2D {
      *            if true then scaling is performed
      * 
      */
-    @Override
+
     public void ifft2(boolean scale) {
         int oldNthreads = ConcurrencyUtils.getNumberOfThreads();
         ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.nextPow2(oldNthreads));
@@ -171,7 +171,7 @@ public class DenseLargeFComplexMatrix2D extends WrapperFComplexMatrix2D {
      * @param scale
      *            if true then scaling is performed
      */
-    @Override
+
     public void ifftColumns(final boolean scale) {
         if (fftColumns == null) {
             fftColumns = new FloatFFT_1D(rows);
@@ -216,7 +216,7 @@ public class DenseLargeFComplexMatrix2D extends WrapperFComplexMatrix2D {
      * @param scale
      *            if true then scaling is performed
      */
-    @Override
+
     public void ifftRows(final boolean scale) {
         if (fftRows == null) {
             fftRows = new FloatFFT_1D(columns);
@@ -249,39 +249,32 @@ public class DenseLargeFComplexMatrix2D extends WrapperFComplexMatrix2D {
         }
     }
 
-    @Override
     public float[] getQuick(int row, int column) {
         return new float[] { elements[row][2 * column], elements[row][2 * column + 1] };
     }
 
-    @Override
     public void setQuick(int row, int column, float[] value) {
         elements[row][2 * column] = value[0];
         elements[row][2 * column + 1] = value[1];
     }
 
-    @Override
     public void setQuick(int row, int column, float re, float im) {
         elements[row][2 * column] = re;
         elements[row][2 * column + 1] = im;
     }
 
-    @Override
     public float[][] elements() {
         return elements;
     }
 
-    @Override
     protected FComplexMatrix2D getContent() {
         return this;
     }
 
-    @Override
     public FComplexMatrix2D like(int rows, int columns) {
         return new DenseLargeFComplexMatrix2D(rows, columns);
     }
 
-    @Override
     public FComplexMatrix1D like1D(int size) {
         return new DenseFComplexMatrix1D(size);
     }

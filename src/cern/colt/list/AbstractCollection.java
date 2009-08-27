@@ -70,7 +70,7 @@ public abstract class AbstractCollection extends cern.colt.PersistentObject {
      * Returns a string representation of the receiver, containing the String
      * representation of each element.
      */
-    @Override
+
     public String toString() {
         return toList().toString();
     }

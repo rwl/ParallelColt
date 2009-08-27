@@ -866,7 +866,7 @@ public abstract class DComplexMatrix3D extends AbstractMatrix3D {
      * @return <code>true</code> if the objects are the same; <code>false</code>
      *         otherwise.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -1179,7 +1179,7 @@ public abstract class DComplexMatrix3D extends AbstractMatrix3D {
      * 
      * @return a string representation of the matrix.
      */
-    @Override
+
     public String toString() {
         return toString("%.4f");
     }

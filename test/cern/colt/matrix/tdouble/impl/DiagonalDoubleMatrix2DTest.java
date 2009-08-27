@@ -19,7 +19,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         DINDEX = 3;
         A = new DiagonalDoubleMatrix2D(NROWS, NCOLUMNS, DINDEX);
@@ -29,7 +28,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
 
     }
 
-    @Override
     protected void populateMatrices() {
         ConcurrencyUtils.setThreadsBeginN_2D(1);
         if (DINDEX >= 0) {
@@ -60,7 +58,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignDouble() {
         double value = Math.random();
         A.assign(value);
@@ -75,7 +72,23 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
+    public void testAssignDoubleArray() {
+        double[] expected = new double[DLENGTH];
+        for (int i = 0; i < DLENGTH; i++) {
+            expected[i] = Math.random();
+        }
+        A.assign(expected);
+        if (DINDEX >= 0) {
+            for (int r = 0; r < DLENGTH; r++) {
+                assertEquals(expected[r], A.getQuick(r, r + DINDEX), TOL);
+            }
+        } else {
+            for (int r = 0; r < DLENGTH; r++) {
+                assertEquals(expected[r], A.getQuick(r - DINDEX, r), TOL);
+            }
+        }
+    }
+
     public void testAssignDoubleArrayArray() {
         double[][] expected = new double[NROWS][NCOLUMNS];
         for (int r = 0; r < NROWS; r++) {
@@ -95,7 +108,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignDoubleFunction() {
         DoubleMatrix2D Acopy = A.copy();
         A.assign(DoubleFunctions.acos);
@@ -112,7 +124,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignDoubleMatrix2DDoubleDoubleFunction() {
         DoubleMatrix2D Acopy = A.copy();
         A.assign(B, DoubleFunctions.div);
@@ -127,7 +138,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testAssignDoubleMatrix2DDoubleDoubleFunctionIntArrayListIntArrayList() {
         IntArrayList rowList = new IntArrayList();
         IntArrayList columnList = new IntArrayList();
@@ -154,13 +164,11 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testCardinality() {
         int card = A.cardinality();
         assertEquals(DLENGTH, card);
     }
 
-    @Override
     public void testMaxLocation() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -180,7 +188,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testMinLocation() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -200,7 +207,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testGetNegativeValues() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -238,7 +244,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testGetNonZeros() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -276,7 +281,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testGetPositiveValues() {
         A.assign(0);
         if (DINDEX >= 0) {
@@ -314,7 +318,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testToArray() {
         double[][] array = A.toArray();
         assertTrue(NROWS == array.length);
@@ -326,7 +329,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testVectorize() {
         DoubleMatrix1D Avec = A.vectorize();
         int idx = 0;
@@ -337,7 +339,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewColumn() {
         DoubleMatrix1D col = A.viewColumn(NCOLUMNS / 2);
         assertEquals(NROWS, col.size());
@@ -346,7 +347,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewColumnFlip() {
         DoubleMatrix2D B = A.viewColumnFlip();
         assertEquals(A.size(), B.size());
@@ -357,7 +357,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewDice() {
         DoubleMatrix2D B = A.viewDice();
         assertEquals(NROWS, B.columns());
@@ -369,7 +368,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewPart() {
         DoubleMatrix2D B = A.viewPart(NROWS / 2, NCOLUMNS / 2, NROWS / 3, NCOLUMNS / 3);
         assertEquals(NROWS / 3, B.rows());
@@ -381,7 +379,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewRow() {
         DoubleMatrix1D B = A.viewRow(NROWS / 2);
         assertEquals(NCOLUMNS, B.size());
@@ -390,7 +387,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewRowFlip() {
         DoubleMatrix2D B = A.viewRowFlip();
         assertEquals(A.size(), B.size());
@@ -401,7 +397,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewSelectionDoubleMatrix1DProcedure() {
         final double value = 2;
         A.assign(0);
@@ -438,7 +433,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewSelectionIntArrayIntArray() {
         int[] rowIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2 };
         int[] colIndexes = new int[] { NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2, NROWS - 1 };
@@ -452,7 +446,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewSorted() {
         DoubleMatrix2D B = A.viewSorted(1);
         for (int r = 0; r < NROWS - 1; r++) {
@@ -460,7 +453,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testViewStrides() {
         int rowStride = 3;
         int colStride = 5;
@@ -472,7 +464,6 @@ public class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         }
     }
 
-    @Override
     public void testZMultDoubleMatrix2DDoubleMatrix2DDoubleDoubleBooleanBoolean() {
         double alpha = 3;
         double beta = 5;

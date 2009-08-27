@@ -41,7 +41,6 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         this.content = newContent;
     }
 
-    @Override
     public Object elements() {
         return content.elements();
     }
@@ -508,22 +507,18 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         }
     }
 
-    @Override
-    public float getQuick(int slice, int row, int column) {
+    public synchronized float getQuick(int slice, int row, int column) {
         return content.getQuick(slice, row, column);
     }
 
-    @Override
     public FloatMatrix3D like(int slices, int rows, int columns) {
         return content.like(slices, rows, columns);
     }
 
-    @Override
-    public void setQuick(int slice, int row, int column, float value) {
+    public synchronized void setQuick(int slice, int row, int column, float value) {
         content.setQuick(slice, row, column, value);
     }
 
-    @Override
     public FloatMatrix1D vectorize() {
         FloatMatrix1D v = new DenseFloatMatrix1D((int) size());
         int length = rows * columns;
@@ -533,13 +528,11 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return v;
     }
 
-    @Override
     public FloatMatrix2D viewColumn(int column) {
         checkColumn(column);
         return new DelegateFloatMatrix2D(this, 2, column);
     }
 
-    @Override
     public FloatMatrix3D viewColumnFlip() {
         if (columns == 0)
             return this;
@@ -549,23 +542,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int slice, int row, int column) {
+            public synchronized float getQuick(int slice, int row, int column) {
                 return content.getQuick(slice, row, columns - 1 - column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, float value) {
+            public synchronized void setQuick(int slice, int row, int column, float value) {
                 content.setQuick(slice, row, columns - 1 - column, value);
             }
 
-            @Override
-            public float get(int slice, int row, int column) {
+            public synchronized float get(int slice, int row, int column) {
                 return content.get(slice, row, columns - 1 - column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, float value) {
+            public synchronized void set(int slice, int row, int column, float value) {
                 content.set(slice, row, columns - 1 - column, value);
             }
         };
@@ -573,13 +562,11 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return view;
     }
 
-    @Override
     public FloatMatrix2D viewSlice(int slice) {
         checkSlice(slice);
         return new DelegateFloatMatrix2D(this, 0, slice);
     }
 
-    @Override
     public FloatMatrix3D viewSliceFlip() {
         if (slices == 0)
             return this;
@@ -589,23 +576,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int slice, int row, int column) {
+            public synchronized float getQuick(int slice, int row, int column) {
                 return content.getQuick(slices - 1 - slice, row, column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, float value) {
+            public synchronized void setQuick(int slice, int row, int column, float value) {
                 content.setQuick(slices - 1 - slice, row, column, value);
             }
 
-            @Override
-            public float get(int slice, int row, int column) {
+            public synchronized float get(int slice, int row, int column) {
                 return content.get(slices - 1 - slice, row, column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, float value) {
+            public synchronized void set(int slice, int row, int column, float value) {
                 content.set(slices - 1 - slice, row, column, value);
             }
         };
@@ -613,7 +596,6 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return view;
     }
 
-    @Override
     public FloatMatrix3D viewDice(int axis0, int axis1, int axis2) {
         int d = 3;
         if (axis0 < 0 || axis0 >= d || axis1 < 0 || axis1 >= d || axis2 < 0 || axis2 >= d || axis0 == axis1
@@ -630,23 +612,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
                  */
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public float getQuick(int slice, int row, int column) {
+                public synchronized float getQuick(int slice, int row, int column) {
                     return content.getQuick(row, slice, column);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, float value) {
+                public synchronized void setQuick(int slice, int row, int column, float value) {
                     content.setQuick(row, slice, column, value);
                 }
 
-                @Override
-                public float get(int slice, int row, int column) {
+                public synchronized float get(int slice, int row, int column) {
                     return content.get(row, slice, column);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, float value) {
+                public synchronized void set(int slice, int row, int column, float value) {
                     content.set(row, slice, column, value);
                 }
             };
@@ -657,23 +635,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
                  */
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public float getQuick(int slice, int row, int column) {
+                public synchronized float getQuick(int slice, int row, int column) {
                     return content.getQuick(row, column, slice);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, float value) {
+                public synchronized void setQuick(int slice, int row, int column, float value) {
                     content.setQuick(row, column, slice, value);
                 }
 
-                @Override
-                public float get(int slice, int row, int column) {
+                public synchronized float get(int slice, int row, int column) {
                     return content.get(row, column, slice);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, float value) {
+                public synchronized void set(int slice, int row, int column, float value) {
                     content.set(row, column, slice, value);
                 }
             };
@@ -684,23 +658,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
                  */
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public float getQuick(int slice, int row, int column) {
+                public synchronized float getQuick(int slice, int row, int column) {
                     return content.getQuick(column, row, slice);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, float value) {
+                public synchronized void setQuick(int slice, int row, int column, float value) {
                     content.setQuick(column, row, slice, value);
                 }
 
-                @Override
-                public float get(int slice, int row, int column) {
+                public synchronized float get(int slice, int row, int column) {
                     return content.get(column, row, slice);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, float value) {
+                public synchronized void set(int slice, int row, int column, float value) {
                     content.set(column, row, slice, value);
                 }
             };
@@ -711,23 +681,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
                  */
                 private static final long serialVersionUID = 1L;
 
-                @Override
-                public float getQuick(int slice, int row, int column) {
+                public synchronized float getQuick(int slice, int row, int column) {
                     return content.getQuick(column, slice, row);
                 }
 
-                @Override
-                public void setQuick(int slice, int row, int column, float value) {
+                public synchronized void setQuick(int slice, int row, int column, float value) {
                     content.setQuick(column, slice, row, value);
                 }
 
-                @Override
-                public float get(int slice, int row, int column) {
+                public synchronized float get(int slice, int row, int column) {
                     return content.get(column, slice, row);
                 }
 
-                @Override
-                public void set(int slice, int row, int column, float value) {
+                public synchronized void set(int slice, int row, int column, float value) {
                     content.set(column, slice, row, value);
                 }
             };
@@ -740,7 +706,6 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return view;
     }
 
-    @Override
     public FloatMatrix3D viewPart(final int slice, final int row, final int column, int depth, int height, int width) {
         checkBox(slice, row, column, depth, height, width);
         WrapperFloatMatrix3D view = new WrapperFloatMatrix3D(this) {
@@ -749,23 +714,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int i, int j, int k) {
+            public synchronized float getQuick(int i, int j, int k) {
                 return content.getQuick(slice + i, row + j, column + k);
             }
 
-            @Override
-            public void setQuick(int i, int j, int k, float value) {
+            public synchronized void setQuick(int i, int j, int k, float value) {
                 content.setQuick(slice + i, row + j, column + k, value);
             }
 
-            @Override
-            public float get(int i, int j, int k) {
+            public synchronized float get(int i, int j, int k) {
                 return content.get(slice + i, row + j, column + k);
             }
 
-            @Override
-            public void set(int i, int j, int k, float value) {
+            public synchronized void set(int i, int j, int k, float value) {
                 content.set(slice + i, row + j, column + k, value);
             }
         };
@@ -776,13 +737,11 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return view;
     }
 
-    @Override
     public FloatMatrix2D viewRow(int row) {
         checkRow(row);
         return new DelegateFloatMatrix2D(this, 1, row);
     }
 
-    @Override
     public FloatMatrix3D viewRowFlip() {
         if (rows == 0)
             return this;
@@ -792,23 +751,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int slice, int row, int column) {
+            public synchronized float getQuick(int slice, int row, int column) {
                 return content.getQuick(slice, rows - 1 - row, column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, float value) {
+            public synchronized void setQuick(int slice, int row, int column, float value) {
                 content.setQuick(slice, rows - 1 - row, column, value);
             }
 
-            @Override
-            public float get(int slice, int row, int column) {
+            public synchronized float get(int slice, int row, int column) {
                 return content.get(slice, rows - 1 - row, column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, float value) {
+            public synchronized void set(int slice, int row, int column, float value) {
                 content.set(slice, rows - 1 - row, column, value);
             }
         };
@@ -816,7 +771,6 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return view;
     }
 
-    @Override
     public FloatMatrix3D viewSelection(int[] sliceIndexes, int[] rowIndexes, int[] columnIndexes) {
         // check for "all"
         if (sliceIndexes == null) {
@@ -848,23 +802,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int i, int j, int k) {
+            public synchronized float getQuick(int i, int j, int k) {
                 return content.getQuick(six[i], rix[j], cix[k]);
             }
 
-            @Override
-            public void setQuick(int i, int j, int k, float value) {
+            public synchronized void setQuick(int i, int j, int k, float value) {
                 content.setQuick(six[i], rix[j], cix[k], value);
             }
 
-            @Override
-            public float get(int i, int j, int k) {
+            public synchronized float get(int i, int j, int k) {
                 return content.get(six[i], rix[j], cix[k]);
             }
 
-            @Override
-            public void set(int i, int j, int k, float value) {
+            public synchronized void set(int i, int j, int k, float value) {
                 content.set(six[i], rix[j], cix[k], value);
             }
         };
@@ -875,7 +825,6 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return view;
     }
 
-    @Override
     public FloatMatrix3D viewStrides(final int _sliceStride, final int _rowStride, final int _columnStride) {
         if (_sliceStride <= 0 || _rowStride <= 0 || _columnStride <= 0)
             throw new IndexOutOfBoundsException("illegal stride");
@@ -885,23 +834,19 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
              */
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public float getQuick(int slice, int row, int column) {
+            public synchronized float getQuick(int slice, int row, int column) {
                 return content.getQuick(_sliceStride * slice, _rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void setQuick(int slice, int row, int column, float value) {
+            public synchronized void setQuick(int slice, int row, int column, float value) {
                 content.setQuick(_sliceStride * slice, _rowStride * row, _columnStride * column, value);
             }
 
-            @Override
-            public float get(int slice, int row, int column) {
+            public synchronized float get(int slice, int row, int column) {
                 return content.get(_sliceStride * slice, _rowStride * row, _columnStride * column);
             }
 
-            @Override
-            public void set(int slice, int row, int column, float value) {
+            public synchronized void set(int slice, int row, int column, float value) {
                 content.set(_sliceStride * slice, _rowStride * row, _columnStride * column, value);
             }
         };
@@ -915,22 +860,18 @@ public class WrapperFloatMatrix3D extends FloatMatrix3D {
         return view;
     }
 
-    @Override
     protected FloatMatrix3D getContent() {
         return content;
     }
 
-    @Override
     public FloatMatrix2D like2D(int rows, int columns) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected FloatMatrix2D like2D(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
         throw new InternalError(); // should never get called
     }
 
-    @Override
     protected FloatMatrix3D viewSelectionLike(int[] sliceOffsets, int[] rowOffsets, int[] columnOffsets) {
         throw new InternalError(); // should never get called
     }

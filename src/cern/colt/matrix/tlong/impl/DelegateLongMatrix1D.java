@@ -56,25 +56,25 @@ class DelegateLongMatrix1D extends WrapperLongMatrix1D {
      *            the index of the cell.
      * @return the value of the specified cell.
      */
-    @Override
-    public long getQuick(int index) {
+
+    public synchronized long getQuick(int index) {
         return content.getQuick(row, index);
     }
 
     /**
      * Construct and returns a new empty matrix <i>of the same dynamic type</i>
      * as the receiver, having the specified size. For example, if the receiver
-     * is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix must also
-     * be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an instance of
-     * type <tt>SparseLongMatrix1D</tt> the new matrix must also be of type
-     * <tt>SparseLongMatrix1D</tt>, etc. In general, the new matrix should have
-     * internal parametrization as similar as possible.
+     * is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix must
+     * also be of type <tt>DenseLongMatrix1D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix1D</tt> the new matrix must also be
+     * of type <tt>SparseLongMatrix1D</tt>, etc. In general, the new matrix
+     * should have internal parametrization as similar as possible.
      * 
      * @param size
      *            the number of cell the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    @Override
+
     public LongMatrix1D like(int size) {
         return content.like1D(size);
     }
@@ -83,9 +83,9 @@ class DelegateLongMatrix1D extends WrapperLongMatrix1D {
      * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
      * type</i>, entirelly independent of the receiver. For example, if the
      * receiver is an instance of type <tt>DenseLongMatrix1D</tt> the new matrix
-     * must be of type <tt>DenseLongMatrix2D</tt>, if the receiver is an instance
-     * of type <tt>SparseLongMatrix1D</tt> the new matrix must be of type
-     * <tt>SparseLongMatrix2D</tt>, etc.
+     * must be of type <tt>DenseLongMatrix2D</tt>, if the receiver is an
+     * instance of type <tt>SparseLongMatrix1D</tt> the new matrix must be of
+     * type <tt>SparseLongMatrix2D</tt>, etc.
      * 
      * @param rows
      *            the number of rows the matrix shall have.
@@ -93,7 +93,7 @@ class DelegateLongMatrix1D extends WrapperLongMatrix1D {
      *            the number of columns the matrix shall have.
      * @return a new matrix of the corresponding dynamic type.
      */
-    @Override
+
     public LongMatrix2D like2D(int rows, int columns) {
         return content.like(rows, columns);
     }
@@ -112,8 +112,8 @@ class DelegateLongMatrix1D extends WrapperLongMatrix1D {
      * @param value
      *            the value to be filled into the specified cell.
      */
-    @Override
-    public void setQuick(int index, long value) {
+
+    public synchronized void setQuick(int index, long value) {
         content.setQuick(row, index, value);
     }
 }

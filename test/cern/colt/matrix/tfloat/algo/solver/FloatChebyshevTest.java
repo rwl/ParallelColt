@@ -12,7 +12,6 @@ public class FloatChebyshevTest extends FloatIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         // Get the extremal eigenvalues
         DenseFloatEigenvalueDecomposition evd = DenseFloatAlgebra.DEFAULT.eig(A);

@@ -106,7 +106,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      */
-    public OpenIntFloatHashMap(int initialCapacity, float minLoadFactor, float maxLoadFactor) {
+    public OpenIntFloatHashMap(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         setUp(initialCapacity, minLoadFactor, maxLoadFactor);
     }
 
@@ -118,7 +118,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      *            a function object taking as argument the current association's
      *            value.
      */
-    @Override
+
     public void assign(cern.colt.function.tfloat.FloatFunction function) {
         // specialization for speed
         if (function instanceof cern.jet.math.tfloat.FloatMult) { // x[i] = mult*x[i]
@@ -148,7 +148,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @param other
      *            the other map to be copied into the receiver.
      */
-    @Override
+
     public void assign(AbstractIntFloatMap other) {
         if (!(other instanceof OpenIntFloatHashMap)) {
             super.assign(other);
@@ -171,7 +171,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * Removes all (key,value) associations from the receiver. Implicitly calls
      * <tt>trimToSize()</tt>.
      */
-    @Override
+
     public void clear() {
         new ByteArrayList(this.state).fillFromToWith(0, this.state.length - 1, FREE);
         // new FloatArrayList(values).fillFromToWith(0, state.length-1, 0); //
@@ -192,7 +192,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * 
      * @return a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         OpenIntFloatHashMap copy = (OpenIntFloatHashMap) super.clone();
         copy.table = copy.table.clone();
@@ -206,7 +206,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified key.
      */
-    @Override
+
     public boolean containsKey(int key) {
         return indexOfKey(key) >= 0;
     }
@@ -216,7 +216,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * 
      * @return <tt>true</tt> if the receiver contains the specified value.
      */
-    @Override
+
     public boolean containsValue(float value) {
         return indexOfValue(value) >= 0;
     }
@@ -235,7 +235,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @param minCapacity
      *            the desired minimum capacity.
      */
-    @Override
+
     public void ensureCapacity(int minCapacity) {
         if (table.length < minCapacity) {
             int newCapacity = nextPrime(minCapacity);
@@ -259,7 +259,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEachKey(IntProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -280,7 +280,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @return <tt>false</tt> if the procedure stopped before all keys where
      *         iterated over, <tt>true</tt> otherwise.
      */
-    @Override
+
     public boolean forEachPair(final IntFloatProcedure procedure) {
         for (int i = table.length; i-- > 0;) {
             if (state[i] == FULL)
@@ -301,7 +301,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @return the value associated with the specified key; <tt>0</tt> if no
      *         such key is present.
      */
-    @Override
+
     public float get(int key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -430,7 +430,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @return the first key for which holds <tt>get(key) == value</tt>; returns
      *         <tt>Integer.MIN_VALUE</tt> if no such key exists.
      */
-    @Override
+
     public int keyOf(float value) {
         // returns the first key found; there may be more matching keys,
         // however.
@@ -452,7 +452,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @param list
      *            the list to be filled, can have any size.
      */
-    @Override
+
     public void keys(IntArrayList list) {
         list.setSize(distinct);
         int[] elements = list.elements();
@@ -492,7 +492,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @param valueList
      *            the list to be filled with values, can have any size.
      */
-    @Override
+
     public void pairsMatching(final IntFloatProcedure condition, final IntArrayList keyList,
             final FloatArrayList valueList) {
         keyList.clear();
@@ -518,7 +518,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      *         <tt>false</tt> if the receiver did already contain such a key -
      *         the new value has now replaced the formerly associated value.
      */
-    @Override
+
     public boolean put(int key, float value) {
         int i = indexOfInsertion(key);
         if (i < 0) { // already contained
@@ -608,7 +608,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @return <tt>true</tt> if the receiver contained the specified key,
      *         <tt>false</tt> otherwise.
      */
-    @Override
+
     public boolean removeKey(int key) {
         int i = indexOfKey(key);
         if (i < 0)
@@ -651,8 +651,8 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
      *             .
      */
-    @Override
-    protected void setUp(int initialCapacity, float minLoadFactor, float maxLoadFactor) {
+
+    protected void setUp(int initialCapacity, double minLoadFactor, double maxLoadFactor) {
         int capacity = initialCapacity;
         super.setUp(capacity, minLoadFactor, maxLoadFactor);
         capacity = nextPrime(capacity);
@@ -690,7 +690,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * Releases any superfluous internal memory. An application can use this
      * operation to minimize the storage of the receiver.
      */
-    @Override
+
     public void trimToSize() {
         // * 1.2 because open addressing's performance exponentially degrades
         // beyond that point
@@ -713,7 +713,7 @@ public class OpenIntFloatHashMap extends AbstractIntFloatMap {
      * @param list
      *            the list to be filled, can have any size.
      */
-    @Override
+
     public void values(FloatArrayList list) {
         list.setSize(distinct);
         float[] elements = list.elements();

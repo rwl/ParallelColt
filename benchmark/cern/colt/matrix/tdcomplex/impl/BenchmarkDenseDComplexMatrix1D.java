@@ -509,7 +509,7 @@ public class BenchmarkDenseDComplexMatrix1D {
         DComplexMatrix1D A = new DenseDComplexMatrix1D(a);
         int slices = BenchmarkMatrixKernel.MATRIX_SIZE_1D / 64;
         int rows = 16;
-        int cols = 4;
+        int columns = 4;
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
@@ -553,7 +553,7 @@ public class BenchmarkDenseDComplexMatrix1D {
         DComplexMatrix1D A = new DenseDComplexMatrix1D(a);
         int slices = BenchmarkMatrixKernel.MATRIX_SIZE_1D / 64;
         int rows = 16;
-        int cols = 4;
+        int columns = 4;
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
@@ -736,15 +736,15 @@ public class BenchmarkDenseDComplexMatrix1D {
         /* No view */
         DComplexMatrix1D A = new DenseDComplexMatrix1D(a);
         int rows = BenchmarkMatrixKernel.MATRIX_SIZE_1D / 64;
-        int cols = 64;
+        int columns = 64;
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            DComplexMatrix2D B = A.reshape(rows, cols);
+            DComplexMatrix2D B = A.reshape(rows, columns);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                B = A.reshape(rows, cols);
+                B = A.reshape(rows, columns);
                 t.stop();
                 noViewTimes[i] += t.millis();
             }
@@ -757,10 +757,10 @@ public class BenchmarkDenseDComplexMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            DComplexMatrix2D B = Av.reshape(rows, cols);
+            DComplexMatrix2D B = Av.reshape(rows, columns);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                B = Av.reshape(rows, cols);
+                B = Av.reshape(rows, columns);
                 t.stop();
                 viewTimes[i] += t.millis();
             }
@@ -780,15 +780,15 @@ public class BenchmarkDenseDComplexMatrix1D {
         DComplexMatrix1D A = new DenseDComplexMatrix1D(a);
         int slices = BenchmarkMatrixKernel.MATRIX_SIZE_1D / 64;
         int rows = 16;
-        int cols = 4;
+        int columns = 4;
         for (int i = 0; i < BenchmarkMatrixKernel.NTHREADS.length; i++) {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            DComplexMatrix3D B = A.reshape(slices, rows, cols);
+            DComplexMatrix3D B = A.reshape(slices, rows, columns);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                B = A.reshape(slices, rows, cols);
+                B = A.reshape(slices, rows, columns);
                 t.stop();
                 noViewTimes[i] += t.millis();
             }
@@ -801,10 +801,10 @@ public class BenchmarkDenseDComplexMatrix1D {
             ConcurrencyUtils.setNumberOfThreads(BenchmarkMatrixKernel.NTHREADS[i]);
 
             // warm-up
-            DComplexMatrix3D B = Av.reshape(slices, rows, cols);
+            DComplexMatrix3D B = Av.reshape(slices, rows, columns);
             for (int j = 0; j < BenchmarkMatrixKernel.NITERS; j++) {
                 t.reset().start();
-                B = Av.reshape(slices, rows, cols);
+                B = Av.reshape(slices, rows, columns);
                 t.stop();
                 viewTimes[i] += t.millis();
             }

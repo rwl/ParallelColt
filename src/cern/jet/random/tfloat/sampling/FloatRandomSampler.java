@@ -47,8 +47,9 @@ import cern.jet.random.tfloat.engine.FloatRandomEngine;
  * 
  * <p>
  * <b>Performance:</b> Space requirements are zero. Running time is
- * <tt>O(n)</tt> on average, <tt>O(N)</tt> in the worst case. <h2
- * align=center>Performance (200Mhz Pentium Pro, JDK 1.2, NT)</h2> <center>
+ * <tt>O(n)</tt> on average, <tt>O(N)</tt> in the worst case.
+ * <h2 * align=center>Performance (200Mhz Pentium Pro, JDK 1.2, NT)</h2>
+ * <center>
  * <table border="1">
  * <tr>
  * <td align="center" width="20%">n</td>
@@ -193,7 +194,7 @@ public class FloatRandomSampler extends cern.colt.PersistentObject {
     /**
      * Returns a deep copy of the receiver.
      */
-    @Override
+
     public Object clone() {
         FloatRandomSampler copy = (FloatRandomSampler) super.clone();
         copy.my_RandomGenerator = (FloatRandomEngine) this.my_RandomGenerator.clone();

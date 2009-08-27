@@ -171,7 +171,6 @@ public abstract class FloatIterativeSolverTest extends TestCase {
         super(arg0);
     }
 
-    @Override
     protected void setUp() throws Exception {
         createMatrix();
 
@@ -185,12 +184,12 @@ public abstract class FloatIterativeSolverTest extends TestCase {
         FloatIterationMonitor im = new DefaultFloatIterationMonitor(1000000, rtol, 1e-25f, 1e+3f);
         //        im.setIterationReporter(new NoFloatIterationReporter() {
         //
-        //            @Override
+        //            
         //            public void monitor(float r, FloatMatrix1D x, int i) {
         //                System.out.println("Norm of residual = " + r);
         //            }
         //
-        //            @Override
+        //            
         //            public void monitor(float r, int i) {
         //                System.out.println("Residual = " + r);
         //            }
@@ -219,7 +218,6 @@ public abstract class FloatIterativeSolverTest extends TestCase {
         A = Aco.getRowCompressed(true);
     }
 
-    @Override
     protected void tearDown() throws Exception {
         A = null;
         b = bt = x = null;

@@ -231,7 +231,7 @@ public class MatrixInfo {
      *       %%MatrixMarket matrix coordinate real general
      * </pre>
      */
-    @Override
+
     public String toString() {
         StringBuilder buf = new StringBuilder();
 

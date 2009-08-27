@@ -102,7 +102,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         this.isNoView = !isView;
     }
 
-    @Override
     public int aggregate(final cern.colt.function.tint.IntIntFunction aggr, final cern.colt.function.tint.IntFunction f) {
         if (size == 0)
             throw new IllegalArgumentException("size == 0");
@@ -139,7 +138,50 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return a;
     }
 
-    @Override
+    public int aggregate(final cern.colt.function.tint.IntIntFunction aggr,
+            final cern.colt.function.tint.IntFunction f, final IntArrayList indexList) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        final int size = indexList.size();
+        final int[] indexElements = indexList.elements();
+        int a = 0;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
+
+                    public Integer call() throws Exception {
+                        int idx = zero + indexElements[firstIdx] * stride;
+                        int a = f.apply(elements[idx]);
+                        int elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            idx = zero + indexElements[i] * stride;
+                            elem = elements[idx];
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            int elem;
+            int idx = zero + indexElements[0] * stride;
+            a = f.apply(elements[idx]);
+            for (int i = 1; i < size; i++) {
+                idx = zero + indexElements[i] * stride;
+                elem = elements[idx];
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
+
     public int aggregate(final IntMatrix1D other, final cern.colt.function.tint.IntIntFunction aggr,
             final cern.colt.function.tint.IntIntFunction f) {
         if (!(other instanceof DenseIntMatrix1D)) {
@@ -188,7 +230,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return a;
     }
 
-    @Override
     public IntMatrix1D assign(final cern.colt.function.tint.IntFunction function) {
         final int multiplicator;
         if (function instanceof cern.jet.math.tint.IntMult) {
@@ -248,7 +289,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    @Override
     public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond,
             final cern.colt.function.tint.IntFunction function) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -285,7 +325,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    @Override
     public IntMatrix1D assign(final cern.colt.function.tint.IntProcedure cond, final int value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -321,7 +360,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    @Override
     public IntMatrix1D assign(final int value) {
         final int[] elems = this.elements;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -353,7 +391,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    @Override
     public IntMatrix1D assign(final int[] values) {
         if (values.length != size)
             throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
@@ -397,7 +434,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    @Override
     public IntMatrix1D assign(IntMatrix1D source) {
         // overriden for performance only
         if (!(source instanceof DenseIntMatrix1D)) {
@@ -462,7 +498,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    @Override
     public IntMatrix1D assign(final IntMatrix1D y, final cern.colt.function.tint.IntIntFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseIntMatrix1D)) {
@@ -630,7 +665,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -680,12 +714,10 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return cardinality;
     }
 
-    @Override
     public int[] elements() {
         return elements;
     }
 
-    @Override
     public void getNonZeros(final IntArrayList indexList, final IntArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -716,7 +748,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
-    @Override
     public void getPositiveValues(final IntArrayList indexList, final IntArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -747,7 +778,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
-    @Override
     public void getNegativeValues(final IntArrayList indexList, final IntArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -778,7 +808,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
-    @Override
     public int[] getMaxLocation() {
         int location = 0;
         int maxValue = 0;
@@ -813,11 +842,11 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                     results[j] = (int[]) futures[j].get();
                 }
                 maxValue = results[0][0];
-                location = results[0][1];
+                location = (int) results[0][1];
                 for (int j = 1; j < nthreads; j++) {
                     if (maxValue < results[j][0]) {
                         maxValue = results[j][0];
-                        location = results[j][1];
+                        location = (int) results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -840,7 +869,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return new int[] { maxValue, location };
     }
 
-    @Override
     public int[] getMinLocation() {
         int location = 0;
         int minValue = 0;
@@ -875,11 +903,11 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                     results[j] = (int[]) futures[j].get();
                 }
                 minValue = results[0][0];
-                location = results[0][1];
+                location = (int) results[0][1];
                 for (int j = 1; j < nthreads; j++) {
                     if (minValue > results[j][0]) {
                         minValue = results[j][0];
-                        location = results[j][1];
+                        location = (int) results[j][1];
                     }
                 }
             } catch (ExecutionException ex) {
@@ -902,25 +930,21 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return new int[] { minValue, location };
     }
 
-    @Override
     public int getQuick(int index) {
         return elements[zero + index * stride];
     }
 
-    @Override
     public IntMatrix1D like(int size) {
         return new DenseIntMatrix1D(size);
     }
 
-    @Override
     public IntMatrix2D like2D(int rows, int columns) {
         return new DenseIntMatrix2D(rows, columns);
     }
 
-    @Override
     public IntMatrix2D reshape(final int rows, final int columns) {
         if (rows * columns != size) {
-            throw new IllegalArgumentException("rows*cols != size");
+            throw new IllegalArgumentException("rows*columns != size");
         }
         IntMatrix2D M = new DenseIntMatrix2D(rows, columns);
         final int[] elemsOther = (int[]) M.elements();
@@ -967,10 +991,9 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return M;
     }
 
-    @Override
     public IntMatrix3D reshape(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != size) {
-            throw new IllegalArgumentException("slices*rows*cols != size");
+            throw new IllegalArgumentException("slices*rows*columns != size");
         }
         IntMatrix3D M = new DenseIntMatrix3D(slices, rows, columns);
         final int[] elemsOther = (int[]) M.elements();
@@ -1022,12 +1045,10 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return M;
     }
 
-    @Override
     public void setQuick(int index, int value) {
         elements[zero + index * stride] = value;
     }
 
-    @Override
     public void swap(final IntMatrix1D other) {
         // overriden for performance only
         if (!(other instanceof DenseIntMatrix1D)) {
@@ -1079,7 +1100,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         }
     }
 
-    @Override
     public void toArray(int[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
@@ -1089,7 +1109,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             super.toArray(values);
     }
 
-    @Override
     public int zDotProduct(IntMatrix1D y) {
         if (!(y instanceof DenseIntMatrix1D)) {
             return super.zDotProduct(y);
@@ -1165,7 +1184,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return sum;
     }
 
-    @Override
     public int zDotProduct(IntMatrix1D y, int from, int length) {
         if (!(y instanceof DenseIntMatrix1D)) {
             return super.zDotProduct(y, from, length);
@@ -1179,11 +1197,11 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             tail = size;
         if (y.size() < tail)
             tail = (int) y.size();
-        final int[] elemsOther = yy.elements;
+        final int[] elementsOther = yy.elements;
         int zeroThis = (int) index(from);
         int zeroOther = (int) yy.index(from);
         int strideOther = yy.stride;
-        if (elements == null || elemsOther == null)
+        if (elements == null || elementsOther == null)
             throw new InternalError();
         int sum = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1191,14 +1209,13 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             final int zeroThisF = zeroThis;
             final int zeroOtherF = zeroOther;
             final int strideOtherF = strideOther;
-            nthreads = Math.min(nthreads, size);
+            nthreads = Math.min(nthreads, length);
             Future<?>[] futures = new Future[nthreads];
             Integer[] results = new Integer[nthreads];
             int k = length / nthreads;
             for (int j = 0; j < nthreads; j++) {
                 final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-
+                final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Integer>() {
                     public Integer call() throws Exception {
                         int idx = zeroThisF + firstIdx * stride;
@@ -1208,13 +1225,13 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                         int sum = 0;
                         int min = lastIdx - firstIdx;
                         for (int k = min / 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF]
-                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
-                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
-                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF];
                         }
                         for (int k = min % 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elementsOther[idxOther += strideOtherF];
                         }
                         return sum;
                     }
@@ -1238,19 +1255,18 @@ public class DenseIntMatrix1D extends IntMatrix1D {
             zeroOther -= strideOther;
             int min = tail - from;
             for (int k = min / 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
-                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
-                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
-                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther];
             }
             for (int k = min % 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elementsOther[zeroOther += strideOther];
             }
         }
         return sum;
     }
 
-    @Override
     public int zSum() {
         int sum = 0;
         final int[] elems = this.elements;
@@ -1274,7 +1290,7 @@ public class DenseIntMatrix1D extends IntMatrix1D {
                             sum += elems[idx];
                             idx += stride;
                         }
-                        return Integer.valueOf(sum);
+                        return sum;
                     }
                 });
             }
@@ -1301,7 +1317,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return sum;
     }
 
-    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int index = zero;
@@ -1315,7 +1330,6 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return cardinality;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(IntMatrix1D other) {
         if (other instanceof SelectedDenseIntMatrix1D) {
             SelectedDenseIntMatrix1D otherMatrix = (SelectedDenseIntMatrix1D) other;
@@ -1327,12 +1341,10 @@ public class DenseIntMatrix1D extends IntMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
-    @Override
     protected IntMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseIntMatrix1D(this.elements, offsets);
     }

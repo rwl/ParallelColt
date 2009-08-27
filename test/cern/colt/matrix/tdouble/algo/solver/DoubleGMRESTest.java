@@ -9,7 +9,6 @@ public class DoubleGMRESTest extends DoubleIterativeSolverTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         solver = new DoubleGMRES(x);
         M = solver.getPreconditioner(); //identity preconditioner

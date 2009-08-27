@@ -349,7 +349,6 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
     }
 
-    @Override
     public DoubleMatrix2D assign(final cern.colt.function.tdouble.DoubleFunction function) {
         if (function instanceof cern.jet.math.tdouble.DoubleMult) { // x[i] = mult*x[i]
             final double alpha = ((cern.jet.math.tdouble.DoubleMult) function).multiplicator;
@@ -375,7 +374,6 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(double value) {
         if (value == 0) {
             Arrays.fill(dcs.i, 0);
@@ -390,7 +388,6 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(DoubleMatrix2D source) {
         if (source == this)
             return this; // nothing to do
@@ -426,7 +423,6 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
     }
 
-    @Override
     public DoubleMatrix2D assign(final DoubleMatrix2D y, cern.colt.function.tdouble.DoubleDoubleFunction function) {
         checkShape(y);
 
@@ -497,17 +493,14 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return super.assign(y, function);
     }
 
-    @Override
     public int cardinality() {
         return dcs.p[columns];
     }
 
-    @Override
     public Dcs elements() {
         return dcs;
     }
 
-    @Override
     public DoubleMatrix2D forEachNonZero(final cern.colt.function.tdouble.IntIntDoubleFunction function) {
         final int[] rowIndexesA = dcs.i;
         final int[] columnPointersA = dcs.p;
@@ -552,7 +545,6 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return dense;
     }
 
-    @Override
     public synchronized double getQuick(int row, int column) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
         int k = searchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
@@ -620,17 +612,14 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return rowIndexesSorted;
     }
 
-    @Override
     public DoubleMatrix2D like(int rows, int columns) {
         return new SparseCCDoubleMatrix2D(rows, columns);
     }
 
-    @Override
     public DoubleMatrix1D like1D(int size) {
         return new SparseDoubleMatrix1D(size);
     }
 
-    @Override
     public synchronized void setQuick(int row, int column, double value) {
         //        int k = cern.colt.Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
         int k = searchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
@@ -677,26 +666,24 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         Dcs_dropzeros.cs_dropzeros(dcs); //remove zeroes
     }
 
-    @Override
     public void trimToSize() {
         Dcs_util.cs_sprealloc(dcs, 0);
     }
-    
-    @Override
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+        builder.append(rows).append(" x ").append(columns).append(" sparse matrix, nnz = ").append(cardinality())
+                .append('\n');
         for (int i = 0; i < columns; i++) {
-            int high = dcs.p[i+1];
+            int high = dcs.p[i + 1];
             for (int j = dcs.p[i]; j < high; j++) {
-                builder.append('(').append(dcs.i[j]).append(',').append(i).append(')').append('\t').append(dcs.x[j]).append('\n');
+                builder.append('(').append(dcs.i[j]).append(',').append(i).append(')').append('\t').append(dcs.x[j])
+                        .append('\n');
             }
         }
         return builder.toString();
     }
-    
 
-    @Override
     public DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta,
             final boolean transposeA) {
         final int rowsA = transposeA ? columns : rows;
@@ -775,13 +762,13 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
                     elementsZ[zeroZ + j * strideZ] += result[j];
                     elementsZ[zeroZ + (j + 1) * strideZ] += result[j + 1];
                     elementsZ[zeroZ + (j + 2) * strideZ] += result[j + 2];
-                    elementsZ[zeroZ + (j + 3) * strideZ] += result[j + 3];                    
-                    elementsZ[zeroZ + (j + 4) * strideZ] += result[j + 4];                    
-                    elementsZ[zeroZ + (j + 5) * strideZ] += result[j + 5];                    
-                    elementsZ[zeroZ + (j + 6) * strideZ] += result[j + 6];                    
-                    elementsZ[zeroZ + (j + 7) * strideZ] += result[j + 7];                    
-                    elementsZ[zeroZ + (j + 8) * strideZ] += result[j + 8];                    
-                    elementsZ[zeroZ + (j + 9) * strideZ] += result[j + 9];                    
+                    elementsZ[zeroZ + (j + 3) * strideZ] += result[j + 3];
+                    elementsZ[zeroZ + (j + 4) * strideZ] += result[j + 4];
+                    elementsZ[zeroZ + (j + 5) * strideZ] += result[j + 5];
+                    elementsZ[zeroZ + (j + 6) * strideZ] += result[j + 6];
+                    elementsZ[zeroZ + (j + 7) * strideZ] += result[j + 7];
+                    elementsZ[zeroZ + (j + 8) * strideZ] += result[j + 8];
+                    elementsZ[zeroZ + (j + 9) * strideZ] += result[j + 9];
                 }
                 for (int j = 0; j < rem; j++) {
                     elementsZ[zeroZ + j * strideZ] += result[j];
@@ -865,7 +852,6 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return z;
     }
 
-    @Override
     public DoubleMatrix2D zMult(DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, double beta,
             final boolean transposeA, boolean transposeB) {
         int rowsA = rows;
@@ -997,7 +983,6 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return C;
     }
 
-    @Override
     protected DoubleMatrix2D getContent() {
         return this;
     }

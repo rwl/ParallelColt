@@ -12,6 +12,7 @@ import cern.colt.function.tdouble.DoubleIntProcedure;
 import cern.colt.function.tdouble.DoubleProcedure;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
+import cern.colt.map.AbstractMap;
 
 /**
  * Abstract base class for hash maps holding (key,value) associations of type
@@ -29,7 +30,7 @@ import cern.colt.list.tint.IntArrayList;
  * @version 1.0, 09/24/99
  * @see java.util.HashMap
  */
-public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
+public abstract class AbstractDoubleIntMap extends AbstractMap {
     /**
      * 
      */
@@ -113,7 +114,7 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      *            object to be compared for equality with this map.
      * @return <tt>true</tt> if the specified object is equal to this map.
      */
-    @Override
+
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -428,7 +429,7 @@ public abstract class AbstractDoubleIntMap extends AbstractDoubleMap {
      * Returns a string representation of the receiver, containing the String
      * representation of each key-value pair, sorted ascending by key.
      */
-    @Override
+
     public String toString() {
         DoubleArrayList theKeys = keys();
         theKeys.sort();

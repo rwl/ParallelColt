@@ -294,7 +294,7 @@ public class DoubleArithmetic extends DoubleConstants {
      *            must hold <tt>k &gt;= 0</tt>.
      */
     static public double factorial(long k) {
-        int ki = (int)k;
+        int ki = (int) k;
         if (ki < 0)
             throw new IllegalArgumentException();
 
@@ -308,7 +308,7 @@ public class DoubleArithmetic extends DoubleConstants {
         else
             return Double.POSITIVE_INFINITY;
     }
-    
+
     /**
      * Returns the largest <code>long &lt;= value</code>. <dt>Examples: <code>
      * 1.0 -> 1, 1.2 -> 1, 1.9 -> 1 <dt>

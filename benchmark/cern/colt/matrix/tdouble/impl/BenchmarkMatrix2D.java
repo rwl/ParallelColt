@@ -19,25 +19,25 @@ import cern.jet.math.tdouble.DoubleFunctions;
  * <center>
  * <table border cellpadding="3" cellspacing="0" align="center">
  * <tr valign="middle" bgcolor="#33CC66" nowrap align="center">
- * <td nowrap colspan="7"><font size="+2">Iteration Performance [million method
+ * <td nowrap columnspan="7"><font size="+2">Iteration Performance [million method
  * calls per second]</font><br>
  * <font size="-1">Pentium Pro 200 Mhz, SunJDK 1.2.2, NT, java -classic,<br>
  * 60 times repeating the same iteration </font></td>
  * </tr>
  * <tr valign="middle" bgcolor="#33CC66" nowrap align="center">
  * <td nowrap><div align="left"> Element type</div></td>
- * <td nowrap colspan="6">Matrix2D type</td>
+ * <td nowrap columnspan="6">Matrix2D type</td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td nowrap bgcolor="#FF9966" rowspan="2"><div align="left"> .</div></td>
- * <td bgcolor="#FF9966" colspan="2">
+ * <td bgcolor="#FF9966" columnspan="2">
  * <p>
  * <tt>DenseDoubleMatrix2D</tt><br>
  * 1000 x 1000
  * </p>
  * </td>
- * <td bgcolor="#FF9966" colspan="2">&nbsp;</td>
- * <td bgcolor="#FF9966" colspan="2">
+ * <td bgcolor="#FF9966" columnspan="2">&nbsp;</td>
+ * <td bgcolor="#FF9966" columnspan="2">
  * <p>
  * <tt>SparseDoubleMatrix2D</tt><br>
  * 100 x 1000,<br>
@@ -73,9 +73,11 @@ import cern.jet.math.tdouble.DoubleFunctions;
  * <td nowrap>0.3</td>
  * </tr>
  * </table>
- * </center> <p align="left"> As can be seen, sparse matrices are certainly not
- * quite as quick as dense ones, but not really slow either. Considering their
- * minimal footprint they can be a real alternative.
+ * </center>
+ * <p align="left">
+ * As can be seen, sparse matrices are certainly not quite as quick as dense
+ * ones, but not really slow either. Considering their minimal footprint they
+ * can be a real alternative.
  * <p>
  * Comparing the OO abstractions to zero-abstraction primitive Java arrays may
  * or may not be useful. Still, the table below provides some interesting
@@ -88,20 +90,20 @@ import cern.jet.math.tdouble.DoubleFunctions;
  * <center>
  * <table border cellpadding="3" cellspacing="0" align="center" * width="617">
  * <tr valign="middle" bgcolor="#33CC66" nowrap align="center">
- * <td height="30" nowrap colspan="7"><font size="+2">Iteration Performance
+ * <td height="30" nowrap columnspan="7"><font size="+2">Iteration Performance
  * [million element accesses per second]</font><br>
  * <font size="-1">Pentium Pro 200 Mhz, SunJDK 1.2.2, NT, java -classic,<br>
  * 200 times repeating the same iteration </font></td>
  * </tr>
  * <tr valign="middle" bgcolor="#33CC66" nowrap align="center">
  * <td width="78" height="30" nowrap><div align="left"> Element type</div></td>
- * <td height="30" nowrap colspan="6"><div align="center">Matrix2D type = Java
+ * <td height="30" nowrap columnspan="6"><div align="center">Matrix2D type = Java
  * array <tt>double[][]</tt></div></td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td width="78" height="60" nowrap bgcolor="#FF9966" rowspan="2"><div
  * align="left"> .</div></td>
- * <td height="132" bgcolor="#FF9966" colspan="2">
+ * <td height="132" bgcolor="#FF9966" columnspan="2">
  * <p>
  * Unoptimized Form<br>
  * 1000 x 1000<br>
@@ -118,7 +120,7 @@ import cern.jet.math.tdouble.DoubleFunctions;
  * 
  * </font> </div>
  * </td>
- * <td height="132" bgcolor="#FF9966" colspan="4">Optimized Form<br>
+ * <td height="132" bgcolor="#FF9966" columnspan="4">Optimized Form<br>
  * 1000 x 1000 <div align="left"> <font size="-1">
  * 
  * <pre>
@@ -137,21 +139,21 @@ import cern.jet.math.tdouble.DoubleFunctions;
  * <td width="152" height="30" bgcolor="#FF9966">getting</td>
  * <td width="144" height="30" bgcolor="#FF9966">setting</td>
  * <td width="150" height="30" bgcolor="#FF9966">getting</td>
- * <td width="138" height="30" bgcolor="#FF9966" colspan="3">setting</td>
+ * <td width="138" height="30" bgcolor="#FF9966" columnspan="3">setting</td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td width="78" height="30" nowrap bgcolor="#FF9966">double</td>
  * <td width="152" height="30" nowrap>1.6</td>
  * <td width="144" height="30" nowrap>1.8</td>
  * <td width="150" height="30" nowrap>18</td>
- * <td width="138" height="30" nowrap colspan="3">11</td>
+ * <td width="138" height="30" nowrap columnspan="3">11</td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td width="78" height="30" nowrap bgcolor="#FF9966">int</td>
  * <td width="152" height="30" nowrap>1.5</td>
  * <td width="144" height="30" nowrap>1.8</td>
  * <td width="150" height="30" nowrap>28</td>
- * <td width="138" height="30" nowrap colspan="3">26</td>
+ * <td width="138" height="30" nowrap columnspan="3">26</td>
  * </tr>
  * </table>
  * </center> <left>

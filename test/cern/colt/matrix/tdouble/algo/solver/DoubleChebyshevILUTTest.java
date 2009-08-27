@@ -11,7 +11,6 @@ public class DoubleChebyshevILUTTest extends DoubleChebyshevTest {
         super(arg0);
     }
 
-    @Override
     protected void createSolver() throws Exception {
         super.createSolver();
         M = new DoubleILUT(A.rows());

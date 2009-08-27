@@ -5,7 +5,6 @@ public class SparseFComplexMatrix1DViewTest extends SparseFComplexMatrix1DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseFComplexMatrix1D(SIZE).viewFlip();
         B = new SparseFComplexMatrix1D(SIZE).viewFlip();

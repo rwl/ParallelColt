@@ -131,20 +131,20 @@ import cern.colt.function.tfloat.FloatProcedure;
  * often acceptable. <center>
  * <table border cellpadding="3" cellspacing="0" * align="center">
  * <tr valign="middle" bgcolor="#33CC66" nowrap align="center">
- * <td nowrap colspan="7"><font size="+2">Iteration Performance [million
+ * <td nowrap columnspan="7"><font size="+2">Iteration Performance [million
  * function evaluations per second]</font><br>
  * <font size="-1">Pentium Pro 200 Mhz, SunJDK 1.2.2, NT, java -classic, </font>
  * </td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td nowrap bgcolor="#FF9966" rowspan="2">&nbsp;</td>
- * <td bgcolor="#FF9966" colspan="2">
+ * <td bgcolor="#FF9966" columnspan="2">
  * <p>
  * 30000000 iterations
  * </p>
  * </td>
- * <td bgcolor="#FF9966" colspan="2">3000000 iterations (10 times less)</td>
- * <td bgcolor="#FF9966" colspan="2">&nbsp;</td>
+ * <td bgcolor="#FF9966" columnspan="2">3000000 iterations (10 times less)</td>
+ * <td bgcolor="#FF9966" columnspan="2">&nbsp;</td>
  * </tr>
  * <tr valign="middle" bgcolor="#66CCFF" nowrap align="center">
  * <td bgcolor="#FF9966"> <tt>F.plus</tt></td>
@@ -827,7 +827,8 @@ public class FloatFunctions extends Object {
         float b = 0.2f;
         float v = (float) (Math.sin(a) + Math.pow(Math.cos(b), 2));
         System.out.println(v);
-        FloatFloatFunction f = FloatFunctions.chain(FloatFunctions.plus, FloatFunctions.sin, FloatFunctions.chain(FloatFunctions.square, FloatFunctions.cos));
+        FloatFloatFunction f = FloatFunctions.chain(FloatFunctions.plus, FloatFunctions.sin, FloatFunctions.chain(
+                FloatFunctions.square, FloatFunctions.cos));
         // FloatFloatFunction f = F.chain(plus,sin,F.chain(square,cos));
         System.out.println(f.apply(a, b));
         FloatFloatFunction g = new FloatFloatFunction() {
@@ -856,7 +857,8 @@ public class FloatFunctions extends Object {
         System.out.println(v);
 
         // FloatFloatFunction f = F.chain(F.plus,F.identity,F.identity);
-        FloatFloatFunction f = FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.chain(FloatFunctions.plus, FloatFunctions.sin, FloatFunctions.chain(FloatFunctions.square, FloatFunctions.cos)));
+        FloatFloatFunction f = FloatFunctions.chain(FloatFunctions.abs, FloatFunctions.chain(FloatFunctions.plus,
+                FloatFunctions.sin, FloatFunctions.chain(FloatFunctions.square, FloatFunctions.cos)));
         // FloatFloatFunction f =
         // F.chain(F.plus,F.sin,F.chain(F.square,F.cos));
         // FloatFloatFunction f = F.plus;

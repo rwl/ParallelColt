@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import cern.colt.list.tint.IntArrayList;
 import cern.colt.list.tlong.LongArrayList;
 import cern.colt.matrix.tlong.LongMatrix1D;
 import cern.colt.matrix.tlong.LongMatrix2D;
@@ -102,7 +103,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         this.isNoView = !isView;
     }
 
-    @Override
     public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongFunction f) {
         if (size == 0)
@@ -140,7 +140,50 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return a;
     }
 
-    @Override
+    public long aggregate(final cern.colt.function.tlong.LongLongFunction aggr,
+            final cern.colt.function.tlong.LongFunction f, final IntArrayList indexList) {
+        if (size() == 0)
+            throw new IllegalArgumentException("size == 0");
+        final int size = indexList.size();
+        final int[] indexElements = indexList.elements();
+        long a = 0;
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Callable<Long>() {
+
+                    public Long call() throws Exception {
+                        int idx = zero + indexElements[firstIdx] * stride;
+                        long a = f.apply(elements[idx]);
+                        long elem;
+                        for (int i = firstIdx + 1; i < lastIdx; i++) {
+                            idx = zero + indexElements[i] * stride;
+                            elem = elements[idx];
+                            a = aggr.apply(a, f.apply(elem));
+                        }
+                        return a;
+                    }
+                });
+            }
+            a = ConcurrencyUtils.waitForCompletion(futures, aggr);
+        } else {
+            long elem;
+            int idx = zero + indexElements[0] * stride;
+            a = f.apply(elements[idx]);
+            for (int i = 1; i < size; i++) {
+                idx = zero + indexElements[i] * stride;
+                elem = elements[idx];
+                a = aggr.apply(a, f.apply(elem));
+            }
+        }
+        return a;
+    }
+
     public long aggregate(final LongMatrix1D other, final cern.colt.function.tlong.LongLongFunction aggr,
             final cern.colt.function.tlong.LongLongFunction f) {
         if (!(other instanceof DenseLongMatrix1D)) {
@@ -189,7 +232,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return a;
     }
 
-    @Override
     public LongMatrix1D assign(final cern.colt.function.tlong.LongFunction function) {
         final long multiplicator;
         if (function instanceof cern.jet.math.tlong.LongMult) {
@@ -249,7 +291,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
     public LongMatrix1D assign(final cern.colt.function.tlong.LongProcedure cond,
             final cern.colt.function.tlong.LongFunction function) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -286,8 +327,7 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
-    public LongMatrix1D assign(final cern.colt.function.tlong.LongProcedure cond, final int value) {
+    public LongMatrix1D assign(final cern.colt.function.tlong.LongProcedure cond, final long value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
             nthreads = Math.min(nthreads, size);
@@ -322,7 +362,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
     public LongMatrix1D assign(final long value) {
         final long[] elems = this.elements;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -354,7 +393,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
     public LongMatrix1D assign(final long[] values) {
         if (values.length != size)
             throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
@@ -398,7 +436,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
     public LongMatrix1D assign(final int[] values) {
         if (values.length != size)
             throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
@@ -438,7 +475,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
     public LongMatrix1D assign(LongMatrix1D source) {
         // overriden for performance only
         if (!(source instanceof DenseLongMatrix1D)) {
@@ -503,7 +539,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
     public LongMatrix1D assign(final LongMatrix1D y, final cern.colt.function.tlong.LongLongFunction function) {
         // overriden for performance only
         if (!(y instanceof DenseLongMatrix1D)) {
@@ -671,7 +706,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return this;
     }
 
-    @Override
     public int cardinality() {
         int cardinality = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -721,12 +755,10 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return cardinality;
     }
 
-    @Override
     public long[] elements() {
         return elements;
     }
 
-    @Override
     public void getNonZeros(final LongArrayList indexList, final LongArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -757,7 +789,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         }
     }
 
-    @Override
     public void getPositiveValues(final LongArrayList indexList, final LongArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -788,7 +819,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         }
     }
 
-    @Override
     public void getNegativeValues(final LongArrayList indexList, final LongArrayList valueList) {
         indexList.clear();
         valueList.clear();
@@ -819,7 +849,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         }
     }
 
-    @Override
     public long[] getMaxLocation() {
         int location = 0;
         long maxValue = 0;
@@ -881,7 +910,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return new long[] { maxValue, location };
     }
 
-    @Override
     public long[] getMinLocation() {
         int location = 0;
         long minValue = 0;
@@ -943,25 +971,21 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return new long[] { minValue, location };
     }
 
-    @Override
     public long getQuick(int index) {
         return elements[zero + index * stride];
     }
 
-    @Override
     public LongMatrix1D like(int size) {
         return new DenseLongMatrix1D(size);
     }
 
-    @Override
     public LongMatrix2D like2D(int rows, int columns) {
         return new DenseLongMatrix2D(rows, columns);
     }
 
-    @Override
     public LongMatrix2D reshape(final int rows, final int columns) {
         if (rows * columns != size) {
-            throw new IllegalArgumentException("rows*cols != size");
+            throw new IllegalArgumentException("rows*columns != size");
         }
         LongMatrix2D M = new DenseLongMatrix2D(rows, columns);
         final long[] elemsOther = (long[]) M.elements();
@@ -1008,10 +1032,9 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return M;
     }
 
-    @Override
     public LongMatrix3D reshape(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != size) {
-            throw new IllegalArgumentException("slices*rows*cols != size");
+            throw new IllegalArgumentException("slices*rows*columns != size");
         }
         LongMatrix3D M = new DenseLongMatrix3D(slices, rows, columns);
         final long[] elemsOther = (long[]) M.elements();
@@ -1063,12 +1086,10 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return M;
     }
 
-    @Override
     public void setQuick(int index, long value) {
         elements[zero + index * stride] = value;
     }
 
-    @Override
     public void swap(final LongMatrix1D other) {
         // overriden for performance only
         if (!(other instanceof DenseLongMatrix1D)) {
@@ -1120,7 +1141,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         }
     }
 
-    @Override
     public void toArray(long[] values) {
         if (values.length < size)
             throw new IllegalArgumentException("values too small");
@@ -1130,7 +1150,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
             super.toArray(values);
     }
 
-    @Override
     public long zDotProduct(LongMatrix1D y) {
         if (!(y instanceof DenseLongMatrix1D)) {
             return super.zDotProduct(y);
@@ -1206,7 +1225,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return sum;
     }
 
-    @Override
     public long zDotProduct(LongMatrix1D y, int from, int length) {
         if (!(y instanceof DenseLongMatrix1D)) {
             return super.zDotProduct(y, from, length);
@@ -1220,11 +1238,11 @@ public class DenseLongMatrix1D extends LongMatrix1D {
             tail = size;
         if (y.size() < tail)
             tail = (int) y.size();
-        final long[] elemsOther = yy.elements;
+        final long[] elementsOther = yy.elements;
         int zeroThis = (int) index(from);
         int zeroOther = (int) yy.index(from);
         int strideOther = yy.stride;
-        if (elements == null || elemsOther == null)
+        if (elements == null || elementsOther == null)
             throw new InternalError();
         long sum = 0;
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1232,14 +1250,13 @@ public class DenseLongMatrix1D extends LongMatrix1D {
             final int zeroThisF = zeroThis;
             final int zeroOtherF = zeroOther;
             final int strideOtherF = strideOther;
-            nthreads = Math.min(nthreads, size);
+            nthreads = Math.min(nthreads, length);
             Future<?>[] futures = new Future[nthreads];
             Long[] results = new Long[nthreads];
             int k = length / nthreads;
             for (int j = 0; j < nthreads; j++) {
                 final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-
+                final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
                 futures[j] = ConcurrencyUtils.submit(new Callable<Long>() {
                     public Long call() throws Exception {
                         int idx = zeroThisF + firstIdx * stride;
@@ -1249,13 +1266,13 @@ public class DenseLongMatrix1D extends LongMatrix1D {
                         long sum = 0;
                         int min = lastIdx - firstIdx;
                         for (int k = min / 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF]
-                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
-                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF]
-                                    + elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF]
+                                    + elements[idx += stride] * elementsOther[idxOther += strideOtherF];
                         }
                         for (int k = min % 4; --k >= 0;) {
-                            sum += elements[idx += stride] * elemsOther[idxOther += strideOtherF];
+                            sum += elements[idx += stride] * elementsOther[idxOther += strideOtherF];
                         }
                         return sum;
                     }
@@ -1279,19 +1296,18 @@ public class DenseLongMatrix1D extends LongMatrix1D {
             zeroOther -= strideOther;
             int min = tail - from;
             for (int k = min / 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
-                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
-                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther]
-                        + elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther]
+                        + elements[zeroThis += stride] * elementsOther[zeroOther += strideOther];
             }
             for (int k = min % 4; --k >= 0;) {
-                sum += elements[zeroThis += stride] * elemsOther[zeroOther += strideOther];
+                sum += elements[zeroThis += stride] * elementsOther[zeroOther += strideOther];
             }
         }
         return sum;
     }
 
-    @Override
     public long zSum() {
         long sum = 0;
         final long[] elems = this.elements;
@@ -1342,7 +1358,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return sum;
     }
 
-    @Override
     protected int cardinality(int maxCardinality) {
         int cardinality = 0;
         int index = zero;
@@ -1356,7 +1371,6 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return cardinality;
     }
 
-    @Override
     protected boolean haveSharedCellsRaw(LongMatrix1D other) {
         if (other instanceof SelectedDenseLongMatrix1D) {
             SelectedDenseLongMatrix1D otherMatrix = (SelectedDenseLongMatrix1D) other;
@@ -1368,12 +1382,10 @@ public class DenseLongMatrix1D extends LongMatrix1D {
         return false;
     }
 
-    @Override
     public long index(int rank) {
         return zero + rank * stride;
     }
 
-    @Override
     protected LongMatrix1D viewSelectionLike(int[] offsets) {
         return new SelectedDenseLongMatrix1D(this.elements, offsets);
     }

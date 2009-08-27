@@ -204,7 +204,7 @@ public class DenseDoubleCholeskyDecomposition implements java.io.Serializable {
      * 
      * </pre>
      */
-    @Override
+
     public String toString() {
         StringBuffer buf = new StringBuffer();
         String unknown = "Illegal operation or error: ";

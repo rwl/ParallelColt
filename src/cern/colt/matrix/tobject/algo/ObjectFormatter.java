@@ -51,7 +51,7 @@ public class ObjectFormatter extends AbstractFormatter {
     /**
      * Converts a given cell to a String; no alignment considered.
      */
-    @Override
+
     protected String form(AbstractMatrix1D matrix, int index, Former formatter) {
         return this.form((ObjectMatrix1D) matrix, index, formatter);
     }
@@ -69,7 +69,7 @@ public class ObjectFormatter extends AbstractFormatter {
     /**
      * Returns a string representations of all cells; no alignment considered.
      */
-    @Override
+
     protected String[][] format(AbstractMatrix2D matrix) {
         return this.format((ObjectMatrix2D) matrix);
     }
@@ -144,7 +144,7 @@ public class ObjectFormatter extends AbstractFormatter {
      * @param matrix
      *            the matrix to convert.
      */
-    @Override
+
     protected String toString(AbstractMatrix2D matrix) {
         return this.toString((ObjectMatrix2D) matrix);
     }

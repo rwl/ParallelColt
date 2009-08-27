@@ -6,7 +6,6 @@ public class SparseRCDoubleMatrix2DViewTest extends SparseRCDoubleMatrix2DTest {
         super(arg0);
     }
 
-    @Override
     protected void createMatrices() throws Exception {
         A = new SparseRCDoubleMatrix2D(NCOLUMNS, NROWS).viewDice();
         B = new SparseRCDoubleMatrix2D(NCOLUMNS, NROWS).viewDice();

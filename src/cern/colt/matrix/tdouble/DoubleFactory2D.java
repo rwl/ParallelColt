@@ -9,9 +9,7 @@ It is provided "as is" without expressed or implied warranty.
 package cern.colt.matrix.tdouble;
 
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.jet.math.tdouble.DoubleFunctions;
 
 /**
@@ -102,16 +100,6 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * A factory producing sparse hash matrices.
      */
     public static final DoubleFactory2D sparse = new DoubleFactory2D();
-
-    /**
-     * A factory producing sparse row compressed matrices.
-     */
-    public static final DoubleFactory2D rowCompressed = new DoubleFactory2D();
-
-    /**
-     * A factory producing sparse row compressed matrices.
-     */
-    public static final DoubleFactory2D columnCompressed = new DoubleFactory2D();
 
     /**
      * Checks whether the given array is rectangular, that is, whether all rows
@@ -397,7 +385,7 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
      * 
      * </td>
      * <td><tt>IllegalArgumentException<br>
-     A[0,1].cols != A[2,1].cols<br>
+     A[0,1].columns != A[2,1].columns<br>
      (2 != 3)</tt></td>
      * </tr>
      * </table>
@@ -945,10 +933,6 @@ public class DoubleFactory2D extends cern.colt.PersistentObject {
     public DoubleMatrix2D make(int rows, int columns) {
         if (this == sparse) {
             return new SparseDoubleMatrix2D(rows, columns);
-        } else if (this == rowCompressed) {
-            return new SparseRCDoubleMatrix2D(rows, columns);
-        } else if (this == columnCompressed) {
-            return new SparseCCDoubleMatrix2D(rows, columns);
         } else {
             return new DenseDoubleMatrix2D(rows, columns);
         }
