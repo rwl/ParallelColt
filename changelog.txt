@@ -1,5 +1,11 @@
 Parallel Colt changelog
 
+0.9.1:	September 19, 2009
+	- Removed source code of CSparseJ, JTransforms, JPlasma and Optimization.
+	- Added jar files of CSparseJ, JTransforms, JPlasma and Optimization.
+	- Renamed jar files of JARPACK, JUnit and Netlib-Java.
+	- JUnit updated to version 4.7. 
+
 0.9:	August 27, 2009 
 	- Added new types of objects to cern.colt.buffer.
 	- Added OpenDoubleLongHashMap and OpenFloatLongHashMap.

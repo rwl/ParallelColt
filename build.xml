@@ -13,7 +13,7 @@ See the target "usage" further below for instructions on how to build the softwa
 <!-- ================================================================= -->
 <project name="parallelcolt" default="help" basedir=".">
 	
-	<property name="version" value="0.9" />
+	<property name="version" value="0.9.1" />
 
 	<property name="compiler" value="javac1.5" />
 	
@@ -50,7 +50,7 @@ See the target "usage" further below for instructions on how to build the softwa
 
 	<property name="doc.tar.includes" value="${doc.dest}/**" />
 	
-	<property name="classpath" value="${lib.dir}/junit-4.4.jar:${lib.dir}/arpack-combo-0.1.jar:${lib.dir}/netlib-java-0.9.1.jar:${lib.dir}/core-lapack.jar"/>
+	<property name="classpath" value="${lib.dir}/junit.jar:${lib.dir}/arpack-combo.jar:${lib.dir}/netlib-java.jar:${lib.dir}/jplasma.jar:${lib.dir}/jtransforms.jar:${lib.dir}/csparsej.jar:${lib.dir}/optimization.jar"/>
 
 	<!-- ================================================================= -->
 	<!-- Default target                                                    -->
@@ -144,7 +144,7 @@ Further individual targets used internally by above targets:
 
 		<delete dir="${doc.dest}" />
 		<mkdir dir="${doc.dest}" />
-		<javadoc maxmemory = "256m" classpath="${classpath}" sourcepath="${javac.src}" destdir="${doc.dest}" public="true" author="true" use="true" splitIndex="true" version="true" doctitle="&lt;h2&gt;&lt;a target=_top href=http://sites.google.com/site/piotrwendykier/software/parallelcolt &gt;Parallel Colt&lt;/a&gt; &lt;/h2&gt;&lt;h4&gt;Open Source Libraries for High Performance Scientific and Technical Computing in Java&lt;/h4&gt;&lt;hr&gt;" windowtitle="Parallel Colt ${version} - API Specification" header="&lt;b&gt;Parallel Colt ${version}&lt;/b&gt;" bottom="&lt;font size=-1 &gt;Jump to the &lt;a target=_top href=http://piotr.wendykier.googlepages.com/parallelcolt &gt;Parallel Colt Homepage&lt;/a&gt;">
+		<javadoc maxmemory = "256m" classpath="${classpath}" sourcepath="${javac.src}" destdir="${doc.dest}" public="true" author="true" use="true" splitIndex="true" version="true" doctitle="&lt;h2&gt;&lt;a target=_top href=http://sites.google.com/site/piotrwendykier/software/parallelcolt &gt;Parallel Colt&lt;/a&gt; &lt;/h2&gt;&lt;h4&gt;Open Source Libraries for High Performance Scientific and Technical Computing in Java&lt;/h4&gt;&lt;hr&gt;" windowtitle="Parallel Colt ${version} - API Specification" header="&lt;b&gt;Parallel Colt ${version}&lt;/b&gt;" bottom="&lt;font size=-1 &gt;Jump to the &lt;a target=_top href=http://sites.google.com/site/piotrwendykier/software/parallelcolt &gt;Parallel Colt Homepage&lt;/a&gt;">
 			<packageset dir="${javac.src}" />
 			<link href="http://java.sun.com/javase/6/docs/api/" />
 		</javadoc>
