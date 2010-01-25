@@ -1,5 +1,8 @@
 Parallel Colt changelog
 
+0.9.2:	January 24, 2010
+	- Fixed bug in DenseDoubleAlgebra.solve() and DenseFloatAlgebra.solve() causing IndexOutOfBoundsException.
+	 
 0.9.1:	September 19, 2009
 	- Removed source code of CSparseJ, JTransforms, JPlasma and Optimization.
 	- Added jar files of CSparseJ, JTransforms, JPlasma and Optimization.

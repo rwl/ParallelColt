@@ -1121,7 +1121,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
         } else {
             DoubleMatrix2D X = B.copy();
             qr(A).solve(X);
-            return X.viewPart(0, 0, X.rows(), A.columns()).copy();
+            return X.viewPart(0, 0, A.columns(), B.columns()).copy();
         }
     }
 
