@@ -1,5 +1,10 @@
 Parallel Colt changelog
 
+0.9.4:	March 21, 2010
+	- JPlasma updated to version 1.2.
+	- Removed DenseDoubleSingularValueDecomposition and DenseFloatSingularValueDecomposition.
+	- Renamed DenseDoubleSingularValueDecompositionDC and DenseFloatSingularValueDecompositionDC.	 
+
 0.9.3:	February 28, 2010
 	- JPlasma updated to version 1.1.
 

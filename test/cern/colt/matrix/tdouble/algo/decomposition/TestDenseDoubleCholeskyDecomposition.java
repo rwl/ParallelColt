@@ -12,79 +12,82 @@ public class TestDenseDoubleCholeskyDecomposition {
 
     public static void main(String[] args) {
 
-        int N = 4;
-        int NRHS = 1;
-        Random r = new Random(0);
+        for (int k = 0; k < 20; k++) {
 
-        DoubleMatrix2D A1 = new DenseColumnDoubleMatrix2D(N, N);
-        DoubleMatrix2D A2 = new DenseColumnDoubleMatrix2D(N, N);
-        DoubleMatrix2D B1 = new DenseColumnDoubleMatrix2D(N, NRHS);
-        DoubleMatrix2D B2 = new DenseColumnDoubleMatrix2D(N, NRHS);
+            int N = 600;
+            int NRHS = 5;
+            Random r = new Random(0);
 
-        /* Initialize A1 and A2 for Symmetric Positive Matrix */
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                A1.setQuick(i, j, 0.5 - r.nextDouble());
-                A2.setQuick(i, j, A1.getQuick(i, j));
+            DoubleMatrix2D A1 = new DenseColumnDoubleMatrix2D(N, N);
+            DoubleMatrix2D A2 = new DenseColumnDoubleMatrix2D(N, N);
+            DoubleMatrix2D B1 = new DenseColumnDoubleMatrix2D(N, NRHS);
+            DoubleMatrix2D B2 = new DenseColumnDoubleMatrix2D(N, NRHS);
+
+            /* Initialize A1 and A2 for Symmetric Positive Matrix */
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    A1.setQuick(i, j, 0.5 - r.nextDouble());
+                    A2.setQuick(i, j, A1.getQuick(i, j));
+                }
             }
-        }
 
-        for (int i = 0; i < N; i++) {
-            A1.setQuick(i, i, A1.getQuick(i, i) + N);
-            A2.setQuick(i, i, A1.getQuick(i, i));
-        }
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                A1.setQuick(i, j, A1.getQuick(j, i));
-                A2.setQuick(i, j, A1.getQuick(j, i));
+            for (int i = 0; i < N; i++) {
+                A1.setQuick(i, i, A1.getQuick(i, i) + N);
+                A2.setQuick(i, i, A1.getQuick(i, i));
             }
-        }
-        /* Initialize B1 and B2 */
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < NRHS; j++) {
-                B1.setQuick(i, j, 0.5 - r.nextDouble());
-                B2.setQuick(i, j, B1.getQuick(i, j));
+
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    A1.setQuick(i, j, A1.getQuick(j, i));
+                    A2.setQuick(i, j, A1.getQuick(j, i));
+                }
             }
-        }
-
-        testCholesky(A1, A2, B1, B2);
-
-        A1 = new DenseDoubleMatrix2D(N, N);
-        A2 = new DenseDoubleMatrix2D(N, N);
-        B1 = new DenseDoubleMatrix2D(N, NRHS);
-        B2 = new DenseDoubleMatrix2D(N, NRHS);
-        r = new Random(0);
-
-        /* Initialize A1 and A2 for Symmetric Positive Matrix */
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                A1.setQuick(i, j, 0.5 - r.nextDouble());
-                A2.setQuick(i, j, A1.getQuick(i, j));
+            /* Initialize B1 and B2 */
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < NRHS; j++) {
+                    B1.setQuick(i, j, 0.5 - r.nextDouble());
+                    B2.setQuick(i, j, B1.getQuick(i, j));
+                }
             }
-        }
 
-        for (int i = 0; i < N; i++) {
-            A1.setQuick(i, i, A1.getQuick(i, i) + N);
-            A2.setQuick(i, i, A1.getQuick(i, i));
-        }
+            testCholesky(A1, A2, B1, B2);
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                A1.setQuick(i, j, A1.getQuick(j, i));
-                A2.setQuick(i, j, A1.getQuick(j, i));
+            A1 = new DenseDoubleMatrix2D(N, N);
+            A2 = new DenseDoubleMatrix2D(N, N);
+            B1 = new DenseDoubleMatrix2D(N, NRHS);
+            B2 = new DenseDoubleMatrix2D(N, NRHS);
+            r = new Random(0);
+
+            /* Initialize A1 and A2 for Symmetric Positive Matrix */
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    A1.setQuick(i, j, 0.5 - r.nextDouble());
+                    A2.setQuick(i, j, A1.getQuick(i, j));
+                }
             }
-        }
-        /* Initialize B1 and B2 */
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < NRHS; j++) {
-                B1.setQuick(i, j, 0.5 - r.nextDouble());
-                B2.setQuick(i, j, B1.getQuick(i, j));
+
+            for (int i = 0; i < N; i++) {
+                A1.setQuick(i, i, A1.getQuick(i, i) + N);
+                A2.setQuick(i, i, A1.getQuick(i, i));
             }
+
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    A1.setQuick(i, j, A1.getQuick(j, i));
+                    A2.setQuick(i, j, A1.getQuick(j, i));
+                }
+            }
+            /* Initialize B1 and B2 */
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < NRHS; j++) {
+                    B1.setQuick(i, j, 0.5 - r.nextDouble());
+                    B2.setQuick(i, j, B1.getQuick(i, j));
+                }
+            }
+
+            testCholesky(A1, A2, B1, B2);
         }
-
-        testCholesky(A1, A2, B1, B2);
-
+        System.out.println("All finished");       
         System.exit(0);
 
     }

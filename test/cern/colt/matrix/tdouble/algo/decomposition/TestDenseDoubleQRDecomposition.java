@@ -12,33 +12,38 @@ import cern.jet.math.tdouble.DoubleFunctions;
 public class TestDenseDoubleQRDecomposition {
 
     public static void main(String[] args) {
-        int M = 6;
-        int N = 4;
-        int NRHS = 1;
-        Random r = new Random(0);
 
-        DoubleMatrix2D A1 = new DenseColumnDoubleMatrix2D(M, N);
-        DoubleMatrix2D A2 = new DenseColumnDoubleMatrix2D(M, N);
-        DoubleMatrix2D B1 = new DenseColumnDoubleMatrix2D(M, NRHS);
-        DoubleMatrix2D B2 = new DenseColumnDoubleMatrix2D(M, NRHS);
+        for (int k = 0; k < 20; k++) {
+            int M = 600;
+            int N = 400;
+            int NRHS = 5;
+            Random r = new Random(0);
 
-        /* Initialize A1 and A2*/
-        for (int i = 0; i < M; i++) {
-            for (int j = 0; j < N; j++) {
-                A1.setQuick(i, j, 0.5 - r.nextDouble());
-                A2.setQuick(i, j, A1.getQuick(i, j));
+            DoubleMatrix2D A1 = new DenseColumnDoubleMatrix2D(M, N);
+            DoubleMatrix2D A2 = new DenseColumnDoubleMatrix2D(M, N);
+            DoubleMatrix2D B1 = new DenseColumnDoubleMatrix2D(M, NRHS);
+            DoubleMatrix2D B2 = new DenseColumnDoubleMatrix2D(M, NRHS);
+
+            /* Initialize A1 and A2*/
+            for (int i = 0; i < M; i++) {
+                for (int j = 0; j < N; j++) {
+                    A1.setQuick(i, j, 0.5 - r.nextDouble());
+                    A2.setQuick(i, j, A1.getQuick(i, j));
+                }
             }
-        }
 
-        /* Initialize B1 and B2 */
-        for (int i = 0; i < M; i++) {
-            for (int j = 0; j < NRHS; j++) {
-                B1.setQuick(i, j, 0.5 - r.nextDouble());
-                B2.setQuick(i, j, B1.getQuick(i, j));
+            /* Initialize B1 and B2 */
+            for (int i = 0; i < M; i++) {
+                for (int j = 0; j < NRHS; j++) {
+                    B1.setQuick(i, j, 0.5 - r.nextDouble());
+                    B2.setQuick(i, j, B1.getQuick(i, j));
+                }
             }
+            
+            testQR(A1, A2, B1, B2);
         }
-
-        testQR(A1, A2, B1, B2);
+        System.out.println("All finished");       
+        System.exit(0);
     }
 
     private static void testQR(DoubleMatrix2D A1, DoubleMatrix2D A2, DoubleMatrix2D B1, DoubleMatrix2D B2) {

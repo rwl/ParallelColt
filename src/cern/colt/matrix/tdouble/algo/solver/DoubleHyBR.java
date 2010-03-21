@@ -24,7 +24,7 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
-import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleSingularValueDecompositionDC;
+import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleSingularValueDecomposition;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoubleIdentity;
 import cern.colt.matrix.tdouble.algo.solver.preconditioner.DoublePreconditioner;
 import cern.colt.matrix.tdouble.impl.DenseColumnDoubleMatrix2D;
@@ -178,7 +178,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
         DoubleMatrix2D U = new DenseDoubleMatrix2D(1, (int) b.size());
         DoubleMatrix2D C = null;
         DoubleMatrix2D V = null;
-        DenseDoubleSingularValueDecompositionDC svd;
+        DenseDoubleSingularValueDecomposition svd;
         if (computeRnrm) {
             work = b.copy();
             A.zMult(x, work, -1, 1, false);
@@ -209,7 +209,7 @@ public class DoubleHyBR extends AbstractDoubleIterativeSolver {
                 }
                 switch (inSolver) {
                 case TIKHONOV:
-                    svd = alg.svdDC(C);
+                    svd = alg.svd(C);
                     Ub = svd.getU();
                     sv = svd.getSingularValues();
                     Vb = svd.getV();

@@ -24,7 +24,6 @@ import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleEigenvalueDecompos
 import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleLUDecomposition;
 import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleQRDecomposition;
 import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleSingularValueDecomposition;
-import cern.colt.matrix.tdouble.algo.decomposition.DenseDoubleSingularValueDecompositionDC;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix3D;
@@ -1250,15 +1249,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
      * matrix.
      */
     public DenseDoubleSingularValueDecomposition svd(DoubleMatrix2D matrix) {
-        return new DenseDoubleSingularValueDecomposition(matrix);
-    }
-
-    /**
-     * Constructs and returns the SingularValue-decomposition of the given
-     * matrix. This is a divide-and-conquer version.
-     */
-    public DenseDoubleSingularValueDecompositionDC svdDC(DoubleMatrix2D matrix) {
-        return new DenseDoubleSingularValueDecompositionDC(matrix, true, true);
+        return new DenseDoubleSingularValueDecomposition(matrix, true, true);
     }
 
     /**
@@ -1577,7 +1568,7 @@ public class DenseDoubleAlgebra extends cern.colt.PersistentObject {
 
         DenseDoubleSingularValueDecomposition svd = null;
         try {
-            svd = new DenseDoubleSingularValueDecomposition(matrix);
+            svd = new DenseDoubleSingularValueDecomposition(matrix, true, true);
         } catch (IllegalArgumentException exc) {
             buf.append("\n\n" + constructionException + " SingularValueDecomposition: " + exc.getMessage());
         }

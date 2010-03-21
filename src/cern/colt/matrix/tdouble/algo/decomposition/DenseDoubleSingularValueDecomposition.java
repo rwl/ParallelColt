@@ -8,475 +8,118 @@ It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdouble.algo.decomposition;
 
-import cern.colt.matrix.tdouble.DoubleFactory2D;
+import org.netlib.lapack.LAPACK;
+
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
+import cern.colt.matrix.tdouble.impl.DenseColumnDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.DiagonalDoubleMatrix2D;
 
 /**
- * For an <tt>m x n</tt> matrix <tt>A</tt> with <tt>m >= n</tt>, the singular
- * value decomposition is an <tt>m x n</tt> orthogonal matrix <tt>U</tt>, an
- * <tt>n x n</tt> diagonal matrix <tt>S</tt>, and an <tt>n x n</tt> orthogonal
- * matrix <tt>V</tt> so that <tt>A = U*S*V'</tt>.
+ * 
+ * For an <tt>m x n</tt> matrix <tt>A</tt>, the singular value decomposition is
+ * an <tt>m x m</tt> orthogonal matrix <tt>U</tt>, an <tt>m x n</tt> diagonal
+ * matrix <tt>S</tt>, and an <tt>n x n</tt> orthogonal matrix <tt>V</tt> so that
+ * <tt>A = U*S*V'</tt>.
  * <P>
  * The singular values, <tt>sigma[k] = S[k][k]</tt>, are ordered so that
- * <tt>sigma[0] >= sigma[1] >= ... >= sigma[n-1]</tt>.
+ * <tt>sigma[0] >= sigma[1] >= ... >= sigma[min(m-1,n-1)]</tt>.
  * <P>
- * The singular value decomposition always exists, so the constructor will never
- * fail. The matrix condition number and the effective numerical rank can be
- * computed from this decomposition.
+ * 
+ * This implementation uses the divide-and-conquer algorithm (dgesdd) from
+ * LAPACK.
+ * 
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ * 
  */
-public class DenseDoubleSingularValueDecomposition implements java.io.Serializable {
-    static final long serialVersionUID = 1020;
+public class DenseDoubleSingularValueDecomposition {
 
-    /**
-     * Arrays for internal storage of U and V.
-     * 
-     * @serial internal storage of U.
-     * @serial internal storage of V.
-     */
-    private double[][] U, V;
+    private DoubleMatrix2D U;
 
-    /**
-     * Array for internal storage of singular values.
-     * 
-     * @serial internal storage of singular values.
-     */
-    private double[] s;
+    private DoubleMatrix2D V;
 
-    /**
-     * Row and column dimensions.
-     * 
-     * @serial row dimension.
-     * @serial column dimension.
-     */
-    private int m, n;
+    private DoubleMatrix2D S;
+
+    private double[] elementsU;
+
+    private double[] elementsVt;
+
+    private double[] elementsS;
+
+    private org.netlib.util.intW info;
+
+    private int m;
+
+    private int n;
+
+    private int mn;
+
+    private boolean wantWholeUV;
+
+    private boolean wantUV;
+
+    private boolean columnMatrix = false;
 
     /**
      * Constructs and returns a new singular value decomposition object; The
      * decomposed matrices can be retrieved via instance methods of the returned
      * decomposition object.
      * 
-     * @param Arg
-     *            A rectangular matrix.
-     * @throws IllegalArgumentException
-     *             if <tt>A.rows() < A.columns()</tt>.
+     * @param A
+     *            rectangular matrix
+     * 
+     * @param wantUV
+     *            if true then all matrices (U, S, V') are computed; otherwise
+     *            only S is computed
+     * @param wantWholeUV
+     *            if true then all m columns of U and all n rows of V' are
+     *            computed; otherwise only the first min(m,n) columns of U and
+     *            the first min(m,n) rows of V' are computed
      */
-    public DenseDoubleSingularValueDecomposition(DoubleMatrix2D Arg) {
-        DoubleProperty.DEFAULT.checkRectangular(Arg);
-
-        // Derived from LINPACK code.
-        // Initialize.
-        double[][] A = Arg.toArray();
-        m = Arg.rows();
-        n = Arg.columns();
-        int nu = Math.min(m, n);
-        s = new double[Math.min(m + 1, n)];
-        U = new double[m][nu];
-        V = new double[n][n];
-        double[] e = new double[n];
-        double[] work = new double[m];
-        boolean wantu = true;
-        boolean wantv = true;
-
-        // Reduce A to bidiagonal form, storing the diagonal elements
-        // in s and the super-diagonal elements in e.
-
-        int nct = Math.min(m - 1, n);
-        int nrt = Math.max(0, Math.min(n - 2, m));
-        int max_nct_nrt = Math.max(nct, nrt);
-        for (int k = 0; k < max_nct_nrt; k++) {
-            if (k < nct) {
-
-                // Compute the transformation for the k-th column and
-                // place the k-th diagonal in s[k].
-                // Compute 2-norm of k-th column without under/overflow.
-                s[k] = 0;
-                for (int i = k; i < m; i++) {
-                    s[k] = DenseDoubleAlgebra.hypot(s[k], A[i][k]);
-                }
-                if (s[k] != 0.0) {
-                    if (A[k][k] < 0.0) {
-                        s[k] = -s[k];
-                    }
-                    for (int i = k; i < m; i++) {
-                        A[i][k] /= s[k];
-                    }
-                    A[k][k] += 1.0;
-                }
-                s[k] = -s[k];
-            }
-            for (int j = k + 1; j < n; j++) {
-                if ((k < nct) & (s[k] != 0.0)) {
-
-                    // Apply the transformation.
-
-                    double t = 0;
-                    for (int i = k; i < m; i++) {
-                        t += A[i][k] * A[i][j];
-                    }
-                    t = -t / A[k][k];
-                    for (int i = k; i < m; i++) {
-                        A[i][j] += t * A[i][k];
-                    }
-                }
-
-                // Place the k-th row of A into e for the
-                // subsequent calculation of the row transformation.
-
-                e[j] = A[k][j];
-            }
-            if (wantu & (k < nct)) {
-
-                // Place the transformation in U for subsequent back
-                // multiplication.
-
-                for (int i = k; i < m; i++) {
-                    U[i][k] = A[i][k];
-                }
-            }
-            if (k < nrt) {
-
-                // Compute the k-th row transformation and place the
-                // k-th super-diagonal in e[k].
-                // Compute 2-norm without under/overflow.
-                e[k] = 0;
-                for (int i = k + 1; i < n; i++) {
-                    e[k] = DenseDoubleAlgebra.hypot(e[k], e[i]);
-                }
-                if (e[k] != 0.0) {
-                    if (e[k + 1] < 0.0) {
-                        e[k] = -e[k];
-                    }
-                    for (int i = k + 1; i < n; i++) {
-                        e[i] /= e[k];
-                    }
-                    e[k + 1] += 1.0;
-                }
-                e[k] = -e[k];
-                if ((k + 1 < m) & (e[k] != 0.0)) {
-
-                    // Apply the transformation.
-
-                    for (int i = k + 1; i < m; i++) {
-                        work[i] = 0.0;
-                    }
-                    for (int j = k + 1; j < n; j++) {
-                        for (int i = k + 1; i < m; i++) {
-                            work[i] += e[j] * A[i][j];
-                        }
-                    }
-                    for (int j = k + 1; j < n; j++) {
-                        double t = -e[j] / e[k + 1];
-                        for (int i = k + 1; i < m; i++) {
-                            A[i][j] += t * work[i];
-                        }
-                    }
-                }
-                if (wantv) {
-
-                    // Place the transformation in V for subsequent
-                    // back multiplication.
-
-                    for (int i = k + 1; i < n; i++) {
-                        V[i][k] = e[i];
-                    }
-                }
-            }
+    public DenseDoubleSingularValueDecomposition(DoubleMatrix2D A, boolean wantUV, boolean wantWholeUV) {
+        DoubleProperty.DEFAULT.checkDense(A);
+        this.wantUV = wantUV;
+        this.wantWholeUV = wantWholeUV;
+        m = A.rows();
+        n = A.columns();
+        double[] elementsA;
+        if (A instanceof DenseColumnDoubleMatrix2D) {
+            elementsA = (double[]) A.copy().elements();
+            columnMatrix = true;
+        } else {
+            elementsA = (double[]) A.viewDice().copy().elements();
         }
-
-        // Set up the final bidiagonal matrix or order p.
-
-        int p = Math.min(n, m + 1);
-        if (nct < n) {
-            s[nct] = A[nct][nct];
+        mn = Math.min(m, n);
+        int maxmn = Math.max(m, n);
+        int lwork;
+        double[] work;
+        info = new org.netlib.util.intW(2);
+        int[] iwork = new int[8 * mn];
+        elementsS = new double[mn];
+        if (wantUV = true) {
+            if (wantWholeUV) { // JOBZ='A'
+                elementsU = new double[m * m];
+                elementsVt = new double[n * n];
+                lwork = 3 * mn * mn + Math.max(maxmn, 4 * mn * mn + 4 * mn) + maxmn;
+                work = new double[lwork];
+                LAPACK.getInstance().dgesdd("A", m, n, elementsA, m, elementsS, elementsU, m, elementsVt, n, work,
+                        lwork, iwork, info);
+            } else { // JOBZ='S'
+                elementsU = new double[m * mn];
+                elementsVt = new double[mn * n];
+                lwork = 3 * mn * mn + Math.max(maxmn, 4 * mn * mn + 4 * mn) + maxmn;
+                work = new double[lwork];
+                LAPACK.getInstance().dgesdd("S", m, n, elementsA, m, elementsS, elementsU, m, elementsVt, mn, work,
+                        lwork, iwork, info);
+            }
+        } else {// JOBZ='N'
+            lwork = 3 * mn + Math.max(maxmn, 6 * mn) + maxmn;
+            work = new double[lwork];
+            LAPACK.getInstance().dgesdd("N", m, n, elementsA, m, elementsS, null, m, null, n, work, lwork, iwork, info);
         }
-        if (m < p) {
-            s[p - 1] = 0.0;
-        }
-        if (nrt + 1 < p) {
-            e[nrt] = A[nrt][p - 1];
-        }
-        e[p - 1] = 0.0;
-
-        // If required, generate U.
-
-        if (wantu) {
-            for (int j = nct; j < nu; j++) {
-                for (int i = 0; i < m; i++) {
-                    U[i][j] = 0.0;
-                }
-                U[j][j] = 1.0;
-            }
-            for (int k = nct - 1; k >= 0; k--) {
-                if (s[k] != 0.0) {
-                    for (int j = k + 1; j < nu; j++) {
-                        double t = 0;
-                        for (int i = k; i < m; i++) {
-                            t += U[i][k] * U[i][j];
-                        }
-                        t = -t / U[k][k];
-                        for (int i = k; i < m; i++) {
-                            U[i][j] += t * U[i][k];
-                        }
-                    }
-                    for (int i = k; i < m; i++) {
-                        U[i][k] = -U[i][k];
-                    }
-                    U[k][k] = 1.0 + U[k][k];
-                    for (int i = 0; i < k - 1; i++) {
-                        U[i][k] = 0.0;
-                    }
-                } else {
-                    for (int i = 0; i < m; i++) {
-                        U[i][k] = 0.0;
-                    }
-                    U[k][k] = 1.0;
-                }
-            }
-        }
-
-        // If required, generate V.
-
-        if (wantv) {
-            for (int k = n - 1; k >= 0; k--) {
-                if ((k < nrt) & (e[k] != 0.0)) {
-                    for (int j = k + 1; j < nu; j++) {
-                        double t = 0;
-                        for (int i = k + 1; i < n; i++) {
-                            t += V[i][k] * V[i][j];
-                        }
-                        t = -t / V[k + 1][k];
-                        for (int i = k + 1; i < n; i++) {
-                            V[i][j] += t * V[i][k];
-                        }
-                    }
-                }
-                for (int i = 0; i < n; i++) {
-                    V[i][k] = 0.0;
-                }
-                V[k][k] = 1.0;
-            }
-        }
-
-        // Main iteration loop for the singular values.
-
-        int pp = p - 1;
-        int iter = 0;
-        double eps = Math.pow(2.0, -52.0);
-        while (p > 0) {
-            int k, kase;
-
-            // Here is where a test for too many iterations would go.
-
-            // This section of the program inspects for
-            // negligible elements in the s and e arrays. On
-            // completion the variables kase and k are set as follows.
-
-            // kase = 1 if s(p) and e[k-1] are negligible and k<p
-            // kase = 2 if s(k) is negligible and k<p
-            // kase = 3 if e[k-1] is negligible, k<p, and
-            // s(k), ..., s(p) are not negligible (qr step).
-            // kase = 4 if e(p-1) is negligible (convergence).
-
-            for (k = p - 2; k >= -1; k--) {
-                if (k == -1) {
-                    break;
-                }
-                if (Math.abs(e[k]) <= eps * (Math.abs(s[k]) + Math.abs(s[k + 1]))) {
-                    e[k] = 0.0;
-                    break;
-                }
-            }
-            if (k == p - 2) {
-                kase = 4;
-            } else {
-                int ks;
-                for (ks = p - 1; ks >= k; ks--) {
-                    if (ks == k) {
-                        break;
-                    }
-                    double t = (ks != p ? Math.abs(e[ks]) : 0.) + (ks != k + 1 ? Math.abs(e[ks - 1]) : 0.);
-                    if (Math.abs(s[ks]) <= eps * t) {
-                        s[ks] = 0.0;
-                        break;
-                    }
-                }
-                if (ks == k) {
-                    kase = 3;
-                } else if (ks == p - 1) {
-                    kase = 1;
-                } else {
-                    kase = 2;
-                    k = ks;
-                }
-            }
-            k++;
-
-            // Perform the task indicated by kase.
-
-            switch (kase) {
-
-            // Deflate negligible s(p).
-
-            case 1: {
-                double f = e[p - 2];
-                e[p - 2] = 0.0;
-                for (int j = p - 2; j >= k; j--) {
-                    double t = DenseDoubleAlgebra.hypot(s[j], f);
-                    double cs = s[j] / t;
-                    double sn = f / t;
-                    s[j] = t;
-                    if (j != k) {
-                        f = -sn * e[j - 1];
-                        e[j - 1] = cs * e[j - 1];
-                    }
-                    if (wantv) {
-                        for (int i = 0; i < n; i++) {
-                            t = cs * V[i][j] + sn * V[i][p - 1];
-                            V[i][p - 1] = -sn * V[i][j] + cs * V[i][p - 1];
-                            V[i][j] = t;
-                        }
-                    }
-                }
-            }
-                break;
-
-            // Split at negligible s(k).
-
-            case 2: {
-                double f = e[k - 1];
-                e[k - 1] = 0.0;
-                for (int j = k; j < p; j++) {
-                    double t = DenseDoubleAlgebra.hypot(s[j], f);
-                    double cs = s[j] / t;
-                    double sn = f / t;
-                    s[j] = t;
-                    f = -sn * e[j];
-                    e[j] = cs * e[j];
-                    if (wantu) {
-                        for (int i = 0; i < m; i++) {
-                            t = cs * U[i][j] + sn * U[i][k - 1];
-                            U[i][k - 1] = -sn * U[i][j] + cs * U[i][k - 1];
-                            U[i][j] = t;
-                        }
-                    }
-                }
-            }
-                break;
-
-            // Perform one qr step.
-
-            case 3: {
-
-                // Calculate the shift.
-
-                double scale = Math.max(Math.max(Math.max(Math.max(Math.abs(s[p - 1]), Math.abs(s[p - 2])), Math
-                        .abs(e[p - 2])), Math.abs(s[k])), Math.abs(e[k]));
-                double sp = s[p - 1] / scale;
-                double spm1 = s[p - 2] / scale;
-                double epm1 = e[p - 2] / scale;
-                double sk = s[k] / scale;
-                double ek = e[k] / scale;
-                double b = ((spm1 + sp) * (spm1 - sp) + epm1 * epm1) / 2.0;
-                double c = (sp * epm1) * (sp * epm1);
-                double shift = 0.0;
-                if ((b != 0.0) | (c != 0.0)) {
-                    shift = Math.sqrt(b * b + c);
-                    if (b < 0.0) {
-                        shift = -shift;
-                    }
-                    shift = c / (b + shift);
-                }
-                double f = (sk + sp) * (sk - sp) + shift;
-                double g = sk * ek;
-
-                // Chase zeros.
-
-                for (int j = k; j < p - 1; j++) {
-                    double t = DenseDoubleAlgebra.hypot(f, g);
-                    double cs = f / t;
-                    double sn = g / t;
-                    if (j != k) {
-                        e[j - 1] = t;
-                    }
-                    f = cs * s[j] + sn * e[j];
-                    e[j] = cs * e[j] - sn * s[j];
-                    g = sn * s[j + 1];
-                    s[j + 1] = cs * s[j + 1];
-                    if (wantv) {
-                        for (int i = 0; i < n; i++) {
-                            t = cs * V[i][j] + sn * V[i][j + 1];
-                            V[i][j + 1] = -sn * V[i][j] + cs * V[i][j + 1];
-                            V[i][j] = t;
-                        }
-                    }
-                    t = DenseDoubleAlgebra.hypot(f, g);
-                    cs = f / t;
-                    sn = g / t;
-                    s[j] = t;
-                    f = cs * e[j] + sn * s[j + 1];
-                    s[j + 1] = -sn * e[j] + cs * s[j + 1];
-                    g = sn * e[j + 1];
-                    e[j + 1] = cs * e[j + 1];
-                    if (wantu && (j < m - 1)) {
-                        for (int i = 0; i < m; i++) {
-                            t = cs * U[i][j] + sn * U[i][j + 1];
-                            U[i][j + 1] = -sn * U[i][j] + cs * U[i][j + 1];
-                            U[i][j] = t;
-                        }
-                    }
-                }
-                e[p - 2] = f;
-                iter = iter + 1;
-            }
-                break;
-
-            // Convergence.
-
-            case 4: {
-
-                // Make the singular values positive.
-
-                if (s[k] <= 0.0) {
-                    s[k] = (s[k] < 0.0 ? -s[k] : 0.0);
-                    if (wantv) {
-                        for (int i = 0; i <= pp; i++) {
-                            V[i][k] = -V[i][k];
-                        }
-                    }
-                }
-
-                // Order the singular values.
-
-                while (k < pp) {
-                    if (s[k] >= s[k + 1]) {
-                        break;
-                    }
-                    double t = s[k];
-                    s[k] = s[k + 1];
-                    s[k + 1] = t;
-                    if (wantv && (k < n - 1)) {
-                        for (int i = 0; i < n; i++) {
-                            t = V[i][k + 1];
-                            V[i][k + 1] = V[i][k];
-                            V[i][k] = t;
-                        }
-                    }
-                    if (wantu && (k < m - 1)) {
-                        for (int i = 0; i < m; i++) {
-                            t = U[i][k + 1];
-                            U[i][k + 1] = U[i][k];
-                            U[i][k] = t;
-                        }
-                    }
-                    k++;
-                }
-                iter = 0;
-                p--;
-            }
-                break;
-            }
+        if (info.val != 0) {
+            throw new IllegalArgumentException("Error occured while computing SVD decomposition: " + info);
         }
     }
 
@@ -484,7 +127,7 @@ public class DenseDoubleSingularValueDecomposition implements java.io.Serializab
      * Returns the two norm condition number, which is <tt>max(S) / min(S)</tt>.
      */
     public double cond() {
-        return s[0] / s[Math.min(m, n) - 1];
+        return elementsS[0] / elementsS[mn - 1];
     }
 
     /**
@@ -493,14 +136,17 @@ public class DenseDoubleSingularValueDecomposition implements java.io.Serializab
      * @return S
      */
     public DoubleMatrix2D getS() {
-        double[][] S = new double[n][n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                S[i][j] = 0.0;
+        if (S == null) {
+            if (wantWholeUV == false) {
+                S = new DiagonalDoubleMatrix2D(mn, mn, 0);
+            } else {
+                S = new DiagonalDoubleMatrix2D(m, n, 0);
             }
-            S[i][i] = this.s[i];
+            for (int i = 0; i < mn; i++) {
+                S.setQuick(i, i, elementsS[i]);
+            }
         }
-        return DoubleFactory2D.dense.make(S);
+        return S.copy();
     }
 
     /**
@@ -510,7 +156,7 @@ public class DenseDoubleSingularValueDecomposition implements java.io.Serializab
      * @return diagonal of <tt>S</tt>.
      */
     public double[] getSingularValues() {
-        return s;
+        return elementsS;
     }
 
     /**
@@ -519,9 +165,26 @@ public class DenseDoubleSingularValueDecomposition implements java.io.Serializab
      * @return <tt>U</tt>
      */
     public DoubleMatrix2D getU() {
-        // return new DoubleMatrix2D(U,m,Math.min(m+1,n));
-        return DoubleFactory2D.dense.make(U).viewPart(0, 0, m, Math.min(m + 1, n));
-
+        if (wantUV == false) {
+            throw new IllegalAccessError("Matrix U was not computed");
+        } else {
+            if (U == null) {
+                if (wantWholeUV == false) {
+                    if (columnMatrix) {
+                        U = new DenseColumnDoubleMatrix2D(m, mn).assign(elementsU);
+                    } else {
+                        U = new DenseDoubleMatrix2D(mn, m).assign(elementsU).viewDice();
+                    }
+                } else {
+                    if (columnMatrix) {
+                        U = new DenseColumnDoubleMatrix2D(m, m).assign(elementsU);
+                    } else {
+                        U = new DenseDoubleMatrix2D(m, m).assign(elementsU).viewDice();
+                    }
+                }
+            }
+            return U.copy();
+        }
     }
 
     /**
@@ -530,14 +193,44 @@ public class DenseDoubleSingularValueDecomposition implements java.io.Serializab
      * @return <tt>V</tt>
      */
     public DoubleMatrix2D getV() {
-        return DoubleFactory2D.dense.make(V);
+        if (wantUV == false) {
+            throw new IllegalAccessError("Matrix V was not computed");
+        } else {
+            if (V == null) {
+                if (wantWholeUV == false) {
+                    if (columnMatrix) {
+                        V = new DenseColumnDoubleMatrix2D(mn, n).assign(elementsVt).viewDice();
+                    } else {
+                        V = new DenseDoubleMatrix2D(n, mn).assign(elementsVt);
+                    }
+                } else {
+                    if (columnMatrix) {
+                        V = new DenseColumnDoubleMatrix2D(n, n).assign(elementsVt).viewDice();
+                    } else {
+                        V = new DenseDoubleMatrix2D(n, n).assign(elementsVt);
+                    }
+                }
+            }
+            return V.copy();
+        }
+    }
+
+    /**
+     * Returns the output flag
+     * 
+     * @return 0: successful exit<br>
+     *         < 0: if INFO = -i, the i-th argument had an illegal value<br>
+     *         > 0: process did not converge.
+     */
+    public org.netlib.util.intW getInfo() {
+        return info;
     }
 
     /**
      * Returns the two norm, which is <tt>max(S)</tt>.
      */
     public double norm2() {
-        return s[0];
+        return elementsS[0];
     }
 
     /**
@@ -546,10 +239,10 @@ public class DenseDoubleSingularValueDecomposition implements java.io.Serializab
      */
     public int rank() {
         double eps = Math.pow(2.0, -52.0);
-        double tol = Math.max(m, n) * s[0] * eps;
+        double tol = Math.max(m, n) * elementsS[0] * eps;
         int r = 0;
-        for (int i = 0; i < s.length; i++) {
-            if (s[i] > tol) {
+        for (int i = 0; i < elementsS.length; i++) {
+            if (elementsS[i] > tol) {
                 r++;
             }
         }

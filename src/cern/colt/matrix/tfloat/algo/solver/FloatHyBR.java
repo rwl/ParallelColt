@@ -26,7 +26,7 @@ import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.algo.DenseFloatAlgebra;
-import cern.colt.matrix.tfloat.algo.decomposition.DenseFloatSingularValueDecompositionDC;
+import cern.colt.matrix.tfloat.algo.decomposition.DenseFloatSingularValueDecomposition;
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatIdentity;
 import cern.colt.matrix.tfloat.algo.solver.preconditioner.FloatPreconditioner;
 import cern.colt.matrix.tfloat.impl.DenseColumnFloatMatrix2D;
@@ -180,7 +180,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
         FloatMatrix2D U = new DenseFloatMatrix2D(1, (int) b.size());
         FloatMatrix2D C = null;
         FloatMatrix2D V = null;
-        DenseFloatSingularValueDecompositionDC svd;
+        DenseFloatSingularValueDecomposition svd;
         if (computeRnrm) {
             work = b.copy();
             A.zMult(x, work, -1, 1, false);
@@ -211,7 +211,7 @@ public class FloatHyBR extends AbstractFloatIterativeSolver {
                 }
                 switch (inSolver) {
                 case TIKHONOV:
-                    svd = alg.svdDC(C);
+                    svd = alg.svd(C);
                     Ub = svd.getU();
                     sv = svd.getSingularValues();
                     Vb = svd.getV();

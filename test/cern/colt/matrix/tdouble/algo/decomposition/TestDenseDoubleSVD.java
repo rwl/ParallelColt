@@ -10,8 +10,8 @@ import cern.jet.math.tdouble.DoubleFunctions;
 
 public class TestDenseDoubleSVD {
     public static void main(String[] args) {
-        int M = 6;
-        int N = 4;
+        int M = 60;
+        int N = 40;
         int NRHS = 1;
         Random r = new Random(0);
 
@@ -44,7 +44,7 @@ public class TestDenseDoubleSVD {
         int N = A1.columns();
         double eps = 1e-10;
 
-        DenseDoubleSingularValueDecompositionDC svd = new DenseDoubleSingularValueDecompositionDC(A2, true, false);
+        DenseDoubleSingularValueDecomposition svd = new DenseDoubleSingularValueDecomposition(A2, true, false);
         DoubleMatrix2D S = svd.getS();
         DoubleMatrix2D V = svd.getV();
         DoubleMatrix2D U = svd.getU();
