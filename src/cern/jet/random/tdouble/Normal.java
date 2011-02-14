@@ -102,8 +102,8 @@ public class Normal extends AbstractContinousDoubleDistribution {
         if (cacheFilled && this.mean == mean && this.standardDeviation == standardDeviation) {
             cacheFilled = false;
             return cache;
-		}
-		;
+        }
+        ;
 
         double x, y, r, z;
         do {
@@ -113,10 +113,10 @@ public class Normal extends AbstractContinousDoubleDistribution {
         } while (r >= 1.0);
 
         z = Math.sqrt(-2.0 * Math.log(r) / r);
-		if(this.mean == mean && this.standardDeviation == standardDeviation){
-			cache = mean + standardDeviation * x * z;
-			cacheFilled = true;
-		}
+        if(this.mean == mean && this.standardDeviation == standardDeviation){
+                cache = mean + standardDeviation * x * z;
+                cacheFilled = true;
+        }
         return mean + standardDeviation * y * z;
     }
 
