@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: lib/junit.jar lib/arpack-combo.jar lib/netlib-java.jar lib/jplasma.jar lib/jtransforms.jar lib/csparsej.jar lib/optimization.jar
-Main-Class: cern.colt.AllTests
-

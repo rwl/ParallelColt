@@ -1,0 +1,86 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.rwl</groupId>
+  <artifactId>parallelcolt</artifactId>
+  <version>0.9.5-SNAPSHOT</version>
+  <name>ParallelColt</name>
+  <description>Parallel Colt is a multithreaded version of Colt - a library for high performance scientific computing in Java. It contains efficient algorithms for data analysis, linear algebra, multi-dimensional arrays, Fourier transforms, statistics and histogramming.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.rwl</groupId>
+      <artifactId>arpack-combo</artifactId>
+      <version>1.0.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/arpack-combo.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.rwl</groupId>
+      <artifactId>jplasma</artifactId>
+      <version>1.0.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/jplasma.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.rwl</groupId>
+      <artifactId>jtransforms</artifactId>
+      <version>1.0.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/jtransforms.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.rwl</groupId>
+      <artifactId>netlib-java</artifactId>
+      <version>1.0.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/netlib-java.jar</systemPath>
+    </dependency>
+
+    <dependency>
+    	<groupId>net.sourceforge.csparsej</groupId>
+    	<artifactId>csparsej</artifactId>
+    	<version>1.1.1</version>
+    </dependency>
+
+
+    <dependency>
+    	<groupId>com.github.rwl</groupId>
+    	<artifactId>optimization</artifactId>
+    	<version>1.3</version>
+    </dependency>
+    <dependency>
+    	<groupId>junit</groupId>
+    	<artifactId>junit</artifactId>
+    	<version>4.10</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/benchmark/java</source>
+                <source>src/benchmark/resources</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

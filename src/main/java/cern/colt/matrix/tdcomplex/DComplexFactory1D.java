@@ -122,7 +122,7 @@ public class DComplexFactory1D extends cern.colt.PersistentObject {
      * given value.
      */
     public DComplexMatrix1D make(int size, double[] initialValue) {
-        return make(size).assign(initialValue);
+        return make(size).assign(initialValue[0], initialValue[1]);
     }
 
     /**
