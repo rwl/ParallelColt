@@ -5,6 +5,7 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.algo.DComplexProperty;
 import cern.colt.matrix.tdcomplex.impl.SparseCCDComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
+import edu.emory.mathcs.csparsej.tdcomplex.DZcs_common.DZcsa;
 import edu.emory.mathcs.csparsej.tdcomplex.DZcs_happly;
 import edu.emory.mathcs.csparsej.tdcomplex.DZcs_ipvec;
 import edu.emory.mathcs.csparsej.tdcomplex.DZcs_pvec;
@@ -163,7 +164,8 @@ public class SparseDComplexQRDecomposition {
         }
         int mn = Math.min(m, n);
         for (int j = 0; j < mn; j++) {
-            if (R.getQuick(j, j) == 0)
+            double[] jj = R.getQuick(j, j);
+            if (jj[0] == 0 && jj[1] == 0)
                 return false;
         }
         return true;
@@ -189,14 +191,14 @@ public class SparseDComplexQRDecomposition {
         if (!this.hasFullRank()) {
             throw new IllegalArgumentException("Matrix is rank deficient.");
         }
-        double[] x;
+        DZcsa x;
         if (b.isView()) {
-            x = (double[]) b.copy().elements();
+            x = new DZcsa((double[]) b.copy().elements());
         } else {
-            x = (double[]) b.elements();
+            x = new DZcsa((double[]) b.elements());
         }
         if (m >= n) {
-            double[] y = new double[S != null ? S.m2 : 1]; /* get workspace */
+            DZcsa y = new DZcsa(S != null ? S.m2 : 1); /* get workspace */
             DZcs_ipvec.cs_ipvec(S.pinv, x, y, m); /* y(0:m-1) = b(p(0:m-1) */
             for (int k = 0; k < n; k++) /* apply Householder refl. to x */
             {
@@ -205,7 +207,7 @@ public class SparseDComplexQRDecomposition {
             DZcs_usolve.cs_usolve(N.U, y); /* y = R\y */
             DZcs_ipvec.cs_ipvec(S.q, y, x, n); /* x(q(0:n-1)) = y(0:n-1) */
         } else {
-            double[] y = new double[S != null ? S.m2 : 1]; /* get workspace */
+            DZcsa y = new DZcsa(S != null ? S.m2 : 1); /* get workspace */
             DZcs_pvec.cs_pvec(S.q, x, y, m); /* y(q(0:m-1)) = b(0:m-1) */
             DZcs_utsolve.cs_utsolve(N.U, y); /* y = R'\y */
             for (int k = m - 1; k >= 0; k--) /* apply Householder refl. to x */

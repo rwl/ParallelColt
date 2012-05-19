@@ -1,9 +1,9 @@
 /*
 Copyright (C) 1999 CERN - European Organization for Nuclear Research.
-Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
-is hereby granted without fee, provided that the above copyright notice appear in all copies and 
-that both that copyright notice and this permission notice appear in supporting documentation. 
-CERN makes no representations about the suitability of this software for any purpose. 
+Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
+is hereby granted without fee, provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear in supporting documentation.
+CERN makes no representations about the suitability of this software for any purpose.
 It is provided "as is" without expressed or implied warranty.
  */
 package cern.colt.matrix.tdcomplex.algo;
@@ -15,6 +15,8 @@ import java.util.concurrent.Future;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix3D;
+import cern.colt.matrix.tdcomplex.impl.SparseCCDComplexMatrix2D;
+import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
@@ -39,10 +41,10 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * alter their tolerance. Any attempt to do so will throw an Exception.
  * <p>
  * Note that this implementation is not synchronized.
- * 
+ *
  * @author wolfgang.hoschek@cern.ch
  * @version 1.1, 28/May/2000 (fixed strange bugs involving NaN, -inf, inf)
- * 
+ *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 public class DComplexProperty {
@@ -81,7 +83,7 @@ public class DComplexProperty {
 
     /**
      * Sets the tolerance to <tt>Math.abs(newTolerance)</tt>.
-     * 
+     *
      * @throws UnsupportedOperationException
      *             if <tt>this==DEFAULT || this==ZERO || this==TWELVE</tt>.
      */
@@ -99,10 +101,15 @@ public class DComplexProperty {
         return tolerance;
     }
 
+    public void checkSparse(DComplexMatrix2D A) {
+        if (!(A instanceof SparseCCDComplexMatrix2D) && !(A instanceof SparseRCDComplexMatrix2D))
+            throw new IllegalArgumentException("Matrix must be sparse");
+    }
+
     /**
      * Returns whether all cells of the given matrix <tt>A</tt> are equal to the
      * given value.
-     * 
+     *
      * @param A
      *            the first matrix to compare.
      * @param value
@@ -182,7 +189,7 @@ public class DComplexProperty {
 
     /**
      * Returns whether both given matrices <tt>A</tt> and <tt>B</tt> are equal.
-     * 
+     *
      * @param A
      *            the first matrix to compare.
      * @param B
@@ -270,7 +277,7 @@ public class DComplexProperty {
     /**
      * Returns whether all cells of the given matrix <tt>A</tt> are equal to the
      * given value.
-     * 
+     *
      * @param A
      *            the first matrix to compare.
      * @param value
@@ -355,7 +362,7 @@ public class DComplexProperty {
 
     /**
      * Returns whether both given matrices <tt>A</tt> and <tt>B</tt> are equal.
-     * 
+     *
      * @param A
      *            the first matrix to compare.
      * @param B
@@ -448,7 +455,7 @@ public class DComplexProperty {
     /**
      * Returns whether all cells of the given matrix <tt>A</tt> are equal to the
      * given value.
-     * 
+     *
      * @param A
      *            the first matrix to compare.
      * @param value
@@ -538,7 +545,7 @@ public class DComplexProperty {
 
     /**
      * Returns whether both given matrices <tt>A</tt> and <tt>B</tt> are equal.
-     * 
+     *
      * @param A
      *            the first matrix to compare.
      * @param B

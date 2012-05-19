@@ -16,6 +16,8 @@ import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
+import edu.emory.mathcs.csparsej.tdcomplex.DZcs_common.DZcs;
+import edu.emory.mathcs.csparsej.tdcomplex.DZcs_transpose;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -69,6 +71,19 @@ public class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     public SparseCCDComplexMatrix2D(double[][] values) {
         this(values.length, values[0].length);
         assign(values);
+    }
+
+    /**
+     * Constructs a matrix with a given internal storage.
+     * 
+     * @param dzcs
+     *            internal storage.
+     */
+    public SparseCCDComplexMatrix2D(DZcs dzcs) {	
+        this(dzcs.m, dzcs.n);
+        rowIndexes = dzcs.i;
+        columnPointers = dzcs.p;
+        values = dzcs.x;	    
     }
 
     /**
@@ -489,6 +504,30 @@ public class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
      */
     public int[] getRowIndexes() {
         return rowIndexes;
+    }
+
+    @Override
+    public DZcs elements() {
+        DZcs cs = new DZcs();
+        cs.i = rowIndexes ;
+        cs.p = columnPointers;
+        cs.x = values;
+        cs.nz = -1;
+        cs.nzmax = values.length / 2;
+        return cs;
+    }
+
+    /**
+     * Returns a new matrix that is the transpose of this matrix. This method
+     * creates a new object (not a view), so changes in the returned matrix are
+     * NOT reflected in this matrix.
+     * 
+     * @return the transpose of this matrix
+     */
+    public SparseCCDComplexMatrix2D getTranspose() {
+        DZcs dzcst = DZcs_transpose.cs_transpose(elements(), true);
+        SparseCCDComplexMatrix2D tr = new SparseCCDComplexMatrix2D(dzcst);
+        return tr;
     }
 
     public SparseCCDComplexMatrix2D getConjugateTranspose() {
