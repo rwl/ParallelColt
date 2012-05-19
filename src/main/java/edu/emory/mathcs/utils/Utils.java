@@ -49,6 +49,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  *
  * @author Richard Lincoln
  */
+@SuppressWarnings("static-access")
 public class Utils extends Object {
 
 	public static final IntFunctions ifunc = IntFunctions.intFunctions;
@@ -57,8 +58,6 @@ public class Utils extends Object {
 
 	public static final double[] j = {0.0, 1.0};
 
-
-	// singleton
 	public static final Utils util = new Utils();
 
 	/**
@@ -71,7 +70,13 @@ public class Utils extends Object {
 	/**
 	 * Machine epsilon.
 	 */
-	public static final double EPS = 1e-15;
+	public static final double EPS;
+
+	static {
+		double d = 0.5;
+		while (1 + d > 1) d /= 2;
+		EPS = d;
+	}
 
 	/**
 	 *
@@ -533,7 +538,6 @@ public class Utils extends Object {
 	 * @param radians is 'theta' expressed in radians.
 	 * @return complex polar representation.
 	 */
-	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D polar(DoubleMatrix1D r, DoubleMatrix1D theta, boolean radians) {
 		DoubleMatrix1D real = theta.copy();
 		DoubleMatrix1D imag = theta.copy();
@@ -557,7 +561,6 @@ public class Utils extends Object {
 		return polar(r, theta, true);
 	}
 
-	@SuppressWarnings("static-access")
 	public static DComplexMatrix2D polar(DoubleMatrix2D r, DoubleMatrix2D theta, boolean radians) {
 		DoubleMatrix2D real = theta.copy();
 		DoubleMatrix2D imag = theta.copy();
@@ -582,7 +585,6 @@ public class Utils extends Object {
 	 * @param x
 	 * @return [x(1)-x(0)  x(2)-x(1) ... x(n)-x(n-1)]
 	 */
-	@SuppressWarnings("static-access")
 	public static IntMatrix1D diff(IntMatrix1D x) {
 		int size = (int) x.size() -1;
 		IntMatrix1D d = IntFactory1D.dense.make(size);
@@ -596,7 +598,6 @@ public class Utils extends Object {
 	 * @param x
 	 * @return [x(1)-x(0)  x(2)-x(1) ... x(n)-x(n-1)]
 	 */
-	@SuppressWarnings("static-access")
 	public static DoubleMatrix1D diff(DoubleMatrix1D x) {
 		int size = (int) x.size() -1;
 		DoubleMatrix1D d = DoubleFactory1D.dense.make(size);
@@ -735,7 +736,6 @@ public class Utils extends Object {
 	 * @param row_major
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static IntMatrix1D sub2ind(int rows, int cols, IntMatrix1D I, IntMatrix1D J, boolean row_major) {
 		IntMatrix1D ind;
 		if (row_major) {
