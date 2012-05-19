@@ -2,25 +2,69 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.rwl</groupId>
   <artifactId>parallelcolt</artifactId>
-  <version>0.9.5-SNAPSHOT</version>
+  <version>0.9.4-SNAPSHOT</version>
   <name>ParallelColt</name>
   <description>Parallel Colt is a multithreaded version of Colt - a library for high performance scientific computing in Java. It contains efficient algorithms for data analysis, linear algebra, multi-dimensional arrays, Fourier transforms, statistics and histogramming.</description>
+  <url>http://sourceforge.net/projects/parallelcolt/</url>
+
+  <licenses>
+    <license>
+      <comments>packages cern.colt.* cern.jet.* cern.clhep.*</comments>
+      <name>CERN Public License</name>
+      <url>http://acs.lbl.gov/software/colt/license.html</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <comments>packages hep.aida.*</comments>
+      <name>Gnu LGPL</name>
+      <url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <!-- <url>https://parallelcolt.svn.sourceforge.net/svnroot/parallelcolt</url>
+    <connection>scm:svn:https://parallelcolt.svn.sourceforge.net/svnroot/parallelcolt</connection>
+    <developerConnection>scm:svn:https://parallelcolt.svn.sourceforge.net/svnroot/parallelcolt</developerConnection> -->
+    <url>git@github.com:rwl/ParallelColt.git</url>
+    <connection>scm:git:git@github.com:rwl/ParallelColt.git</connection>
+    <developerConnection>scm:git:git@github.com:rwl/ParallelColt.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>wendykierp</id>
+      <name>Piotr Wendykier</name>
+      <email>piotr.wendykier@gmail.com</email>
+    </developer>
+    <developer>
+      <id>vishvas</id>
+      <name>Vishvas Vasuki</name>
+      <email>vishvas@users.sourceforge.net</email>
+    </developer>
+    <developer>
+      <id>rwl</id>
+      <name>Richard Lincoln</name>
+      <email>r.w.lincoln@gmail.com</email>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.github.rwl</groupId>
       <artifactId>jplasma</artifactId>
-      <version>1.0.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/jplasma.jar</systemPath>
+      <version>1.2.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.rwl</groupId>
       <artifactId>jtransforms</artifactId>
-      <version>1.0.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/jtransforms.jar</systemPath>
+      <version>2.4.0</version>
     </dependency>
 
     <dependency>
@@ -70,7 +114,47 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <!-- need this for gpg plugin to work correctly -->
+          <mavenExecutorId>forked-path</mavenExecutorId>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
