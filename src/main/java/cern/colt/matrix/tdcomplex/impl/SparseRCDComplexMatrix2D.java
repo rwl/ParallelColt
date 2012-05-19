@@ -573,6 +573,47 @@ public class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
         return rowPointers;
     }
 
+    /**
+     * Returns a new matrix that is the transpose of this matrix. This method
+     * creates a new object (not a view), so changes in the returned matrix are
+     * NOT reflected in this matrix.
+     * 
+     * @return the transpose of this matrix
+     */
+    public SparseRCDComplexMatrix2D getTranspose() {
+        int nnz = rowPointers[rows];
+        int[] w = new int[columns];
+        int[] rowPointersT = new int[columns + 1];
+        int[] columnIndexesT = new int[nnz];
+        double[] valuesT = new double[2 * nnz];
+
+        for (int p = 0; p < nnz; p++) {
+            w[columnIndexes[p]]++;
+        }
+        cumsum(rowPointersT, w, columns);
+        int q;
+        for (int j = 0; j < rows; j++) {
+            int high = rowPointers[j + 1];
+            for (int p = rowPointers[j]; p < high; p++) {
+                columnIndexesT[q = w[columnIndexes[p]]++] = j;
+                valuesT[2 * q] = values[2 * p];
+                valuesT[2 * q + 1] = values[2 * p + 1];
+            }
+        }
+        SparseRCDComplexMatrix2D T = new SparseRCDComplexMatrix2D(columns, rows);
+        T.rowPointers = rowPointersT;
+        T.columnIndexes = columnIndexesT;
+        T.values = valuesT;
+        return T;
+    }
+
+    /**
+     * Returns a new matrix that is the conjugate transpose of this matrix.
+     * This method creates a new object (not a view), so changes in the
+     * returned matrix are NOT reflected in this matrix.
+     * 
+     * @return the conjugate transpose of this matrix
+     */
     public SparseRCDComplexMatrix2D getConjugateTranspose() {
         int nnz = rowPointers[rows];
         int[] w = new int[columns];

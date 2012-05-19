@@ -12,9 +12,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import cern.colt.matrix.AbstractFormatter;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix3D;
+import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseCCDComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
@@ -69,6 +71,7 @@ public class DComplexProperty {
     /**
      * Not instantiable by no-arg constructor.
      */
+    @SuppressWarnings("unused")
     private DComplexProperty() {
         this(1.0E-9); // just to be on the safe side
     }
@@ -99,6 +102,22 @@ public class DComplexProperty {
      */
     public double tolerance() {
         return tolerance;
+    }
+
+    public void checkDense(DComplexMatrix1D A) {
+        if (!(A instanceof DenseDComplexMatrix1D))
+            throw new IllegalArgumentException("Matrix must be dense");
+    }
+
+    /**
+     * Checks whether the given matrix <tt>A</tt> is <i>square</i>.
+     * 
+     * @throws IllegalArgumentException
+     *             if <tt>A.rows() != A.columns()</tt>.
+     */
+    public void checkSquare(DComplexMatrix2D A) {
+        if (A.rows() != A.columns())
+            throw new IllegalArgumentException("Matrix must be square: " + AbstractFormatter.shape(A));
     }
 
     public void checkSparse(DComplexMatrix2D A) {
