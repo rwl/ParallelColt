@@ -10,7 +10,7 @@ Fourier transforms, statistics and histogramming.
 License and Copyright
 ---------------------
 
-### Packages cern.colt.* , cern.jet.*, cern.clhep.*
+### Packages cern.colt.\* , cern.jet.\* , cern.clhep.\*
 
 Copyright (C) 1999 CERN - European Organization for Nuclear Research.
 
@@ -22,7 +22,7 @@ documentation. CERN makes no representations about the suitability of
 this software for any purpose. It is provided "as is" without expressed
 or implied warranty.
 
-### Packages hep.aida.*
+### Packages hep.aida.\*
 
 Written by Pavel Binko, Dino Ferrero Merlino, Wolfgang Hoschek, Tony
 Johnson, Andreas Pfeiffer, and others. Check the FreeHEP home page for
