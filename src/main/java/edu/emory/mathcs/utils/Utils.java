@@ -57,6 +57,10 @@ public class Utils extends Object {
 	public static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	public static final double[] j = {0.0, 1.0};
+	
+	public static final double[] CZERO = {0.0, 0.0};
+	public static final double[] CONE = {1.0, 0.0};
+	public static final double[] CNEG_ONE = {-1.0, 0.0};
 
 	public static final Utils util = new Utils();
 
@@ -413,6 +417,24 @@ public class Utils extends Object {
 			}
 		}
 		return values;
+	}
+	
+	/**
+	 * 
+	 * @param a
+	 * @return
+	 */
+	public static double max(DoubleMatrix1D a) {
+		return a.aggregate(dfunc.max, dfunc.identity);
+	}
+	
+	/**
+	 * 
+	 * @param a
+	 * @return
+	 */
+	public static double min(DoubleMatrix1D a) {
+		return a.aggregate(dfunc.min, dfunc.identity);
 	}
 
 	/**
