@@ -27,14 +27,16 @@ public class TestSparseDComplexLUDecomposition {
         /* Initialize A1 and A2*/
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                A1.setQuick(i, j, 0.5 - r.nextDouble(), 0.5 - r.nextDouble());
+//                A1.setQuick(i, j, 0.5 - r.nextDouble(), 0.5 - r.nextDouble());
+                A1.setQuick(i, j, 0.5 - r.nextDouble(), 0.0);
                 A2.setQuick(i, j, A1.getQuick(i, j));
             }
         }
 
         /* Initialize B1 and B2 */
         for (int i = 0; i < N; i++) {
-            B1.setQuick(i, 0.5 - r.nextDouble(), 0.5 - r.nextDouble());
+//            B1.setQuick(i, 0.5 - r.nextDouble(), 0.5 - r.nextDouble());
+            B1.setQuick(i, 0.5 - r.nextDouble(), 0.0);
             B2.setQuick(i, B1.getQuick(i));
         }
 
@@ -102,8 +104,8 @@ public class TestSparseDComplexLUDecomposition {
 
         System.out.print("============\n");
         System.out.print("Checking the Residual of the solution \n");
-        System.out.print(String.format("-- ||Ax-B||_oo/((||A||_oo||x||_oo+||B||_oo).N.eps) = %e \n", Rnorm
-                / ((Anorm * Xnorm + Bnorm) * N * eps)));
+        System.out.printf("-- ||Ax-B||_oo/((||A||_oo||x||_oo+||B||_oo).N.eps) = %e \n",
+                        Rnorm / ((Anorm * Xnorm + Bnorm) * N * eps));
 
         if (Rnorm / ((Anorm * Xnorm + Bnorm) * N * eps) > 10.0) {
             System.out.print("-- The solution is suspicious ! \n");

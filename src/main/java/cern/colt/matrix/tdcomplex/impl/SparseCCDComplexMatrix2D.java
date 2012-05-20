@@ -128,6 +128,39 @@ public class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
 
     /**
+     * Constructs a matrix with given parameters. The arrays are not copied.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @param rowIndexes
+     *            row indexes
+     * @param columnPointers
+     *            column pointers
+     * @param values
+     *            numerical values
+     */
+    public SparseCCDComplexMatrix2D(int rows, int columns, int[] rowIndexes, int[] columnPointers, double[] values) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        if (columnPointers.length != columns + 1) {
+            throw new IllegalArgumentException("columnPointers.length != columns + 1");
+        }
+        if (2 * rowIndexes.length != values.length) {
+            throw new IllegalArgumentException("2 * rowIndexes.length != values.length");
+        }
+        this.columnPointers = columnPointers;
+        this.rowIndexes = rowIndexes;
+        this.values = values;
+    }
+
+    /**
      * Constructs a matrix with indexes given in the coordinate format and a
      * single value.
      * 
@@ -509,6 +542,8 @@ public class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     @Override
     public DZcs elements() {
         DZcs cs = new DZcs();
+        cs.m = rows;
+        cs.n = columns;
         cs.i = rowIndexes ;
         cs.p = columnPointers;
         cs.x = values;
