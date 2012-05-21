@@ -50,7 +50,7 @@ public interface SparseDoubleLUDecomposition {
 	 * 
 	 * @return symbolic LU analysis
 	 */
-	public abstract Dcss getSymbolicAnalysis();
+	public abstract Object getSymbolicAnalysis();
 
 	/**
 	 * Returns whether the matrix is nonsingular (has an inverse).

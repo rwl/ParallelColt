@@ -10,7 +10,7 @@ import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-public class TestSparseDoubleLUDecomposition {
+public class TestCSparseDoubleLUDecomposition {
 
     public static void main(String[] args) {
         int N = 180;
@@ -44,14 +44,14 @@ public class TestSparseDoubleLUDecomposition {
         int N = A1.columns();
         double eps = 1e-10;
 
-        SparseDoubleLUDecomposition lu = new SparseDoubleLUDecomposition(A2, 0, true);
+        SparseDoubleLUDecomposition lu = new CSparseDoubleLUDecomposition(A2, 0, true);
         //        DoubleMatrix2D L = lu.getL();
         //        DoubleMatrix2D U = lu.getU();
         DoubleMatrix1D X = B2.copy();
         lu.solve(X);
 
         System.out.print("\n");
-        System.out.print("------ SparseDoubleLUFactorization tests-------  \n");
+        System.out.print("------ CSparseDoubleLUFactorization tests-------  \n");
         System.out.print(String.format("            Size of the Matrix %d by %d\n", M, N));
         System.out.print("\n");
         System.out.print(" The matrix A is randomly generated for each test.\n");
@@ -64,11 +64,11 @@ public class TestSparseDoubleLUDecomposition {
 
         if ((info_solution == 0)) {
             System.out.print("***************************************************\n");
-            System.out.print(" ---- SparseDoubleLUFactorization tests... PASSED !\n");
+            System.out.print(" ---- CSparseDoubleLUFactorization tests... PASSED !\n");
             System.out.print("***************************************************\n");
         } else {
             System.out.print("***************************************************\n");
-            System.out.print(" ---- SparseDoubleLUFactorization tests... FAILED !\n");
+            System.out.print(" ---- CSparseDoubleLUFactorization tests... FAILED !\n");
             System.out.print("***************************************************\n");
         }
     }

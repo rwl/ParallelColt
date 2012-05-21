@@ -215,6 +215,42 @@ public class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
 
     /**
+     * Constructs a matrix with given parameters. The arrays are not copied.
+     * 
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @param rowIndexes
+     *            row indexes
+     * @param columnPointers
+     *            columns pointers
+     * @param values
+     *            numerical values
+     */
+    public SparseCCDoubleMatrix2D(int rows, int columns, int[] rowIndexes, int[] columnPointers, double[] values) {
+        super(null);
+        try {
+            setUp(rows, columns);
+        } catch (IllegalArgumentException exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+            if (!"matrix too large".equals(exc.getMessage()))
+                throw exc;
+        }
+        if (columnPointers.length != columns + 1) {
+            throw new IllegalArgumentException("columnsPointers.length != columns + 1");
+        }
+        Dcs dcs = new Dcs();
+        dcs.m = rows;
+        dcs.n = columns;
+        dcs.i = rowIndexes;
+        dcs.p = columnPointers;
+        dcs.x = values;
+        dcs.nz = -1;  // column-compressed
+        dcs.nzmax = values.length;
+        this.dcs = dcs;
+    }
+
+    /**
      * Constructs a matrix with indexes given in the coordinate format and a
      * single value.
      * 

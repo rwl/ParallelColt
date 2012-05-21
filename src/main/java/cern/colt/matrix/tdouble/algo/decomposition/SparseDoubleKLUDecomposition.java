@@ -1,9 +1,5 @@
 package cern.colt.matrix.tdouble.algo.decomposition;
 
-import static edu.ufl.cise.klu.tdouble.Dklu_analyze.klu_analyze;
-import static edu.ufl.cise.klu.tdouble.Dklu_defaults.klu_defaults;
-import static edu.ufl.cise.klu.tdouble.Dklu_factor.klu_factor;
-import static edu.ufl.cise.klu.tdouble.Dklu_solve.klu_solve;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
@@ -15,13 +11,20 @@ import edu.ufl.cise.klu.common.KLU_common;
 import edu.ufl.cise.klu.common.KLU_numeric;
 import edu.ufl.cise.klu.common.KLU_symbolic;
 
+import static edu.ufl.cise.btf.tdouble.Dbtf_maxtrans.btf_maxtrans;
+import static edu.ufl.cise.klu.tdouble.Dklu_analyze.klu_analyze;
+import static edu.ufl.cise.klu.tdouble.Dklu_defaults.klu_defaults;
+import static edu.ufl.cise.klu.tdouble.Dklu_factor.klu_factor;
+import static edu.ufl.cise.klu.tdouble.Dklu_solve.klu_solve;
+import static edu.ufl.cise.klu.tdouble.Dklu_extract.klu_extract;
+
 /**
  * LU decomposition implemented using JKLU.
  * 
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  */
-public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
+public class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     private KLU_symbolic S;
     private KLU_numeric N;
     private KLU_common Common;
@@ -52,7 +55,7 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
      * @throws IllegalArgumentException
      *             if <tt>order</tt> is not in [0,1]
      */
-    public KLUSparseDoubleLUDecomposition(DoubleMatrix2D A, int order, boolean checkIfSingular, boolean preOrder) {
+    public SparseDoubleKLUDecomposition(DoubleMatrix2D A, int order, boolean checkIfSingular, boolean preOrder) {
         DoubleProperty.DEFAULT.checkSquare(A);
         DoubleProperty.DEFAULT.checkSparse(A);
 
@@ -61,7 +64,7 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
         }
 
 		Common = new KLU_common();
-		klu_defaults (Common);
+		klu_defaults(Common);
 		Common.ordering = order;
 		Common.btf = preOrder ? 1 : 0;
 		
@@ -85,14 +88,15 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
             throw new IllegalArgumentException("Exception occured in klu_factor()");
         }
         if (checkIfSingular) {
-            Dcsd D = Dcs_dmperm.cs_dmperm(dcs, 1); /* check if matrix is singular */
-            if (D != null && D.rr[3] < n) {
+        	/* check if matrix is singular */
+        	int sprank = btf_maxtrans(n, n, Ap, Ai, Common.maxwork, new double[1], new int[n]) ;
+            if (sprank < n) {
                 isNonSingular = false;
             }
         }
     }
     
-    public KLUSparseDoubleLUDecomposition(DoubleMatrix2D A, int order, boolean checkIfSingular) {
+    public SparseDoubleKLUDecomposition(DoubleMatrix2D A, int order, boolean checkIfSingular) {
     	this(A, order, checkIfSingular, true);
     }
 
@@ -104,15 +108,12 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
             return 0; // avoid rounding errors
         int pivsign = 1;
         for (int i = 0; i < n; i++) {
-            if (N.pinv[i] != i) {
+            if (N.Pinv[i] != i) {
                 pivsign = -pivsign;
             }
         }
         if (U == null) {
-            U = new SparseCCDoubleMatrix2D(N.U);
-            if (rcMatrix) {
-                U = ((SparseCCDoubleMatrix2D) U).getRowCompressed();
-            }
+            U = getU();
         }
         double det = pivsign;
         for (int j = 0; j < n; j++) {
@@ -126,7 +127,11 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
 	 */
     public DoubleMatrix2D getL() {
         if (L == null) {
-            L = new SparseCCDoubleMatrix2D(N.L);
+            int[] Lp = new int[N.lnz + 1];
+            int[] Li = new int[N.lnz];
+            double[] Lx = new double[N.lnz];
+        	klu_extract(N, S, Lp, Li, Lx, null, null, null, null, null, null, null, null, null, null, Common);
+            L = new SparseCCDoubleMatrix2D(n, n, Li, Lp, Lx);
             if (rcMatrix) {
                 L = ((SparseCCDoubleMatrix2D) L).getRowCompressed();
             }
@@ -138,10 +143,10 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
 	 * @see cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition#getPivot()
 	 */
     public int[] getPivot() {
-        if (N.pinv == null)
+        if (N.Pinv == null)
             return null;
-        int[] pinv = new int[N.pinv.length];
-        System.arraycopy(N.pinv, 0, pinv, 0, pinv.length);
+        int[] pinv = new int[N.Pinv.length];
+        System.arraycopy(N.Pinv, 0, pinv, 0, pinv.length);
         return pinv;
     }
 
@@ -150,7 +155,11 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
 	 */
     public DoubleMatrix2D getU() {
         if (U == null) {
-            U = new SparseCCDoubleMatrix2D(N.U);
+            int[] Up = new int[N.unz + 1];
+            int[] Ui = new int[N.unz];
+            double[] Ux = new double[N.unz];
+            klu_extract(N, S, null, null, null, Up, Ui, Ux, null, null, null, null, null, null, null, Common);
+            U = new SparseCCDoubleMatrix2D(n, n, Ui, Up, Ux);
             if (rcMatrix) {
                 U = ((SparseCCDoubleMatrix2D) U).getRowCompressed();
             }
@@ -162,15 +171,23 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
 	 * @see cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition#getSymbolicAnalysis()
 	 */
     public KLU_symbolic getSymbolicAnalysis() {
-        Dcss S2 = new Dcss();
-        S2.cp = S.cp != null ? S.cp.clone() : null;
-        S2.leftmost = S.leftmost != null ? S.leftmost.clone() : null;
-        S2.lnz = S.lnz;
-        S2.m2 = S.m2;
-        S2.parent = S.parent != null ? S.parent.clone() : null;
-        S2.pinv = S.pinv != null ? S.pinv.clone() : null;
-        S2.q = S.q != null ? S.q.clone() : null;
-        S2.unz = S.unz;
+    	KLU_symbolic S2 = new KLU_symbolic();
+    	S2.symmetry = S.symmetry;
+    	S2.est_flops = S.est_flops;
+    	S2.lnz = S.lnz;
+    	S2.unz = S.unz;
+    	S2.Lnz = S.Lnz.clone();
+    	S2.n = S.n;
+    	S2.nz = S.nz;
+    	S2.nzoff = S.nzoff;
+    	S2.nblocks = S.nblocks;
+    	S2.maxblock = S.maxblock;
+    	S2.ordering = S.ordering;
+    	S2.do_btf = S.do_btf;
+    	S2.P = S.P.clone();
+    	S2.Q = S.Q.clone();
+    	S2.R = S.R.clone();
+    	S2.structural_rank = S.structural_rank;
         return S2;
     }
 
@@ -192,7 +209,6 @@ public class KLUSparseDoubleLUDecomposition implements SparseDoubleLUDecompositi
             throw new IllegalArgumentException("A is singular");
         }
         DoubleProperty.DEFAULT.checkDense(b);
-        double[] y = new double[n];
         double[] x;
         if (b.isView()) {
             x = (double[]) b.copy().elements();
