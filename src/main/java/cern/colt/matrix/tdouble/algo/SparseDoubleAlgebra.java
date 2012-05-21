@@ -10,6 +10,7 @@ package cern.colt.matrix.tdouble.algo;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.algo.decomposition.CSparseDoubleLUDecomposition;
 import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleCholeskyDecomposition;
 import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition;
 import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleQRDecomposition;
@@ -141,7 +142,7 @@ public class SparseDoubleAlgebra {
      * @return the LU-decomposition of the given matrix
      */
     public SparseDoubleLUDecomposition lu(DoubleMatrix2D matrix, int order) {
-        return new SparseDoubleLUDecomposition(matrix, order, true);
+        return new CSparseDoubleLUDecomposition(matrix, order, true);
     }
 
     /**
