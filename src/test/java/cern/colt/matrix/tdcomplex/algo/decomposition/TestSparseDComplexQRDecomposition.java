@@ -4,14 +4,14 @@ import java.util.Random;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
-import cern.colt.matrix.tdcomplex.algo.DenseDComplexAlgebra;
 import cern.colt.matrix.tdcomplex.algo.DComplexProperty;
-import cern.colt.matrix.tdcomplex.algo.SparseDComplexAlgebra;
 import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
-
-import static edu.emory.mathcs.utils.Utils.CONE;
-import static edu.emory.mathcs.utils.Utils.CNEG_ONE;
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
+import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
 public class TestSparseDComplexQRDecomposition {
     public static void main(String[] args) {
@@ -28,14 +28,14 @@ public class TestSparseDComplexQRDecomposition {
         /* Initialize A1 and A2*/
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
-                A1.setQuick(i, j, 0.5 - r.nextDouble(), 0.5 - r.nextDouble());
+                A1.setQuick(i, j, 0.5 - r.nextDouble(), 0.0);  // TODO: test complex part
                 A2.setQuick(i, j, A1.getQuick(i, j));
             }
         }
 
         /* Initialize B1 and B2 */
         for (int i = 0; i < MN; i++) {
-            B1.setQuick(i, 0.5 - r.nextDouble(), 0.5 - r.nextDouble());
+            B1.setQuick(i, 0.5 - r.nextDouble(), 0.0);  // TODO: test complex part
             B2.setQuick(i, B1.getQuick(i));
         }
 
@@ -78,30 +78,34 @@ public class TestSparseDComplexQRDecomposition {
         DComplexProperty.DEFAULT.checkSparse(A1);
         DComplexProperty.DEFAULT.checkDense(B1);
         DComplexProperty.DEFAULT.checkDense(B2);
-        int M = A1.rows();
         int N = A1.columns();
         int info_solution;
         double Rnorm, Anorm, Xnorm, Bnorm;
-        double[] alpha, beta;
+        double alpha, beta;
 
-        alpha = CONE;
-        beta = CNEG_ONE;
+        alpha = 1;
+        beta = -1;
 
-        Xnorm = DenseDComplexAlgebra.DEFAULT.normInfinity(B2);
-        Anorm = SparseDComplexAlgebra.DEFAULT.normInfinity(A1);
-        Bnorm = DenseDComplexAlgebra.DEFAULT.normInfinity(B1);
+        // TODO: test complex part
+        DoubleMatrix2D AA1 = new SparseRCDoubleMatrix2D(A1.getRealPart().toArray());
+        DoubleMatrix1D BB1 = B1.getRealPart();
+        DoubleMatrix1D BB2 = B2.getRealPart();
+
+        Xnorm = DenseDoubleAlgebra.DEFAULT.normInfinity(BB2);
+        Anorm = SparseDoubleAlgebra.DEFAULT.normInfinity(AA1);
+        Bnorm = DenseDoubleAlgebra.DEFAULT.normInfinity(BB1);
 
         //B1 = A1*B2 - B1;
-        A1.zMult(B2, B1, alpha, beta, false);
+        AA1.zMult(BB2, BB1, alpha, beta, false);
 
-        DComplexMatrix1D Residual = A1.zMult(B1.viewPart(0, A1.rows()).copy(), null, alpha, beta, true);
+        DoubleMatrix1D Residual = AA1.zMult(BB1.viewPart(0, A1.rows()).copy(), null, alpha, beta, true);
 
-        Rnorm = DenseDComplexAlgebra.DEFAULT.normInfinity(Residual);
+        Rnorm = DenseDoubleAlgebra.DEFAULT.normInfinity(Residual);
 
         System.out.print("============\n");
         System.out.print("Checking the Residual of the solution \n");
-        System.out.print(String.format("-- ||Ax-B||_oo/((||A||_oo||x||_oo+||B||_oo).N.eps) = %e \n", Rnorm
-                / ((Anorm * Xnorm + Bnorm) * N * eps)));
+        System.out.printf("-- ||Ax-B||_oo/((||A||_oo||x||_oo+||B||_oo).N.eps) = %e \n",
+                Rnorm / ((Anorm * Xnorm + Bnorm) * N * eps));
 
         if (Rnorm / ((Anorm * Xnorm + Bnorm) * N * eps) > 10.0) {
             System.out.print("-- The solution is suspicious ! \n");

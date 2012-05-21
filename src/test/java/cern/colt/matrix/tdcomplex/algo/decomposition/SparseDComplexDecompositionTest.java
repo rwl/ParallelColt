@@ -5,7 +5,7 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseCCDComplexMatrix2D;
 
-public class SparseDComplexLUDecompositionTest {
+public class SparseDComplexDecompositionTest {
 
 	private static int N = 5 ;
 	private static int [ ] Ap = {0, 2, 5, 9, 10, 12} ;
@@ -18,14 +18,17 @@ public class SparseDComplexLUDecompositionTest {
 	 */
 	public static void main(String[] args) {
 
-	        DComplexMatrix2D A = new SparseCCDComplexMatrix2D(N, N, Ap, Ai, Ax);
-	        DComplexMatrix1D B = new DenseDComplexMatrix1D(b);
+	        DComplexMatrix2D A = new SparseCCDComplexMatrix2D(N, N, Ai, Ap, Ax);
+	        DComplexMatrix1D Blu = new DenseDComplexMatrix1D(b);
+	        DComplexMatrix1D Bqr = new DenseDComplexMatrix1D(b);
 
 	        SparseDComplexLUDecomposition lu = new SparseDComplexLUDecomposition(A, 0, true);
-
-	        lu.solve(B);
+	        lu.solve(Blu);
+	        System.out.println(Blu.toString());
 	        
-	        System.out.print(B.toString());
+	        SparseDComplexQRDecomposition qr = new SparseDComplexQRDecomposition(A, 0);
+	        qr.solve(Bqr);
+	        System.out.println(Bqr);
 	}
 
 }
