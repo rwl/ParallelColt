@@ -57,7 +57,7 @@ public class Utils extends Object {
 	public static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	public static final double[] j = {0.0, 1.0};
-	
+
 	public static final double[] CZERO = {0.0, 0.0};
 	public static final double[] CONE = {1.0, 0.0};
 	public static final double[] CNEG_ONE = {-1.0, 0.0};
@@ -418,18 +418,18 @@ public class Utils extends Object {
 		}
 		return values;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param a
 	 * @return
 	 */
 	public static double max(DoubleMatrix1D a) {
 		return a.aggregate(dfunc.max, dfunc.identity);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param a
 	 * @return
 	 */
@@ -778,6 +778,21 @@ public class Utils extends Object {
 	public static DoubleMatrix1D append(DoubleMatrix1D x, double a) {
 		int n = (int) x.size();
 		DoubleMatrix1D y = DoubleFactory1D.dense.make(n + 1);
+		y.viewPart(0, n).assign(x);
+		y.setQuick(n, a);
+		return y;
+	}
+
+	/**
+	 * Appends a value to the given matrix.
+	 *
+	 * @param x input matrix of length n
+	 * @param a value to append
+	 * @return new matrix of length n + 1
+	 */
+	public static IntMatrix1D append(IntMatrix1D x, int a) {
+		int n = (int) x.size();
+		IntMatrix1D y = IntFactory1D.dense.make(n + 1);
 		y.viewPart(0, n).assign(x);
 		y.setQuick(n, a);
 		return y;
