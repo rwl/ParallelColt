@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.rwl</groupId>
+  <groupId>net.sourceforge.parallelcolt</groupId>
   <artifactId>parallelcolt</artifactId>
-  <version>0.9.5-SNAPSHOT</version>
+  <version>0.10.0-SNAPSHOT</version>
   <name>ParallelColt</name>
   <description>Parallel Colt is a multithreaded version of Colt - a library for high performance scientific computing in Java. It contains efficient algorithms for data analysis, linear algebra, multi-dimensional arrays, Fourier transforms, statistics and histogramming.</description>
   <url>http://sourceforge.net/projects/parallelcolt/</url>
@@ -56,13 +56,13 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.rwl</groupId>
+      <groupId>net.sourceforge.jplasma</groupId>
       <artifactId>jplasma</artifactId>
       <version>1.2.0</version>
     </dependency>
 
     <dependency>
-      <groupId>com.github.rwl</groupId>
+      <groupId>net.sourceforge.jtransforms</groupId>
       <artifactId>jtransforms</artifactId>
       <version>2.4.0</version>
     </dependency>
@@ -74,9 +74,9 @@
     </dependency>
 
     <dependency>
-    	<groupId>com.github.rwl</groupId>
+    	<groupId>net.sourceforge.parallelcolt</groupId>
     	<artifactId>optimization</artifactId>
-    	<version>1.3</version>
+    	<version>1.0</version>
     </dependency>
 
     <dependency>
@@ -99,13 +99,13 @@
 
   <build>
     <plugins>
-       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-compiler-plugin</artifactId>
-         <configuration>
-           <source>1.5</source>
-           <target>1.5</target>
-         </configuration>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
       </plugin>
       
       <plugin>
