@@ -98,6 +98,7 @@
     	<groupId>junit</groupId>
     	<artifactId>junit</artifactId>
     	<version>4.10</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -150,7 +151,7 @@
             <id>add-source</id>
             <phase>generate-sources</phase>
             <goals>
-              <goal>add-source</goal>
+              <goal>add-test-source</goal>
             </goals>
             <configuration>
               <sources>
