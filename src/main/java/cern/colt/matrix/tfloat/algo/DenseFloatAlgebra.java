@@ -35,7 +35,7 @@ import cern.colt.matrix.tint.impl.DenseIntMatrix1D;
 import cern.colt.matrix.tint.impl.DenseIntMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;
 import cern.jet.math.tint.IntFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Linear algebraic matrix operations operating on dense matrices.

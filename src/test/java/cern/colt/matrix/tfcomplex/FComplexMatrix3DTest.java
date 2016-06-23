@@ -9,7 +9,7 @@ import cern.colt.matrix.tfloat.FloatFactory3D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
 import cern.jet.math.tfcomplex.FComplex;
 import cern.jet.math.tfcomplex.FComplexFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public abstract class FComplexMatrix3DTest extends TestCase {
 

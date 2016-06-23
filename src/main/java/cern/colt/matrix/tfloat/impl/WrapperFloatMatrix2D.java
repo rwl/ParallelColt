@@ -15,7 +15,7 @@ import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tfcomplex.impl.DenseLargeFComplexMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * 2-d matrix holding <tt>float</tt> elements; either a view wrapping another

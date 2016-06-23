@@ -16,7 +16,7 @@ import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix3D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix3D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Sparse hashed 3-d matrix holding <tt>complex</tt> elements. This

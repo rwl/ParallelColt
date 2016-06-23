@@ -18,11 +18,11 @@ import cern.colt.matrix.tfcomplex.impl.DenseFComplexMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
-import edu.emory.mathcs.jtransforms.dct.FloatDCT_1D;
-import edu.emory.mathcs.jtransforms.dht.FloatDHT_1D;
-import edu.emory.mathcs.jtransforms.dst.FloatDST_1D;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import org.jtransforms.dct.FloatDCT_1D;
+import org.jtransforms.dht.FloatDHT_1D;
+import org.jtransforms.dst.FloatDST_1D;
+import org.jtransforms.fft.FloatFFT_1D;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 1-d matrix (aka <i>vector</i>) holding <tt>float</tt> elements. First

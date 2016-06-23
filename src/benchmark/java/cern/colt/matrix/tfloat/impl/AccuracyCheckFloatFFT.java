@@ -3,7 +3,7 @@ package cern.colt.matrix.tfloat.impl;
 import java.util.Random;
 
 import cern.colt.matrix.tfcomplex.impl.DenseFComplexMatrix1D;
-import edu.emory.mathcs.utils.IOUtils;
+import edu.emory.mathcs.utils.pc.IOUtils;
 
 /**
  * Accuracy check of float precision FFT's

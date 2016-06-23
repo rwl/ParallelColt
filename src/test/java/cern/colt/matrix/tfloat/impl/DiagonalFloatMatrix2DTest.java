@@ -7,7 +7,7 @@ import cern.colt.matrix.tfloat.FloatMatrix1DProcedure;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix2DTest;
 import cern.jet.math.tfloat.FloatFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class DiagonalFloatMatrix2DTest extends FloatMatrix2DTest {
 

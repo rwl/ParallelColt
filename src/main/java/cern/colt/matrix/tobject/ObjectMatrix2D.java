@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.list.tobject.ObjectArrayList;
 import cern.colt.matrix.AbstractMatrix2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Abstract base class for 2-d matrices holding <tt>Object</tt> elements. First

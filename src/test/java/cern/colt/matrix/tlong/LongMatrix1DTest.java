@@ -10,7 +10,7 @@ import cern.colt.function.tlong.LongProcedure;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.list.tlong.LongArrayList;
 import cern.jet.math.tlong.LongFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public abstract class LongMatrix1DTest extends TestCase {
     /**

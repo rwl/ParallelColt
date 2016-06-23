@@ -8,7 +8,7 @@ import cern.colt.matrix.tfcomplex.AllFComplexMatrixTests;
 import cern.colt.matrix.tfloat.AllFloatMatrixTests;
 import cern.colt.matrix.tint.AllIntMatrixTests;
 import cern.colt.matrix.tlong.AllLongMatrixTests;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class AllTests {
 

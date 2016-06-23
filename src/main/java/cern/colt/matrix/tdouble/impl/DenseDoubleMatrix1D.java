@@ -18,11 +18,13 @@ import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
-import edu.emory.mathcs.jtransforms.dct.DoubleDCT_1D;
-import edu.emory.mathcs.jtransforms.dht.DoubleDHT_1D;
-import edu.emory.mathcs.jtransforms.dst.DoubleDST_1D;
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+
+import org.jtransforms.dct.DoubleDCT_1D;
+import org.jtransforms.dht.DoubleDHT_1D;
+import org.jtransforms.dst.DoubleDST_1D;
+import org.jtransforms.fft.DoubleFFT_1D;
+
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 1-d matrix (aka <i>vector</i>) holding <tt>double</tt> elements. First

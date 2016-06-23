@@ -15,7 +15,7 @@ import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix3D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
 import cern.colt.matrix.tfloat.impl.DenseLargeFloatMatrix3D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * 3-d matrix holding <tt>complex</tt> elements; either a view wrapping another

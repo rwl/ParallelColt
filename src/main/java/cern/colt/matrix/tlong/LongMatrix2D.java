@@ -19,7 +19,7 @@ import cern.colt.list.tlong.LongArrayList;
 import cern.colt.matrix.AbstractMatrix2D;
 import cern.colt.matrix.tlong.impl.DenseLongMatrix1D;
 import cern.colt.matrix.tlong.impl.DenseLongMatrix2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Abstract base class for 2-d matrices holding <tt>int</tt> elements. First see

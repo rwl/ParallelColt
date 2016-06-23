@@ -18,11 +18,11 @@ import cern.colt.matrix.tfcomplex.impl.DenseFComplexMatrix3D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
-import edu.emory.mathcs.jtransforms.dct.FloatDCT_3D;
-import edu.emory.mathcs.jtransforms.dht.FloatDHT_3D;
-import edu.emory.mathcs.jtransforms.dst.FloatDST_3D;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_3D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import org.jtransforms.dct.FloatDCT_3D;
+import org.jtransforms.dht.FloatDHT_3D;
+import org.jtransforms.dst.FloatDST_3D;
+import org.jtransforms.fft.FloatFFT_3D;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 3-d matrix holding <tt>float</tt> elements. First see the <a

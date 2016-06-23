@@ -13,6 +13,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.jtransforms.dct.DoubleDCT_2D;
+import org.jtransforms.dht.DoubleDHT_2D;
+import org.jtransforms.dst.DoubleDST_2D;
+import org.jtransforms.fft.DoubleFFT_2D;
+
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.io.MatrixInfo;
@@ -21,11 +26,7 @@ import cern.colt.matrix.io.MatrixVectorReader;
 import cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import edu.emory.mathcs.jtransforms.dct.DoubleDCT_2D;
-import edu.emory.mathcs.jtransforms.dht.DoubleDHT_2D;
-import edu.emory.mathcs.jtransforms.dst.DoubleDST_2D;
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 2-d matrix holding <tt>double</tt> elements. First see the <a

@@ -17,7 +17,7 @@ import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Abstract base class for 2-d matrices holding <tt>complex</tt> elements.

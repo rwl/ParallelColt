@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Diagonal 2-d matrix holding <tt>complex</tt> elements. First see the <a
