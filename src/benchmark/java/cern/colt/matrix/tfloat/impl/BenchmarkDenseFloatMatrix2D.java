@@ -17,7 +17,7 @@ import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class BenchmarkDenseFloatMatrix2D {
 

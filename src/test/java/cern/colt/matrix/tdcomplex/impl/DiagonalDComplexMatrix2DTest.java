@@ -11,7 +11,7 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 

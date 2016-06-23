@@ -11,7 +11,7 @@ import cern.colt.matrix.tfloat.FloatFactory2D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.jet.math.tfcomplex.FComplex;
 import cern.jet.math.tfcomplex.FComplexFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class DiagonalFComplexMatrix2DTest extends FComplexMatrix2DTest {
 

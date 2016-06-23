@@ -23,7 +23,7 @@ import edu.emory.mathcs.csparsej.tdouble.Dcs_multiply;
 import edu.emory.mathcs.csparsej.tdouble.Dcs_transpose;
 import edu.emory.mathcs.csparsej.tdouble.Dcs_util;
 import edu.emory.mathcs.csparsej.tdouble.Dcs_common.Dcs;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Sparse column-compressed 2-d matrix holding <tt>double</tt> elements. First

@@ -9,7 +9,7 @@ import cern.colt.matrix.tfloat.FloatFactory1D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.jet.math.tfcomplex.FComplex;
 import cern.jet.math.tfcomplex.FComplexFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public abstract class FComplexMatrix1DTest extends TestCase {
     /**

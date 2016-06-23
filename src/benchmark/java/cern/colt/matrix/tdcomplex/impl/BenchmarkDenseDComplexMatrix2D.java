@@ -18,7 +18,7 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdcomplex.DComplex;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class BenchmarkDenseDComplexMatrix2D {
 

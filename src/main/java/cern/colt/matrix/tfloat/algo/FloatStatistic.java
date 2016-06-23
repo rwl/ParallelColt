@@ -20,7 +20,7 @@ import cern.colt.matrix.tfloat.FloatMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix3D;
 import cern.jet.math.tfloat.FloatFunctions;
 import cern.jet.random.tfloat.engine.FloatRandomEngine;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Basic statistics operations on matrices. Computation of covariance,

@@ -20,7 +20,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.random.tdouble.engine.DoubleRandomEngine;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Basic statistics operations on matrices. Computation of covariance,

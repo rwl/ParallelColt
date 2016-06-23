@@ -23,7 +23,7 @@ import cern.colt.matrix.tfloat.impl.SparseCCFloatMatrix2D;
 import cern.colt.matrix.tfloat.impl.SparseFloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.SparseRCFloatMatrix2D;
 import cern.jet.math.tfloat.FloatFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Tests matrices for linear algebraic properties (equality, tridiagonality,

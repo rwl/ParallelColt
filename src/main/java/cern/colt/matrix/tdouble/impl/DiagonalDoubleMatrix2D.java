@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Diagonal 2-d matrix holding <tt>double</tt> elements. First see the <a

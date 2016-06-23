@@ -5,7 +5,7 @@ import cern.colt.function.tdouble.DoubleProcedure;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.jet.math.tdouble.DoubleFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public abstract class DoubleMatrix3DTest extends TestCase {
     /**

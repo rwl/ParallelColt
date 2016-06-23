@@ -28,11 +28,11 @@ import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
 import cern.colt.matrix.tfcomplex.impl.DenseFComplexMatrix2D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.FloatMatrix2D;
-import edu.emory.mathcs.jtransforms.dct.FloatDCT_2D;
-import edu.emory.mathcs.jtransforms.dht.FloatDHT_2D;
-import edu.emory.mathcs.jtransforms.dst.FloatDST_2D;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import org.jtransforms.dct.FloatDCT_2D;
+import org.jtransforms.dht.FloatDHT_2D;
+import org.jtransforms.dst.FloatDST_2D;
+import org.jtransforms.fft.FloatFFT_2D;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 2-d matrix holding <tt>float</tt> elements. First see the <a

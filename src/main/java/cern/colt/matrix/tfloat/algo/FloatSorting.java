@@ -977,7 +977,7 @@ public class FloatSorting extends cern.colt.PersistentObject {
     }
 
     public static void main(String[] args) {
-        edu.emory.mathcs.utils.ConcurrencyUtils.setNumberOfThreads(2);
+        edu.emory.mathcs.utils.pc.ConcurrencyUtils.setNumberOfThreads(2);
         zdemo8(10000000);
         System.exit(0);
     }

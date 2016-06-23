@@ -17,7 +17,7 @@ import cern.colt.function.tfloat.FloatComparator;
 import cern.colt.function.tint.IntComparator;
 import cern.colt.function.tlong.LongComparator;
 import cern.colt.function.tshort.ShortComparator;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Quicksorts, mergesorts and binary searches; complements

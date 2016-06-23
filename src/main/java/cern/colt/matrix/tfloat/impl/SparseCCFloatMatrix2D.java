@@ -23,7 +23,7 @@ import edu.emory.mathcs.csparsej.tfloat.Scs_multiply;
 import edu.emory.mathcs.csparsej.tfloat.Scs_transpose;
 import edu.emory.mathcs.csparsej.tfloat.Scs_util;
 import edu.emory.mathcs.csparsej.tfloat.Scs_common.Scs;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Sparse column-compressed 2-d matrix holding <tt>float</tt> elements. First

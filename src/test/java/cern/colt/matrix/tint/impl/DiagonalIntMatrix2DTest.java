@@ -6,7 +6,7 @@ import cern.colt.matrix.tint.IntMatrix1DProcedure;
 import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.IntMatrix2DTest;
 import cern.jet.math.tint.IntFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class DiagonalIntMatrix2DTest extends IntMatrix2DTest {
 

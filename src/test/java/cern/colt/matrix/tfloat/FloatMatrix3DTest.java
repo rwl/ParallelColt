@@ -5,7 +5,7 @@ import cern.colt.function.tfloat.FloatProcedure;
 import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.jet.math.tfloat.FloatFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public abstract class FloatMatrix3DTest extends TestCase {
     /**

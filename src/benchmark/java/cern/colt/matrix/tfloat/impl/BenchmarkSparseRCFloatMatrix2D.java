@@ -9,7 +9,7 @@ import cern.colt.Timer;
 import cern.colt.matrix.io.MatrixVectorReader;
 import cern.colt.matrix.tfloat.FloatFactory1D;
 import cern.colt.matrix.tfloat.FloatMatrix1D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class BenchmarkSparseRCFloatMatrix2D {
     private static final Timer t = new Timer();

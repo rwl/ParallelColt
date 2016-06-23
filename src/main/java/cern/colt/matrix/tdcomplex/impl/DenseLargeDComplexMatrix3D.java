@@ -11,9 +11,9 @@ package cern.colt.matrix.tdcomplex.impl;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix3D;
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_2D;
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import org.jtransforms.fft.DoubleFFT_2D;
+import org.jtransforms.fft.DoubleFFT_3D;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 3-d matrix holding <tt>complex</tt> elements.<br>

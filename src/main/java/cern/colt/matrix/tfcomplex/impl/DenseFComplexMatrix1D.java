@@ -13,6 +13,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.jtransforms.fft.FloatFFT_1D;
+
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tfcomplex.FComplexMatrix1D;
 import cern.colt.matrix.tfcomplex.FComplexMatrix2D;
@@ -21,8 +23,7 @@ import cern.colt.matrix.tfloat.FloatMatrix1D;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.jet.math.tfcomplex.FComplex;
 import cern.jet.math.tfcomplex.FComplexFunctions;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 1-d matrix (aka <i>vector</i>) holding <tt>complex</tt> elements.

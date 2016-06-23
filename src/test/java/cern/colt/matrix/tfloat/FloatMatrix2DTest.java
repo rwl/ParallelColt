@@ -9,7 +9,7 @@ import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tfloat.impl.DenseFloatMatrix1D;
 import cern.jet.math.tfloat.FloatFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public abstract class FloatMatrix2DTest extends TestCase {
     /**

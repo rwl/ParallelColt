@@ -8,7 +8,7 @@ import cern.colt.function.tint.IntProcedure;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tint.impl.DenseIntMatrix1D;
 import cern.jet.math.tint.IntFunctions;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public abstract class IntMatrix2DTest extends TestCase {
     /**

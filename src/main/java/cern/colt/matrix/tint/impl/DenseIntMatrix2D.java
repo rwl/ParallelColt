@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.IntMatrix2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 2-d matrix holding <tt>int</tt> elements. First see the <a

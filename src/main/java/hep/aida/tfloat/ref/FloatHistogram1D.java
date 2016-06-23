@@ -5,7 +5,7 @@ import hep.aida.tfloat.FloatIHistogram1D;
 
 import java.util.concurrent.Future;
 
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * A reference implementation of hep.aida.IHistogram1D. The goal is to provide a

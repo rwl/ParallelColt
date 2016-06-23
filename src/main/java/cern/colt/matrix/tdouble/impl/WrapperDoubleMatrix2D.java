@@ -15,7 +15,7 @@ import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdcomplex.impl.DenseLargeDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * 2-d matrix holding <tt>double</tt> elements; either a view wrapping another

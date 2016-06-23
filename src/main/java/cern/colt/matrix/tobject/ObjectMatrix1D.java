@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.list.tobject.ObjectArrayList;
 import cern.colt.matrix.AbstractMatrix1D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding

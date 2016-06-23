@@ -9,7 +9,7 @@ import cern.colt.Timer;
 import cern.colt.matrix.io.MatrixVectorReader;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 public class BenchmarkSparseCCDoubleMatrix2D {
     private static final Timer t = new Timer();

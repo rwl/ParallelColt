@@ -15,7 +15,7 @@ import cern.colt.function.tlong.LongProcedure;
 import cern.colt.list.tfloat.FloatArrayList;
 import cern.colt.list.tlong.LongArrayList;
 import cern.colt.map.AbstractMap;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Abstract base class for hash maps holding (key,value) associations of type

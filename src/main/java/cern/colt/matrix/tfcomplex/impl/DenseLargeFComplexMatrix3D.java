@@ -10,10 +10,11 @@ package cern.colt.matrix.tfcomplex.impl;
 
 import java.util.concurrent.Future;
 
+import org.jtransforms.fft.FloatFFT_2D;
+import org.jtransforms.fft.FloatFFT_3D;
+
 import cern.colt.matrix.tfcomplex.FComplexMatrix3D;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_2D;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_3D;
-import edu.emory.mathcs.utils.ConcurrencyUtils;
+import edu.emory.mathcs.utils.pc.ConcurrencyUtils;
 
 /**
  * Dense 3-d matrix holding <tt>complex</tt> elements.<br>
