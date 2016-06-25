@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sourceforge.parallelcolt</groupId>
   <artifactId>parallelcolt</artifactId>
-  <version>0.11.1-SNAPSHOT</version>
+  <version>0.11.2-SNAPSHOT</version>
   <name>ParallelColt</name>
   <description>Parallel Colt is a multithreaded version of Colt - a library for high performance scientific computing in Java. It contains efficient algorithms for data analysis, linear algebra, multi-dimensional arrays, Fourier transforms, statistics and histogramming.</description>
   <url>http://sourceforge.net/projects/parallelcolt/</url>
@@ -176,7 +176,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.4</version>
+        <version>2.8.1</version>
         <configuration>
           <doctitle>&lt;h2&gt;&lt;a target=_top href=${project.url} &gt;Parallel Colt&lt;/a&gt; &lt;/h2&gt;&lt;h4&gt;Open Source Libraries for High Performance Scientific and Technical Computing in Java&lt;/h4&gt;&lt;hr&gt;</doctitle>
           <show>public</show>
@@ -187,6 +187,7 @@
           <windowtitle>Parallel Colt ${project.version} - API Specification</windowtitle>
           <header>&lt;b&gt;Parallel Colt ${project.version}&lt;/b&gt;</header>
           <bottom>&lt;font size=-1 &gt;Jump to the &lt;a target=_top href=${project.url} &gt;Parallel Colt Homepage&lt;/a&gt;</bottom>
+          <failOnError>false</failOnError>
         </configuration>
       </plugin>
     </plugins>
